@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Xml.Linq;
+using AtomUI.City.Testing.Processes;
 using AtomUI.City.Templates;
 
 namespace AtomUI.City.TemplateSmokeTests;
@@ -556,37 +557,28 @@ public sealed class ApplicationTemplateBuildSmokeTests
         string nugetPackagesPath,
         params string[] arguments)
     {
-        var startInfo = new ProcessStartInfo("dotnet")
+        var environment = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            WorkingDirectory = workingDirectory,
-            RedirectStandardError = true,
-            RedirectStandardOutput = true,
+            ["DOTNET_CLI_USE_MSBUILD_SERVER"] = "0",
+            ["MSBUILDDISABLENODEREUSE"] = "1",
+            ["NUGET_PACKAGES"] = nugetPackagesPath,
+            ["UseSharedCompilation"] = "false",
         };
-        startInfo.Environment["DOTNET_CLI_USE_MSBUILD_SERVER"] = "0";
-        startInfo.Environment["MSBUILDDISABLENODEREUSE"] = "1";
-        startInfo.Environment["NUGET_PACKAGES"] = nugetPackagesPath;
-        startInfo.Environment["UseSharedCompilation"] = "false";
 
-        foreach (var argument in arguments)
-        {
-            startInfo.ArgumentList.Add(argument);
-        }
-
-        using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Could not start dotnet.");
-        var stdoutTask = process.StandardOutput.ReadToEndAsync();
-        var stderrTask = process.StandardError.ReadToEndAsync();
-        await process.WaitForExitAsync();
-        var stdout = await stdoutTask;
-        var stderr = await stderrTask;
-
+        var result = await ProcessTestRunner.RunAsync(
+            "dotnet",
+            workingDirectory,
+            TimeSpan.FromMinutes(5),
+            environment,
+            arguments);
         Assert.True(
-            process.ExitCode == 0,
+            result.ExitCode == 0,
             $"""
-            dotnet {string.Join(' ', arguments)} failed with exit code {process.ExitCode}.
+            dotnet {string.Join(' ', arguments)} failed with exit code {result.ExitCode}.
             STDOUT:
-            {stdout}
+            {result.StandardOutput}
             STDERR:
-            {stderr}
+            {result.StandardError}
             """);
     }
 

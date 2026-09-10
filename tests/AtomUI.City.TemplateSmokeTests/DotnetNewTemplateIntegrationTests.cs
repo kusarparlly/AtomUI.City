@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO.Compression;
+using AtomUI.City.Testing.Processes;
 
 namespace AtomUI.City.TemplateSmokeTests;
 
@@ -134,42 +135,24 @@ public sealed class DotnetNewTemplateIntegrationTests
         string dotnetHome,
         params string[] arguments)
     {
-        var startInfo = new ProcessStartInfo("dotnet")
+        var environment = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
-            WorkingDirectory = workingDirectory,
-            RedirectStandardError = true,
-            RedirectStandardOutput = true,
+            ["DOTNET_CLI_HOME"] = dotnetHome,
+            ["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1",
+            ["DOTNET_NOLOGO"] = "1",
+            ["DOTNET_CLI_USE_MSBUILD_SERVER"] = "0",
+            ["MSBUILDDISABLENODEREUSE"] = "1",
         };
-        startInfo.Environment["DOTNET_CLI_HOME"] = dotnetHome;
-        startInfo.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1";
-        startInfo.Environment["DOTNET_NOLOGO"] = "1";
-        startInfo.Environment["DOTNET_CLI_USE_MSBUILD_SERVER"] = "0";
-        startInfo.Environment["MSBUILDDISABLENODEREUSE"] = "1";
 
-        foreach (var argument in arguments)
-        {
-            startInfo.ArgumentList.Add(argument);
-        }
-
-        using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Could not start dotnet.");
-        var stdoutTask = process.StandardOutput.ReadToEndAsync();
-        var stderrTask = process.StandardError.ReadToEndAsync();
-        using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(2));
-        try
-        {
-            await process.WaitForExitAsync(timeout.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            process.Kill(entireProcessTree: true);
-            throw new TimeoutException($"dotnet {string.Join(' ', arguments)} timed out.");
-        }
-
-        var stdout = await stdoutTask;
-        var stderr = await stderrTask;
+        var result = await ProcessTestRunner.RunAsync(
+            "dotnet",
+            workingDirectory,
+            TimeSpan.FromMinutes(2),
+            environment,
+            arguments);
         Assert.True(
-            process.ExitCode == 0,
-            $"dotnet {string.Join(' ', arguments)} failed.\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}");
+            result.ExitCode == 0,
+            $"dotnet {string.Join(' ', arguments)} failed.\nSTDOUT:\n{result.StandardOutput}\nSTDERR:\n{result.StandardError}");
     }
 
     private static DirectoryInfo FindRepositoryRoot()

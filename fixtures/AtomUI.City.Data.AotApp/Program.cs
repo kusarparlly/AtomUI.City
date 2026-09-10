@@ -1,4 +1,5 @@
 using AtomUI.City.Data;
+using AtomUI.City.Fixtures;
 
 namespace AtomUI.City.Data.AotApp;
 
@@ -15,7 +16,12 @@ public sealed record AotReply(int Value);
 
 internal static class Program
 {
-    public static async Task<int> Main()
+    public static Task<int> Main()
+    {
+        return ProcessEntryPoint.RunAsync(RunAsync);
+    }
+
+    private static async Task<int> RunAsync()
     {
         var catalog = new DataClientDescriptorCatalog();
         catalog.RegisterGenerated<

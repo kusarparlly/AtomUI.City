@@ -20,6 +20,7 @@
     <ProjectReference Include="../../src/AtomUI.City.Data/AtomUI.City.Data.csproj" />
     <ProjectReference Include="../../fixtures/AtomUI.City.Data.HeadlessApp/AtomUI.City.Data.HeadlessApp.csproj"
                       ReferenceOutputAssembly="false" />
+    <Compile Include="../Shared/ProcessTestRunner.cs" Link="ProcessTestRunner.cs" />
   </ItemGroup>
 
 </Project>

@@ -21,6 +21,22 @@ internal static class ProcessTestRunner
         TimeSpan timeout,
         params string[] arguments)
     {
+        return await RunAsync(
+                fileName,
+                workingDirectory,
+                timeout,
+                environment: null,
+                arguments)
+            .ConfigureAwait(false);
+    }
+
+    public static async Task<TestProcessResult> RunAsync(
+        string fileName,
+        string? workingDirectory,
+        TimeSpan timeout,
+        IReadOnlyDictionary<string, string?>? environment,
+        params string[] arguments)
+    {
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
         ArgumentNullException.ThrowIfNull(arguments);
 
@@ -41,6 +57,20 @@ internal static class ProcessTestRunner
         startInfo.Environment["DOTNET_CLI_DO_NOT_USE_MSBUILD_SERVER"] = "1";
         startInfo.Environment["DOTNET_CLI_UI_LANGUAGE"] = "en-US";
         startInfo.Environment["MSBUILDDISABLENODEREUSE"] = "1";
+        if (environment is not null)
+        {
+            foreach (var entry in environment)
+            {
+                if (entry.Value is null)
+                {
+                    startInfo.Environment.Remove(entry.Key);
+                }
+                else
+                {
+                    startInfo.Environment[entry.Key] = entry.Value;
+                }
+            }
+        }
 
         using var process = new Process { StartInfo = startInfo };
         StartWithoutWindowsErrorDialog(process);

@@ -1,6 +1,7 @@
 using System.Net;
 using AtomUI.City.Data;
 using AtomUI.City.Data.HeadlessApp.Grpc;
+using AtomUI.City.Fixtures;
 using Google.Protobuf;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -14,8 +15,19 @@ internal static class Program
 {
     private const string GrpcServiceName = "datafixture.DataProbe";
 
-    public static async Task<int> Main()
+    public static Task<int> Main(string[] args)
     {
+        return ProcessEntryPoint.RunAsync(() => RunAsync(args));
+    }
+
+    private static async Task<int> RunAsync(string[] args)
+    {
+        if (args.Contains("--expected-failure", StringComparer.Ordinal))
+        {
+            throw new InvalidOperationException("DATA_HEADLESS_EXPECTED_FAILURE");
+        }
+
+        ConfigureLoopbackProxyBypass();
         var descriptorCatalog = new DataClientDescriptorCatalog();
         descriptorCatalog.RegisterGenerated<
             global::AtomUI.City.Generated.GeneratedDataClientRegistrar_AtomUI_City_Data_HeadlessApp_247672EF>();
@@ -81,7 +93,7 @@ internal static class Program
 
     private static async Task VerifyHttpPipelineAsync(Uri endpoint)
     {
-        using var httpClient = new HttpClient { BaseAddress = endpoint };
+        using var httpClient = CreateLoopbackHttpClient(endpoint);
         using var pipeline = new DataRequestPipeline(
             new HttpDataTransport(new FixedHttpClientFactory(httpClient)));
         var requests = Enumerable.Range(0, 100).Select(async value =>
@@ -93,14 +105,18 @@ internal static class Program
                 _ => new HttpRequestMessage(HttpMethod.Get, $"/api/echo/{value}"),
                 async (response, token) => int.Parse(await response.Content.ReadAsStringAsync(token)));
             var result = await pipeline.SendAsync(request);
-            Ensure(result.Succeeded && result.Value == value + 1, "HTTP pipeline returned an invalid result.");
+            Ensure(
+                result.Succeeded && result.Value == value + 1,
+                $"HTTP pipeline returned an invalid result for value {value}: " +
+                $"{result.Status}/{result.Error?.Kind}/{result.Error?.Message}/" +
+                $"{result.Error?.Exception?.GetType().FullName}.");
         });
         await Task.WhenAll(requests);
     }
 
     private static async Task VerifyLargePayloadAsync(Uri endpoint, byte[] payload)
     {
-        using var httpClient = new HttpClient { BaseAddress = endpoint };
+        using var httpClient = CreateLoopbackHttpClient(endpoint);
         var client = new DataLargePayloadClient(httpClient);
         await using var destination = new MemoryStream();
         using var download = new HttpRequestMessage(HttpMethod.Get, "/api/payload");
@@ -310,6 +326,33 @@ internal static class Program
         var port = ((IPEndPoint)listener.LocalEndpoint).Port;
         listener.Stop();
         return port;
+    }
+
+    private static HttpClient CreateLoopbackHttpClient(Uri endpoint)
+    {
+        return new HttpClient(new SocketsHttpHandler { UseProxy = false })
+        {
+            BaseAddress = endpoint,
+        };
+    }
+
+    private static void ConfigureLoopbackProxyBypass()
+    {
+        AddLoopbackProxyBypass("NO_PROXY");
+        if (!OperatingSystem.IsWindows())
+        {
+            AddLoopbackProxyBypass("no_proxy");
+        }
+    }
+
+    private static void AddLoopbackProxyBypass(string variableName)
+    {
+        const string loopbackHosts = "localhost,127.0.0.1,::1";
+        var current = Environment.GetEnvironmentVariable(variableName);
+        var value = string.IsNullOrWhiteSpace(current)
+            ? loopbackHosts
+            : $"{current},{loopbackHosts}";
+        Environment.SetEnvironmentVariable(variableName, value);
     }
 
     private static void Ensure(bool condition, string message)

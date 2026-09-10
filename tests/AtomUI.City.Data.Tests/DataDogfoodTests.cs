@@ -1,48 +1,65 @@
-using System.Diagnostics;
+using AtomUI.City.Testing.Processes;
 
 namespace AtomUI.City.Data.Tests;
 
 public sealed class DataDogfoodTests
 {
+    private static readonly IReadOnlyDictionary<string, string?> InvalidProxyEnvironment =
+        new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["HTTP_PROXY"] = "http://127.0.0.1:1",
+            ["HTTPS_PROXY"] = "http://127.0.0.1:1",
+            ["ALL_PROXY"] = "http://127.0.0.1:1",
+            ["NO_PROXY"] = null,
+            ["no_proxy"] = null,
+        };
+
     [Fact]
     public async Task RealLocalHttpGrpcAndSignalRFixturePasses()
     {
-        var assembly = Path.Combine(
+        var assembly = GetFixtureAssembly();
+        Assert.True(File.Exists(assembly), $"Headless fixture was not built: {assembly}");
+
+        var result = await ProcessTestRunner.RunAsync(
+            "dotnet",
+            Path.GetDirectoryName(assembly),
+            TimeSpan.FromSeconds(45),
+            InvalidProxyEnvironment,
+            assembly);
+
+        Assert.True(
+            result.ExitCode == 0,
+            $"Fixture failed with exit code {result.ExitCode}.{Environment.NewLine}{result.StandardError}");
+        Assert.Contains("DATA_HEADLESS_OK", result.StandardOutput, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task HeadlessFixtureConvertsUnhandledFailureToStableProcessResult()
+    {
+        var assembly = GetFixtureAssembly();
+        Assert.True(File.Exists(assembly), $"Headless fixture was not built: {assembly}");
+
+        var result = await ProcessTestRunner.RunAsync(
+            "dotnet",
+            Path.GetDirectoryName(assembly),
+            TimeSpan.FromSeconds(15),
+            environment: null,
+            assembly,
+            "--expected-failure");
+
+        Assert.Equal(1, result.ExitCode);
+        Assert.Contains("DATA_HEADLESS_EXPECTED_FAILURE", result.StandardError, StringComparison.Ordinal);
+        Assert.DoesNotContain("Unhandled exception.", result.StandardError, StringComparison.Ordinal);
+    }
+
+    private static string GetFixtureAssembly()
+    {
+        return Path.GetFullPath(Path.Combine(
             AppContext.BaseDirectory,
             "..",
             "..",
             "AtomUI.City.Data.HeadlessApp",
             "net10.0",
-            "AtomUI.City.Data.HeadlessApp.dll");
-        assembly = Path.GetFullPath(assembly);
-        Assert.True(File.Exists(assembly), $"Headless fixture was not built: {assembly}");
-
-        using var process = Process.Start(new ProcessStartInfo
-        {
-            FileName = "dotnet",
-            Arguments = $"\"{assembly}\"",
-            WorkingDirectory = Path.GetDirectoryName(assembly)!,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-        }) ?? throw new InvalidOperationException("Data headless fixture process could not be started.");
-        var outputTask = process.StandardOutput.ReadToEndAsync();
-        var errorTask = process.StandardError.ReadToEndAsync();
-        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-        try
-        {
-            await process.WaitForExitAsync(timeout.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            process.Kill(entireProcessTree: true);
-            throw new TimeoutException("Data headless fixture did not complete within 30 seconds.");
-        }
-
-        var output = await outputTask;
-        var error = await errorTask;
-        Assert.True(process.ExitCode == 0, $"Fixture failed with exit code {process.ExitCode}.{Environment.NewLine}{error}");
-        Assert.Contains("DATA_HEADLESS_OK", output, StringComparison.Ordinal);
+            "AtomUI.City.Data.HeadlessApp.dll"));
     }
 }
