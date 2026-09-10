@@ -1,4 +1,6 @@
 using AtomUI.City.Core.Lifecycle;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 
 namespace AtomUI.City.Presentation;
 
@@ -9,6 +11,17 @@ public interface IPresentationRuntime
     bool IsReady { get; }
 
     LifecycleScope? PresentationScope { get; }
+
+    IApplicationLifetime? ApplicationLifetime { get; }
+
+    IReadOnlyCollection<WindowSession> Windows { get; }
+
+    void Attach(
+        IApplicationLifetime applicationLifetime,
+        LifecycleScope hostScope,
+        string presentationScopeId = "presentation");
+
+    WindowSession RegisterWindow(Window window, string windowId);
 
     ValueTask StartAsync(
         LifecycleScope applicationScope,

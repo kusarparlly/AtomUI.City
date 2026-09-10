@@ -18,7 +18,7 @@ public sealed class PackageMetadataTests
         Assert.Equal("AtomUI.City is a full-stack application framework for Avalonia and AtomUI applications.", properties["Description"]);
         Assert.Equal("avalonia;AtomUI;full-stack;framework;desktop", properties["PackageTags"]);
         Assert.Equal("https://github.com/AtomUI/AtomUI.City", properties["ProjectUrl"]);
-        Assert.False(properties.ContainsKey("RepositoryUrl"));
+        Assert.Equal("https://github.com/AtomUI/AtomUI.City", properties["RepositoryUrl"]);
         Assert.Equal("true", properties["PublishRepositoryUrl"]);
         Assert.Equal("LGPL-3.0-only", properties["PackageLicenseExpression"]);
         Assert.Equal("$(AtomUICityVersion)", properties["Version"]);

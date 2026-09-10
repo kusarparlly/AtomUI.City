@@ -1,0 +1,662 @@
+#nullable enable
+AtomUI.City.Presentation.ActivePluginView
+AtomUI.City.Presentation.ActivePluginView.ActivePluginView(string! pluginId, AtomUI.City.Presentation.IRouteOutlet! outlet, AtomUI.City.Presentation.BoundViewHandle! handle, string? contributionId = null) -> void
+AtomUI.City.Presentation.ActivePluginView.ContributionId.get -> string?
+AtomUI.City.Presentation.ActivePluginView.Handle.get -> AtomUI.City.Presentation.BoundViewHandle!
+AtomUI.City.Presentation.ActivePluginView.Outlet.get -> AtomUI.City.Presentation.IRouteOutlet!
+AtomUI.City.Presentation.ActivePluginView.PluginId.get -> string!
+AtomUI.City.Presentation.ActivePluginViewRegistry
+AtomUI.City.Presentation.ActivePluginViewRegistry.ActivePluginViewRegistry() -> void
+AtomUI.City.Presentation.ActivePluginViewRegistry.ActivePluginViewRegistry(AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Presentation.ActivePluginViewRegistry.ActiveViews.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Presentation.ActivePluginView!>!
+AtomUI.City.Presentation.ActivePluginViewRegistry.CloseContributionViewsAsync(string! contributionId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<int>
+AtomUI.City.Presentation.ActivePluginViewRegistry.ClosePluginViewsAsync(string! pluginId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<int>
+AtomUI.City.Presentation.ActivePluginViewRegistry.Track(AtomUI.City.Presentation.ActivePluginView! view) -> AtomUI.City.Presentation.IActivePluginViewLease!
+AtomUI.City.Presentation.ActivePluginViewRegistryServiceCollectionExtensions
+AtomUI.City.Presentation.AvaloniaRouteOutletTarget
+AtomUI.City.Presentation.AvaloniaRouteOutletTarget.AvaloniaRouteOutletTarget(Avalonia.Controls.ContentControl! control) -> void
+AtomUI.City.Presentation.AvaloniaRouteOutletTarget.Content.get -> object?
+AtomUI.City.Presentation.AvaloniaRouteOutletTarget.SetContent(object? content) -> void
+AtomUI.City.Presentation.AvaloniaUiDispatcher
+AtomUI.City.Presentation.AvaloniaUiDispatcher.AvaloniaUiDispatcher() -> void
+AtomUI.City.Presentation.AvaloniaUiDispatcher.AvaloniaUiDispatcher(AtomUI.City.Presentation.IPresentationRuntime! runtime) -> void
+AtomUI.City.Presentation.AvaloniaUiDispatcher.AvaloniaUiDispatcher(Avalonia.Threading.Dispatcher! dispatcher) -> void
+AtomUI.City.Presentation.AvaloniaUiDispatcher.AvaloniaUiDispatcher(Avalonia.Threading.Dispatcher! dispatcher, AtomUI.City.Presentation.IPresentationRuntime? runtime) -> void
+AtomUI.City.Presentation.AvaloniaUiDispatcher.AvaloniaUiDispatcher(Avalonia.Threading.Dispatcher! dispatcher, AtomUI.City.Presentation.IPresentationRuntime? runtime, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Presentation.AvaloniaUiDispatcher.CheckAccess() -> bool
+AtomUI.City.Presentation.AvaloniaUiDispatcher.InvokeAsync(System.Action! callback, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.AvaloniaUiDispatcher.InvokeAsync<T>(System.Func<T>! callback, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<T>
+AtomUI.City.Presentation.AvaloniaUiDispatcher.PostAsync(System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>! callback, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.AvaloniaUiDispatcherServiceCollectionExtensions
+AtomUI.City.Presentation.BoundViewHandle
+AtomUI.City.Presentation.BoundViewHandle.Descriptor.get -> AtomUI.City.Presentation.ViewDescriptor?
+AtomUI.City.Presentation.BoundViewHandle.Dispose() -> void
+AtomUI.City.Presentation.BoundViewHandle.IsDisposed.get -> bool
+AtomUI.City.Presentation.BoundViewHandle.View.get -> object!
+AtomUI.City.Presentation.BoundViewHandle.ViewModel.get -> object!
+AtomUI.City.Presentation.CommandBinding
+AtomUI.City.Presentation.CommandBinding.BindAsync(System.Windows.Input.ICommand! command, AtomUI.City.Presentation.IUiCommandSource! source, AtomUI.City.Mvvm.IActivationScope! activationScope, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.ICommandBindingHandle!>
+AtomUI.City.Presentation.CommandBinding.BindAsync(System.Windows.Input.ICommand! command, AtomUI.City.Presentation.IUiCommandSource! source, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.ICommandBindingHandle!>
+AtomUI.City.Presentation.CommandBinding.CommandBinding(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher) -> void
+AtomUI.City.Presentation.CommandBinding.CommandBinding(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Presentation.DefaultViewModelFactory
+AtomUI.City.Presentation.DefaultViewModelFactory.AcquireAsync(AtomUI.City.Presentation.ViewModelAcquisitionRequest! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.ViewModelLease!>
+AtomUI.City.Presentation.DefaultViewModelFactory.DefaultViewModelFactory() -> void
+AtomUI.City.Presentation.IActivePluginViewLease
+AtomUI.City.Presentation.IActivePluginViewLease.View.get -> AtomUI.City.Presentation.ActivePluginView!
+AtomUI.City.Presentation.IActivePluginViewRegistry
+AtomUI.City.Presentation.IActivePluginViewRegistry.ActiveViews.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Presentation.ActivePluginView!>!
+AtomUI.City.Presentation.IActivePluginViewRegistry.CloseContributionViewsAsync(string! contributionId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<int>
+AtomUI.City.Presentation.IActivePluginViewRegistry.ClosePluginViewsAsync(string! pluginId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<int>
+AtomUI.City.Presentation.IActivePluginViewRegistry.Track(AtomUI.City.Presentation.ActivePluginView! view) -> AtomUI.City.Presentation.IActivePluginViewLease!
+AtomUI.City.Presentation.ICommandBindingHandle
+AtomUI.City.Presentation.ICommandBindingHandle.RefreshAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.IInteractionHandlerRegistry
+AtomUI.City.Presentation.IInteractionHandlerRegistry.GetModalQueueSnapshot(string? windowId = null) -> AtomUI.City.Presentation.PresentationQueueSnapshot!
+AtomUI.City.Presentation.IInteractionHandlerRegistry.HandleAsync<TRequest, TResult>(TRequest request, AtomUI.City.Presentation.InteractionDispatchContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Mvvm.InteractionResult<TResult>!>
+AtomUI.City.Presentation.IInteractionHandlerRegistry.HandleAsync<TRequest, TResult>(TRequest request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Mvvm.InteractionResult<TResult>!>
+AtomUI.City.Presentation.IInteractionHandlerRegistry.Register<TRequest, TResult>(System.Func<AtomUI.City.Mvvm.InteractionContext<TRequest>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<TResult>>! handler, AtomUI.City.Mvvm.IActivationScope? activationScope = null) -> System.IDisposable!
+AtomUI.City.Presentation.IInteractionHandlerRegistry.Register<TRequest, TResult>(System.Func<AtomUI.City.Mvvm.InteractionContext<TRequest>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<TResult>>! handler, AtomUI.City.Presentation.InteractionHandlerRegistrationOptions! options) -> System.IDisposable!
+AtomUI.City.Presentation.IInteractionHandlerRegistry.RevokeContribution(string! contributionId) -> int
+AtomUI.City.Presentation.IInteractionHandlerRegistry.RevokePlugin(string! pluginId) -> int
+AtomUI.City.Presentation.InteractionDispatchContext
+AtomUI.City.Presentation.InteractionDispatchContext.<Clone>$() -> AtomUI.City.Presentation.InteractionDispatchContext!
+AtomUI.City.Presentation.InteractionDispatchContext.ActivationScope.get -> AtomUI.City.Mvvm.IActivationScope?
+AtomUI.City.Presentation.InteractionDispatchContext.ActivationScope.init -> void
+AtomUI.City.Presentation.InteractionDispatchContext.Deconstruct(out string? WindowId, out string? RouteId, out AtomUI.City.Mvvm.IActivationScope? ActivationScope, out bool IsModal) -> void
+AtomUI.City.Presentation.InteractionDispatchContext.Equals(AtomUI.City.Presentation.InteractionDispatchContext? other) -> bool
+AtomUI.City.Presentation.InteractionDispatchContext.InteractionDispatchContext(string? WindowId = null, string? RouteId = null, AtomUI.City.Mvvm.IActivationScope? ActivationScope = null, bool IsModal = true) -> void
+AtomUI.City.Presentation.InteractionDispatchContext.IsModal.get -> bool
+AtomUI.City.Presentation.InteractionDispatchContext.IsModal.init -> void
+AtomUI.City.Presentation.InteractionDispatchContext.RouteId.get -> string?
+AtomUI.City.Presentation.InteractionDispatchContext.RouteId.init -> void
+AtomUI.City.Presentation.InteractionDispatchContext.WindowId.get -> string?
+AtomUI.City.Presentation.InteractionDispatchContext.WindowId.init -> void
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.ActivationScope.get -> AtomUI.City.Mvvm.IActivationScope?
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.ActivationScope.init -> void
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.ContributionId.get -> string?
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.ContributionId.init -> void
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.InteractionHandlerRegistrationOptions() -> void
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.PluginId.get -> string?
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.PluginId.init -> void
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.RouteId.get -> string?
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.RouteId.init -> void
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.Scope.get -> AtomUI.City.Presentation.InteractionHandlerScope
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.Scope.init -> void
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.WindowId.get -> string?
+AtomUI.City.Presentation.InteractionHandlerRegistrationOptions.WindowId.init -> void
+AtomUI.City.Presentation.InteractionHandlerRegistry
+AtomUI.City.Presentation.InteractionHandlerRegistry.GetModalQueueSnapshot(string? windowId = null) -> AtomUI.City.Presentation.PresentationQueueSnapshot!
+AtomUI.City.Presentation.InteractionHandlerRegistry.HandleAsync<TRequest, TResult>(TRequest request, AtomUI.City.Presentation.InteractionDispatchContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Mvvm.InteractionResult<TResult>!>
+AtomUI.City.Presentation.InteractionHandlerRegistry.HandleAsync<TRequest, TResult>(TRequest request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Mvvm.InteractionResult<TResult>!>
+AtomUI.City.Presentation.InteractionHandlerRegistry.InteractionHandlerRegistry(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher) -> void
+AtomUI.City.Presentation.InteractionHandlerRegistry.InteractionHandlerRegistry(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Presentation.InteractionHandlerRegistry.InteractionHandlerRegistry(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics, AtomUI.City.Presentation.PresentationQueueOptions? queueOptions) -> void
+AtomUI.City.Presentation.InteractionHandlerRegistry.Register<TRequest, TResult>(System.Func<AtomUI.City.Mvvm.InteractionContext<TRequest>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<TResult>>! handler, AtomUI.City.Mvvm.IActivationScope? activationScope = null) -> System.IDisposable!
+AtomUI.City.Presentation.InteractionHandlerRegistry.Register<TRequest, TResult>(System.Func<AtomUI.City.Mvvm.InteractionContext<TRequest>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<TResult>>! handler, AtomUI.City.Presentation.InteractionHandlerRegistrationOptions! options) -> System.IDisposable!
+AtomUI.City.Presentation.InteractionHandlerRegistry.RevokeContribution(string! contributionId) -> int
+AtomUI.City.Presentation.InteractionHandlerRegistry.RevokePlugin(string! pluginId) -> int
+AtomUI.City.Presentation.InteractionHandlerScope
+AtomUI.City.Presentation.InteractionHandlerScope.Activation = 3 -> AtomUI.City.Presentation.InteractionHandlerScope
+AtomUI.City.Presentation.InteractionHandlerScope.Presentation = 0 -> AtomUI.City.Presentation.InteractionHandlerScope
+AtomUI.City.Presentation.InteractionHandlerScope.Route = 2 -> AtomUI.City.Presentation.InteractionHandlerScope
+AtomUI.City.Presentation.InteractionHandlerScope.Window = 1 -> AtomUI.City.Presentation.InteractionHandlerScope
+AtomUI.City.Presentation.IPresentationFailurePresenter
+AtomUI.City.Presentation.IPresentationFailurePresenter.PresentAsync(AtomUI.City.Presentation.PresentationFailure! failure, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.IPresentationPluginUnloadCoordinator
+AtomUI.City.Presentation.IPresentationPluginUnloadCoordinator.CleanupAsync(AtomUI.City.Presentation.PresentationPluginUnloadRequest! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.PresentationPluginUnloadResult!>
+AtomUI.City.Presentation.IPresentationResourceDictionaryRevoker
+AtomUI.City.Presentation.IPresentationResourceDictionaryRevoker.RevokeAsync(AtomUI.City.Presentation.PresentationResourceDictionaryRevocation! revocation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.PresentationResourceDictionaryRevokeResult!>
+AtomUI.City.Presentation.IPresentationResourceDictionaryTarget
+AtomUI.City.Presentation.IPresentationResourceDictionaryTarget.RevokeResourcesAsync(AtomUI.City.Presentation.PresentationResourceDictionaryRevocation! revocation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.IPresentationResourceLease
+AtomUI.City.Presentation.IPresentationResourceLease.Contribution.get -> AtomUI.City.Presentation.PresentationResourceContribution!
+AtomUI.City.Presentation.IPresentationResourceRegistry
+AtomUI.City.Presentation.IPresentationResourceRegistry.Contributions.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Presentation.PresentationResourceContribution!>!
+AtomUI.City.Presentation.IPresentationResourceRegistry.Register(AtomUI.City.Presentation.PresentationResourceContribution! contribution) -> AtomUI.City.Presentation.IPresentationResourceLease!
+AtomUI.City.Presentation.IPresentationResourceRegistry.RevokeContribution(string! contributionId) -> int
+AtomUI.City.Presentation.IPresentationResourceRegistry.RevokePlugin(string! pluginId) -> int
+AtomUI.City.Presentation.IPresentationRuntime
+AtomUI.City.Presentation.IPresentationRuntime.ApplicationLifetime.get -> Avalonia.Controls.ApplicationLifetimes.IApplicationLifetime?
+AtomUI.City.Presentation.IPresentationRuntime.Attach(Avalonia.Controls.ApplicationLifetimes.IApplicationLifetime! applicationLifetime, AtomUI.City.Core.Lifecycle.LifecycleScope! hostScope, string! presentationScopeId = "presentation") -> void
+AtomUI.City.Presentation.IPresentationRuntime.CreateWindowScope(string! windowScopeId) -> AtomUI.City.Core.Lifecycle.LifecycleScope!
+AtomUI.City.Presentation.IPresentationRuntime.IsReady.get -> bool
+AtomUI.City.Presentation.IPresentationRuntime.PresentationScope.get -> AtomUI.City.Core.Lifecycle.LifecycleScope?
+AtomUI.City.Presentation.IPresentationRuntime.RegisterWindow(Avalonia.Controls.Window! window, string! windowId) -> AtomUI.City.Presentation.WindowSession!
+AtomUI.City.Presentation.IPresentationRuntime.StartAsync(AtomUI.City.Core.Lifecycle.LifecycleScope! applicationScope, string! presentationScopeId = "presentation", System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.IPresentationRuntime.State.get -> AtomUI.City.Presentation.PresentationRuntimeState
+AtomUI.City.Presentation.IPresentationRuntime.StopAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.IPresentationRuntime.Windows.get -> System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Presentation.WindowSession!>!
+AtomUI.City.Presentation.IRouteOutlet
+AtomUI.City.Presentation.IRouteOutlet.CommitAsync(AtomUI.City.Presentation.RouteOutletCommitPlan! plan, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.RouteOutletCommitResult!>
+AtomUI.City.Presentation.IRouteOutlet.CurrentContent.get -> object?
+AtomUI.City.Presentation.IRouteOutlet.CurrentEntry.get -> AtomUI.City.Presentation.PresentationEntry?
+AtomUI.City.Presentation.IRouteOutlet.Name.get -> string!
+AtomUI.City.Presentation.IRouteOutlet.QueueSnapshot.get -> AtomUI.City.Presentation.PresentationQueueSnapshot!
+AtomUI.City.Presentation.IRouteOutlet.State.get -> AtomUI.City.Presentation.RouteOutletState
+AtomUI.City.Presentation.IRouteOutletTarget
+AtomUI.City.Presentation.IRouteOutletTarget.Content.get -> object?
+AtomUI.City.Presentation.IRouteOutletTarget.SetContent(object? content) -> void
+AtomUI.City.Presentation.IUiCommandSource
+AtomUI.City.Presentation.IUiCommandSource.ApplyCommandState(AtomUI.City.Presentation.UiCommandState! state) -> void
+AtomUI.City.Presentation.IUiCommandSource.CommandParameter.get -> object?
+AtomUI.City.Presentation.IUiCommandSource.ExecuteRequested -> System.EventHandler?
+AtomUI.City.Presentation.IValidationVisualStateTarget
+AtomUI.City.Presentation.IValidationVisualStateTarget.ApplyValidationState(AtomUI.City.Presentation.ValidationVisualStateSnapshot! snapshot) -> void
+AtomUI.City.Presentation.IViewDataContextAware
+AtomUI.City.Presentation.IViewDataContextAware.DataContext.get -> object?
+AtomUI.City.Presentation.IViewDataContextAware.DataContext.set -> void
+AtomUI.City.Presentation.IViewLocator
+AtomUI.City.Presentation.IViewLocator.Locate(AtomUI.City.Presentation.ViewLookupRequest! request) -> AtomUI.City.Presentation.ViewDescriptor!
+AtomUI.City.Presentation.IViewLocator.Locate(System.Type! viewModelType, string? viewKey = null) -> AtomUI.City.Presentation.ViewDescriptor!
+AtomUI.City.Presentation.IViewLocator.TryLocate(AtomUI.City.Presentation.ViewLookupRequest! request, out AtomUI.City.Presentation.ViewDescriptor? descriptor) -> bool
+AtomUI.City.Presentation.IViewLocator.TryLocate(System.Type! viewModelType, string? viewKey, out AtomUI.City.Presentation.ViewDescriptor? descriptor) -> bool
+AtomUI.City.Presentation.IViewModelFactory
+AtomUI.City.Presentation.IViewModelFactory.AcquireAsync(AtomUI.City.Presentation.ViewModelAcquisitionRequest! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.ViewModelLease!>
+AtomUI.City.Presentation.IViewRegistry
+AtomUI.City.Presentation.IViewRegistry.Register(AtomUI.City.Presentation.ViewDescriptor! descriptor) -> void
+AtomUI.City.Presentation.IViewRegistry.RegisterManifest(System.Collections.Generic.IEnumerable<AtomUI.City.Presentation.ViewDescriptor!>! descriptors) -> void
+AtomUI.City.Presentation.IViewRegistry.RevokeContribution(string! contributionId) -> int
+AtomUI.City.Presentation.IViewRegistry.RevokePlugin(string! pluginId) -> int
+AtomUI.City.Presentation.NullPresentationFailurePresenter
+AtomUI.City.Presentation.NullPresentationFailurePresenter.NullPresentationFailurePresenter() -> void
+AtomUI.City.Presentation.NullPresentationFailurePresenter.PresentAsync(AtomUI.City.Presentation.PresentationFailure! failure, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.PresentationDiagnosticIds
+AtomUI.City.Presentation.PresentationEntry
+AtomUI.City.Presentation.PresentationEntry.ActivationScope.get -> AtomUI.City.Mvvm.ActivationScope!
+AtomUI.City.Presentation.PresentationEntry.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.PresentationEntry.Handle.get -> AtomUI.City.Presentation.BoundViewHandle!
+AtomUI.City.Presentation.PresentationEntry.IsActivated.get -> bool
+AtomUI.City.Presentation.PresentationEntry.OperationId.get -> long
+AtomUI.City.Presentation.PresentationEntry.ReuseKey.get -> string?
+AtomUI.City.Presentation.PresentationEntry.RouteId.get -> string?
+AtomUI.City.Presentation.PresentationEntry.View.get -> object!
+AtomUI.City.Presentation.PresentationEntry.ViewModel.get -> object!
+AtomUI.City.Presentation.PresentationEntry.ViewModelLease.get -> AtomUI.City.Presentation.ViewModelLease?
+AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.BindingFailed = 7 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.CandidateOwnershipViolation = 18 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.DispatcherUnavailable = 12 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.DuplicateOutlet = 2 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.DuplicateView = 0 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.DuplicateWindow = 1 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.InteractionQueueFull = 17 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.MultipleCloseConfirmations = 19 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.OutletCommitFailed = 9 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.OutletNotFound = 8 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.OutletQueueFull = 16 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.PresentationOutOfSync = 15 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.RuntimeNotReady = 10 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.RuntimeStopping = 11 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.ViewCreationFailed = 6 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.ViewModelCreationFailed = 5 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.ViewModelNotFound = 4 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.ViewNotFound = 3 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.WindowCloseRejected = 14 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationError.WindowNotFound = 13 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationException
+AtomUI.City.Presentation.PresentationException.Error.get -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationException.PresentationException(AtomUI.City.Presentation.PresentationError error, string! message) -> void
+AtomUI.City.Presentation.PresentationException.PresentationException(AtomUI.City.Presentation.PresentationError error, string! message, System.Exception! innerException) -> void
+AtomUI.City.Presentation.PresentationFailure
+AtomUI.City.Presentation.PresentationFailure.<Clone>$() -> AtomUI.City.Presentation.PresentationFailure!
+AtomUI.City.Presentation.PresentationFailure.Deconstruct(out AtomUI.City.Presentation.PresentationFailureLevel Level, out AtomUI.City.Presentation.PresentationError Error, out string! Message, out long OperationId, out string? WindowId, out string? OutletName, out string? RouteId, out System.Exception? Exception) -> void
+AtomUI.City.Presentation.PresentationFailure.Equals(AtomUI.City.Presentation.PresentationFailure? other) -> bool
+AtomUI.City.Presentation.PresentationFailure.Error.get -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationFailure.Error.init -> void
+AtomUI.City.Presentation.PresentationFailure.Exception.get -> System.Exception?
+AtomUI.City.Presentation.PresentationFailure.Exception.init -> void
+AtomUI.City.Presentation.PresentationFailure.Level.get -> AtomUI.City.Presentation.PresentationFailureLevel
+AtomUI.City.Presentation.PresentationFailure.Level.init -> void
+AtomUI.City.Presentation.PresentationFailure.Message.get -> string!
+AtomUI.City.Presentation.PresentationFailure.Message.init -> void
+AtomUI.City.Presentation.PresentationFailure.OperationId.get -> long
+AtomUI.City.Presentation.PresentationFailure.OperationId.init -> void
+AtomUI.City.Presentation.PresentationFailure.OutletName.get -> string?
+AtomUI.City.Presentation.PresentationFailure.OutletName.init -> void
+AtomUI.City.Presentation.PresentationFailure.PresentationFailure(AtomUI.City.Presentation.PresentationFailureLevel Level, AtomUI.City.Presentation.PresentationError Error, string! Message, long OperationId = 0, string? WindowId = null, string? OutletName = null, string? RouteId = null, System.Exception? Exception = null) -> void
+AtomUI.City.Presentation.PresentationFailure.RouteId.get -> string?
+AtomUI.City.Presentation.PresentationFailure.RouteId.init -> void
+AtomUI.City.Presentation.PresentationFailure.WindowId.get -> string?
+AtomUI.City.Presentation.PresentationFailure.WindowId.init -> void
+AtomUI.City.Presentation.PresentationFailureLevel
+AtomUI.City.Presentation.PresentationFailureLevel.Operation = 0 -> AtomUI.City.Presentation.PresentationFailureLevel
+AtomUI.City.Presentation.PresentationFailureLevel.Outlet = 1 -> AtomUI.City.Presentation.PresentationFailureLevel
+AtomUI.City.Presentation.PresentationFailureLevel.Runtime = 3 -> AtomUI.City.Presentation.PresentationFailureLevel
+AtomUI.City.Presentation.PresentationFailureLevel.Window = 2 -> AtomUI.City.Presentation.PresentationFailureLevel
+AtomUI.City.Presentation.PresentationInteractionServiceCollectionExtensions
+AtomUI.City.Presentation.PresentationModule
+AtomUI.City.Presentation.PresentationModule.PresentationModule() -> void
+AtomUI.City.Presentation.PresentationPluginUnloadCoordinator
+AtomUI.City.Presentation.PresentationPluginUnloadCoordinator.CleanupAsync(AtomUI.City.Presentation.PresentationPluginUnloadRequest! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.PresentationPluginUnloadResult!>
+AtomUI.City.Presentation.PresentationPluginUnloadCoordinator.PresentationPluginUnloadCoordinator(AtomUI.City.Presentation.IActivePluginViewRegistry! activeViews, AtomUI.City.Presentation.IInteractionHandlerRegistry! interactionHandlers, AtomUI.City.Presentation.IViewRegistry! views, AtomUI.City.Presentation.IPresentationResourceRegistry! resources, AtomUI.City.Presentation.IPresentationResourceDictionaryRevoker! resourceDictionaries, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Presentation.PresentationPluginUnloadCoordinatorServiceCollectionExtensions
+AtomUI.City.Presentation.PresentationPluginUnloadError
+AtomUI.City.Presentation.PresentationPluginUnloadError.<Clone>$() -> AtomUI.City.Presentation.PresentationPluginUnloadError!
+AtomUI.City.Presentation.PresentationPluginUnloadError.Deconstruct(out AtomUI.City.Presentation.PresentationPluginUnloadErrorKind Kind, out string! Message, out System.Exception? Exception) -> void
+AtomUI.City.Presentation.PresentationPluginUnloadError.Equals(AtomUI.City.Presentation.PresentationPluginUnloadError? other) -> bool
+AtomUI.City.Presentation.PresentationPluginUnloadError.Exception.get -> System.Exception?
+AtomUI.City.Presentation.PresentationPluginUnloadError.Exception.init -> void
+AtomUI.City.Presentation.PresentationPluginUnloadError.Kind.get -> AtomUI.City.Presentation.PresentationPluginUnloadErrorKind
+AtomUI.City.Presentation.PresentationPluginUnloadError.Kind.init -> void
+AtomUI.City.Presentation.PresentationPluginUnloadError.Message.get -> string!
+AtomUI.City.Presentation.PresentationPluginUnloadError.Message.init -> void
+AtomUI.City.Presentation.PresentationPluginUnloadError.PresentationPluginUnloadError(AtomUI.City.Presentation.PresentationPluginUnloadErrorKind Kind, string! Message, System.Exception? Exception = null) -> void
+AtomUI.City.Presentation.PresentationPluginUnloadErrorKind
+AtomUI.City.Presentation.PresentationPluginUnloadErrorKind.ActiveViewsRemaining = 0 -> AtomUI.City.Presentation.PresentationPluginUnloadErrorKind
+AtomUI.City.Presentation.PresentationPluginUnloadErrorKind.InteractionHandlerRevokeFailed = 1 -> AtomUI.City.Presentation.PresentationPluginUnloadErrorKind
+AtomUI.City.Presentation.PresentationPluginUnloadErrorKind.ResourceContributionRevokeFailed = 4 -> AtomUI.City.Presentation.PresentationPluginUnloadErrorKind
+AtomUI.City.Presentation.PresentationPluginUnloadErrorKind.ResourceDictionaryRevokeFailed = 3 -> AtomUI.City.Presentation.PresentationPluginUnloadErrorKind
+AtomUI.City.Presentation.PresentationPluginUnloadErrorKind.ViewDescriptorRevokeFailed = 2 -> AtomUI.City.Presentation.PresentationPluginUnloadErrorKind
+AtomUI.City.Presentation.PresentationPluginUnloadRequest
+AtomUI.City.Presentation.PresentationPluginUnloadRequest.ContributionId.get -> string?
+AtomUI.City.Presentation.PresentationPluginUnloadRequest.PluginId.get -> string!
+AtomUI.City.Presentation.PresentationPluginUnloadRequest.PresentationPluginUnloadRequest(string! pluginId, string? contributionId = null) -> void
+AtomUI.City.Presentation.PresentationPluginUnloadResult
+AtomUI.City.Presentation.PresentationPluginUnloadResult.ClosedViewCount.get -> int
+AtomUI.City.Presentation.PresentationPluginUnloadResult.ContributionId.get -> string?
+AtomUI.City.Presentation.PresentationPluginUnloadResult.Errors.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Presentation.PresentationPluginUnloadError!>!
+AtomUI.City.Presentation.PresentationPluginUnloadResult.PluginId.get -> string!
+AtomUI.City.Presentation.PresentationPluginUnloadResult.PresentationPluginUnloadResult(string! pluginId, string? contributionId, int closedViewCount, int revokedInteractionHandlerCount, int revokedViewDescriptorCount, int revokedResourceContributionCount, bool resourceDictionariesRevoked, System.Collections.Generic.IReadOnlyList<AtomUI.City.Presentation.PresentationPluginUnloadError!>! errors) -> void
+AtomUI.City.Presentation.PresentationPluginUnloadResult.ResourceDictionariesRevoked.get -> bool
+AtomUI.City.Presentation.PresentationPluginUnloadResult.RevokedInteractionHandlerCount.get -> int
+AtomUI.City.Presentation.PresentationPluginUnloadResult.RevokedResourceContributionCount.get -> int
+AtomUI.City.Presentation.PresentationPluginUnloadResult.RevokedViewDescriptorCount.get -> int
+AtomUI.City.Presentation.PresentationPluginUnloadResult.Succeeded.get -> bool
+AtomUI.City.Presentation.PresentationQueueOptions
+AtomUI.City.Presentation.PresentationQueueOptions.ModalInteractionPendingCapacity.get -> int
+AtomUI.City.Presentation.PresentationQueueOptions.ModalInteractionPendingCapacity.init -> void
+AtomUI.City.Presentation.PresentationQueueOptions.OutletPendingCapacity.get -> int
+AtomUI.City.Presentation.PresentationQueueOptions.OutletPendingCapacity.init -> void
+AtomUI.City.Presentation.PresentationQueueOptions.PresentationQueueOptions() -> void
+AtomUI.City.Presentation.PresentationQueueSnapshot
+AtomUI.City.Presentation.PresentationQueueSnapshot.<Clone>$() -> AtomUI.City.Presentation.PresentationQueueSnapshot!
+AtomUI.City.Presentation.PresentationQueueSnapshot.Capacity.get -> int
+AtomUI.City.Presentation.PresentationQueueSnapshot.Capacity.init -> void
+AtomUI.City.Presentation.PresentationQueueSnapshot.Deconstruct(out int Capacity, out int PendingCount, out int InFlightCount, out int PeakPendingCount, out long RejectedCount) -> void
+AtomUI.City.Presentation.PresentationQueueSnapshot.Equals(AtomUI.City.Presentation.PresentationQueueSnapshot? other) -> bool
+AtomUI.City.Presentation.PresentationQueueSnapshot.InFlightCount.get -> int
+AtomUI.City.Presentation.PresentationQueueSnapshot.InFlightCount.init -> void
+AtomUI.City.Presentation.PresentationQueueSnapshot.PeakPendingCount.get -> int
+AtomUI.City.Presentation.PresentationQueueSnapshot.PeakPendingCount.init -> void
+AtomUI.City.Presentation.PresentationQueueSnapshot.PendingCount.get -> int
+AtomUI.City.Presentation.PresentationQueueSnapshot.PendingCount.init -> void
+AtomUI.City.Presentation.PresentationQueueSnapshot.PresentationQueueSnapshot(int Capacity, int PendingCount, int InFlightCount, int PeakPendingCount, long RejectedCount) -> void
+AtomUI.City.Presentation.PresentationQueueSnapshot.RejectedCount.get -> long
+AtomUI.City.Presentation.PresentationQueueSnapshot.RejectedCount.init -> void
+AtomUI.City.Presentation.PresentationResourceContribution
+AtomUI.City.Presentation.PresentationResourceContribution.ContributionId.get -> string?
+AtomUI.City.Presentation.PresentationResourceContribution.Kind.get -> string!
+AtomUI.City.Presentation.PresentationResourceContribution.PluginId.get -> string?
+AtomUI.City.Presentation.PresentationResourceContribution.PresentationResourceContribution(string! kind, object! resource, string? pluginId = null, string? contributionId = null) -> void
+AtomUI.City.Presentation.PresentationResourceContribution.Resource.get -> object!
+AtomUI.City.Presentation.PresentationResourceDictionaryRevocation
+AtomUI.City.Presentation.PresentationResourceDictionaryRevocation.ContributionId.get -> string?
+AtomUI.City.Presentation.PresentationResourceDictionaryRevocation.PluginId.get -> string!
+AtomUI.City.Presentation.PresentationResourceDictionaryRevocation.PresentationResourceDictionaryRevocation(string! pluginId, string? contributionId = null) -> void
+AtomUI.City.Presentation.PresentationResourceDictionaryRevoker
+AtomUI.City.Presentation.PresentationResourceDictionaryRevoker.PresentationResourceDictionaryRevoker(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, System.Collections.Generic.IEnumerable<AtomUI.City.Presentation.IPresentationResourceDictionaryTarget!>! targets) -> void
+AtomUI.City.Presentation.PresentationResourceDictionaryRevoker.PresentationResourceDictionaryRevoker(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, System.Collections.Generic.IEnumerable<AtomUI.City.Presentation.IPresentationResourceDictionaryTarget!>! targets, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Presentation.PresentationResourceDictionaryRevoker.RevokeAsync(AtomUI.City.Presentation.PresentationResourceDictionaryRevocation! revocation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.PresentationResourceDictionaryRevokeResult!>
+AtomUI.City.Presentation.PresentationResourceDictionaryRevokeResult
+AtomUI.City.Presentation.PresentationResourceDictionaryRevokeResult.Errors.get -> System.Collections.Generic.IReadOnlyList<System.Exception!>!
+AtomUI.City.Presentation.PresentationResourceDictionaryRevokeResult.PresentationResourceDictionaryRevokeResult(System.Collections.Generic.IReadOnlyList<System.Exception!>! errors) -> void
+AtomUI.City.Presentation.PresentationResourceDictionaryRevokeResult.Succeeded.get -> bool
+AtomUI.City.Presentation.PresentationResourceRegistry
+AtomUI.City.Presentation.PresentationResourceRegistry.Contributions.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Presentation.PresentationResourceContribution!>!
+AtomUI.City.Presentation.PresentationResourceRegistry.PresentationResourceRegistry() -> void
+AtomUI.City.Presentation.PresentationResourceRegistry.PresentationResourceRegistry(AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Presentation.PresentationResourceRegistry.Register(AtomUI.City.Presentation.PresentationResourceContribution! contribution) -> AtomUI.City.Presentation.IPresentationResourceLease!
+AtomUI.City.Presentation.PresentationResourceRegistry.RevokeContribution(string! contributionId) -> int
+AtomUI.City.Presentation.PresentationResourceRegistry.RevokePlugin(string! pluginId) -> int
+AtomUI.City.Presentation.PresentationResourceRegistryServiceCollectionExtensions
+AtomUI.City.Presentation.PresentationRuntime
+AtomUI.City.Presentation.PresentationRuntime.ApplicationLifetime.get -> Avalonia.Controls.ApplicationLifetimes.IApplicationLifetime?
+AtomUI.City.Presentation.PresentationRuntime.Attach(Avalonia.Controls.ApplicationLifetimes.IApplicationLifetime! applicationLifetime, AtomUI.City.Core.Lifecycle.LifecycleScope! hostScope, string! presentationScopeId = "presentation") -> void
+AtomUI.City.Presentation.PresentationRuntime.CreateWindowScope(string! windowScopeId) -> AtomUI.City.Core.Lifecycle.LifecycleScope!
+AtomUI.City.Presentation.PresentationRuntime.IsReady.get -> bool
+AtomUI.City.Presentation.PresentationRuntime.PresentationRuntime(AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Presentation.PresentationRuntime.PresentationRuntime(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Presentation.PresentationRuntime.PresentationScope.get -> AtomUI.City.Core.Lifecycle.LifecycleScope?
+AtomUI.City.Presentation.PresentationRuntime.RegisterWindow(Avalonia.Controls.Window! window, string! windowId) -> AtomUI.City.Presentation.WindowSession!
+AtomUI.City.Presentation.PresentationRuntime.StartAsync(AtomUI.City.Core.Lifecycle.LifecycleScope! applicationScope, string! presentationScopeId = "presentation", System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.PresentationRuntime.State.get -> AtomUI.City.Presentation.PresentationRuntimeState
+AtomUI.City.Presentation.PresentationRuntime.StopAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.PresentationRuntime.Windows.get -> System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Presentation.WindowSession!>!
+AtomUI.City.Presentation.PresentationRuntimeServiceCollectionExtensions
+AtomUI.City.Presentation.PresentationRuntimeState
+AtomUI.City.Presentation.PresentationRuntimeState.Faulted = 4 -> AtomUI.City.Presentation.PresentationRuntimeState
+AtomUI.City.Presentation.PresentationRuntimeState.NotReady = 0 -> AtomUI.City.Presentation.PresentationRuntimeState
+AtomUI.City.Presentation.PresentationRuntimeState.Ready = 1 -> AtomUI.City.Presentation.PresentationRuntimeState
+AtomUI.City.Presentation.PresentationRuntimeState.Stopped = 3 -> AtomUI.City.Presentation.PresentationRuntimeState
+AtomUI.City.Presentation.PresentationRuntimeState.Stopping = 2 -> AtomUI.City.Presentation.PresentationRuntimeState
+AtomUI.City.Presentation.PresentationServiceCollectionExtensions
+AtomUI.City.Presentation.RouteOutlet
+AtomUI.City.Presentation.RouteOutlet.CommitAsync(AtomUI.City.Presentation.RouteOutletCommitPlan! plan, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.RouteOutletCommitResult!>
+AtomUI.City.Presentation.RouteOutlet.CurrentContent.get -> object?
+AtomUI.City.Presentation.RouteOutlet.CurrentEntry.get -> AtomUI.City.Presentation.PresentationEntry?
+AtomUI.City.Presentation.RouteOutlet.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.RouteOutlet.Name.get -> string!
+AtomUI.City.Presentation.RouteOutlet.QueueSnapshot.get -> AtomUI.City.Presentation.PresentationQueueSnapshot!
+AtomUI.City.Presentation.RouteOutlet.RouteOutlet(string! name, AtomUI.City.Core.Threading.IUiDispatcher! dispatcher) -> void
+AtomUI.City.Presentation.RouteOutlet.RouteOutlet(string! name, AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Presentation.RouteOutlet.RouteOutlet(string! name, AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, AtomUI.City.Presentation.IRouteOutletTarget? target, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null, AtomUI.City.Presentation.IPresentationFailurePresenter? failurePresenter = null, AtomUI.City.Presentation.PresentationQueueOptions? queueOptions = null, AtomUI.City.Presentation.VisualLifecycleHub? lifecycleHub = null, string? windowId = null) -> void
+AtomUI.City.Presentation.RouteOutlet.State.get -> AtomUI.City.Presentation.RouteOutletState
+AtomUI.City.Presentation.RouteOutletCommitPlan
+AtomUI.City.Presentation.RouteOutletCommitPlan.Handle.get -> AtomUI.City.Presentation.BoundViewHandle?
+AtomUI.City.Presentation.RouteOutletCommitPlan.LifecycleToken.get -> System.Threading.CancellationToken
+AtomUI.City.Presentation.RouteOutletCommitPlan.Operation.get -> AtomUI.City.Presentation.RouteOutletOperation
+AtomUI.City.Presentation.RouteOutletCommitPlan.OutletName.get -> string!
+AtomUI.City.Presentation.RouteOutletCommitPlan.ReuseKey.get -> string?
+AtomUI.City.Presentation.RouteOutletCommitPlan.RouteId.get -> string?
+AtomUI.City.Presentation.RouteOutletCommitPlan.ViewModelLease.get -> AtomUI.City.Presentation.ViewModelLease?
+AtomUI.City.Presentation.RouteOutletCommitResult
+AtomUI.City.Presentation.RouteOutletCommitResult.Error.get -> AtomUI.City.Presentation.PresentationError?
+AtomUI.City.Presentation.RouteOutletCommitResult.Message.get -> string?
+AtomUI.City.Presentation.RouteOutletCommitResult.OperationId.get -> long
+AtomUI.City.Presentation.RouteOutletCommitResult.Succeeded.get -> bool
+AtomUI.City.Presentation.RouteOutletOperation
+AtomUI.City.Presentation.RouteOutletOperation.Clear = 1 -> AtomUI.City.Presentation.RouteOutletOperation
+AtomUI.City.Presentation.RouteOutletOperation.Replace = 0 -> AtomUI.City.Presentation.RouteOutletOperation
+AtomUI.City.Presentation.RouteOutletProperties
+AtomUI.City.Presentation.RouteOutletState
+AtomUI.City.Presentation.RouteOutletState.Committed = 3 -> AtomUI.City.Presentation.RouteOutletState
+AtomUI.City.Presentation.RouteOutletState.Empty = 0 -> AtomUI.City.Presentation.RouteOutletState
+AtomUI.City.Presentation.RouteOutletState.Faulted = 7 -> AtomUI.City.Presentation.RouteOutletState
+AtomUI.City.Presentation.RouteOutletState.OutOfSync = 4 -> AtomUI.City.Presentation.RouteOutletState
+AtomUI.City.Presentation.RouteOutletState.Preparing = 1 -> AtomUI.City.Presentation.RouteOutletState
+AtomUI.City.Presentation.RouteOutletState.Stopped = 6 -> AtomUI.City.Presentation.RouteOutletState
+AtomUI.City.Presentation.RouteOutletState.Stopping = 5 -> AtomUI.City.Presentation.RouteOutletState
+AtomUI.City.Presentation.RouteOutletState.TemporaryAttached = 2 -> AtomUI.City.Presentation.RouteOutletState
+AtomUI.City.Presentation.UiCommandState
+AtomUI.City.Presentation.UiCommandState.<Clone>$() -> AtomUI.City.Presentation.UiCommandState!
+AtomUI.City.Presentation.UiCommandState.CanExecute.get -> bool
+AtomUI.City.Presentation.UiCommandState.CanExecute.init -> void
+AtomUI.City.Presentation.UiCommandState.Deconstruct(out bool CanExecute, out bool IsExecuting) -> void
+AtomUI.City.Presentation.UiCommandState.Equals(AtomUI.City.Presentation.UiCommandState? other) -> bool
+AtomUI.City.Presentation.UiCommandState.IsExecuting.get -> bool
+AtomUI.City.Presentation.UiCommandState.IsExecuting.init -> void
+AtomUI.City.Presentation.UiCommandState.UiCommandState(bool CanExecute, bool IsExecuting) -> void
+AtomUI.City.Presentation.UiStateFeedbackKind
+AtomUI.City.Presentation.UiStateFeedbackKind.AnimationStateChanged = 9 -> AtomUI.City.Presentation.UiStateFeedbackKind
+AtomUI.City.Presentation.UiStateFeedbackKind.CommandInvoked = 1 -> AtomUI.City.Presentation.UiStateFeedbackKind
+AtomUI.City.Presentation.UiStateFeedbackKind.HoverChanged = 5 -> AtomUI.City.Presentation.UiStateFeedbackKind
+AtomUI.City.Presentation.UiStateFeedbackKind.InteractionCompleted = 2 -> AtomUI.City.Presentation.UiStateFeedbackKind
+AtomUI.City.Presentation.UiStateFeedbackKind.LayoutUpdated = 7 -> AtomUI.City.Presentation.UiStateFeedbackKind
+AtomUI.City.Presentation.UiStateFeedbackKind.PointerMoved = 6 -> AtomUI.City.Presentation.UiStateFeedbackKind
+AtomUI.City.Presentation.UiStateFeedbackKind.ScrollOffsetChanged = 8 -> AtomUI.City.Presentation.UiStateFeedbackKind
+AtomUI.City.Presentation.UiStateFeedbackKind.SelectionChanged = 4 -> AtomUI.City.Presentation.UiStateFeedbackKind
+AtomUI.City.Presentation.UiStateFeedbackKind.ValidationRequested = 3 -> AtomUI.City.Presentation.UiStateFeedbackKind
+AtomUI.City.Presentation.UiStateFeedbackKind.ValueChanged = 0 -> AtomUI.City.Presentation.UiStateFeedbackKind
+AtomUI.City.Presentation.UiStateFeedbackPolicy
+AtomUI.City.Presentation.ValidationVisualStateBinding
+AtomUI.City.Presentation.ValidationVisualStateBinding.ApplyAsync(AtomUI.City.Mvvm.ValidationScope! scope, AtomUI.City.Presentation.IValidationVisualStateTarget! target, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.ValidationVisualStateBinding.ValidationVisualStateBinding(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher) -> void
+AtomUI.City.Presentation.ValidationVisualStateBinding.ValidationVisualStateBinding(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Presentation.ValidationVisualStateSnapshot
+AtomUI.City.Presentation.ValidationVisualStateSnapshot.Errors.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Collections.Generic.IReadOnlyList<string!>!>!
+AtomUI.City.Presentation.ValidationVisualStateSnapshot.Exception.get -> System.Exception?
+AtomUI.City.Presentation.ValidationVisualStateSnapshot.Messages.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Collections.Generic.IReadOnlyList<AtomUI.City.Mvvm.ValidationMessage!>!>!
+AtomUI.City.Presentation.ValidationVisualStateSnapshot.Status.get -> AtomUI.City.Mvvm.ValidationStatus
+AtomUI.City.Presentation.ViewBinder
+AtomUI.City.Presentation.ViewBinder.Bind(AtomUI.City.Presentation.ViewDescriptor! descriptor, object! view, object! viewModel) -> AtomUI.City.Presentation.BoundViewHandle!
+AtomUI.City.Presentation.ViewBinder.Bind(AtomUI.City.Presentation.ViewDescriptor! descriptor, object! view, object! viewModel, AtomUI.City.Presentation.VisualIdentity? identity) -> AtomUI.City.Presentation.BoundViewHandle!
+AtomUI.City.Presentation.ViewBinder.ViewBinder() -> void
+AtomUI.City.Presentation.ViewBinder.ViewBinder(AtomUI.City.Core.Diagnostics.IHostDiagnostics! diagnostics) -> void
+AtomUI.City.Presentation.ViewBinder.ViewBinder(AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics, AtomUI.City.Presentation.VisualLifecycleHub? lifecycleHub) -> void
+AtomUI.City.Presentation.ViewBinder.ViewBinder(AtomUI.City.Presentation.VisualLifecycleHub! lifecycleHub) -> void
+AtomUI.City.Presentation.ViewDescriptor
+AtomUI.City.Presentation.ViewDescriptor.ConstructorParameterTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+AtomUI.City.Presentation.ViewDescriptor.ContributionId.get -> string?
+AtomUI.City.Presentation.ViewDescriptor.CreateView(AtomUI.City.Presentation.ViewFactoryContext! context) -> object!
+AtomUI.City.Presentation.ViewDescriptor.PluginId.get -> string?
+AtomUI.City.Presentation.ViewDescriptor.ViewDescriptor(System.Type! viewModelType, System.Type! viewType, string? viewKey, System.Func<AtomUI.City.Presentation.ViewFactoryContext!, object!>! viewFactory, string? pluginId = null, string? contributionId = null, System.Collections.Generic.IReadOnlyList<System.Type!>? constructorParameterTypes = null) -> void
+AtomUI.City.Presentation.ViewDescriptor.ViewKey.get -> string?
+AtomUI.City.Presentation.ViewDescriptor.ViewModelType.get -> System.Type!
+AtomUI.City.Presentation.ViewDescriptor.ViewType.get -> System.Type!
+AtomUI.City.Presentation.ViewFactory
+AtomUI.City.Presentation.ViewFactory.CreateAsync(AtomUI.City.Presentation.ViewDescriptor! descriptor, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<object!>
+AtomUI.City.Presentation.ViewFactory.ViewFactory(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher) -> void
+AtomUI.City.Presentation.ViewFactory.ViewFactory(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Presentation.ViewFactory.ViewFactory(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, System.IServiceProvider! services) -> void
+AtomUI.City.Presentation.ViewFactory.ViewFactory(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, System.IServiceProvider! services, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Presentation.ViewFactoryContext
+AtomUI.City.Presentation.ViewFactoryContext.Services.get -> System.IServiceProvider!
+AtomUI.City.Presentation.ViewFactoryContext.ViewFactoryContext(System.IServiceProvider! services) -> void
+AtomUI.City.Presentation.ViewForAttribute
+AtomUI.City.Presentation.ViewForAttribute.ContributionId.get -> string?
+AtomUI.City.Presentation.ViewForAttribute.ContributionId.init -> void
+AtomUI.City.Presentation.ViewForAttribute.Key.get -> string?
+AtomUI.City.Presentation.ViewForAttribute.Key.init -> void
+AtomUI.City.Presentation.ViewForAttribute.PluginId.get -> string?
+AtomUI.City.Presentation.ViewForAttribute.PluginId.init -> void
+AtomUI.City.Presentation.ViewForAttribute.ViewForAttribute(System.Type! viewModelType) -> void
+AtomUI.City.Presentation.ViewForAttribute.ViewModelType.get -> System.Type!
+AtomUI.City.Presentation.ViewLookupRequest
+AtomUI.City.Presentation.ViewLookupRequest.OwnerId.get -> string?
+AtomUI.City.Presentation.ViewLookupRequest.RouteId.get -> string?
+AtomUI.City.Presentation.ViewLookupRequest.ViewKey.get -> string?
+AtomUI.City.Presentation.ViewLookupRequest.ViewLookupRequest(System.Type! viewModelType, string? viewKey = null, string? routeId = null, string? ownerId = null) -> void
+AtomUI.City.Presentation.ViewLookupRequest.ViewModelType.get -> System.Type!
+AtomUI.City.Presentation.ViewModelAcquisitionRequest
+AtomUI.City.Presentation.ViewModelAcquisitionRequest.<Clone>$() -> AtomUI.City.Presentation.ViewModelAcquisitionRequest!
+AtomUI.City.Presentation.ViewModelAcquisitionRequest.Deconstruct(out System.Type! ViewModelType, out System.IServiceProvider! Services, out System.Func<System.IServiceProvider!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<object!>>? Factory, out object? ReusableInstance) -> void
+AtomUI.City.Presentation.ViewModelAcquisitionRequest.Equals(AtomUI.City.Presentation.ViewModelAcquisitionRequest? other) -> bool
+AtomUI.City.Presentation.ViewModelAcquisitionRequest.Factory.get -> System.Func<System.IServiceProvider!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<object!>>?
+AtomUI.City.Presentation.ViewModelAcquisitionRequest.Factory.init -> void
+AtomUI.City.Presentation.ViewModelAcquisitionRequest.ReusableInstance.get -> object?
+AtomUI.City.Presentation.ViewModelAcquisitionRequest.ReusableInstance.init -> void
+AtomUI.City.Presentation.ViewModelAcquisitionRequest.Services.get -> System.IServiceProvider!
+AtomUI.City.Presentation.ViewModelAcquisitionRequest.ViewModelAcquisitionRequest(System.Type! ViewModelType, System.IServiceProvider! Services, System.Func<System.IServiceProvider!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<object!>>? Factory = null, object? ReusableInstance = null) -> void
+AtomUI.City.Presentation.ViewModelAcquisitionRequest.ViewModelType.get -> System.Type!
+AtomUI.City.Presentation.ViewModelLease
+AtomUI.City.Presentation.ViewModelLease.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.ViewModelLease.Instance.get -> object!
+AtomUI.City.Presentation.ViewModelLease.Ownership.get -> AtomUI.City.Presentation.ViewModelOwnership
+AtomUI.City.Presentation.ViewModelOwnership
+AtomUI.City.Presentation.ViewModelOwnership.Borrowed = 2 -> AtomUI.City.Presentation.ViewModelOwnership
+AtomUI.City.Presentation.ViewModelOwnership.EntryOwned = 0 -> AtomUI.City.Presentation.ViewModelOwnership
+AtomUI.City.Presentation.ViewModelOwnership.ServiceScopeOwned = 1 -> AtomUI.City.Presentation.ViewModelOwnership
+AtomUI.City.Presentation.ViewRegistrationOptions
+AtomUI.City.Presentation.ViewRegistrationOptions.ReplaceExisting.get -> bool
+AtomUI.City.Presentation.ViewRegistrationOptions.ReplaceExisting.init -> void
+AtomUI.City.Presentation.ViewRegistrationOptions.ViewRegistrationOptions() -> void
+AtomUI.City.Presentation.ViewRegistry
+AtomUI.City.Presentation.ViewRegistry.Locate(AtomUI.City.Presentation.ViewLookupRequest! request) -> AtomUI.City.Presentation.ViewDescriptor!
+AtomUI.City.Presentation.ViewRegistry.Locate(System.Type! viewModelType, string? viewKey = null) -> AtomUI.City.Presentation.ViewDescriptor!
+AtomUI.City.Presentation.ViewRegistry.Register(AtomUI.City.Presentation.ViewDescriptor! descriptor) -> void
+AtomUI.City.Presentation.ViewRegistry.Register(AtomUI.City.Presentation.ViewDescriptor! descriptor, AtomUI.City.Presentation.ViewRegistrationOptions? options) -> void
+AtomUI.City.Presentation.ViewRegistry.RegisterManifest(System.Collections.Generic.IEnumerable<AtomUI.City.Presentation.ViewDescriptor!>! descriptors) -> void
+AtomUI.City.Presentation.ViewRegistry.RegisterManifest(System.Collections.Generic.IEnumerable<AtomUI.City.Presentation.ViewDescriptor!>! descriptors, AtomUI.City.Presentation.ViewRegistrationOptions? options) -> void
+AtomUI.City.Presentation.ViewRegistry.RevokeContribution(string! contributionId) -> int
+AtomUI.City.Presentation.ViewRegistry.RevokePlugin(string! pluginId) -> int
+AtomUI.City.Presentation.ViewRegistry.TryLocate(AtomUI.City.Presentation.ViewLookupRequest! request, out AtomUI.City.Presentation.ViewDescriptor? descriptor) -> bool
+AtomUI.City.Presentation.ViewRegistry.TryLocate(System.Type! viewModelType, out AtomUI.City.Presentation.ViewDescriptor? descriptor) -> bool
+AtomUI.City.Presentation.ViewRegistry.TryLocate(System.Type! viewModelType, string? viewKey, out AtomUI.City.Presentation.ViewDescriptor? descriptor) -> bool
+AtomUI.City.Presentation.ViewRegistry.ViewRegistry() -> void
+AtomUI.City.Presentation.ViewRegistry.ViewRegistry(AtomUI.City.Core.Diagnostics.IHostDiagnostics! diagnostics) -> void
+AtomUI.City.Presentation.ViewRegistryServiceCollectionExtensions
+AtomUI.City.Presentation.VisualIdentity
+AtomUI.City.Presentation.VisualIdentity.<Clone>$() -> AtomUI.City.Presentation.VisualIdentity!
+AtomUI.City.Presentation.VisualIdentity.Deconstruct(out object! View, out string? WindowId, out string? OutletName, out long? OperationId, out string? EntryId) -> void
+AtomUI.City.Presentation.VisualIdentity.EntryId.get -> string?
+AtomUI.City.Presentation.VisualIdentity.EntryId.init -> void
+AtomUI.City.Presentation.VisualIdentity.Equals(AtomUI.City.Presentation.VisualIdentity? other) -> bool
+AtomUI.City.Presentation.VisualIdentity.OperationId.get -> long?
+AtomUI.City.Presentation.VisualIdentity.OperationId.init -> void
+AtomUI.City.Presentation.VisualIdentity.OutletName.get -> string?
+AtomUI.City.Presentation.VisualIdentity.OutletName.init -> void
+AtomUI.City.Presentation.VisualIdentity.View.get -> object!
+AtomUI.City.Presentation.VisualIdentity.View.init -> void
+AtomUI.City.Presentation.VisualIdentity.VisualIdentity(object! View, string? WindowId = null, string? OutletName = null, long? OperationId = null, string? EntryId = null) -> void
+AtomUI.City.Presentation.VisualIdentity.WindowId.get -> string?
+AtomUI.City.Presentation.VisualIdentity.WindowId.init -> void
+AtomUI.City.Presentation.VisualLifecycleEvent
+AtomUI.City.Presentation.VisualLifecycleEvent.<Clone>$() -> AtomUI.City.Presentation.VisualLifecycleEvent!
+AtomUI.City.Presentation.VisualLifecycleEvent.Equals(AtomUI.City.Presentation.VisualLifecycleEvent? other) -> bool
+AtomUI.City.Presentation.VisualLifecycleEvent.Identity.get -> AtomUI.City.Presentation.VisualIdentity!
+AtomUI.City.Presentation.VisualLifecycleEvent.Kind.get -> AtomUI.City.Presentation.VisualLifecycleEventKind
+AtomUI.City.Presentation.VisualLifecycleEvent.View.get -> object!
+AtomUI.City.Presentation.VisualLifecycleEvent.VisualLifecycleEvent(AtomUI.City.Presentation.VisualIdentity! identity, AtomUI.City.Presentation.VisualLifecycleEventKind kind) -> void
+AtomUI.City.Presentation.VisualLifecycleEvent.VisualLifecycleEvent(object! view, AtomUI.City.Presentation.VisualLifecycleEventKind kind) -> void
+AtomUI.City.Presentation.VisualLifecycleEventKind
+AtomUI.City.Presentation.VisualLifecycleEventKind.Attached = 0 -> AtomUI.City.Presentation.VisualLifecycleEventKind
+AtomUI.City.Presentation.VisualLifecycleEventKind.Detached = 1 -> AtomUI.City.Presentation.VisualLifecycleEventKind
+AtomUI.City.Presentation.VisualLifecycleEventKind.Focused = 4 -> AtomUI.City.Presentation.VisualLifecycleEventKind
+AtomUI.City.Presentation.VisualLifecycleEventKind.Hidden = 7 -> AtomUI.City.Presentation.VisualLifecycleEventKind
+AtomUI.City.Presentation.VisualLifecycleEventKind.Loaded = 2 -> AtomUI.City.Presentation.VisualLifecycleEventKind
+AtomUI.City.Presentation.VisualLifecycleEventKind.Unfocused = 5 -> AtomUI.City.Presentation.VisualLifecycleEventKind
+AtomUI.City.Presentation.VisualLifecycleEventKind.Unloaded = 3 -> AtomUI.City.Presentation.VisualLifecycleEventKind
+AtomUI.City.Presentation.VisualLifecycleEventKind.Visible = 6 -> AtomUI.City.Presentation.VisualLifecycleEventKind
+AtomUI.City.Presentation.VisualLifecycleHub
+AtomUI.City.Presentation.VisualLifecycleHub.Notify(AtomUI.City.Presentation.VisualIdentity! identity, AtomUI.City.Presentation.VisualLifecycleEventKind kind) -> void
+AtomUI.City.Presentation.VisualLifecycleHub.Notify(AtomUI.City.Presentation.VisualLifecycleEvent! lifecycleEvent) -> void
+AtomUI.City.Presentation.VisualLifecycleHub.Notify(object! view, AtomUI.City.Presentation.VisualLifecycleEventKind kind) -> void
+AtomUI.City.Presentation.VisualLifecycleHub.Subscribe(System.Action<AtomUI.City.Presentation.VisualLifecycleEvent!>! handler) -> System.IDisposable!
+AtomUI.City.Presentation.VisualLifecycleHub.Subscribe(System.Action<AtomUI.City.Presentation.VisualLifecycleEvent!>! handler, AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions! options) -> System.IDisposable!
+AtomUI.City.Presentation.VisualLifecycleHub.VisualLifecycleHub() -> void
+AtomUI.City.Presentation.VisualLifecycleHub.VisualLifecycleHub(AtomUI.City.Core.Diagnostics.IHostDiagnostics! diagnostics) -> void
+AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions
+AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions.ActivationScope.get -> AtomUI.City.Mvvm.IActivationScope?
+AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions.ActivationScope.init -> void
+AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions.EntryId.get -> string?
+AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions.EntryId.init -> void
+AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions.OperationId.get -> long?
+AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions.OperationId.init -> void
+AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions.OutletName.get -> string?
+AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions.OutletName.init -> void
+AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions.VisualLifecycleSubscriptionOptions() -> void
+AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions.WindowId.get -> string?
+AtomUI.City.Presentation.VisualLifecycleSubscriptionOptions.WindowId.init -> void
+AtomUI.City.Presentation.WindowCloseOrigin
+AtomUI.City.Presentation.WindowCloseOrigin.Application = 1 -> AtomUI.City.Presentation.WindowCloseOrigin
+AtomUI.City.Presentation.WindowCloseOrigin.OperatingSystem = 2 -> AtomUI.City.Presentation.WindowCloseOrigin
+AtomUI.City.Presentation.WindowCloseOrigin.User = 0 -> AtomUI.City.Presentation.WindowCloseOrigin
+AtomUI.City.Presentation.WindowSession
+AtomUI.City.Presentation.WindowSession.ActiveCloseOrigin.get -> AtomUI.City.Presentation.WindowCloseOrigin?
+AtomUI.City.Presentation.WindowSession.CloseAsync(AtomUI.City.Presentation.WindowCloseOrigin origin, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<bool>
+AtomUI.City.Presentation.WindowSession.CloseAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<bool>
+AtomUI.City.Presentation.WindowSession.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.WindowSession.GetOutlet(string! name) -> AtomUI.City.Presentation.IRouteOutlet!
+AtomUI.City.Presentation.WindowSession.Id.get -> string!
+AtomUI.City.Presentation.WindowSession.Outlets.get -> System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Presentation.IRouteOutlet!>!
+AtomUI.City.Presentation.WindowSession.RegisterOutlet(string! name, AtomUI.City.Presentation.IRouteOutletTarget! target) -> System.IDisposable!
+AtomUI.City.Presentation.WindowSession.Scope.get -> AtomUI.City.Core.Lifecycle.LifecycleScope!
+AtomUI.City.Presentation.WindowSession.State.get -> AtomUI.City.Presentation.WindowSessionState
+AtomUI.City.Presentation.WindowSession.Window.get -> Avalonia.Controls.Window!
+AtomUI.City.Presentation.WindowSessionState
+AtomUI.City.Presentation.WindowSessionState.Closed = 3 -> AtomUI.City.Presentation.WindowSessionState
+AtomUI.City.Presentation.WindowSessionState.Closing = 2 -> AtomUI.City.Presentation.WindowSessionState
+AtomUI.City.Presentation.WindowSessionState.Faulted = 4 -> AtomUI.City.Presentation.WindowSessionState
+AtomUI.City.Presentation.WindowSessionState.Ready = 1 -> AtomUI.City.Presentation.WindowSessionState
+AtomUI.City.Presentation.WindowSessionState.Registered = 0 -> AtomUI.City.Presentation.WindowSessionState
+const AtomUI.City.Presentation.PresentationDiagnosticIds.CandidateOwnershipViolation = "AUCPRS042" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.CommandStateApplied = "AUCPRS026" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.CommandStateApplyFailed = "AUCPRS027" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.DispatcherCallbackFailed = "AUCPRS004" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.DispatcherOperationRejected = "AUCPRS003" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.FailurePresenterFailed = "AUCPRS038" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.InteractionFailed = "AUCPRS022" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.InteractionHandled = "AUCPRS020" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.InteractionHandlerRevoked = "AUCPRS023" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.InteractionNotHandled = "AUCPRS021" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.InteractionQueueRejected = "AUCPRS041" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.MultipleCloseConfirmations = "AUCPRS043" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.OutletCommitFailed = "AUCPRS013" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.OutletCommitPlanned = "AUCPRS011" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.OutletCommitSucceeded = "AUCPRS012" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.OutletQueueRejected = "AUCPRS040" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.OutletRollbackFailed = "AUCPRS036" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.PluginUnloadCleanupCompleted = "AUCPRS034" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.PluginUnloadCleanupFailed = "AUCPRS035" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.PluginViewClosed = "AUCPRS032" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.PluginViewCloseFailed = "AUCPRS033" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.PluginViewTracked = "AUCPRS031" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.PresentationEntryCleanupFailed = "AUCPRS037" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ResourceContributionRegistered = "AUCPRS028" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ResourceContributionRevoked = "AUCPRS029" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ResourceContributionRevokeFailed = "AUCPRS030" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ResourceDictionaryRevoked = "AUCPRS016" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ResourceDictionaryRevokeFailed = "AUCPRS017" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.RuntimeReady = "AUCPRS001" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.RuntimeStopping = "AUCPRS002" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ValidationVisualStateApplied = "AUCPRS024" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ValidationVisualStateApplyFailed = "AUCPRS025" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ViewBindingFailed = "AUCPRS010" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ViewBound = "AUCPRS009" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ViewCreated = "AUCPRS007" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ViewCreationFailed = "AUCPRS008" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ViewLocatorFailed = "AUCPRS006" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ViewLocatorMatched = "AUCPRS005" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.VisualLifecycleAdapterExecuted = "AUCPRS014" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.VisualLifecycleAdapterFailed = "AUCPRS015" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.WindowCleanupFailed = "AUCPRS039" -> string!
+const AtomUI.City.Presentation.PresentationQueueOptions.DefaultModalInteractionPendingCapacity = 8 -> int
+const AtomUI.City.Presentation.PresentationQueueOptions.DefaultOutletPendingCapacity = 32 -> int
+override AtomUI.City.Presentation.InteractionDispatchContext.Equals(object? obj) -> bool
+override AtomUI.City.Presentation.InteractionDispatchContext.GetHashCode() -> int
+override AtomUI.City.Presentation.InteractionDispatchContext.ToString() -> string!
+override AtomUI.City.Presentation.PresentationFailure.Equals(object? obj) -> bool
+override AtomUI.City.Presentation.PresentationFailure.GetHashCode() -> int
+override AtomUI.City.Presentation.PresentationFailure.ToString() -> string!
+override AtomUI.City.Presentation.PresentationModule.ConfigureServices(AtomUI.City.Core.Modularity.ServiceConfigurationContext! context) -> void
+override AtomUI.City.Presentation.PresentationModule.OnApplicationShutdownAsync(AtomUI.City.Core.Modularity.ApplicationShutdownContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+override AtomUI.City.Presentation.PresentationPluginUnloadError.Equals(object? obj) -> bool
+override AtomUI.City.Presentation.PresentationPluginUnloadError.GetHashCode() -> int
+override AtomUI.City.Presentation.PresentationPluginUnloadError.ToString() -> string!
+override AtomUI.City.Presentation.PresentationQueueSnapshot.Equals(object? obj) -> bool
+override AtomUI.City.Presentation.PresentationQueueSnapshot.GetHashCode() -> int
+override AtomUI.City.Presentation.PresentationQueueSnapshot.ToString() -> string!
+override AtomUI.City.Presentation.UiCommandState.Equals(object? obj) -> bool
+override AtomUI.City.Presentation.UiCommandState.GetHashCode() -> int
+override AtomUI.City.Presentation.UiCommandState.ToString() -> string!
+override AtomUI.City.Presentation.ViewModelAcquisitionRequest.Equals(object? obj) -> bool
+override AtomUI.City.Presentation.ViewModelAcquisitionRequest.GetHashCode() -> int
+override AtomUI.City.Presentation.ViewModelAcquisitionRequest.ToString() -> string!
+override AtomUI.City.Presentation.VisualIdentity.Equals(object? obj) -> bool
+override AtomUI.City.Presentation.VisualIdentity.GetHashCode() -> int
+override AtomUI.City.Presentation.VisualIdentity.ToString() -> string!
+override AtomUI.City.Presentation.VisualLifecycleEvent.Equals(object? obj) -> bool
+override AtomUI.City.Presentation.VisualLifecycleEvent.GetHashCode() -> int
+override AtomUI.City.Presentation.VisualLifecycleEvent.ToString() -> string!
+static AtomUI.City.Presentation.ActivePluginViewRegistryServiceCollectionExtensions.AddActivePluginViewRegistry(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Presentation.AvaloniaUiDispatcherServiceCollectionExtensions.AddAvaloniaUiDispatcher(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Presentation.BoundViewHandle.FromExisting(object! view, object! viewModel, System.Action? dispose = null) -> AtomUI.City.Presentation.BoundViewHandle!
+static AtomUI.City.Presentation.InteractionDispatchContext.Global.get -> AtomUI.City.Presentation.InteractionDispatchContext!
+static AtomUI.City.Presentation.InteractionDispatchContext.operator !=(AtomUI.City.Presentation.InteractionDispatchContext? left, AtomUI.City.Presentation.InteractionDispatchContext? right) -> bool
+static AtomUI.City.Presentation.InteractionDispatchContext.operator ==(AtomUI.City.Presentation.InteractionDispatchContext? left, AtomUI.City.Presentation.InteractionDispatchContext? right) -> bool
+static AtomUI.City.Presentation.PresentationFailure.operator !=(AtomUI.City.Presentation.PresentationFailure? left, AtomUI.City.Presentation.PresentationFailure? right) -> bool
+static AtomUI.City.Presentation.PresentationFailure.operator ==(AtomUI.City.Presentation.PresentationFailure? left, AtomUI.City.Presentation.PresentationFailure? right) -> bool
+static AtomUI.City.Presentation.PresentationInteractionServiceCollectionExtensions.AddPresentationInteractionHandlers(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Presentation.PresentationPluginUnloadCoordinatorServiceCollectionExtensions.AddPresentationPluginUnloadCoordinator(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Presentation.PresentationPluginUnloadError.operator !=(AtomUI.City.Presentation.PresentationPluginUnloadError? left, AtomUI.City.Presentation.PresentationPluginUnloadError? right) -> bool
+static AtomUI.City.Presentation.PresentationPluginUnloadError.operator ==(AtomUI.City.Presentation.PresentationPluginUnloadError? left, AtomUI.City.Presentation.PresentationPluginUnloadError? right) -> bool
+static AtomUI.City.Presentation.PresentationQueueSnapshot.operator !=(AtomUI.City.Presentation.PresentationQueueSnapshot? left, AtomUI.City.Presentation.PresentationQueueSnapshot? right) -> bool
+static AtomUI.City.Presentation.PresentationQueueSnapshot.operator ==(AtomUI.City.Presentation.PresentationQueueSnapshot? left, AtomUI.City.Presentation.PresentationQueueSnapshot? right) -> bool
+static AtomUI.City.Presentation.PresentationResourceDictionaryRevokeResult.Success() -> AtomUI.City.Presentation.PresentationResourceDictionaryRevokeResult!
+static AtomUI.City.Presentation.PresentationResourceRegistryServiceCollectionExtensions.AddPresentationResourceRegistry(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Presentation.PresentationRuntimeServiceCollectionExtensions.AddPresentationRuntime(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Presentation.PresentationServiceCollectionExtensions.AddPresentation(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Presentation.PresentationServiceCollectionExtensions.AddPresentation(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, AtomUI.City.Presentation.PresentationQueueOptions! queueOptions) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Presentation.RouteOutletCommitPlan.Clear(string! outletName) -> AtomUI.City.Presentation.RouteOutletCommitPlan!
+static AtomUI.City.Presentation.RouteOutletCommitPlan.Replace(string! outletName, AtomUI.City.Presentation.BoundViewHandle! handle, AtomUI.City.Presentation.ViewModelLease? viewModelLease = null, string? routeId = null, string? reuseKey = null, System.Threading.CancellationToken lifecycleToken = default(System.Threading.CancellationToken)) -> AtomUI.City.Presentation.RouteOutletCommitPlan!
+static AtomUI.City.Presentation.RouteOutletCommitResult.Failed(AtomUI.City.Presentation.PresentationError error, string! message, long operationId = 0) -> AtomUI.City.Presentation.RouteOutletCommitResult!
+static AtomUI.City.Presentation.RouteOutletCommitResult.Success(long operationId = 0) -> AtomUI.City.Presentation.RouteOutletCommitResult!
+static AtomUI.City.Presentation.RouteOutletProperties.GetName(Avalonia.Controls.Control! control) -> string?
+static AtomUI.City.Presentation.RouteOutletProperties.SetName(Avalonia.Controls.Control! control, string? value) -> void
+static AtomUI.City.Presentation.UiCommandState.operator !=(AtomUI.City.Presentation.UiCommandState? left, AtomUI.City.Presentation.UiCommandState? right) -> bool
+static AtomUI.City.Presentation.UiCommandState.operator ==(AtomUI.City.Presentation.UiCommandState? left, AtomUI.City.Presentation.UiCommandState? right) -> bool
+static AtomUI.City.Presentation.UiStateFeedbackPolicy.CanNotifyViewModel(AtomUI.City.Presentation.UiStateFeedbackKind kind) -> bool
+static AtomUI.City.Presentation.ValidationVisualStateSnapshot.From(AtomUI.City.Mvvm.ValidationScope! scope) -> AtomUI.City.Presentation.ValidationVisualStateSnapshot!
+static AtomUI.City.Presentation.ViewModelAcquisitionRequest.operator !=(AtomUI.City.Presentation.ViewModelAcquisitionRequest? left, AtomUI.City.Presentation.ViewModelAcquisitionRequest? right) -> bool
+static AtomUI.City.Presentation.ViewModelAcquisitionRequest.operator ==(AtomUI.City.Presentation.ViewModelAcquisitionRequest? left, AtomUI.City.Presentation.ViewModelAcquisitionRequest? right) -> bool
+static AtomUI.City.Presentation.ViewModelLease.Borrowed(object! instance) -> AtomUI.City.Presentation.ViewModelLease!
+static AtomUI.City.Presentation.ViewModelLease.EntryOwned(object! instance) -> AtomUI.City.Presentation.ViewModelLease!
+static AtomUI.City.Presentation.ViewModelLease.ServiceScopeOwned(object! instance, Microsoft.Extensions.DependencyInjection.IServiceScope! serviceScope) -> AtomUI.City.Presentation.ViewModelLease!
+static AtomUI.City.Presentation.ViewRegistryServiceCollectionExtensions.AddViewRegistry(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Presentation.VisualIdentity.operator !=(AtomUI.City.Presentation.VisualIdentity? left, AtomUI.City.Presentation.VisualIdentity? right) -> bool
+static AtomUI.City.Presentation.VisualIdentity.operator ==(AtomUI.City.Presentation.VisualIdentity? left, AtomUI.City.Presentation.VisualIdentity? right) -> bool
+static AtomUI.City.Presentation.VisualLifecycleEvent.operator !=(AtomUI.City.Presentation.VisualLifecycleEvent? left, AtomUI.City.Presentation.VisualLifecycleEvent? right) -> bool
+static AtomUI.City.Presentation.VisualLifecycleEvent.operator ==(AtomUI.City.Presentation.VisualLifecycleEvent? left, AtomUI.City.Presentation.VisualLifecycleEvent? right) -> bool
+static readonly AtomUI.City.Presentation.RouteOutletProperties.NameProperty -> Avalonia.AttachedProperty<string?>!

@@ -1,0 +1,159 @@
+using Avalonia;
+using Avalonia.Headless;
+using Avalonia.Threading;
+using AtomUI.City.Core.Lifecycle;
+using AtomUI.City.Core.Threading;
+using AtomUI.City.Presentation;
+using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.InteropServices;
+
+namespace Presentation.PackageConsumer;
+
+internal static class Program
+{
+    public static int Main()
+    {
+        SuppressWindowsErrorDialogs();
+        try
+        {
+            Console.WriteLine("stage=headless-setup");
+            AppBuilder.Configure<Application>()
+                .UseHeadless(new AvaloniaHeadlessPlatformOptions())
+                .SetupWithoutStarting();
+
+            var scenario = RunScenarioAsync();
+            var deadline = DateTime.UtcNow.AddSeconds(45);
+            while (!scenario.IsCompleted)
+            {
+                Dispatcher.UIThread.RunJobs();
+                if (DateTime.UtcNow >= deadline)
+                {
+                    throw new TimeoutException("The Presentation package consumer scenario did not complete.");
+                }
+
+                Thread.Sleep(1);
+            }
+
+            scenario.GetAwaiter().GetResult();
+            return 0;
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine(exception);
+            return 1;
+        }
+    }
+
+    private static async Task RunScenarioAsync()
+    {
+        try
+        {
+
+            var services = new ServiceCollection();
+            services.AddPresentation();
+            services.AddSingleton<IUiDispatcher>(InlineUiDispatcher.Instance);
+            await using var provider = services.BuildServiceProvider();
+            await using var applicationScope = LifecycleScope.CreateRoot(
+                LifecycleScopeKind.Application,
+                "presentation-package-consumer");
+            Console.WriteLine("stage=services-ready");
+
+            var registry = provider.GetRequiredService<IViewRegistry>();
+            registry.Register(new ViewDescriptor(
+                typeof(ConsumerViewModel),
+                typeof(ConsumerView),
+                "main",
+                static _ => new ConsumerView()));
+            var descriptor = registry.Locate(typeof(ConsumerViewModel), "main");
+            Console.WriteLine("stage=view-located");
+
+            var target = new ConsumerOutletTarget();
+            await using var outlet = new RouteOutlet("primary", InlineUiDispatcher.Instance, target);
+            var viewModel = new ConsumerViewModel();
+            var view = descriptor.CreateView(new ViewFactoryContext(provider));
+            var commit = await outlet.CommitAsync(RouteOutletCommitPlan.Replace(
+                "primary",
+                BoundViewHandle.FromExisting(view, viewModel)));
+            Console.WriteLine("stage=outlet-committed");
+
+            var interactions = provider.GetRequiredService<IInteractionHandlerRegistry>();
+            using var registration = interactions.Register<ConsumerRequest, int>(
+                static (context, _) => ValueTask.FromResult(context.Request.Value + 1));
+            var interaction = await interactions.HandleAsync<ConsumerRequest, int>(new ConsumerRequest(41));
+            Console.WriteLine("stage=interaction-completed");
+
+            var runtime = provider.GetRequiredService<IPresentationRuntime>();
+            runtime.Attach(new Avalonia.Controls.ApplicationLifetimes.ClassicDesktopStyleApplicationLifetime(), applicationScope);
+            await runtime.StopAsync();
+            Console.WriteLine("stage=runtime-stopped");
+
+            if (!commit.Succeeded || !ReferenceEquals(target.Content, view) ||
+                interaction.Status != AtomUI.City.Mvvm.InteractionResultStatus.Completed ||
+                interaction.Value != 42 || runtime.State != PresentationRuntimeState.Stopped)
+            {
+                throw new InvalidOperationException("Presentation package consumer contract failed.");
+            }
+
+            Console.WriteLine("PRESENTATION_PACKAGE_CONSUMER_OK view=located outlet=committed interaction=completed runtime=stopped");
+        }
+        catch (Exception exception)
+        {
+            throw new InvalidOperationException("Presentation package consumer scenario failed.", exception);
+        }
+    }
+
+    private static void SuppressWindowsErrorDialogs()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            SetErrorMode(GetErrorMode() | 0x0002);
+        }
+    }
+
+    [DllImport("kernel32.dll")]
+    private static extern uint GetErrorMode();
+
+    [DllImport("kernel32.dll")]
+    private static extern uint SetErrorMode(uint errorMode);
+}
+
+internal sealed record ConsumerRequest(int Value);
+
+internal sealed class ConsumerViewModel;
+
+internal sealed class ConsumerView;
+
+internal sealed class ConsumerOutletTarget : IRouteOutletTarget
+{
+    public object? Content { get; private set; }
+
+    public void SetContent(object? content) => Content = content;
+}
+
+internal sealed class InlineUiDispatcher : IUiDispatcher
+{
+    public static InlineUiDispatcher Instance { get; } = new();
+
+    public bool CheckAccess() => true;
+
+    public ValueTask InvokeAsync(Action callback, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        callback();
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask<T> InvokeAsync<T>(Func<T> callback, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return ValueTask.FromResult(callback());
+    }
+
+    public ValueTask PostAsync(
+        Func<CancellationToken, ValueTask> callback,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return callback(cancellationToken);
+    }
+}

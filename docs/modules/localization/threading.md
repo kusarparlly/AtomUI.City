@@ -29,7 +29,7 @@
 
 ## 后台任务和取消
 
-- IO、package load、Presentation bridge 和文本刷新在可取消阶段必须观察对应 token。
+- IO、package load、可选 application-owned bridge 和文本刷新在可取消阶段必须观察对应 token。
 - mutation 的调用方 token 只控制提交前阶段；一旦 descriptor/cache/state 已提交，后续 bridge 和文本刷新由 service lifetime token 完成，调用方取消不得制造部分发布状态。
 - 长生命周期后台任务必须绑定 owner；owner 释放时取消。
 

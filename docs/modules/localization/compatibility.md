@@ -23,7 +23,7 @@
 - `AssemblyLanguagePackageProvider.Discover(Assembly)` 的 attribute-to-descriptor 映射、assembly location、resource base name、fallback culture、version、checksum 和 contribution id 行为进入 1.0 兼容承诺。
 - `LocalizationService` 的 culture/package cache key、同一 culture/package in-flight load 合并和 lookup load failure fallback 行为进入 1.0 兼容承诺。
 - `LocalizationService` 的 descriptor scope lookup priority、Host/Presentation 全局可见性、scoped descriptor 的 `ScopeId + LocalizationLookupContext + active lease` 可见性、culture switch 活动集合预加载、missing marker、message format failure raw-template fallback 和 `LocalizedText` revision refresh 行为进入 1.0 兼容承诺。
-- `LocalizationService.SetCultureAsync` 在 Presentation bridge 失败时不回滚已提交 culture state、继续刷新本地 `ILocalizedText` 并返回失败 result 的行为进入 1.0 兼容承诺。
+- `LocalizationService.SetCultureAsync` 在可选 application-owned bridge 失败时不回滚已提交 culture state、继续刷新本地 `ILocalizedText` 并返回失败 result 的行为进入 1.0 兼容承诺。
 - `ILocalizationService.RevokePackagesByContributionIdAsync` 的 descriptor 撤销、cache 清理、state revision、重复 revoke 幂等、lookup snapshot 隔离和提交后 service-owned 完成行为进入 1.0 兼容承诺。
 - Localization mutation 的 FIFO 顺序、锁外 callback、`ReentrantOperation` 快速失败以及 revoke/load commit 重验行为进入 1.0 兼容承诺。
 - generated Localization hint folder、`GeneratedLocalizationManifest` 类型名、`RegisterPackages`、`SupportedCultures`、`ResourceKeys`、`Keys` 成员以及生成 descriptor 保留声明 assembly `AssemblyLoadContext` 的行为进入 1.0 兼容承诺。

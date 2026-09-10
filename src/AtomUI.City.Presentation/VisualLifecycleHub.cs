@@ -5,7 +5,7 @@ namespace AtomUI.City.Presentation;
 public sealed class VisualLifecycleHub
 {
     private readonly object _gate = new();
-    private readonly List<Action<VisualLifecycleEvent>> _subscribers = new();
+    private readonly List<Subscription> _subscribers = new();
     private readonly IHostDiagnostics? _diagnostics;
 
     public VisualLifecycleHub()
@@ -21,34 +21,64 @@ public sealed class VisualLifecycleHub
 
     public IDisposable Subscribe(Action<VisualLifecycleEvent> handler)
     {
+        return Subscribe(handler, new VisualLifecycleSubscriptionOptions());
+    }
+
+    public IDisposable Subscribe(
+        Action<VisualLifecycleEvent> handler,
+        VisualLifecycleSubscriptionOptions options)
+    {
         ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(options);
+
+        var subscription = new Subscription(this, handler, options);
 
         lock (_gate)
         {
-            _subscribers.Add(handler);
+            _subscribers.Add(subscription);
         }
 
-        return new Subscription(this, handler);
+        options.ActivationScope?.Add(subscription);
+        return subscription;
     }
 
     public void Notify(object view, VisualLifecycleEventKind kind)
     {
         ArgumentNullException.ThrowIfNull(view);
+        Notify(new VisualLifecycleEvent(view, kind));
+    }
 
-        Action<VisualLifecycleEvent>[] subscribers;
+    public void Notify(VisualIdentity identity, VisualLifecycleEventKind kind)
+    {
+        ArgumentNullException.ThrowIfNull(identity);
+        Notify(new VisualLifecycleEvent(identity, kind));
+    }
+
+    public void Notify(VisualLifecycleEvent lifecycleEvent)
+    {
+        ArgumentNullException.ThrowIfNull(lifecycleEvent);
+        if (!Enum.IsDefined(lifecycleEvent.Kind))
+        {
+            throw new ArgumentOutOfRangeException(nameof(lifecycleEvent), "Visual lifecycle event kind must be defined.");
+        }
+
+        Subscription[] subscribers;
 
         lock (_gate)
         {
             subscribers = _subscribers.ToArray();
         }
 
-        var lifecycleEvent = new VisualLifecycleEvent(view, kind);
-
         foreach (var subscriber in subscribers)
         {
+            if (!subscriber.Matches(lifecycleEvent.Identity))
+            {
+                continue;
+            }
+
             try
             {
-                subscriber(lifecycleEvent);
+                subscriber.Invoke(lifecycleEvent);
                 WriteAdapterExecutedDiagnostic(lifecycleEvent);
             }
             catch (Exception exception)
@@ -58,11 +88,11 @@ public sealed class VisualLifecycleHub
         }
     }
 
-    private void Unsubscribe(Action<VisualLifecycleEvent> handler)
+    private void Unsubscribe(Subscription subscription)
     {
         lock (_gate)
         {
-            _subscribers.Remove(handler);
+            _subscribers.Remove(subscription);
         }
     }
 
@@ -104,6 +134,10 @@ public sealed class VisualLifecycleHub
             ["viewType"] = viewType.FullName,
             ["viewModelType"] = viewModel?.GetType().FullName,
             ["eventKind"] = lifecycleEvent.Kind.ToString(),
+            ["windowId"] = lifecycleEvent.Identity.WindowId,
+            ["outletName"] = lifecycleEvent.Identity.OutletName,
+            ["operationId"] = lifecycleEvent.Identity.OperationId?.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            ["entryId"] = lifecycleEvent.Identity.EntryId,
             ["error"] = exception?.GetType().FullName,
         };
     }
@@ -112,26 +146,48 @@ public sealed class VisualLifecycleHub
     {
         private readonly VisualLifecycleHub _hub;
         private Action<VisualLifecycleEvent>? _handler;
+        private readonly VisualLifecycleSubscriptionOptions _options;
+        private int _disposed;
 
         public Subscription(
             VisualLifecycleHub hub,
-            Action<VisualLifecycleEvent> handler)
+            Action<VisualLifecycleEvent> handler,
+            VisualLifecycleSubscriptionOptions options)
         {
             _hub = hub;
             _handler = handler;
+            _options = options;
         }
+
+        public bool Matches(VisualIdentity identity)
+        {
+            return !IsDisposed &&
+                Matches(_options.WindowId, identity.WindowId) &&
+                Matches(_options.OutletName, identity.OutletName) &&
+                (!_options.OperationId.HasValue || _options.OperationId == identity.OperationId) &&
+                Matches(_options.EntryId, identity.EntryId);
+        }
+
+        public void Invoke(VisualLifecycleEvent lifecycleEvent) => _handler?.Invoke(lifecycleEvent);
 
         public void Dispose()
         {
-            var handler = _handler;
-
-            if (handler is null)
+            if (Interlocked.Exchange(ref _disposed, 1) != 0)
             {
                 return;
             }
 
+            var handler = _handler;
             _handler = null;
-            _hub.Unsubscribe(handler);
+            if (handler is not null)
+            {
+                _hub.Unsubscribe(this);
+            }
         }
+
+        private bool IsDisposed => Volatile.Read(ref _disposed) != 0;
+
+        private static bool Matches(string? expected, string? actual) =>
+            expected is null || string.Equals(expected, actual, StringComparison.Ordinal);
     }
 }

@@ -69,7 +69,7 @@ public sealed class PackagingReleaseGateTests
             .Descendants("PackageVersion")
             .Single(reference => reference.Attribute("Include")?.Value == "Microsoft.SourceLink.GitHub");
 
-        Assert.False(string.IsNullOrWhiteSpace(sourceLinkVersion.Attribute("Version")?.Value));
+        Assert.Equal("10.0.303", sourceLinkVersion.Attribute("Version")?.Value);
     }
 
     [Fact]
@@ -101,6 +101,45 @@ public sealed class PackagingReleaseGateTests
         Assert.True(File.Exists(unshippedApiPath));
         Assert.Contains(
             File.ReadLines(shippedApiPath),
+            line => !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#'));
+    }
+
+    [Fact]
+    public void PresentationPublicApiGateUsesFrozenBaselineAnalyzersAndPackageValidation()
+    {
+        var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
+        var project = XDocument.Load(Path.Combine(
+            repositoryRoot,
+            "src",
+            "AtomUI.City.Presentation",
+            "AtomUI.City.Presentation.csproj"));
+        var properties = ReadProperties(project);
+        var shippedApiPath = Path.Combine(
+            repositoryRoot,
+            "src",
+            "AtomUI.City.Presentation",
+            "PublicAPI.Shipped.txt");
+        var unshippedApiPath = Path.Combine(
+            repositoryRoot,
+            "src",
+            "AtomUI.City.Presentation",
+            "PublicAPI.Unshipped.txt");
+        var analyzerReference = project
+            .Descendants("PackageReference")
+            .Single(reference => reference.Attribute("Include")?.Value == "Microsoft.CodeAnalysis.PublicApiAnalyzers");
+
+        Assert.Equal("all", analyzerReference.Attribute("PrivateAssets")?.Value);
+        Assert.Equal("true", properties["EnablePackageValidation"]);
+        Assert.Equal("true", properties["EnableStrictModeForCompatibleFrameworksInPackage"]);
+        Assert.Contains("RS0016", properties["WarningsAsErrors"], StringComparison.Ordinal);
+        Assert.Contains("RS0017", properties["WarningsAsErrors"], StringComparison.Ordinal);
+        Assert.True(File.Exists(shippedApiPath));
+        Assert.True(File.Exists(unshippedApiPath));
+        Assert.Contains(
+            File.ReadLines(shippedApiPath),
+            line => !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#'));
+        Assert.DoesNotContain(
+            File.ReadLines(unshippedApiPath),
             line => !string.IsNullOrWhiteSpace(line) && !line.StartsWith('#'));
     }
 

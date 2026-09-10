@@ -19,8 +19,6 @@ public static class PresentationDiagnosticIds
     public const string VisualLifecycleAdapterFailed = "AUCPRS015";
     public const string ResourceDictionaryRevoked = "AUCPRS016";
     public const string ResourceDictionaryRevokeFailed = "AUCPRS017";
-    public const string ResourceDictionaryApplied = "AUCPRS018";
-    public const string ResourceDictionaryApplyFailed = "AUCPRS019";
     public const string InteractionHandled = "AUCPRS020";
     public const string InteractionNotHandled = "AUCPRS021";
     public const string InteractionFailed = "AUCPRS022";
@@ -37,4 +35,12 @@ public static class PresentationDiagnosticIds
     public const string PluginViewCloseFailed = "AUCPRS033";
     public const string PluginUnloadCleanupCompleted = "AUCPRS034";
     public const string PluginUnloadCleanupFailed = "AUCPRS035";
+    public const string OutletRollbackFailed = "AUCPRS036";
+    public const string PresentationEntryCleanupFailed = "AUCPRS037";
+    public const string FailurePresenterFailed = "AUCPRS038";
+    public const string WindowCleanupFailed = "AUCPRS039";
+    public const string OutletQueueRejected = "AUCPRS040";
+    public const string InteractionQueueRejected = "AUCPRS041";
+    public const string CandidateOwnershipViolation = "AUCPRS042";
+    public const string MultipleCloseConfirmations = "AUCPRS043";
 }

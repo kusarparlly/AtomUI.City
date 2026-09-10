@@ -41,7 +41,7 @@
 | AUC-LOCALIZATION-003 | Lazy Loading | LocalizationServiceTests |
 | AUC-LOCALIZATION-004 | Lookup and Fallback | LocalizationServiceTests |
 | AUC-LOCALIZATION-005 | Assembly Language Packages | LanguagePackageProviderTests; LocalizationDeclarationAttributeTests |
-| AUC-LOCALIZATION-006 | Presentation Bridge | LocalizationServiceTests |
+| AUC-LOCALIZATION-006 | Optional Application Refresh Hook | LocalizationServiceTests |
 | AUC-LOCALIZATION-007 | Plugin Package Revocation | LocalizationServiceTests |
 | AUC-LOCALIZATION-008 | Generated Localization Manifest | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationManifestBuilderTests |
 
@@ -139,7 +139,7 @@ Revoke contribution
 -> remove package store
 -> invalidate lookup cache
 -> fallback to owning module / host
--> notify Presentation refresh or clear UI
+-> notify optional application refresh hook or clear application UI
 ```
 
 撤销后的资源不能继续被 Host cache 命中。

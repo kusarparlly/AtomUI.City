@@ -17,7 +17,7 @@ AtomUI.City 是应用框架，不只是工具库。它会提供一套默认编�
 -> 编写 ViewModel
 -> 使用 State / Data / EventBus / Security
 -> 由 Lifecycle 管理激活、订阅和释放
--> 由 Presentation 接入 AtomUI/Avalonia
+-> 由 Presentation 接入 Avalonia；控件库由应用选择
 ```
 
 ## 2. 核心约定

@@ -5,4 +5,19 @@
     <None Remove="*.csproj.DotSettings" />
   </ItemGroup>
 
+  <Target Name="NormalizeAtomUICitySourceRepositoryUrl"
+          AfterTargets="SourceControlManagerPublishTranslatedUrls"
+          BeforeTargets="InitializeSourceControlInformation"
+          Condition="'$(RepositoryUrl)' != ''">
+    <PropertyGroup>
+      <PrivateRepositoryUrl>$(RepositoryUrl)</PrivateRepositoryUrl>
+      <ScmRepositoryUrl>$(RepositoryUrl)</ScmRepositoryUrl>
+    </PropertyGroup>
+    <ItemGroup>
+      <SourceRoot Update="@(SourceRoot)"
+                  RepositoryUrl="$(RepositoryUrl)"
+                  ScmRepositoryUrl="$(RepositoryUrl)" />
+    </ItemGroup>
+  </Target>
+
 </Project>

@@ -28,7 +28,7 @@
 | `AtomUI.City.Security` | 认证状态、权限检查、授权策略、路由和命令权限联动。 |
 | `AtomUI.City.EventBus` | 类型事件总线、作用域订阅、事件通道、线程调度、错误策略。 |
 | `AtomUI.City.Localization` | 本地化资源、文化切换、文本刷新、模块化资源注册。 |
-| `AtomUI.City.Presentation` | AtomUI/Avalonia 集成、ViewLocator、UI Dispatcher、Activation 接入、Interaction Handler。 |
+| `AtomUI.City.Presentation` | Avalonia 运行时集成、ViewLocator、UI Dispatcher、Activation 接入、Interaction Handler。 |
 | `AtomUI.City.PluginSystem` | 插件发现、插件元数据、插件加载、插件模块注册、插件生命周期。 |
 | `AtomUI.City.Build` | 构建约定、资源生成、模块清单、路由清单、输出组织。 |
 | `AtomUI.City.Generators` | Source Generator 和 Analyzer 实现，生成模块、路由、Presentation、权限、本地化、插件和事件相关 manifest 与 registrar。 |
@@ -45,7 +45,7 @@ Application
 -> Core
 -> Mvvm / State / Routing / Data / Security / EventBus / Localization / PluginSystem
 -> Presentation
--> AtomUI / Avalonia
+-> Avalonia / optional application UI library
 ```
 
 工程层依赖方向：

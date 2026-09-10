@@ -41,7 +41,7 @@
 | AUC-LOCALIZATION-003 | Lazy Loading | LocalizationServiceTests |
 | AUC-LOCALIZATION-004 | Lookup and Fallback | LocalizationServiceTests |
 | AUC-LOCALIZATION-005 | Assembly Language Packages | LanguagePackageProviderTests; LocalizationDeclarationAttributeTests |
-| AUC-LOCALIZATION-006 | Presentation Bridge | LocalizationServiceTests |
+| AUC-LOCALIZATION-006 | Optional Application Refresh Hook | LocalizationServiceTests |
 | AUC-LOCALIZATION-007 | Plugin Package Revocation | LocalizationServiceTests |
 | AUC-LOCALIZATION-008 | Generated Localization Manifest | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationManifestBuilderTests |
 
@@ -89,7 +89,7 @@ Localization 提供 `GetMessageAsync` 与 `CreateMessageTextAsync` 作为 Valida
 规则：
 
 - Validator 返回 MessageKey 和 MessageArgs。
-- Presentation 负责展示本地化结果。
+- 应用 UI 或独立可选适配包负责展示本地化结果。
 - Culture 切换后可见 validation message 刷新。
 - 缺失 validation key 使用 missing marker。
 
@@ -111,7 +111,7 @@ MessageArgs = [...]
 
 Dialog、Toast、Notification 应传 MessageKey。
 
-已经显示的临时 UI 是否刷新，由 Presentation 策略决定：
+已经显示的临时 UI 是否刷新，由应用 UI 策略决定：
 
 - 长时间存在的 Dialog 应刷新。
 - 短生命周期 Toast 可以不刷新，但后续新 Toast 使用新 culture。

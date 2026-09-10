@@ -1,5 +1,4 @@
 using AtomUI.City.Core.Diagnostics;
-using AtomUI.City.Localization;
 using AtomUI.City.Core.Threading;
 
 namespace AtomUI.City.Presentation;
@@ -30,52 +29,39 @@ public sealed class PresentationResourceDictionaryRevoker : IPresentationResourc
         _diagnostics = diagnostics;
     }
 
-    public async ValueTask<LocalizationResult> RevokeAsync(
+    public async ValueTask<PresentationResourceDictionaryRevokeResult> RevokeAsync(
         PresentationResourceDictionaryRevocation revocation,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(revocation);
 
-        var result = LocalizationResult.Success();
-
+        var failures = new List<Exception>();
         try
         {
-            await _dispatcher
-                .PostAsync(
-                    async dispatcherCancellationToken =>
+            await _dispatcher.PostAsync(
+                async dispatcherCancellationToken =>
+                {
+                    foreach (var target in _targets)
                     {
-                        foreach (var target in _targets)
+                        dispatcherCancellationToken.ThrowIfCancellationRequested();
+                        try
                         {
-                            dispatcherCancellationToken.ThrowIfCancellationRequested();
-
-                            try
-                            {
-                                var revokeResult = await target
-                                    .RevokeResourcesAsync(revocation, dispatcherCancellationToken)
-                                    .ConfigureAwait(false);
-
-                                if (!revokeResult.Succeeded && result.Succeeded)
-                                {
-                                    result = revokeResult;
-                                }
-                            }
-                            catch (OperationCanceledException)
-                                when (dispatcherCancellationToken.IsCancellationRequested)
-                            {
-                                throw;
-                            }
-                            catch (Exception exception) when (result.Succeeded)
-                            {
-                                result = LocalizationResult.Failed(
-                                    new LocalizationError(
-                                        LocalizationErrorKind.PresentationApplyFailed,
-                                        "Presentation resource dictionary revoke failed.",
-                                        exception));
-                            }
+                            await target
+                                .RevokeResourcesAsync(revocation, dispatcherCancellationToken)
+                                .ConfigureAwait(false);
                         }
-                    },
-                    cancellationToken)
-                .ConfigureAwait(false);
+                        catch (OperationCanceledException)
+                            when (dispatcherCancellationToken.IsCancellationRequested)
+                        {
+                            throw;
+                        }
+                        catch (Exception exception)
+                        {
+                            failures.Add(exception);
+                        }
+                    }
+                },
+                cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -83,60 +69,36 @@ public sealed class PresentationResourceDictionaryRevoker : IPresentationResourc
         }
         catch (Exception exception)
         {
-            result = LocalizationResult.Failed(
-                new LocalizationError(
-                    LocalizationErrorKind.PresentationApplyFailed,
-                    "Presentation resource dictionary revoke failed.",
-                    exception));
+            failures.Add(exception);
         }
 
-        WriteRevocationDiagnostic(revocation, result);
-
+        var result = new PresentationResourceDictionaryRevokeResult(failures);
+        WriteDiagnostic(revocation, result);
         return result;
     }
 
-    private void WriteRevocationDiagnostic(
+    private void WriteDiagnostic(
         PresentationResourceDictionaryRevocation revocation,
-        LocalizationResult result)
+        PresentationResourceDictionaryRevokeResult result)
     {
-        if (result.Succeeded)
-        {
-            _diagnostics?.Write(new HostDiagnosticRecord(
-                PresentationDiagnosticIds.ResourceDictionaryRevoked,
-                $"Presentation resource dictionary revoked plugin '{revocation.PluginId}' contribution '{NormalizeContributionId(revocation.ContributionId)}'.",
-                HostDiagnosticSeverity.Info)
-            {
-                Context = CreateDiagnosticContext(revocation, result),
-            });
-
-            return;
-        }
-
+        var firstError = result.Errors.FirstOrDefault();
         _diagnostics?.Write(new HostDiagnosticRecord(
-            PresentationDiagnosticIds.ResourceDictionaryRevokeFailed,
-            $"Presentation resource dictionary failed to revoke plugin '{revocation.PluginId}' contribution '{NormalizeContributionId(revocation.ContributionId)}': {result.Error?.Message}",
-            HostDiagnosticSeverity.Error)
+            result.Succeeded
+                ? PresentationDiagnosticIds.ResourceDictionaryRevoked
+                : PresentationDiagnosticIds.ResourceDictionaryRevokeFailed,
+            result.Succeeded
+                ? $"Presentation resource dictionaries were revoked for plugin '{revocation.PluginId}'."
+                : $"Presentation resource dictionary revoke failed for plugin '{revocation.PluginId}': {firstError?.Message}",
+            result.Succeeded ? HostDiagnosticSeverity.Info : HostDiagnosticSeverity.Error)
         {
-            Context = CreateDiagnosticContext(revocation, result),
+            Context = new Dictionary<string, string?>(StringComparer.Ordinal)
+            {
+                ["pluginId"] = revocation.PluginId,
+                ["contributionId"] = revocation.ContributionId,
+                ["targetCount"] = _targets.Count.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                ["failureCount"] = result.Errors.Count.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                ["error"] = firstError?.GetType().FullName,
+            },
         });
-    }
-
-    private IReadOnlyDictionary<string, string?> CreateDiagnosticContext(
-        PresentationResourceDictionaryRevocation revocation,
-        LocalizationResult result)
-    {
-        return new Dictionary<string, string?>(StringComparer.Ordinal)
-        {
-            ["pluginId"] = revocation.PluginId,
-            ["contributionId"] = revocation.ContributionId,
-            ["targetCount"] = _targets.Count.ToString(System.Globalization.CultureInfo.InvariantCulture),
-            ["errorKind"] = result.Error?.Kind.ToString(),
-            ["error"] = result.Error?.Exception?.GetType().FullName,
-        };
-    }
-
-    private static string NormalizeContributionId(string? contributionId)
-    {
-        return string.IsNullOrWhiteSpace(contributionId) ? "<all>" : contributionId;
     }
 }

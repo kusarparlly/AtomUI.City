@@ -10,7 +10,7 @@
 | Package Provider | ILanguagePackageProvider, LanguagePackageDescriptor, LanguagePackageRegistry | 语言包来源。 | Registry 是运行时 descriptor 的唯一来源；package identity 是 `(culture, packageId)`；File/Assembly/InMemory 均有默认 provider；registry 必须绑定 owner，并在 owner revoke 后拒绝新贡献；批量注册必须全有或全无。 |
 | Lookup | ILocalizationService, LocalizedString, LocalizedMessage, LocalizedText | 文本查找、参数格式化和订阅更新。 | descriptor scope priority 稳定；缺失 key 和格式化失败必须诊断。 |
 | Assembly Package | AssemblyLanguagePackageProvider, LanguagePackageAttribute | 独立 assembly 语言包。 | `Discover(Assembly)` 从 assembly 属性声明生成 descriptor；运行时按 culture 懒加载 embedded locpack。 |
-| Presentation Bridge | IPresentationLocalizationBridge | 通知 UI 刷新。 | Localization 不直接操作 VisualTree。 |
+| Optional Application Bridge | IPresentationLocalizationBridge | culture commit 后通知应用或独立 UI 适配包。 | 默认 no-op；Localization 不操作 VisualTree，Presentation 主模块不负责实现。 |
 
 ## 关键方法合同
 

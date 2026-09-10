@@ -1,43 +1,32 @@
 # AtomUI.City.Presentation Compatibility
 
-## 兼容性范围
+## 1.0 稳定面
 
-本模块兼容面包括 public API、options、attribute、diagnostics code、manifest/schema、generated output、MSBuild property、CLI envelope、template layout、snapshot 或 plugin contract 中实际适用的部分。
+- `PublicAPI.Shipped.txt` 中的公开类型和成员签名；新签名先进入 Unshipped，删除或改变 shipped 签名必须按 breaking change 处理。
+- public API、enum 值、attribute/options 默认值、diagnostic code、generated View registrar 形状。
+- 主包只硬依赖 Avalonia；增加 AtomUI 或 Localization 硬依赖是 breaking change。
+- `PresentationModule` 与 `AddPresentation` 的等价完整注册。
+- `Attach/RegisterWindow` 主路径、Show 前注册、WindowSession/WindowScope 一一对应。
+- exact View key、override owner 栈、generated registrar 稳定排序。
+- ViewModel ownership、async-only lease、single-use candidate、FIFO/final commit/rollback/cancellation 语义。
+- queue 默认容量 32/8、reject-newest、错误分类和 snapshot 字段。
+- close origin、唯一 confirmation、并发 Close/Stop 合并和不可拒绝 shutdown。
+- Visual identity 过滤、真实事件规则和不自动写 State/EventBus。
+- Validation 完全可选且应用拥有规则、文案、回调和样式。
+- plugin UI owner/revoke/unload 顺序。
+- NuGet 包的 net8.0/net10.0 资产以及 Avalonia/Core/Mvvm/Routing/Security/State 依赖边；AtomUI、Localization、fixture、test 和 benchmark 不得进入主包。
 
-## 模块兼容性硬边界
+## 不属于 Presentation 兼容面
 
-- 所有 VisualTree 修改必须在 UI dispatcher 上执行。
-- `AvaloniaUiDispatcher` 的后台 marshal、取消、`PresentationError.DispatcherUnavailable` 和 dispatcher 诊断上下文字段属于 1.0 兼容 contract。
-- ViewLocator 默认使用 generated manifest 或显式注册；`ViewLookupRequest`、`ViewRegistrationOptions.ReplaceExisting`、manifest 原子注册、精确 key lookup 和插件撤销属于 1.0 兼容 contract。
-- `ViewDescriptor.ConstructorParameterTypes`、ViewFactory 取消前不创建、ViewBinder binding 失败释放、BoundViewHandle dispose 幂等和 attach/detach lifecycle 属于 1.0 兼容 contract。
-- `RouteOutlet` 的同 outlet commit 串行、重复提交同一 handle 不释放当前 View、取消前不 attach、失败保留旧 content、拒绝的新 handle 释放和 `OutletCommit*` 诊断上下文字段属于 1.0 兼容 contract。
-- `VisualLifecycleEventKind` 的 Attached、Detached、Loaded、Unloaded、Focused、Unfocused、Visible、Hidden 值，以及 `VisualLifecycleHub` 的订阅顺序、失败隔离和 `VisualLifecycleAdapter*` 诊断上下文字段属于 1.0 兼容 contract。
-- `InteractionHandlerRegistry` 的最后注册 handler 选择、plugin/contribution revoke、预取消不调用 handler、owner revoke 取消 pending interaction 和 `Interaction*` 诊断上下文字段属于 1.0 兼容 contract。
-- `ValidationVisualStateBinding` 的 immutable snapshot、消息变化重新应用、预取消不调用 target、target 释放失败传播和 `ValidationVisualState*` 诊断上下文字段属于 1.0 兼容 contract。
-- `PresentationLocalizationBridge`、`CultureResourceDictionaryApplier` 和 `PresentationResourceDictionaryRevoker` 的局部失败隔离、返回首个失败、dispatcher 执行和 `ResourceDictionary*` 诊断上下文字段属于 1.0 兼容 contract。
-- `PresentationResourceRegistry` 的 resource lease、plugin/contribution revoke、dispose 失败继续撤销其他资源和 `ResourceContribution*` 诊断上下文字段属于 1.0 兼容 contract。
-- `ActivePluginViewRegistry` 的 active view lease、plugin/contribution close、outlet close 失败继续处理、重复 lease dispose 和 `PluginView*` 诊断上下文字段属于 1.0 兼容 contract。
-- `PresentationPluginUnloadCoordinator` 的 cleanup 顺序、active view remaining 阻止 unload、resource dictionary failure 继续 resource revoke、重复 cleanup 幂等和 `PluginUnloadCleanup*` 诊断上下文字段属于 1.0 兼容 contract。
-- 插件 View、resource dictionary、localized binding 必须绑定 plugin lease。
-- VisualTree 变化必须反馈到 ViewModel/State。
+- Localization 的 culture、revision、fallback、文案 key/value 和 language package。
+- 应用自有 Dialog/Toast/Validation UI、Routing-Presentation adapter 业务编排。
+- roadmap 候选、测试替身内部结构、diagnostic message 文案。
+- Linux/macOS runtime 行为；1.0 仅承诺 build-only experimental。
 
-## API 兼容规则
+## Retired before 1.0
 
-- public 类型、成员、枚举值、attribute 参数和扩展方法默认视为兼容性承诺。
-- 删除、重命名、改变默认行为、异常类型、Result status 或诊断码语义属于 breaking change。
-- 新增 API 可以 minor 版本发布，但必须有文档、测试和迁移说明。
+原 `PresentationLocalizationBridge`、`Localized*Binding/Target`、culture applier、flow direction applier 以及 AUCPRS018/019 active 语义在 1.0 冻结前移除。类型不构成 1.0 compatibility，但诊断编号保留且不得复用。
 
-## 数据格式兼容
+## 演进
 
-- manifest、snapshot、generated output、CLI JSON、template variables 和 MSBuild properties 必须有版本或稳定字段说明。
-- reader 必须拒绝高于支持版本的不可理解格式，并输出稳定诊断。
-- 生成输出 hint name、type name 和 field name 改变属于兼容性风险。
-
-## 插件兼容
-
-- 跨插件边界 contract 必须来自 Host 共享程序集。
-- 插件依赖的 capability id、manifest 字段、event contract、route target、state key、permission id 改变必须提供迁移策略。
-
-## 废弃规则
-
-废弃 API 必须说明 Deprecated Since、Replacement、Removal Earliest Version、Migration、Analyzer Diagnostic。
+改变默认值、线程、ownership、取消、提交点、Result/exception、状态终态或关闭可拒绝性均为 breaking change。Deprecated API 必须记录版本、replacement、最早删除版本、迁移方法和 Analyzer diagnostic。

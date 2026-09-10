@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="AtomUI.City local candidate" value="../local-feed" />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+  </packageSources>
+  <packageSourceMapping>
+    <packageSource key="AtomUI.City local candidate">
+      <package pattern="AtomUI.City.*" />
+    </packageSource>
+    <packageSource key="nuget.org">
+      <package pattern="Avalonia*" />
+      <package pattern="CommunityToolkit.*" />
+      <package pattern="HarfBuzzSharp*" />
+      <package pattern="Microsoft.*" />
+      <package pattern="MicroCom.*" />
+      <package pattern="SkiaSharp*" />
+      <package pattern="System.*" />
+      <package pattern="Tmds.*" />
+      <package pattern="runtime.*" />
+      <package pattern="NETStandard.Library" />
+    </packageSource>
+  </packageSourceMapping>
+</configuration>

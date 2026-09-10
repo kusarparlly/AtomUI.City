@@ -11,9 +11,20 @@ public static class PresentationRuntimeServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
 
         services.TryAddSingleton(
-            serviceProvider => new PresentationRuntime(serviceProvider.GetService<IHostDiagnostics>()));
+            serviceProvider =>
+            {
+                var diagnostics = serviceProvider.GetService<IHostDiagnostics>();
+                return new PresentationRuntime(
+                    () => serviceProvider.GetService<AtomUI.City.Core.Threading.IUiDispatcher>(),
+                    diagnostics,
+                    serviceProvider.GetService<PresentationQueueOptions>(),
+                    serviceProvider.GetService<IPresentationFailurePresenter>(),
+                    serviceProvider.GetService<VisualLifecycleHub>());
+            });
         services.TryAddSingleton<IPresentationRuntime>(
             serviceProvider => serviceProvider.GetRequiredService<PresentationRuntime>());
+        services.TryAddSingleton<IViewModelFactory, DefaultViewModelFactory>();
+        services.TryAddSingleton<IPresentationFailurePresenter, NullPresentationFailurePresenter>();
 
         return services;
     }

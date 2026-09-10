@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUtc": "2026-09-10T08:12:45.62309+00:00",
+  "gitCommit": "5ffaecc9b8bd628563ecff0d52a41472b2cca7bd",
+  "candidateFingerprint": "8576e67ca8335fda1496aaafa5e24eb511774d8c9070e2aa88f0a5892f8923d0",
+  "environment": {
+    "operatingSystem": "Microsoft Windows 10.0.26200",
+    "processArchitecture": "X64",
+    "processorIdentifier": "AMD64 Family 25 Model 117 Stepping 2, AuthenticAMD",
+    "dotNetSdk": "10.0.303",
+    "dotNetRuntime": ".NET 10.0.11",
+    "benchmarkDotNet": "0.15.8.0"
+  },
+  "measurements": [
+    {
+      "name": "InteractionDispatchBenchmarks.DispatchGlobalHandler: MediumRun(IterationCount=15, LaunchCount=2, WarmupCount=10)",
+      "meanNanoseconds": 374.79321241378784,
+      "allocatedBytesPerOperation": 1120
+    },
+    {
+      "name": "RouteOutletBenchmarks.ReplaceCommittedEntry: MediumRun(IterationCount=15, LaunchCount=2, WarmupCount=10)",
+      "meanNanoseconds": 1542.6597722371419,
+      "allocatedBytesPerOperation": 1696
+    },
+    {
+      "name": "ViewRegistryBenchmarks.LocateExactOverride: MediumRun(IterationCount=15, LaunchCount=2, WarmupCount=10)",
+      "meanNanoseconds": 32.636422514915466,
+      "allocatedBytesPerOperation": 0
+    },
+    {
+      "name": "VisualLifecycleBenchmarks.NotifyMatchingIdentity: MediumRun(IterationCount=15, LaunchCount=2, WarmupCount=10)",
+      "meanNanoseconds": 21.076331436634064,
+      "allocatedBytesPerOperation": 72
+    }
+  ]
+}

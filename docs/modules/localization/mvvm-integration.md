@@ -41,7 +41,7 @@
 | AUC-LOCALIZATION-003 | Lazy Loading | LocalizationServiceTests |
 | AUC-LOCALIZATION-004 | Lookup and Fallback | LocalizationServiceTests |
 | AUC-LOCALIZATION-005 | Assembly Language Packages | LanguagePackageProviderTests; LocalizationDeclarationAttributeTests |
-| AUC-LOCALIZATION-006 | Presentation Bridge | LocalizationServiceTests |
+| AUC-LOCALIZATION-006 | Optional Application Refresh Hook | LocalizationServiceTests |
 | AUC-LOCALIZATION-007 | Plugin Package Revocation | LocalizationServiceTests |
 | AUC-LOCALIZATION-008 | Generated Localization Manifest | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationManifestBuilderTests |
 
@@ -66,7 +66,7 @@
 
 MVVM 集成让 ViewModel、Command、Interaction 和 Validation 使用统一本地化能力。
 
-Mvvm 不实现资源查找。Localization 提供文本和 culture notification。Presentation 负责 UI 展示刷新。
+Mvvm 不实现资源查找。Localization 提供文本和 culture notification。应用组合层或独立可选 UI 适配包负责 UI 展示刷新。
 
 ### 2. ViewModel Lookup
 
@@ -115,7 +115,7 @@ IconKey
 ```text
 CultureChanged
 -> command text provider refresh
--> Presentation updates menu / toolbar / shortcut UI
+-> application UI adapter updates menu / toolbar / shortcut UI
 ```
 
 Command 可执行性不由 Localization 决定。
@@ -131,7 +131,7 @@ Interaction request 不应传固定显示文本。
 - ButtonKey。
 - MessageArgs。
 
-Presentation handler 在显示时通过 `ILocalizationService.GetMessageAsync` 查找当前 culture 文本。
+应用拥有的 Interaction handler 在显示时通过 `ILocalizationService.GetMessageAsync` 查找当前 culture 文本。
 
 ### 6. Validation
 

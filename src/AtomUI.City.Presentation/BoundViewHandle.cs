@@ -3,6 +3,7 @@ namespace AtomUI.City.Presentation;
 public sealed class BoundViewHandle : IDisposable
 {
     private readonly Action? _dispose;
+    private int _disposed;
 
     private BoundViewHandle(
         ViewDescriptor? descriptor,
@@ -25,7 +26,7 @@ public sealed class BoundViewHandle : IDisposable
 
     public object ViewModel { get; }
 
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => Volatile.Read(ref _disposed) != 0;
 
     public static BoundViewHandle FromExisting(
         object view,
@@ -56,12 +57,11 @@ public sealed class BoundViewHandle : IDisposable
 
     public void Dispose()
     {
-        if (IsDisposed)
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
         {
             return;
         }
 
         _dispose?.Invoke();
-        IsDisposed = true;
     }
 }

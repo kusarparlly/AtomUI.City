@@ -4,7 +4,7 @@ namespace AtomUI.City.Presentation;
 
 public sealed class ViewRegistry : IViewRegistry
 {
-    private readonly Dictionary<ViewRegistrationKey, ViewDescriptor> _descriptors = new();
+    private readonly Dictionary<ViewRegistrationKey, List<ViewDescriptor>> _descriptorLayers = new();
     private readonly ReaderWriterLockSlim _gate = new();
     private readonly IHostDiagnostics? _diagnostics;
 
@@ -82,7 +82,7 @@ public sealed class ViewRegistry : IViewRegistry
             {
                 foreach (var entry in entries)
                 {
-                    if (_descriptors.ContainsKey(entry.Key))
+                    if (_descriptorLayers.ContainsKey(entry.Key))
                     {
                         throw CreateDuplicateException(entry.Descriptor, entry.Key);
                     }
@@ -119,17 +119,17 @@ public sealed class ViewRegistry : IViewRegistry
         _gate.EnterWriteLock();
         try
         {
-            var revokedKeys = _descriptors
-                .Where(item => predicate(item.Value))
-                .Select(item => item.Key)
-                .ToArray();
-
-            foreach (var key in revokedKeys)
+            var revokedCount = 0;
+            foreach (var (key, layers) in _descriptorLayers.ToArray())
             {
-                _descriptors.Remove(key);
+                revokedCount += layers.RemoveAll(descriptor => predicate(descriptor));
+                if (layers.Count == 0)
+                {
+                    _descriptorLayers.Remove(key);
+                }
             }
 
-            return revokedKeys.Length;
+            return revokedCount;
         }
         finally
         {
@@ -164,9 +164,10 @@ public sealed class ViewRegistry : IViewRegistry
         _gate.EnterReadLock();
         try
         {
-            located = _descriptors.TryGetValue(
+            located = _descriptorLayers.TryGetValue(
                 ViewRegistrationKey.Create(request.ViewModelType, request.ViewKey),
-                out descriptor);
+                out var layers);
+            descriptor = located ? layers![^1] : null;
         }
         finally
         {
@@ -209,12 +210,18 @@ public sealed class ViewRegistry : IViewRegistry
         ViewDescriptor descriptor,
         ViewRegistrationOptions? options)
     {
-        if (_descriptors.ContainsKey(key) && options?.ReplaceExisting != true)
+        if (!_descriptorLayers.TryGetValue(key, out var layers))
+        {
+            layers = [];
+            _descriptorLayers[key] = layers;
+        }
+
+        if (layers.Count != 0 && options?.ReplaceExisting != true)
         {
             throw CreateDuplicateException(descriptor, key);
         }
 
-        _descriptors[key] = descriptor;
+        layers.Add(descriptor);
     }
 
     private static PresentationException CreateDuplicateException(

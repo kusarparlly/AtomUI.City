@@ -1,35 +1,81 @@
 # AtomUI.City.Presentation Testing
 
-## 测试原则
+## 测试层次
 
-- 每个 Feature ID 至少有 Unit 或 Contract 测试。
-- 集成测试不能替代单元测试。
-- 生命周期、线程、插件、订阅、连接、dispatcher、source generator、build 和 template 行为必须有专项测试。
-- 诊断码必须断言 code 和关键 context。
-- 释放、取消、unload、Dispose 后行为必须有断言。
+1. Unit/contract：纯对象、并发、ownership、失败注入和诊断。
+2. Generator：Presentation View registrar 的确定性、重复检测和构造参数。
+3. Avalonia.Headless process：真实 Window/Control/VisualTree/dispatcher，但不依赖桌面显示服务器。
+4. Stress：10,000 次导航、Interaction、关闭竞态和资源回收。
+5. Windows desktop dogfood：真实 Win32 Window、Show/Attach/Detach/Close 生命周期。
 
-## 产品级测试门禁
+CLI 或纯 mock 不能代替第 3 和第 5 层。
 
-| 必须证明的行为 | 最低测试要求 |
-| --- | --- |
-| Presentation 负责 ViewModel -> View、UI Dispatcher、Outlet 提交和 UI 运行时桥接。 | 必须通过端到端测试证明 Route target 到 outlet commit。 |
-| 所有 VisualTree 修改必须在 UI dispatcher 上执行。 | 必须断言后台线程提交被 marshal 或拒绝。 |
-| ViewLocator 默认使用 generated manifest 或显式注册，不依赖运行时程序集扫描作为唯一机制。 | 必须断言无注册时失败而不是 scan 兜底。 |
-| 插件 View、resource dictionary、localized binding、interaction handler 必须绑定可撤销 owner。 | 必须覆盖插件 unload 撤销。 |
+## Feature 测试矩阵
 
-## 测试矩阵
+| Feature | 必须覆盖 | 主要测试 |
+| --- | --- | --- |
+| 001 | inline/background dispatch、取消、callback failure、stopping cleanup | AvaloniaUiDispatcherTests, PlatformIntegrationTests |
+| 002/003/012 | exact key、override/revoke、factory type、UI binding、generator output | ViewLocatorTests, ViewBindingTests, generator Presentation tests |
+| 004/010/014/015 | FIFO、queue full、plan reuse、rollback、post-commit cleanup、async lease、Faulted | RouteOutletTests, PresentationIndustrialContractTests |
+| 005 | Bind 不伪造、真实 attach/detach、identity 过滤、迟到事件、handler failure | ViewBindingTests, VisualFeedbackTests, headless/desktop fixture |
+| 006/011 | scope resolution、modal FIFO、跨 Window 并行、capacity、cancel/revoke、optional validation | Interaction/Validation tests |
+| 007/008 | owner revoke、覆盖恢复、active view、字典 UI revoke、局部失败继续 | Resource/Plugin tests |
+| 009/016 | Attach、Show 前注册、named outlet、三类 close、唯一 confirmation、close/stop race | Runtime tests, headless/desktop fixture |
 
-| Feature ID | Test Type | Test File | Required Assertions | Failure Paths | Status |
-| --- | --- | --- | --- | --- | --- |
-| AUC-PRESENTATION-001 | PlatformIntegration | AvaloniaUiDispatcherTests; PresentationPlatformIntegrationTests | 断言 UI 线程识别、后台 marshal、取消、异常映射和平台不可用。 | dispatcher unavailable、work exception、取消。 | Implemented |
-| AUC-PRESENTATION-002 | PlatformIntegration | ViewLocatorTests | 断言 manifest 注册、显式覆盖、重复拒绝、插件撤销和 O(1) lookup 路径。 | 未注册、重复注册、owner revoked。 | Implemented |
-| AUC-PRESENTATION-003 | PlatformIntegration | ViewBindingTests | 断言构造参数、DataContext、失败回滚、handle dispose 和 lifecycle event。 | 构造失败、binding 失败、取消。 | Implemented |
-| AUC-PRESENTATION-004 | PlatformIntegration | RouteOutletTests | 断言成功替换、失败回滚、取消、重复 commit、旧 view dispose 和结果状态。 | commit 失败、dispatcher 失败、old view deactivate 拒绝。 | Implemented |
-| AUC-PRESENTATION-005 | PlatformIntegration | VisualFeedbackTests | 断言 attach/detach、focus、visibility、反馈顺序和 handler 失败隔离。 | 未知 visual、重复 detach、反馈 handler 失败。 | Implemented |
-| AUC-PRESENTATION-006 | PlatformIntegration | PresentationInteractionHandlerTests; ValidationVisualStateBindingTests | 断言 handler 注册撤销、无 handler、验证消息变化、控件释放和取消。 | 无 handler、重复 handler、控件已释放。 | Implemented |
-| AUC-PRESENTATION-007 | PlatformIntegration | PresentationLocalizationBridgeTests; PresentationResourceRegistryTests | 断言 culture 切换、fallback、resource revoke、插件资源卸载和局部失败隔离。 | 语言包缺失、resource dictionary 加载失败、target 已释放。 | Implemented |
-| AUC-PRESENTATION-008 | PlatformIntegration | ActivePluginViewRegistryTests; PresentationPluginUnloadCoordinatorTests | 断言 active view lease、卸载撤销、拒绝卸载、资源释放和重复 unload。 | active view 拒绝关闭、资源撤销失败、handler 仍被引用。 | Implemented |
+## 可执行命令
 
-## 缺口处理
+```powershell
+$env:AVALONIA_TELEMETRY_OPTOUT = "1"
+dotnet test tests/AtomUI.City.Presentation.Tests/AtomUI.City.Presentation.Tests.csproj -c Release
+dotnet test tests/AtomUI.City.Generators.Tests/AtomUI.City.Generators.Tests.csproj -c Release --filter FullyQualifiedName~Presentation
+dotnet run --project fixtures/AtomUI.City.Presentation.HeadlessApp -c Release
+dotnet run --project fixtures/AtomUI.City.Presentation.DesktopApp -c Release
+./engineering/check-presentation-benchmarks.ps1 -Mode Verify -Rounds 1 -Job Short
+./engineering/check-presentation-package-consumer.ps1
+```
 
-如果现有测试只覆盖 smoke 或 happy path，[全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 必须把缺口标为 `Required`。无法单元测试的功能必须提供 Contract、RuntimeLifecycle、PluginLifecycle、Generator、Build、PlatformIntegration、TemplateSmoke 或 Dogfood 测试替代。
+## 批准性能基线
+
+Presentation 1.0 的批准性能环境是固定 Windows 开发机。BenchmarkDotNet 分别测量 exact View lookup、RouteOutlet replace、Interaction dispatch 和 visual identity notification；真实 Avalonia 行为仍由 Headless 与 desktop process 负责，benchmark 不替代平台测试。
+
+```powershell
+# 首次批准或明确重新批准时：三次独立运行并取中位数。
+./engineering/check-presentation-benchmarks.ps1 -Mode Capture -Rounds 3 -Job Medium
+
+# 发布候选：同机三次独立运行并与已批准文件比较。
+./engineering/check-presentation-benchmarks.ps1 -Mode Compare -Rounds 3 -Job Medium
+```
+
+批准文件记录 Windows、CPU、进程架构、SDK、Runtime、BenchmarkDotNet、Git commit 和候选内容指纹，不记录用户名或机器名。环境字段不相同时禁止比较，必须由维护者明确重新批准，门禁不得静默覆盖 baseline。时间回退上限为 15%，分配回退上限为 10%；基线分配为零时新结果也必须为零。普通 Windows CI 使用 `Verify/Short` 证明 benchmark 可执行和结果完整，不把共享 runner 的波动写入批准基线。
+
+## 日常 CI 门禁
+
+- 单压力场景至少 10,000 次操作并在 30 秒内完成。
+- 完成后所有 queue pending/in-flight 为 0。
+- 候选、Entry、ViewModel lease、scope 和 registration 恰好释放一次。
+- 被替换 View/VM 的弱引用在最多三次 `GC.Collect/WaitForPendingFinalizers` 后不可存活。
+- warm-up 后压力段 retained memory 增量不超过 8 MiB。
+- 无未处理异常、死锁或进程 hang；子进程 watchdog 超时必须失败并终止进程。
+
+2026-09-10 Windows 1.0 可重复证据：工程合同 `69/69`、`AtomUI.City.Presentation.Tests` `143/143`、Presentation generator `22/22`；进程测试分别运行 Headless 工业场景和真实 Windows desktop self-test。固定开发机已生成 `baselines/windows-x64.json` 并通过独立 `3 x Medium` Compare；661 条公开签名已冻结；Release `net8.0/net10.0` 构建、SourceLink、strict package validation 和脱离 ProjectReference 的自包含 NuGet consumer 均通过。统一 RC 门禁最终输出候选内容指纹。
+
+## 发布门禁
+
+- Windows desktop self-test 必须创建并显示真实 Window，完成主/命名 Outlet 导航、真实 attached/detached 回执、Interaction、三类关闭映射和资源释放。
+- Release build、unit、generator、headless、stress、desktop 均为零失败。
+- 相对批准 baseline，执行时间回退不超过 15%，分配回退不超过 10%。
+- Linux/macOS 只要求 build/publish；没有平台 smoke 证据时保持 experimental。
+- `PublicAPI.Shipped.txt`、PublicApiAnalyzers、strict SDK package validation、XML 文件和 SourceLink 必须通过。
+- 隔离 package consumer 只能从本地候选 NuGet 包引用 Presentation 及其依赖，不允许 ProjectReference；必须完成 View lookup、Outlet commit、Interaction 和 Runtime stop。
+
+Windows 发布候选的统一入口是：
+
+```powershell
+./engineering/check-presentation-release.ps1
+```
+
+该命令顺序执行 format、Release 零警告 build、工程合同、Presentation unit/Headless/stress/desktop、generator、public API/SourceLink、包消费者和批准基线比较，并输出候选内容指纹。任一子门禁失败时不得标记或发布候选。
+
+## 失败注入
+
+必须覆盖 lookup/create/bind、guard/confirm、activation/deactivation、dispatcher、temporary attach/restore、old Entry cleanup、failure presenter、Window cleanup、plugin revoke 和 queue overflow。测试断言状态、Result、diagnostic code、关键 context、当前 UI 与所有权释放。

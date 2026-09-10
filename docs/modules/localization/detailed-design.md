@@ -41,7 +41,7 @@
 | AUC-LOCALIZATION-003 | Lazy Loading | LocalizationServiceTests |
 | AUC-LOCALIZATION-004 | Lookup and Fallback | LocalizationServiceTests |
 | AUC-LOCALIZATION-005 | Assembly Language Packages | LanguagePackageProviderTests; LocalizationDeclarationAttributeTests |
-| AUC-LOCALIZATION-006 | Presentation Bridge | LocalizationServiceTests |
+| AUC-LOCALIZATION-006 | Optional Application Refresh Hook | LocalizationServiceTests |
 | AUC-LOCALIZATION-007 | Plugin Package Revocation | LocalizationServiceTests |
 | AUC-LOCALIZATION-008 | Generated Localization Manifest | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationManifestBuilderTests |
 
@@ -68,7 +68,7 @@
 
 Localization 负责文化状态、资源包管理、按当前语言懒加载语言包、资源查找、UI 热刷新、插件资源撤销、缺失诊断和 source generator 资源索引。
 
-Localization 不决定业务文案，不直接渲染 UI，不替代 Presentation 的 UI 绑定。它必须让 View、ViewModel、Route、Command、Validation、Data/Security 错误都能用统一方式表达本地化文本。
+Localization 不决定业务文案，不直接渲染 UI，也不替代应用的 Avalonia binding。它必须让 View、ViewModel、Route、Command、Validation、Data/Security 错误都能用统一方式表达本地化文本。
 
 核心链路：
 
@@ -77,7 +77,7 @@ Localization manifest
 -> selected culture
 -> first lookup or culture switch lazily loads visible language packages
 -> immutable LanguagePackage cache
--> Presentation localization bridge
+-> optional application-owned refresh bridge
 -> AtomUI/Avalonia resources and bindings
 ```
 
@@ -87,8 +87,8 @@ Localization manifest
 - Manifest-only startup：启动只加载 manifest，不加载所有语言包。
 - Assembly package capable：普通 .NET 运行时支持语言包独立 assembly 动态加载。
 - AOT compatible：Native AOT 模式使用 file-based locpack provider，不依赖动态 assembly loading。
-- AtomUI-integrated：文化变化最终通过 Presentation bridge 同步到 AtomUI/Avalonia。
-- Transactional culture switch：文化切换必须先准备并校验 package，再提交状态；提交前失败或调用方取消保留旧状态。Presentation bridge 位于提交后，改由 service lifetime token 完成本次刷新；失败返回 Result、记录诊断并继续本地文本刷新，不回滚已发布 CultureState。
+- UI integration：文化变化可通过应用或独立 UI 适配包实现的可选 bridge 同步到 AtomUI/Avalonia。
+- Transactional culture switch：文化切换必须先准备并校验 package，再提交状态；提交前失败或调用方取消保留旧状态。可选 application-owned bridge 位于提交后，改由 service lifetime token 完成本次刷新；失败返回 Result、记录诊断并继续本地文本刷新，不回滚已发布 CultureState。
 - Plugin-aware：插件语言包必须可撤销、可释放、可卸载。
 - Strong diagnostics：缺失 key、重复 key、fallback 失败和格式化错误必须可诊断。
 - Source-generator-first：资源 manifest、强类型 key 和 descriptor 由 source generator 生成。
@@ -117,7 +117,7 @@ Localization 不负责：
 | `ILocalizedText` | 可随文化变化刷新显示值的本地化文本句柄。 |
 | `LanguagePackageRegistry` | 按 owner 管理 Host、Module、Plugin 的 descriptor 注册与撤销。 |
 | `LocalizationLookupContext` / `ILocalizationScopeLease` | 约束 Module、Plugin、Route、Window 资源可见性。 |
-| `IPresentationLocalizationBridge` | Presentation 侧 AtomUI/Avalonia 同步桥。 |
+| `IPresentationLocalizationBridge` | 应用或独立 UI 适配包可选实现的 culture commit 回调；默认 no-op。 |
 | `ILocalizationDiagnostics` | 缺失资源、加载失败、fallback 和刷新诊断。 |
 
 命名不加 `City` 前缀。
@@ -222,21 +222,20 @@ Load failed
 
 ### 9. AtomUI/Avalonia 集成
 
-Localization 不直接操作控件。文化变化通过 Presentation bridge 接入 AtomUI/Avalonia。
+Localization 不直接操作控件。文化变化通过应用或独立可选 UI adapter 接入 AtomUI/Avalonia；Presentation 主模块不实现该适配。
 
 ```text
 LocalizationService.SetCultureAsync
 -> load selected language packages
 -> commit culture state
--> IPresentationLocalizationBridge.ApplyCultureAsync
--> update AtomUI culture
--> update Avalonia ResourceDictionary
--> notify localized bindings
+-> optional application-owned IPresentationLocalizationBridge.ApplyCultureAsync
+-> refresh live ILocalizedText handles
+-> application ViewModel/Avalonia Binding updates UI
 ```
 
 AtomUI/Avalonia 资源更新必须在 UI Thread。
 
-该 UI 线程保证由 Presentation bridge/adapter 提供；Localization Core 的普通 `ILocalizedText` handler 不保证执行线程。
+该 UI 线程保证由应用或独立 UI adapter 提供；Localization Core 的普通 `ILocalizedText` handler 不保证执行线程。
 
 详细规则见：
 
@@ -272,7 +271,7 @@ public sealed partial class SettingsViewModel
 }
 ```
 
-1.0 提供字符串 key、生成 key 常量以及 Presentation 的路由/窗口/通用 setter 绑定。XAML markup extension 和生成的强类型方法 accessor 尚无 Feature ID，不属于当前合同。
+1.0 提供字符串 key、生成 key 常量、`ILocalizedText` 和可选应用刷新 bridge。Presentation 路由/窗口 setter binding 已在 1.0 冻结前移除；XAML markup extension 和生成的强类型方法 accessor 尚无 Feature ID，不属于当前合同。
 
 详细规则见：[mvvm-integration.md](mvvm-integration.md)。
 
@@ -325,14 +324,14 @@ Localization generator 负责：
 | 格式执行异常 | fallback raw template + diagnostics。 |
 | 语言包加载失败 | rollback 到旧 culture。 |
 | 插件资源已撤销 | fallback 或清理对应 UI。 |
-| AtomUI resource apply 失败 | 保留已提交 CultureState，返回失败 Result、记录错误并继续 LocalizedText 刷新；Presentation 自己负责其局部资源一致性。 |
+| UI resource apply 失败 | 保留已提交 CultureState，返回失败 Result、记录错误并继续 LocalizedText 刷新；应用或可选适配包负责其局部资源一致性。 |
 
 ### 14. 测试策略
 
 当前单元测试工程提供私有 test double，未向 `AtomUI.City.Testing` 增加 Localization 专用 public API：
 
 - recording/blocking language package provider。
-- recording/throwing Presentation localization bridge。
+- recording/throwing optional application localization bridge。
 - in-memory diagnostics。
 - deterministic culture switch、并发 load、撤销和 dispose 驱动。
 

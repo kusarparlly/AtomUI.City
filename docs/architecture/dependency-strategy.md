@@ -23,7 +23,7 @@ AtomUI.City 需要依赖成熟的开源基础设施，但不能让外部库决�
 依赖引入必须遵循以下原则：
 
 - `AtomUI.City.Core` 只依赖 .NET 标准基础设施，不依赖 AtomUI/Avalonia、CommunityToolkit.Mvvm、ReactiveUI、System.Reactive。
-- `AtomUI.City.Presentation` 承担 AtomUI/Avalonia 依赖。
+- `AtomUI.City.Presentation` 承担 Avalonia 依赖；AtomUI 控件库由应用按需选择，不是主包硬依赖。
 - `AtomUI.City.Mvvm` 承担 CommunityToolkit.Mvvm 依赖。
 - `AtomUI.City.Data` 承担 HTTP、resilience、client proxy 等依赖。
 - `AtomUI.City.Build` 和 `AtomUI.City.Templates` 可以依赖 Roslyn、模板引擎和 NuGet SDK。
@@ -37,7 +37,7 @@ AtomUI.City 需要依赖成熟的开源基础设施，但不能让外部库决�
 |---|---|---:|---|---|
 | [Microsoft.Extensions.Hosting / DependencyInjection / Configuration / Options / Logging](https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection/overview) | `AtomUI.City.Core` | 必选 | 作为 Host、DI、配置、Options、日志和生命周期的基础设施，符合 .NET 应用框架习惯。 | Core 只暴露 AtomUI.City 自己的生命周期语义，不把所有 Microsoft.Extensions 类型直接扩散为框架概念。 |
 | [Avalonia](https://docs.avaloniaui.net/docs/welcome) | `AtomUI.City.Presentation` | 必选 | AtomUI.City 面向 Avalonia 应用，Presentation 层需要 View、Dispatcher、资源和应用生命周期集成。 | 不进入 Core；所有 UI 依赖必须隔离在 Presentation 或更上层。 |
-| [AtomUI](https://github.com/AtomUI/AtomUI) | `AtomUI.City.Presentation` | 必选 | AtomUI 承担控件、主题、视觉系统和基础样式能力，AtomUI.City 不重造 UI 控件库。 | AtomUI.City 只做应用框架层，不把业务无关框架能力写成控件库能力。 |
+| [AtomUI](https://github.com/AtomUI/AtomUI) | 应用或独立适配包 | 可选 | AtomUI 可承担控件、主题、视觉系统和基础样式能力，但 Presentation 的 Window、Outlet、Dispatcher 和生命周期合同只依赖 Avalonia。 | 不得把 AtomUI 提升为 `AtomUI.City.Presentation` 主包硬依赖；应用拥有具体视觉设计。 |
 | [CommunityToolkit.Mvvm](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/generators/overview) | `AtomUI.City.Mvvm` | 必选 | 提供 `ObservableObject`、`ObservableValidator`、`IRelayCommand`、`IAsyncRelayCommand` 和 Source Generator，减少 ViewModel 样板代码。 | 不进入 Core；不使用 `WeakReferenceMessenger` 作为框架 EventBus 底层。 |
 | [Microsoft.Extensions.Http](https://learn.microsoft.com/en-us/dotnet/core/extensions/httpclient-factory) | `AtomUI.City.Data` | 强推荐 | `IHttpClientFactory` 适合统一管理 HTTP client、DI、日志、配置和请求生命周期。 | Data 应提供自己的请求管线和错误模型，不直接暴露裸 HttpClient 作为唯一抽象。 |
 | [Polly](https://www.pollydocs.org/) | `AtomUI.City.Data` | 强推荐 | Data 层需要 retry、timeout、circuit breaker、fallback 等 resilience 能力。 | 作为请求管线策略实现，不污染 ViewModel 或 Core API。 |

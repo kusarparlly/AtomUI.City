@@ -14,7 +14,8 @@ public static class PresentationInteractionServiceCollectionExtensions
         services.TryAddSingleton(
             serviceProvider => new InteractionHandlerRegistry(
                 serviceProvider.GetRequiredService<IUiDispatcher>(),
-                serviceProvider.GetService<IHostDiagnostics>()));
+                serviceProvider.GetService<IHostDiagnostics>(),
+                serviceProvider.GetService<PresentationQueueOptions>()));
         services.TryAddSingleton<IInteractionHandlerRegistry>(
             serviceProvider => serviceProvider.GetRequiredService<InteractionHandlerRegistry>());
 

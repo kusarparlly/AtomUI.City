@@ -153,24 +153,26 @@ Tests:
 
 公共 API review 未通过时，不允许进入 pack、tag 或 publish。
 
-### 8.1 Core 的机械门禁
+### 8.1 Core、EventBus 与 Presentation 的机械门禁
 
-`AtomUI.City.Core` 当前作为第一批冻结对象执行以下机械检查：
+`AtomUI.City.Core`、`AtomUI.City.EventBus` 和 `AtomUI.City.Presentation` 当前作为冻结对象执行以下机械检查：
 
 - `PublicAPI.Shipped.txt` 保存已经审阅并冻结的签名；删除、改名、移动或修改签名会使编译失败。
 - `PublicAPI.Unshipped.txt` 只保存本轮尚未随版本发布的新签名。新增 API 不允许通过关闭分析器或手工忽略诊断绕过 review。
 - `Microsoft.CodeAnalysis.PublicApiAnalyzers` 的 API diff、可选参数、重载和兼容性诊断按编译错误处理。
-- Core 单独重新启用 `CS1591` 并按错误处理；每个 public 类型和成员必须进入 NuGet XML 文档。
+- Core 单独重新启用 `CS1591` 并按错误处理；EventBus 与 Presentation 保留 API card 为规范文档，并必须随包生成 XML documentation 文件。
 - Release 构建同时编译 `net10.0` 和生产基线 `net8.0`；SDK package validation 以 strict compatible-framework 模式比较两个程序集的 API。
-- `engineering/check-public-api.sh` 必须真实执行 Core Release build 与 pack，不能只检查 baseline 或 XML 文件是否存在。
+- `engineering/check-public-api.sh` 必须真实执行三个冻结模块的 Release build 与 pack，不能只检查 baseline 或 XML 文件是否存在。
 
 由于当前仍处于首次公开发布前，现有审计结果直接形成首份 `PublicAPI.Shipped.txt`。首次 NuGet 版本发布后，还必须配置 package validation baseline version，将新包与已发布包进行二进制兼容比较。
 
 ## 9. 首批冻结范围
 
-第一批实现只冻结以下 API 合同：
+当前实现冻结以下 API 合同：
 
 - `AtomUI.City.Core` 的 Host、Lifecycle、Modularity、DI marker、Diagnostics 和 UI dispatcher abstraction。
+- `AtomUI.City.EventBus` 的 contract、channel、subscription、backpressure、plugin contribution 和 diagnostics。
+- `AtomUI.City.Presentation` 的 runtime、Window/Outlet transaction、View、Interaction、resource、plugin cleanup、failure 和 diagnostics。
 - `AtomUI.City.Testing` 的 TestHost、FakeUiDispatcher、DeterministicScheduler、ModuleTestHost、PluginTestHost、RoutingTestHost、SourceGenerationTestCase、AOT check 和 TestLayer。
 
-Routing、Presentation、State、EventBus、Data、PluginSystem、Build、Generators、CLI 和 Templates 可以继续使用现有设计文档推进细化，但不能在未通过本门禁前标记产品级完成。
+Routing、State、Data、PluginSystem、Build、Generators、CLI 和 Templates 可以继续使用现有设计文档推进细化，但不能在未通过对应门禁前标记产品级完成。

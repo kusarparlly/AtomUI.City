@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+    <ProjectReference Include="../../src/AtomUI.City.Presentation/AtomUI.City.Presentation.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>$(AtomUICityDevelopTargetFramework)</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+</Project>

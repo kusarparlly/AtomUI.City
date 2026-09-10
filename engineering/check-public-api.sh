@@ -8,6 +8,9 @@ unshipped_api="src/AtomUI.City.Core/PublicAPI.Unshipped.txt"
 eventbus_project="src/AtomUI.City.EventBus/AtomUI.City.EventBus.csproj"
 eventbus_shipped_api="src/AtomUI.City.EventBus/PublicAPI.Shipped.txt"
 eventbus_unshipped_api="src/AtomUI.City.EventBus/PublicAPI.Unshipped.txt"
+presentation_project="src/AtomUI.City.Presentation/AtomUI.City.Presentation.csproj"
+presentation_shipped_api="src/AtomUI.City.Presentation/PublicAPI.Shipped.txt"
+presentation_unshipped_api="src/AtomUI.City.Presentation/PublicAPI.Unshipped.txt"
 validation_output="output/public-api/package-validation"
 
 validate_build_artifacts() {
@@ -15,6 +18,7 @@ validate_build_artifacts() {
   local assembly_name="$2"
   local project="$3"
   local signature_count="$4"
+  local require_documented_members="${5:-true}"
   local xml_output_root="output/bin/$configuration/$assembly_name"
   local sourcelink_output_root="output/$assembly_name/obj/$configuration"
   local xml_document_count=0
@@ -23,7 +27,7 @@ validate_build_artifacts() {
 
   while IFS= read -r xml_document; do
     current_member_count="$(grep -c '<member name=' "$xml_document" || true)"
-    if [[ "$current_member_count" -eq 0 ]]; then
+    if [[ "$require_documented_members" == true && "$current_member_count" -eq 0 ]]; then
       printf '%s XML documentation has no API members: %s\n' "$product_name" "$xml_document" >&2
       exit 1
     fi
@@ -88,7 +92,8 @@ validate_build_artifacts() {
 
 for required_file in \
   "$core_project" "$shipped_api" "$unshipped_api" \
-  "$eventbus_project" "$eventbus_shipped_api" "$eventbus_unshipped_api"; do
+  "$eventbus_project" "$eventbus_shipped_api" "$eventbus_unshipped_api" \
+  "$presentation_project" "$presentation_shipped_api" "$presentation_unshipped_api"; do
   if [[ ! -f "$required_file" ]]; then
     printf 'Missing public API gate input: %s\n' "$required_file" >&2
     exit 1
@@ -104,6 +109,12 @@ fi
 eventbus_shipped_signature_count="$(grep -cEv '^[[:space:]]*(#|$)' "$eventbus_shipped_api" || true)"
 if [[ "$eventbus_shipped_signature_count" -eq 0 ]]; then
   printf 'EventBus shipped public API baseline is empty: %s\n' "$eventbus_shipped_api" >&2
+  exit 1
+fi
+
+presentation_shipped_signature_count="$(grep -cEv '^[[:space:]]*(#|$)' "$presentation_shipped_api" || true)"
+if [[ "$presentation_shipped_signature_count" -eq 0 ]]; then
+  printf 'Presentation shipped public API baseline is empty: %s\n' "$presentation_shipped_api" >&2
   exit 1
 fi
 
@@ -127,8 +138,19 @@ if ! grep -q '<EnablePackageValidation>true</EnablePackageValidation>' "$eventbu
   exit 1
 fi
 
+if ! grep -q 'Microsoft.CodeAnalysis.PublicApiAnalyzers' "$presentation_project"; then
+  printf 'Presentation must reference Microsoft.CodeAnalysis.PublicApiAnalyzers.\n' >&2
+  exit 1
+fi
+
+if ! grep -q '<EnablePackageValidation>true</EnablePackageValidation>' "$presentation_project"; then
+  printf 'Presentation must enable SDK package validation.\n' >&2
+  exit 1
+fi
+
 dotnet restore "$core_project" -p:Configuration="$configuration"
 dotnet restore "$eventbus_project" -p:Configuration="$configuration"
+dotnet restore "$presentation_project" -p:Configuration="$configuration"
 
 dotnet build "$core_project" \
   --configuration "$configuration" \
@@ -136,6 +158,11 @@ dotnet build "$core_project" \
   -p:TreatWarningsAsErrors=true
 
 dotnet build "$eventbus_project" \
+  --configuration "$configuration" \
+  --no-restore \
+  -p:TreatWarningsAsErrors=true
+
+dotnet build "$presentation_project" \
   --configuration "$configuration" \
   --no-restore \
   -p:TreatWarningsAsErrors=true
@@ -154,3 +181,10 @@ validate_build_artifacts \
   "AtomUI.City.EventBus" \
   "$eventbus_project" \
   "$eventbus_shipped_signature_count"
+
+validate_build_artifacts \
+  "Presentation" \
+  "AtomUI.City.Presentation" \
+  "$presentation_project" \
+  "$presentation_shipped_signature_count" \
+  false

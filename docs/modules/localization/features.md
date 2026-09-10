@@ -11,7 +11,7 @@
 | AUC-LOCALIZATION-003 | Lazy Package Loading | Completed | LocalizationService, LanguagePackageLoadResult | LocalizationServiceTests |
 | AUC-LOCALIZATION-004 | Lookup and Missing Key Fallback | Completed | LocalizedString, LocalizedText, LocalizationResult | LocalizationServiceTests |
 | AUC-LOCALIZATION-005 | Assembly Language Packages | Completed | AssemblyLanguagePackageProvider, LanguagePackageAttribute | LanguagePackageProviderTests; LocalizationDeclarationAttributeTests |
-| AUC-LOCALIZATION-006 | Presentation Refresh Bridge | Completed | IPresentationLocalizationBridge, LocalizedTextChangedEventArgs | LocalizationServiceTests |
+| AUC-LOCALIZATION-006 | Optional Application Refresh Hook | Completed | IPresentationLocalizationBridge, LocalizedTextChangedEventArgs | LocalizationServiceTests |
 | AUC-LOCALIZATION-007 | Plugin Package Revocation | Completed | ILocalizationService, ResourceScope, LanguagePackageProviderKind | LocalizationServiceTests |
 | AUC-LOCALIZATION-008 | Generated Localization Manifest | Completed | LanguagePackageAttribute, LocalizedResourceAttribute, generated manifest | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationManifestBuilderTests |
 
@@ -102,16 +102,16 @@ Tests: `LanguagePackageProviderTests; LocalizationDeclarationAttributeTests`
 Required Assertions: 断言独立 assembly、属性声明、资源读取、缺失资源和 unload owner。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
 
-## AUC-LOCALIZATION-006 Presentation Refresh Bridge
+## AUC-LOCALIZATION-006 Optional Application Refresh Hook
 
 Feature ID: `AUC-LOCALIZATION-006`
 Status: Completed
-Goal: 把 culture 变化通知 Presentation 刷新 UI 文本、方向和资源。
+Goal: culture 提交后通知可选的应用组合层或独立 UI 适配包，并刷新本地文本句柄。
 Public Contract: IPresentationLocalizationBridge, LocalizedTextChangedEventArgs
-Runtime / Build Behavior: Localization 在语言包加载成功后提交 `CultureState`，以包含 loaded package id 的 batch state 调用 Presentation bridge，并随后刷新已注册 `ILocalizedText`。
-Failure Behavior: Presentation bridge 失败不能回滚 culture state；失败 result 返回给调用方，同时记录 `AtomUiApplyFailed`，本地文本刷新继续执行。
-Threading / Cancellation: 调用方取消仅在 culture state 提交前生效；提交后 bridge 与文本刷新由 service lifetime token 完成本次事务。Localization contract 不引用 Avalonia 类型，UI work 由 Presentation dispatcher 处理。
-Diagnostics: bridge diagnostics 必须包含 culture 和 error kind；Presentation 侧 target count 和 failed target 由 bridge/applier 诊断承接。
+Runtime / Build Behavior: Localization 在语言包加载成功后提交 `CultureState`，调用可选 `IPresentationLocalizationBridge`，随后刷新已注册 `ILocalizedText`。默认 bridge 是 no-op；实现者是应用或独立适配包，不是 `AtomUI.City.Presentation`。
+Failure Behavior: 可选 bridge 失败不能回滚 culture state；失败 result 返回给调用方，本地文本刷新继续执行。
+Threading / Cancellation: 调用方取消仅在 culture state 提交前生效；提交后 bridge 与文本刷新由 service lifetime token 完成本次事务。Localization 不引用 Avalonia，也不保证 UI 线程；适配实现自行 dispatch。
+Diagnostics: bridge diagnostics 必须包含 culture 和 error kind；具体 UI target 的诊断由应用或独立适配包负责。
 Tests: `LocalizationServiceTests`
 Required Assertions: 断言 bridge 调用、局部失败、批量刷新和不依赖 Avalonia 类型。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。

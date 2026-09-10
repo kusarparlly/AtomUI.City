@@ -41,7 +41,7 @@
 | AUC-LOCALIZATION-003 | Lazy Loading | LocalizationServiceTests |
 | AUC-LOCALIZATION-004 | Lookup and Fallback | LocalizationServiceTests |
 | AUC-LOCALIZATION-005 | Assembly Language Packages | LanguagePackageProviderTests; LocalizationDeclarationAttributeTests |
-| AUC-LOCALIZATION-006 | Presentation Bridge | LocalizationServiceTests |
+| AUC-LOCALIZATION-006 | Optional Application Refresh Hook | LocalizationServiceTests |
 | AUC-LOCALIZATION-007 | Plugin Package Revocation | LocalizationServiceTests |
 | AUC-LOCALIZATION-008 | Generated Localization Manifest | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationManifestBuilderTests |
 
@@ -105,7 +105,7 @@ SetCultureAsync
 -> calculate active package set
 -> load target culture packages
 -> validate critical resources
--> prepare Presentation resource swap
+-> prepare optional application resource swap
 -> commit culture state
 -> apply AtomUI/Avalonia resources on UI Thread
 -> notify subscribers
@@ -131,15 +131,15 @@ Package load or critical validation failed
 - 文化切换取消不是 fatal error。
 - 调用方取消只控制提交前阶段；`CultureState` 一旦发布，bridge 和 `LocalizedText` 刷新改用 service lifetime token 完成本次事务，避免已切换 culture 却只刷新部分 UI。
 - 文化切换和其 service-owned load 必须绑定 `LocalizationService` Host 生命周期。
-- provider、Presentation bridge 和 LocalizedText handler 均在框架锁外执行；这些 callback 中重入 mutation 必须快速失败，不能排队等待自身。
+- provider、可选 application-owned bridge 和 LocalizedText handler 均在框架锁外执行；这些 callback 中重入 mutation 必须快速失败，不能排队等待自身。
 
 ### 6. 线程模型
 
 资源加载可以在后台进行。
 
-Localization Core 在当前异步调用链执行 bridge 和 `LocalizedText` handler，不承诺 UI 线程。AtomUI/Avalonia resource swap 和实际 UI binding mutation 必须由 Presentation bridge/adapter 调度到 UI Thread。
+Localization Core 在当前异步调用链执行 bridge 和 `LocalizedText` handler，不承诺 UI 线程。AtomUI/Avalonia resource swap 和实际 UI binding mutation 必须由应用或独立 UI adapter 调度到 UI Thread。
 
-Localization Core 不依赖 Avalonia；Presentation 提供 bridge。
+Localization Core 不依赖 Avalonia；应用组合层或独立可选 UI 适配包实现 bridge。
 
 ### 7. 错误策略
 

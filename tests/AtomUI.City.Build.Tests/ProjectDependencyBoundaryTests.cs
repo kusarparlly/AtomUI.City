@@ -15,7 +15,7 @@ public sealed class ProjectDependencyBoundaryTests
         ["AtomUI.City.Localization"] = ["AtomUI.City.Core", "AtomUI.City.State"],
         ["AtomUI.City.Mvvm"] = ["AtomUI.City.Core"],
         ["AtomUI.City.PluginSystem"] = ["AtomUI.City.Core"],
-        ["AtomUI.City.Presentation"] = ["AtomUI.City.Core", "AtomUI.City.Localization", "AtomUI.City.Mvvm", "AtomUI.City.Routing", "AtomUI.City.Security", "AtomUI.City.State"],
+        ["AtomUI.City.Presentation"] = ["AtomUI.City.Core", "AtomUI.City.Mvvm", "AtomUI.City.Routing", "AtomUI.City.Security", "AtomUI.City.State"],
         ["AtomUI.City.Routing"] = ["AtomUI.City.Core"],
         ["AtomUI.City.Security"] = ["AtomUI.City.Core", "AtomUI.City.Routing"],
         ["AtomUI.City.State"] = ["AtomUI.City.Core"],

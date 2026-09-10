@@ -1,6 +1,7 @@
 using AtomUI.City.Core.Diagnostics;
 using AtomUI.City.Presentation;
 using AtomUI.City.Core.Threading;
+using AtomUI.City.Mvvm;
 
 namespace AtomUI.City.Presentation.Tests;
 
@@ -59,7 +60,7 @@ public sealed class RouteOutletTests
     }
 
     [Fact]
-    public async Task OutletRollsBackWhenPreviousHandleDisposeFails()
+    public async Task OutletKeepsCommittedContentWhenPreviousHandleCleanupFails()
     {
         var dispatcher = new RecordingDispatcher();
         var outlet = new RouteOutlet("primary", dispatcher);
@@ -77,12 +78,11 @@ public sealed class RouteOutletTests
         await outlet.CommitAsync(RouteOutletCommitPlan.Replace("primary", previous));
         var result = await outlet.CommitAsync(RouteOutletCommitPlan.Replace("primary", next));
 
-        Assert.False(result.Succeeded);
-        Assert.Equal(PresentationError.OutletCommitFailed, result.Error);
-        Assert.Same(previousView, outlet.CurrentContent);
-        Assert.False(previous.IsDisposed);
-        Assert.True(next.IsDisposed);
-        Assert.Equal(1, nextDisposeCount);
+        Assert.True(result.Succeeded);
+        Assert.Same(next.View, outlet.CurrentContent);
+        Assert.True(previous.IsDisposed);
+        Assert.False(next.IsDisposed);
+        Assert.Equal(0, nextDisposeCount);
     }
 
     [Fact]
@@ -140,6 +140,54 @@ public sealed class RouteOutletTests
     }
 
     [Fact]
+    public async Task ActivationFailureRestoresPreviousCommittedEntry()
+    {
+        var dispatcher = new RecordingDispatcher();
+        var target = new RecordingTarget();
+        var outlet = new RouteOutlet("primary", dispatcher, target);
+        var previous = BoundViewHandle.FromExisting(new SettingsView(), new SettingsViewModel());
+        var failedView = new SettingsView();
+        var failed = BoundViewHandle.FromExisting(failedView, new FailingActivatable());
+
+        await outlet.CommitAsync(RouteOutletCommitPlan.Replace("primary", previous));
+        var result = await outlet.CommitAsync(RouteOutletCommitPlan.Replace("primary", failed));
+
+        Assert.False(result.Succeeded);
+        Assert.Same(previous.View, outlet.CurrentContent);
+        Assert.Same(previous.View, target.Content);
+        Assert.False(previous.IsDisposed);
+        Assert.True(failed.IsDisposed);
+        Assert.Equal(RouteOutletState.OutOfSync, outlet.State);
+        Assert.Contains(failedView, target.History);
+    }
+
+    [Fact]
+    public async Task AcceptedCommitCancellationStopsWaitingButDoesNotRemoveSerializedCommit()
+    {
+        var dispatcher = new RecordingDispatcher();
+        var outlet = new RouteOutlet("primary", dispatcher);
+        var activation = new DelayedActivatable();
+        var first = BoundViewHandle.FromExisting(new SettingsView(), activation);
+        var second = BoundViewHandle.FromExisting(new SettingsView(), new SettingsViewModel());
+        using var callerCancellation = new CancellationTokenSource();
+
+        var firstCommit = outlet.CommitAsync(
+            RouteOutletCommitPlan.Replace("primary", first),
+            callerCancellation.Token).AsTask();
+        await activation.Started.Task;
+        var secondCommit = outlet.CommitAsync(RouteOutletCommitPlan.Replace("primary", second)).AsTask();
+        await callerCancellation.CancelAsync();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => firstCommit);
+        Assert.False(secondCommit.IsCompleted);
+
+        activation.Release();
+        Assert.True((await secondCommit).Succeeded);
+        Assert.Same(second.View, outlet.CurrentContent);
+        Assert.True(first.IsDisposed);
+    }
+
+    [Fact]
     public async Task OutletRecordsCommitPlanAndSuccessDiagnostics()
     {
         var diagnostics = new InMemoryHostDiagnostics();
@@ -194,6 +242,29 @@ public sealed class RouteOutletTests
                 record.Context["error"] == nameof(PresentationError.OutletNotFound));
     }
 
+    [Fact]
+    public async Task OutletFailureCarriesHierarchicalIdentityToPresenter()
+    {
+        var presenter = new RecordingFailurePresenter();
+        var outlet = new RouteOutlet(
+            "primary",
+            new RecordingDispatcher(),
+            target: null,
+            diagnostics: null,
+            failurePresenter: presenter);
+        var rejected = BoundViewHandle.FromExisting(new SettingsView(), new SettingsViewModel());
+
+        var result = await outlet.CommitAsync(
+            RouteOutletCommitPlan.Replace("secondary", rejected, routeId: "orders"));
+
+        Assert.False(result.Succeeded);
+        var failure = Assert.Single(presenter.Failures);
+        Assert.Equal(PresentationFailureLevel.Outlet, failure.Level);
+        Assert.Equal("primary", failure.OutletName);
+        Assert.Equal("orders", failure.RouteId);
+        Assert.Equal(result.OperationId, failure.OperationId);
+    }
+
     private sealed class RecordingDispatcher : IUiDispatcher
     {
         public int InvokeCount { get; private set; }
@@ -228,4 +299,63 @@ public sealed class RouteOutletTests
     private sealed class SettingsViewModel;
 
     private sealed class SettingsView;
+
+    private sealed class RecordingTarget : IRouteOutletTarget
+    {
+        public object? Content { get; private set; }
+
+        public List<object?> History { get; } = [];
+
+        public void SetContent(object? content)
+        {
+            Content = content;
+            History.Add(content);
+        }
+    }
+
+    private sealed class RecordingFailurePresenter : IPresentationFailurePresenter
+    {
+        public List<PresentationFailure> Failures { get; } = [];
+
+        public ValueTask PresentAsync(
+            PresentationFailure failure,
+            CancellationToken cancellationToken = default)
+        {
+            Failures.Add(failure);
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class FailingActivatable : IActivatable
+    {
+        public ValueTask ActivateAsync(IActivationScope scope) => ActivateAsync(scope, CancellationToken.None);
+
+        public ValueTask ActivateAsync(IActivationScope scope, CancellationToken cancellationToken) =>
+            ValueTask.FromException(new InvalidOperationException("activation failed"));
+
+        public ValueTask DeactivateAsync() => ValueTask.CompletedTask;
+
+        public ValueTask DeactivateAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
+    }
+
+    private sealed class DelayedActivatable : IActivatable
+    {
+        private readonly TaskCompletionSource _release = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public TaskCompletionSource Started { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public ValueTask ActivateAsync(IActivationScope scope) => ActivateAsync(scope, CancellationToken.None);
+
+        public async ValueTask ActivateAsync(IActivationScope scope, CancellationToken cancellationToken)
+        {
+            Started.TrySetResult();
+            await _release.Task.WaitAsync(cancellationToken);
+        }
+
+        public ValueTask DeactivateAsync() => ValueTask.CompletedTask;
+
+        public ValueTask DeactivateAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
+
+        public void Release() => _release.TrySetResult();
+    }
 }

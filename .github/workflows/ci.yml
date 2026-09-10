@@ -52,3 +52,20 @@ jobs:
       - name: Publish and run Core MVP NativeAOT
         shell: pwsh
         run: ./engineering/check-core-mvp-aot.ps1 -Frameworks ${{ matrix.framework }}
+
+  presentation-windows-release:
+    name: Presentation Windows Release Candidate
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.303
+
+      - name: Presentation Windows release gates
+        shell: pwsh
+        run: ./engineering/check-presentation-release.ps1 -BenchmarkMode Verify -BenchmarkRounds 1 -BenchmarkJob Short

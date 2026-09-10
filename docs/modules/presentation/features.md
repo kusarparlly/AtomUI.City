@@ -1,145 +1,66 @@
 # AtomUI.City.Presentation Features
 
-本文件是模块功能规格表。没有 Feature ID 的功能不能进入实现；实现完成必须同步更新测试矩阵。
+状态定义：`Implemented` 表示源码和模块测试已落地；`Release Validation Pending` 表示仍缺真实平台或发布压力证据；`Release Verified` 只能在全部门禁完成后使用；`Retired Before 1.0` 不构成兼容承诺且编号不得复用。
 
 ## Feature 索引
 
-| Feature ID | 名称 | 状态 | Public Contract | 主测试 |
-| --- | --- | --- | --- | --- |
-| AUC-PRESENTATION-001 | UI Dispatcher Bridge | 已实现并通过产品合同测试 | AvaloniaUiDispatcher, IUiDispatcher | AvaloniaUiDispatcherTests; PresentationPlatformIntegrationTests |
-| AUC-PRESENTATION-002 | View Registry and Locator | 已实现并通过产品合同测试 | ViewRegistry, IViewLocator, ViewForAttribute | ViewLocatorTests |
-| AUC-PRESENTATION-003 | View Factory and Binding | 已实现并通过产品合同测试 | ViewFactory, ViewBinder, BoundViewHandle | ViewBindingTests |
-| AUC-PRESENTATION-004 | Route Outlet Commit | 已实现并通过产品合同测试 | IRouteOutlet, RouteOutlet, RouteOutletCommitResult | RouteOutletTests |
-| AUC-PRESENTATION-005 | Visual Lifecycle Feedback | 已实现并通过产品合同测试 | VisualLifecycleHub, VisualLifecycleEvent | VisualFeedbackTests |
-| AUC-PRESENTATION-006 | Interaction and Validation Bridge | 已实现并通过产品合同测试 | InteractionHandlerRegistry, ValidationVisualStateBinding | PresentationInteractionHandlerTests; ValidationVisualStateBindingTests |
-| AUC-PRESENTATION-007 | Localization and Resource Bridge | 已实现并通过产品合同测试 | PresentationLocalizationBridge, PresentationResourceRegistry | PresentationLocalizationBridgeTests; PresentationResourceRegistryTests |
-| AUC-PRESENTATION-008 | Plugin UI Unload Coordination | 已实现并通过产品合同测试 | ActivePluginViewRegistry, PresentationPluginUnloadCoordinator | ActivePluginViewRegistryTests; PresentationPluginUnloadCoordinatorTests |
+| ID | Feature | 状态 | 主要证据 |
+| --- | --- | --- | --- |
+| AUC-PRESENTATION-001 | Avalonia UI Dispatcher Bridge | Release Verified | AvaloniaUiDispatcherTests, platform tests |
+| AUC-PRESENTATION-002 | Exact View Registry and Locator | Release Verified | ViewLocatorTests, generator tests |
+| AUC-PRESENTATION-003 | View Factory and Binding | Release Verified | ViewBindingTests |
+| AUC-PRESENTATION-004 | Transactional Route Outlet Commit | Release Verified | RouteOutletTests, industrial contract tests |
+| AUC-PRESENTATION-005 | Identity-filtered Real Visual Feedback | Release Verified | ViewBindingTests, VisualFeedbackTests, headless fixture |
+| AUC-PRESENTATION-006 | Scoped Interaction and Optional Validation | Release Verified | PresentationInteractionHandlerTests, ValidationVisualStateBindingTests |
+| AUC-PRESENTATION-007 | Owner-bound Presentation Resources | Release Verified | PresentationResourceRegistryTests, resource dictionary revoker tests |
+| AUC-PRESENTATION-008 | Plugin UI Unload Coordination | Release Verified | ActivePluginViewRegistryTests, plugin unload tests |
+| AUC-PRESENTATION-009 | Runtime and Window Sessions | Release Verified | Runtime tests, headless fixture, Windows desktop process test |
+| AUC-PRESENTATION-010 | ViewModel Acquisition and Entry Ownership | Release Verified | ViewModelFactoryTests, RouteOutletTests |
+| AUC-PRESENTATION-011 | Scoped Modal Interaction Resolution | Release Verified | Interaction handler and queue tests |
+| AUC-PRESENTATION-012 | Layered View Overrides | Release Verified | ViewLocatorTests, generator tests |
+| AUC-PRESENTATION-013 | Presentation Localization Revision Convergence | Retired Before 1.0 | 迁移到 Localization/application boundary |
+| AUC-PRESENTATION-014 | Hierarchical Fault Model | Release Verified | failure injection and diagnostics tests |
+| AUC-PRESENTATION-015 | Bounded Backpressure and Candidate Ownership | Release Verified | PresentationIndustrialContractTests |
+| AUC-PRESENTATION-016 | Deterministic Window Close Origins and Confirmation | Release Verified | unit close-origin tests, headless fixture, Windows desktop process test |
 
-## Feature 硬门禁
+## Feature 合同摘要
 
-| 约束 | 验收要求 |
-| --- | --- |
-| Presentation 负责 ViewModel -> View、UI Dispatcher、Outlet 提交和 UI 运行时桥接。 | 必须有实现、测试或工程门禁证据。 |
-| 所有 VisualTree 修改必须在 UI dispatcher 上执行。 | 必须有实现、测试或工程门禁证据。 |
-| ViewLocator 默认使用 generated manifest 或显式注册，不依赖运行时程序集扫描作为唯一机制。 | 必须有实现、测试或工程门禁证据。 |
-| 插件 View、resource dictionary、localized binding、interaction handler 必须绑定可撤销 owner。 | 必须有实现、测试或工程门禁证据。 |
+### 001 Dispatcher
 
-## Feature 实现合同
+后台调用 marshal；UI 调用 inline；Runtime Stopping 允许清理，Stopped/Faulted 拒绝；callback 异常传播并诊断。
 
-- Feature 必须先定义 public contract 或 internal contract。
-- Feature 必须定义非法输入、生命周期状态非法、取消、重复调用和释放后的行为。
-- Feature 必须定义诊断码或明确说明由上层诊断承接。
-- Feature 必须至少有 Unit 或 Contract 测试；涉及生命周期、插件、线程、UI、连接、build 或 generator 的功能必须增加专项测试。
-- Feature 完成状态必须能从 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 追踪。
+### 002-003 View
 
-## AUC-PRESENTATION-001 UI Dispatcher Bridge
+ViewModel Type + ViewKey 精确查找；显式/generated registration；UI dispatcher 创建和 Avalonia DataContext；无运行时扫描 fallback。
 
-Feature ID: `AUC-PRESENTATION-001`
-Status: 已实现并通过产品合同测试
-Goal: 把 Core 的 UI dispatcher 抽象桥接到 Avalonia UI 线程。
-Public Contract: AvaloniaUiDispatcher, IUiDispatcher
-Runtime / Build Behavior: 所有 VisualTree 修改、resource dictionary 修改和 UI-bound notification 都通过 dispatcher 提交。
-Failure Behavior: 非 UI 线程直接提交会 marshal 到 dispatcher；dispatcher 不可用返回 `PresentationError.DispatcherUnavailable`；work exception 原样传播并记录诊断。
-Threading / Cancellation: InvokeAsync 必须观察 token；取消后不得执行 UI work item。
-Diagnostics: dispatcher diagnostics 包含 operation id、calling thread id、dispatcher thread id 和 target action。
-Tests: `AvaloniaUiDispatcherTests; PresentationPlatformIntegrationTests`
-Required Assertions: 断言 UI 线程识别、后台 marshal、取消、异常映射和平台不可用。
-Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+### 004、010、014、015 Outlet/Ownership/Fault
 
-## AUC-PRESENTATION-002 View Registry and Locator
+单次 plan ownership、FIFO、有界 admission、temporary attach、final commit、pre-commit rollback、post-commit no rollback；普通失败 OutOfSync，不变量失败 Faulted，Entry 异步且完整释放。
 
-Feature ID: `AUC-PRESENTATION-002`
-Status: 已实现并通过产品合同测试
-Goal: 建立 ViewModel -> View 的 AOT 友好解析。
-Public Contract: ViewRegistry, IViewLocator, ViewForAttribute, ViewLookupRequest, ViewRegistrationOptions
-Runtime / Build Behavior: View 注册来自 generator manifest 或显式注册；lookup 按 ViewModel type、view key、route id 和 owner context 查找。
-Failure Behavior: View 未注册、重复注册、插件 owner 已卸载必须返回失败，不 fallback 到反射扫描或 assignable type 扫描。
-Threading / Cancellation: registry lookup 可并发读取；注册、显式覆盖和撤销串行。
-Diagnostics: view lookup diagnostics 包含 ViewModel type、view type、route id、owner、plugin id 和 contribution id。
-Tests: `ViewLocatorTests`
-Required Assertions: 断言 manifest 注册、显式覆盖、重复拒绝、插件撤销和 O(1) lookup 路径。
-Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+### 005 Visual feedback
 
-## AUC-PRESENTATION-003 View Factory and Binding
+仅真实 Avalonia 白名单事件；identity 过滤；handler 失败隔离；不改变业务状态。
 
-Feature ID: `AUC-PRESENTATION-003`
-Status: 已实现并通过产品合同测试
-Goal: 创建 View、设置 DataContext、建立 ViewModel 和 visual 的绑定边界。
-Public Contract: ViewFactory, ViewBinder, BoundViewHandle
-Runtime / Build Behavior: ViewFactory 通过 UI dispatcher 创建已注册 View；ViewBinder 设置 DataContext 并发布 attach/detach lifecycle。
-Failure Behavior: 构造失败不污染 outlet；binding 失败释放已创建 View。
-Threading / Cancellation: View 创建和 DataContext 设置在 UI dispatcher；取消后不得返回 bound handle。
-Diagnostics: factory/binding diagnostics 包含 view type、ViewModel type、view key、constructor parameters 和耗时。
-Tests: `ViewBindingTests`
-Required Assertions: 断言构造参数、DataContext、失败回滚、handle dispose 和 lifecycle event。
-Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+### 006、011 Interaction/Validation
 
-## AUC-PRESENTATION-004 Route Outlet Commit
+分层 handler、每 Window 有界 modal FIFO、跨 Window 并行；可见 UI 与文案由应用实现。Validation 是完全可选 visual adapter。
 
-Feature ID: `AUC-PRESENTATION-004`
-Status: 已实现并通过产品合同测试
-Goal: 把 Routing/MVVM 产生的 View 提交到桌面 UI 容器。
-Public Contract: IRouteOutlet, RouteOutlet, RouteOutletCommitPlan, RouteOutletCommitResult
-Runtime / Build Behavior: replace 和 clear 通过 dispatcher 提交；同一 outlet 的 commit 串行执行；重复提交当前 handle 为 no-op；replace 成功前先释放旧 handle，再设置新 content。
-Failure Behavior: outlet mismatch、dispatcher 失败、旧 handle dispose 失败或非法 replace plan 都返回失败并保持旧 visual；被拒绝的新 handle 会释放，释放失败写入诊断。
-Threading / Cancellation: commit 必须在 UI dispatcher 串行执行；取消发生在 dispatcher attach 前时不替换 content，并释放被拒绝 handle。
-Diagnostics: outlet diagnostics 包含 outlet name、requested outlet、operation、current view type、new view type 和 error。
-Tests: `RouteOutletTests`
-Required Assertions: 断言成功替换、失败回滚、取消、重复 commit、旧 view dispose 和结果状态。
-Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+### 007-008 Plugin UI
 
-## AUC-PRESENTATION-005 Visual Lifecycle Feedback
+resource/view/handler 带 owner 和 revoke；active view 优先清理，局部失败继续；resource dictionary revoke 不承载 Localization。
 
-Feature ID: `AUC-PRESENTATION-005`
-Status: 已实现并通过产品合同测试
-Goal: 把 VisualTree attach/detach/focus/visibility 变化反馈给 ViewModel、State 或 EventBus。
-Public Contract: VisualLifecycleHub, VisualLifecycleEvent, UiStateFeedbackPolicy
-Runtime / Build Behavior: Visual 变化统一发布为 lifecycle event；attach、detach、load、unload、focus 和 visibility 事件保留通知顺序；策略决定哪些 UI state feedback 可以进入 ViewModel。
-Failure Behavior: 反馈 handler 失败被隔离并写入诊断，不阻断后续 handler，不破坏 VisualTree。
-Threading / Cancellation: visual event 必须在 UI dispatcher 捕获；同步发布无 token，异步消费者由上层调度策略承接。
-Diagnostics: visual feedback diagnostics 包含 event kind、view type、target ViewModel type 和 error。
-Tests: `VisualFeedbackTests`
-Required Assertions: 断言 attach/detach、focus、visibility、反馈顺序和 handler 失败隔离。
-Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+### 009、016 Runtime/Window
 
-## AUC-PRESENTATION-006 Interaction and Validation Bridge
+双注册入口、Attach/RegisterWindow 主路径、Show 前注册、close origin、唯一 confirmation、并发事务合并和全量清理。
 
-Feature ID: `AUC-PRESENTATION-006`
-Status: 已实现并通过产品合同测试
-Goal: 把 MVVM Interaction/Validation 映射到 UI handler 和视觉状态。
-Public Contract: InteractionHandlerRegistry, ValidationVisualStateBinding
-Runtime / Build Behavior: Interaction handler 按 request/result type 查找最后注册且未释放的 handler；validation binding 将 ValidationScope immutable snapshot 映射到控件状态并保留消息变化。
-Failure Behavior: 无 handler 返回 NotHandled；handler 异常返回 Failed；plugin/contribution revoke 移除 handler；控件已释放时 validation apply 失败并记录诊断。
-Threading / Cancellation: interaction handler 和 validation target 都通过 dispatcher 执行；预取消不调用 handler 或 target；运行中 owner revoke/activation scope dispose 取消 pending interaction。
-Diagnostics: interaction diagnostics 包含 request type、result type、status、plugin id、contribution id 和 error；validation diagnostics 包含 status、keys、message count、target type 和 error。
-Tests: `PresentationInteractionHandlerTests; ValidationVisualStateBindingTests`
-Required Assertions: 断言 handler 注册撤销、无 handler、验证消息变化、控件释放和取消。
-Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+### 012 Generator
 
-## AUC-PRESENTATION-007 Localization and Resource Bridge
+1.0 只生成 View registrar，输出稳定排序；不生成 Interaction/resource/plugin descriptor。
 
-Feature ID: `AUC-PRESENTATION-007`
-Status: 已实现并通过产品合同测试
-Goal: 把 Localization culture 变化同步到 AtomUI/Avalonia 资源和文本绑定。
-Public Contract: PresentationLocalizationBridge, PresentationResourceRegistry
-Runtime / Build Behavior: culture change 批量刷新 text binding、flow direction 和 resource dictionary；resource contribution 通过 lease 绑定 plugin/contribution owner 并可撤销。
-Failure Behavior: 语言包缺失或 resource dictionary 加载失败按 LocalizationResult 返回；局部 applier/target/resource dispose 失败必须诊断并继续刷新或撤销其他 target。
-Threading / Cancellation: 刷新和撤销在 UI dispatcher 执行；dispatcher work 前和每个 applier/target 前观察取消。
-Diagnostics: localization/resource diagnostics 包含 culture、UI culture、package ids、plugin id、contribution id、target count、resource type 和 error。
-Tests: `PresentationLocalizationBridgeTests; PresentationResourceRegistryTests`
-Required Assertions: 断言 culture 切换、fallback、resource revoke、插件资源卸载和局部失败隔离。
-Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+### 013 Retired
 
-## AUC-PRESENTATION-008 Plugin UI Unload Coordination
+Presentation 主包不再引用 Localization，不提供 culture revision、文案 binding 或 language package 处理。该编号永久保留，不得重用。
 
-Feature ID: `AUC-PRESENTATION-008`
-Status: 已实现并通过产品合同测试
-Goal: 插件卸载时撤销 active view、资源、handler 和 localization binding。
-Public Contract: ActivePluginViewRegistry, PresentationPluginUnloadCoordinator
-Runtime / Build Behavior: plugin unload 前先关闭 active view，再撤销 interaction handler、view descriptor、resource dictionary 和 resource contribution；contribution unload 使用 contribution-specific revoke。
-Failure Behavior: active view remaining 阻止后续卸载；resource dictionary 或 descriptor revoke 失败聚合 error 并继续释放可释放资源；重复 cleanup 返回 0-count 成功结果。
-Threading / Cancellation: active view close 和 resource dictionary revoke 通过 dispatcher；cleanup 进入每个异步步骤前观察 token。
-Diagnostics: plugin UI diagnostics 包含 plugin id、contribution id、closed view count、各类 revoke count、resource dictionary 状态、view type、outlet 和 error kinds。
-Tests: `ActivePluginViewRegistryTests; PresentationPluginUnloadCoordinatorTests`
-Required Assertions: 断言 active view lease、卸载撤销、拒绝卸载、资源释放和重复 unload。
-Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+## 治理门禁
+
+新增能力必须先分配 Feature ID，并在同一提交更新 API、诊断、测试和兼容性文档。Feature 状态只能依据可重复执行的证据提升，不能依据代码存在或人工判断提升。

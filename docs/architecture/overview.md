@@ -6,13 +6,13 @@
 
 ## 1. 框架定位
 
-AtomUI.City 是面向 AtomUI/Avalonia 生态的全栈 UI 业务应用框架。
+AtomUI.City 是面向 Avalonia 生态的全栈 UI 业务应用框架，可由应用选择 AtomUI 或其他控件库。
 
 它的目标不是提供一组零散工具类，而是为桌面业务软件提供一套完整的应用开发范式，包括应用启动、模块化、生命周期、MVVM、状态管理、路由、数据访问、安全、本地化、插件、构建、CLI、模板和测试基础设施。
 
-AtomUI.City 在 AtomUI/Avalonia 生态中的定位是应用框架层：它会提供框架级约定，并把这些约定强加给应用开发者，从而换取一致的工程结构、清晰的生命周期、可组合的模块边界和可维护的业务代码组织方式。
+AtomUI.City 在 Avalonia 生态中的定位是应用框架层：它会提供框架级约定，并把这些约定强加给应用开发者，从而换取一致的工程结构、清晰的生命周期、可组合的模块边界和可维护的业务代码组织方式。
 
-底层 UI 控件、主题、视觉系统和基础样式能力由 AtomUI 承担。AtomUI.City 不重造 UI 控件库，而是在 AtomUI/Avalonia 之上提供业务应用框架层。
+底层 UI 运行时由 Avalonia 承担；控件、主题、视觉系统和基础样式由应用选择 AtomUI 或其他控件库。AtomUI.City 不重造 UI 控件库。
 
 ## 2. 核心设计原则
 
@@ -38,7 +38,7 @@ AtomUI.City 第一版遵循以下原则：
 - 不在框架层内置 Workbench、Documents、Dashboard 等具体业务形态。
 - 不把 ReactiveUI 作为默认底层依赖。
 - 不把 IObservable 作为状态、命令、路由和事件系统的主公共 API。
-- 不重造 AtomUI 已经承担的控件、主题和视觉系统。
+- 不重造应用控件库已经承担的控件、主题和视觉系统。
 - 不把包拆得过细。
 - 不把运行时反射扫描作为默认发现机制。
 
@@ -50,9 +50,9 @@ AtomUI.City 的整体结构分为五层：
 
 - Host Layer：应用启动、DI、配置、模块、生命周期、全局错误处理。
 - Application Framework Layer：MVVM、State、Routing、Data、Security、EventBus、Localization、PluginSystem。
-- Presentation Integration Layer：AtomUI/Avalonia 集成、ViewLocator、Activation 接入、UI Dispatcher、Interaction Handler。
+- Presentation Integration Layer：Avalonia 运行时集成、ViewLocator、Activation 接入、UI Dispatcher、Interaction Handler。
 - Engineering Layer：Build、CLI、Templates、Testing。
-- UI Foundation Layer：AtomUI/Avalonia。
+- UI Foundation Layer：Avalonia，以及应用可选的 AtomUI 等控件库。
 
 ```mermaid
 flowchart TD
@@ -71,7 +71,7 @@ flowchart TD
     Cli["AtomUI.City.Cli"]
     Templates["AtomUI.City.Templates"]
     Testing["AtomUI.City.Testing"]
-    AtomUI["AtomUI / Avalonia"]
+    Avalonia["Avalonia / optional application UI library"]
 
     App --> Core
     Core --> Mvvm
@@ -85,7 +85,7 @@ flowchart TD
     Mvvm --> Presentation
     Routing --> Presentation
     State --> Presentation
-    Presentation --> AtomUI
+    Presentation --> Avalonia
     Build --> App
     Cli --> Templates
     Testing --> Core
@@ -94,7 +94,7 @@ flowchart TD
 框架主路径：
 
 ```text
-Route -> ViewModel -> State / Data / EventBus / Security -> Presentation -> AtomUI
+Route -> ViewModel -> State / Data / EventBus / Security -> Presentation -> Avalonia / optional UI library
 ```
 
 这条路径表达的是默认编程模型，而不是限制。业务应用仍可以根据自身复杂度增加领域层、应用服务层或其他内部结构。
@@ -113,7 +113,7 @@ AtomUI.City v1 包结构如下：
 | AtomUI.City.Security | 认证状态、权限检查、授权策略、路由和命令权限联动 |
 | AtomUI.City.EventBus | 类型事件总线、作用域订阅、事件通道、线程调度、错误策略 |
 | AtomUI.City.Localization | 本地化资源、文化切换、文本刷新、模块化资源注册 |
-| AtomUI.City.Presentation | AtomUI/Avalonia 集成、ViewLocator、UI Dispatcher、Activation 接入、Interaction Handler |
+| AtomUI.City.Presentation | Avalonia 运行时集成、ViewLocator、UI Dispatcher、Activation 接入、Interaction Handler |
 | AtomUI.City.PluginSystem | 插件发现、插件元数据、插件加载、插件模块注册、插件生命周期 |
 | AtomUI.City.Build | 构建约定、资源生成、模块清单、路由清单、输出组织 |
 | AtomUI.City.Cli | 项目创建、模块生成、路由生成、构建命令、模板调用 |
@@ -359,13 +359,13 @@ AtomUI.City.Localization 提供模块化本地化能力。
 - 当前文化状态。
 - UI 文本刷新。
 - 路由标题、命令文本、验证消息和错误消息本地化。
-- 与 State 和 Presentation 集成。
+- 与 State、应用组合层和可选 UI 适配包集成；Presentation 主包不处理文案或 culture。
 
 Localization 应支持模块独立贡献资源，并允许插件贡献本地化资源。
 
 ## 16. Presentation
 
-AtomUI.City.Presentation 是 AtomUI/Avalonia 集成层。
+AtomUI.City.Presentation 是 City 业务运行时与 Avalonia 之间的 UI 事务协调层。
 
 核心职责：
 
@@ -379,11 +379,11 @@ AtomUI.City.Presentation 是 AtomUI/Avalonia 集成层。
 - Route Outlet。
 - Command Binding 增强。
 - State 到 UI 的安全更新。
-- 本地化资源刷新。
+- 通用 UI resource contribution 的注册与撤销；文案和本地化刷新由 Localization 与应用组合层负责。
 
 Presentation 层不提供具体业务 UI 形态，不内置 Workbench、Documents、Dashboard 等应用模型。
 
-底层 UI 控件和视觉系统由 AtomUI/Avalonia 负责，Presentation 只负责框架运行时与 UI 运行时之间的连接。
+底层 UI 运行时由 Avalonia 提供，控件库和视觉系统由应用选择；Presentation 只负责框架运行时与 UI 运行时之间的连接。
 
 ## 17. PluginSystem
 
@@ -488,7 +488,7 @@ AtomUI.City.Testing 的目标是让应用可以测试框架编程模型本身，
 | AtomUI.City.Mvvm | 依赖 CommunityToolkit.Mvvm |
 | AtomUI.City.State | 不依赖 ReactiveUI，不要求 System.Reactive |
 | AtomUI.City.EventBus | 自研实现，不基于 WeakReferenceMessenger |
-| AtomUI.City.Presentation | 依赖 AtomUI/Avalonia |
+| AtomUI.City.Presentation | 硬依赖 Avalonia；AtomUI 可选且由应用引入 |
 | AtomUI.City.Routing | 依赖 Core，可与 Presentation 集成 |
 | AtomUI.City.Data | 依赖 Core，可与 Security 和 State 集成 |
 | AtomUI.City.Security | 依赖 Core，可与 Routing 和 Mvvm 集成 |
@@ -512,7 +512,7 @@ AtomUI.City 的默认编程范式是：
 -> 编写 ViewModel
 -> 使用 State / Data / EventBus / Security
 -> 由 Lifecycle 管理激活、订阅和释放
--> 由 Presentation 接入 AtomUI/Avalonia
+-> 由 Presentation 接入 Avalonia；控件库由应用选择
 ```
 
 应用开发者需要接受框架约定：
@@ -529,7 +529,7 @@ AtomUI.City 的默认编程范式是：
 
 ## 24. 总结
 
-AtomUI.City 的架构路线是：围绕 AtomUI/Avalonia 建立完整的桌面业务应用框架，统一 Host、模块、生命周期、MVVM、状态、路由、数据、安全、事件、插件、构建、CLI、模板和测试能力。
+AtomUI.City 的架构路线是：围绕 Avalonia 建立完整的桌面业务应用框架，允许应用选择 AtomUI 等控件库，并统一 Host、模块、生命周期、MVVM、状态、路由、数据、安全、事件、插件、构建、CLI、模板和测试能力。
 
 第一版最重要的目标不是功能铺满，而是建立稳定的框架范式和包边界：
 
@@ -540,7 +540,7 @@ AtomUI.City 的架构路线是：围绕 AtomUI/Avalonia 建立完整的桌面业
 - Data 负责数据访问基础设施。
 - Security 负责认证和权限。
 - EventBus 负责解耦通信。
-- Presentation 负责 AtomUI/Avalonia 集成。
+- Presentation 负责 Avalonia 运行时集成，不决定应用控件库。
 - PluginSystem 负责外部扩展。
 - Build、Cli、Templates 和 Testing 支撑完整开发生命周期。
 

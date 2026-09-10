@@ -9,7 +9,7 @@
 
 ## 模块定位
 
-桌面应用语言包、文化状态、懒加载、fallback、插件本地化和 Presentation 文案刷新。
+桌面应用语言包、文化状态、懒加载、fallback、插件本地化和应用拥有的可选 UI 刷新通知。
 
 ## 产品级硬性约束
 
@@ -49,7 +49,7 @@ AtomUI.City.Localization 作为 Host 服务或模块贡献接入 Core 生命周�
 
 - State 提供 `CultureState` 的 writable 创建能力；Localization 对外只暴露 `IReadOnlyState<CultureState>`。
 - Generators 读取 Localization attributes 并生成稳定 manifest、key 常量和原子 Registry registrar。
-- Presentation 实现 Localization 定义的 bridge/binding contract，并负责把实际 Avalonia/AtomUI 修改调度到 UI 线程；Localization Core 不依赖 Presentation 或 Avalonia。
+- 应用组合层或独立可选 UI 适配包可以实现 Localization 定义的 bridge；Presentation 主模块不实现文案/culture binding，Localization Core 不依赖 Presentation 或 Avalonia。
 
 ## 与 Testing 的关系
 

@@ -21,7 +21,7 @@ mutation 在提交前观察调用方 token；提交 descriptor/cache/state 后�
 - SetCulture 验证 culture 并计算 fallback chain。
 - Provider 懒加载 package。
 - LocalizationService 查找资源。
-- Presentation bridge 批量刷新。
+- 可选 application-owned bridge 回调与本地文本批量刷新。
 
 ## Host Shutdown / 执行结束行为
 

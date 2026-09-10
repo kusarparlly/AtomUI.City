@@ -70,10 +70,11 @@ public sealed class PresentationPluginUnloadCoordinator : IPresentationPluginUnl
 
         if (!resourceDictionaryResult.Succeeded)
         {
+            var exception = resourceDictionaryResult.Errors.FirstOrDefault();
             errors.Add(new PresentationPluginUnloadError(
                 PresentationPluginUnloadErrorKind.ResourceDictionaryRevokeFailed,
-                resourceDictionaryResult.Error?.Message ?? "Presentation resource dictionary revoke failed.",
-                resourceDictionaryResult.Error?.Exception));
+                exception?.Message ?? "Presentation resource dictionary revoke failed.",
+                exception));
         }
 
         var revokedResourceContributionCount = RevokeResourceContributions(request, errors);

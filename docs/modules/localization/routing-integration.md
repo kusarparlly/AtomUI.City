@@ -41,7 +41,7 @@
 | AUC-LOCALIZATION-003 | Lazy Loading | LocalizationServiceTests |
 | AUC-LOCALIZATION-004 | Lookup and Fallback | LocalizationServiceTests |
 | AUC-LOCALIZATION-005 | Assembly Language Packages | LanguagePackageProviderTests; LocalizationDeclarationAttributeTests |
-| AUC-LOCALIZATION-006 | Presentation Bridge | LocalizationServiceTests |
+| AUC-LOCALIZATION-006 | Optional Application Refresh Hook | LocalizationServiceTests |
 | AUC-LOCALIZATION-007 | Plugin Package Revocation | LocalizationServiceTests |
 | AUC-LOCALIZATION-008 | Generated Localization Manifest | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationManifestBuilderTests |
 
@@ -66,7 +66,7 @@
 
 Routing 集成让路由 metadata 使用本地化 key，而不是固定显示文本。
 
-Routing 不查找资源，不操作 UI。Localization 解析 key，Presentation 展示文本。
+Routing 不查找资源，不操作 UI。Localization 解析 key，应用 ViewModel/View 展示文本。
 
 ### 2. Route Metadata
 
@@ -84,11 +84,11 @@ Source Generator 将这些写入 Route descriptor。
 
 ### 3. 页面进入预加载
 
-Presentation 绑定已匹配的 Route 时激活 `LocalizationLookupContext.RouteId` lease；创建 route text binding 的首次 lookup 按需加载当前 culture 的 route package。
+应用的 Routing-Presentation 编排器消费已匹配 Route 时激活 `LocalizationLookupContext.RouteId` lease；ViewModel 或应用 UI 首次 lookup 时按需加载当前 culture 的 route package。
 
 ```text
 Route matched
--> Presentation LocalizedRouteTextBinding activates route scope
+-> application orchestrator activates route localization scope
 -> CreateTextAsync loads selected culture package on demand
 -> bind localized metadata setters
 ```

@@ -41,7 +41,7 @@
 | AUC-LOCALIZATION-003 | Lazy Loading | LocalizationServiceTests |
 | AUC-LOCALIZATION-004 | Lookup and Fallback | LocalizationServiceTests |
 | AUC-LOCALIZATION-005 | Assembly Language Packages | LanguagePackageProviderTests; LocalizationDeclarationAttributeTests |
-| AUC-LOCALIZATION-006 | Presentation Bridge | LocalizationServiceTests |
+| AUC-LOCALIZATION-006 | Optional Application Refresh Hook | LocalizationServiceTests |
 | AUC-LOCALIZATION-007 | Plugin Package Revocation | LocalizationServiceTests |
 | AUC-LOCALIZATION-008 | Generated Localization Manifest | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationManifestBuilderTests |
 
@@ -96,7 +96,7 @@ Localization 不是单个全局字符串字典。它表达 Host、Module、Plugi
 | Plugin | 插件资源。 |
 | Route | 页面或路由资源。 |
 | Window | 窗口级资源。 |
-| Presentation | AtomUI/Avalonia UI 资源桥。 |
+| Presentation | 应用级、始终可见的 UI 文案资源作用域；不表示 `AtomUI.City.Presentation` 拥有本地化职责。 |
 
 资源 Scope 决定加载时机、查找优先级和撤销边界。Host 与 Presentation 是全局 scope；Module、Plugin、Route、Window descriptor 必须携带稳定 `ScopeId`。后四类只有在 `ILocalizationService.ActivateScope` 返回的 lease 存活，并且 lookup 的 `LocalizationLookupContext` 携带相同 id 时才可见。
 

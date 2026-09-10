@@ -1,74 +1,65 @@
 # AtomUI.City.Presentation Diagnostics
 
-## 诊断原则
+诊断码语义稳定且不得复用。message 可以改进；测试至少断言 code 和一个定位字段。
 
-- 诊断码稳定，不能复用。
-- 文档必须区分“当前源码已有诊断码”和“产品级目标诊断”。
-- message 可以优化，但 code 含义不能漂移。
-- 重要失败路径必须有诊断、Result 或声明异常。
-- 测试必须断言 code 和至少一个定位字段。
+## Runtime、View 和 Outlet
 
-## 当前源码诊断码
+| Code | 名称 | Severity | 关键 Context |
+| --- | --- | --- | --- |
+| AUCPRS001 | RuntimeReady | Info | scopeId |
+| AUCPRS002 | RuntimeStopping | Info | scopeId |
+| AUCPRS003 | DispatcherOperationRejected | Warning | operationId, targetAction, thread ids, error |
+| AUCPRS004 | DispatcherCallbackFailed | Error | operationId, targetAction, thread ids, error |
+| AUCPRS005 | ViewLocatorMatched | Info | viewModelType, viewType, viewKey, owner |
+| AUCPRS006 | ViewLocatorFailed | Warning | viewModelType, viewKey, routeId, owner |
+| AUCPRS007 | ViewCreated | Info | view types, constructor parameters, elapsed |
+| AUCPRS008 | ViewCreationFailed | Error | view types, elapsed, error |
+| AUCPRS009 | ViewBound | Info | view types, viewKey, elapsed |
+| AUCPRS010 | ViewBindingFailed | Error | view types, viewKey, elapsed, error |
+| AUCPRS011 | OutletCommitPlanned | Info | operationId, outlet, operation, route, stage |
+| AUCPRS012 | OutletCommitSucceeded | Info | operationId, outlet, operation, route, stage |
+| AUCPRS013 | OutletCommitFailed | Error | operationId, outlet, operation, route, stage, error |
+| AUCPRS014 | VisualLifecycleAdapterExecuted | Info | Window/Outlet/Operation/Entry/View identity, eventKind |
+| AUCPRS015 | VisualLifecycleAdapterFailed | Error | identity, eventKind, error |
+| AUCPRS016 | ResourceDictionaryRevoked | Info | pluginId, contributionId, target/failure count |
+| AUCPRS017 | ResourceDictionaryRevokeFailed | Error | pluginId, contributionId, target/failure count, error |
+| AUCPRS018 | RetiredBefore1.0 | Reserved | 原 culture resource apply 语义，禁止复用 |
+| AUCPRS019 | RetiredBefore1.0 | Reserved | 原 culture resource apply failure 语义，禁止复用 |
 
-| Code | 名称 | Severity | 场景 | Required Context |
-| --- | --- | --- | --- | --- |
-| `AUCPRS003` | DispatcherOperationRejected | Warning | runtime 未 ready、runtime stopping 或 Avalonia dispatcher unavailable。 | `operationId`, `targetAction`, `callingThreadId`, `dispatcherThreadId`, `error` |
-| `AUCPRS004` | DispatcherCallbackFailed | Error | UI dispatcher work item 抛异常。 | `operationId`, `targetAction`, `callingThreadId`, `dispatcherThreadId`, `error` |
-| `AUCPRS005` | ViewLocatorMatched | Info | ViewModel 精确 key lookup 命中 ViewDescriptor。 | `viewModelType`, `viewType`, `viewKey`, `routeId`, `ownerId`, `pluginId`, `contributionId` |
-| `AUCPRS006` | ViewLocatorFailed | Warning | ViewModel 精确 key lookup 未命中。 | `viewModelType`, `viewKey`, `routeId`, `ownerId` |
-| `AUCPRS007` | ViewCreated | Info | ViewFactory 创建 View 成功。 | `viewModelType`, `viewType`, `viewKey`, `constructorParameters`, `elapsedMilliseconds` |
-| `AUCPRS008` | ViewCreationFailed | Error | ViewFactory 创建 View 失败。 | `viewModelType`, `viewType`, `viewKey`, `constructorParameters`, `elapsedMilliseconds`, `error` |
-| `AUCPRS009` | ViewBound | Info | ViewBinder 设置 DataContext 并建立 BoundViewHandle。 | `viewModelType`, `viewType`, `viewKey`, `elapsedMilliseconds` |
-| `AUCPRS010` | ViewBindingFailed | Error | ViewBinder binding 失败并释放已创建 View。 | `viewModelType`, `viewType`, `viewKey`, `elapsedMilliseconds`, `error` |
-| `AUCPRS011` | OutletCommitPlanned | Info | RouteOutlet 收到 commit plan。 | `outletName`, `requestedOutletName`, `operation`, `currentViewType`, `newViewType` |
-| `AUCPRS012` | OutletCommitSucceeded | Info | RouteOutlet 成功提交 replace 或 clear。 | `outletName`, `requestedOutletName`, `operation`, `currentViewType`, `newViewType` |
-| `AUCPRS013` | OutletCommitFailed | Error | RouteOutlet commit 失败、outlet mismatch、dispatcher 失败或 rejected handle dispose 失败。 | `outletName`, `requestedOutletName`, `operation`, `currentViewType`, `newViewType`, `error` |
-| `AUCPRS014` | VisualLifecycleAdapterExecuted | Info | Visual lifecycle handler 成功处理事件。 | `viewType`, `viewModelType`, `eventKind`, `error` |
-| `AUCPRS015` | VisualLifecycleAdapterFailed | Error | Visual lifecycle handler 处理事件失败。 | `viewType`, `viewModelType`, `eventKind`, `error` |
-| `AUCPRS016` | ResourceDictionaryRevoked | Info | Resource dictionary target 成功撤销 plugin 或 contribution 资源。 | `pluginId`, `contributionId`, `targetCount`, `errorKind`, `error` |
-| `AUCPRS017` | ResourceDictionaryRevokeFailed | Error | Resource dictionary target 撤销失败。 | `pluginId`, `contributionId`, `targetCount`, `errorKind`, `error` |
-| `AUCPRS018` | ResourceDictionaryApplied | Info | Resource dictionary target 成功应用 culture 和 packages。 | `culture`, `uiCulture`, `packageIds`, `targetCount`, `errorKind`, `error` |
-| `AUCPRS019` | ResourceDictionaryApplyFailed | Error | Resource dictionary target 应用 culture 或 packages 失败。 | `culture`, `uiCulture`, `packageIds`, `targetCount`, `errorKind`, `error` |
-| `AUCPRS020` | InteractionHandled | Info | Interaction handler 成功处理 request。 | `requestType`, `resultType`, `status`, `pluginId`, `contributionId`, `error` |
-| `AUCPRS021` | InteractionNotHandled | Warning | Interaction request 没有可用 handler。 | `requestType`, `resultType`, `status`, `pluginId`, `contributionId`, `error` |
-| `AUCPRS022` | InteractionFailed | Error | Interaction handler 抛异常。 | `requestType`, `resultType`, `status`, `pluginId`, `contributionId`, `error` |
-| `AUCPRS023` | InteractionHandlerRevoked | Info | Interaction handler 被 plugin 或 contribution revoke。 | `requestType`, `resultType`, `status`, `pluginId`, `contributionId`, `error` |
-| `AUCPRS024` | ValidationVisualStateApplied | Info | ValidationScope snapshot 应用到 visual target。 | `status`, `keys`, `messageCount`, `targetType`, `error` |
-| `AUCPRS025` | ValidationVisualStateApplyFailed | Error | Validation visual target 应用失败。 | `status`, `keys`, `messageCount`, `targetType`, `error` |
-| `AUCPRS028` | ResourceContributionRegistered | Info | Presentation resource contribution 注册。 | `kind`, `pluginId`, `contributionId`, `resourceType`, `error` |
-| `AUCPRS029` | ResourceContributionRevoked | Info | Presentation resource contribution 撤销。 | `kind`, `pluginId`, `contributionId`, `resourceType`, `error` |
-| `AUCPRS030` | ResourceContributionRevokeFailed | Error | Presentation resource contribution 撤销失败。 | `kind`, `pluginId`, `contributionId`, `resourceType`, `error` |
-| `AUCPRS031` | PluginViewTracked | Info | Active plugin view lease 被 tracking。 | `pluginId`, `contributionId`, `outletName`, `viewType`, `viewModelType`, `error` |
-| `AUCPRS032` | PluginViewClosed | Info | Active plugin view 成功从 outlet 清理。 | `pluginId`, `contributionId`, `outletName`, `viewType`, `viewModelType`, `error` |
-| `AUCPRS033` | PluginViewCloseFailed | Error | Active plugin view outlet clear 失败。 | `pluginId`, `contributionId`, `outletName`, `viewType`, `viewModelType`, `error` |
-| `AUCPRS034` | PluginUnloadCleanupCompleted | Info | Plugin UI unload cleanup 成功完成。 | `pluginId`, `contributionId`, `closedViewCount`, `revokedInteractionHandlerCount`, `revokedViewDescriptorCount`, `revokedResourceContributionCount`, `resourceDictionariesRevoked`, `errorKinds` |
-| `AUCPRS035` | PluginUnloadCleanupFailed | Error | Plugin UI unload cleanup 失败或部分失败。 | `pluginId`, `contributionId`, `closedViewCount`, `revokedInteractionHandlerCount`, `revokedViewDescriptorCount`, `revokedResourceContributionCount`, `resourceDictionariesRevoked`, `errorKinds` |
+## Interaction、Validation、Command 和 Plugin
 
-## 产品级必须诊断的失败
+| Code | 名称 | Severity | 关键 Context |
+| --- | --- | --- | --- |
+| AUCPRS020 | InteractionHandled | Info | request/result type, status, owner |
+| AUCPRS021 | InteractionNotHandled | Warning | request/result type, status |
+| AUCPRS022 | InteractionFailed | Error | request/result type, owner, error |
+| AUCPRS023 | InteractionHandlerRevoked | Info | request/result type, plugin/contribution |
+| AUCPRS024 | ValidationVisualStateApplied | Info | status, keys, messageCount, targetType |
+| AUCPRS025 | ValidationVisualStateApplyFailed | Error | status, keys, targetType, error |
+| AUCPRS026 | CommandStateApplied | Info | canExecute, isExecuting |
+| AUCPRS027 | CommandStateApplyFailed | Error | error |
+| AUCPRS028 | ResourceContributionRegistered | Info | kind, plugin, contribution, resourceType |
+| AUCPRS029 | ResourceContributionRevoked | Info | kind, plugin, contribution, resourceType |
+| AUCPRS030 | ResourceContributionRevokeFailed | Error | owner, resourceType, error |
+| AUCPRS031 | PluginViewTracked | Info | owner, outlet, view types |
+| AUCPRS032 | PluginViewClosed | Info | owner, outlet, view types |
+| AUCPRS033 | PluginViewCloseFailed | Error | owner, outlet, error |
+| AUCPRS034 | PluginUnloadCleanupCompleted | Info | owner and revoke counts |
+| AUCPRS035 | PluginUnloadCleanupFailed | Error | owner, counts, errorKinds |
 
-- View 未注册：返回失败并诊断。
-- 非 UI 线程提交：marshal 到 dispatcher；dispatcher 不可用或 work 失败必须诊断。
-- View lookup 未注册或 owner 已撤销：返回失败并诊断。
-- View 创建失败：不替换现有 outlet。
-- View binding 失败：释放已创建 View 并诊断。
-- Outlet commit 失败：保留旧 content，释放被拒绝的新 handle，并记录 outlet、operation、view type 和 error。
-- Visual lifecycle handler 失败：记录失败并继续通知后续 handler。
-- Interaction handler 缺失、失败或撤销：记录 request/result type、owner 和 status。
-- Validation visual target 失败：记录 status、keys、message count、target type 和 error；用户取消不记录失败。
-- Culture 或 resource dictionary 局部失败：记录失败并继续刷新或撤销后续 target，返回首个失败。
-- Presentation resource contribution 撤销失败：记录失败并继续撤销同 plugin 或 contribution 下的其他资源。
-- 插件卸载 active view：detach 并撤销资源；active view remaining 阻止 unload 并输出 failed cleanup 诊断。
+## 工业化故障与背压
 
-## 上下文字段
+| Code | 名称 | Severity | 关键 Context |
+| --- | --- | --- | --- |
+| AUCPRS036 | OutletRollbackFailed | Error | operationId, outlet, stage, error |
+| AUCPRS037 | PresentationEntryCleanupFailed | Error | operationId, outlet, error |
+| AUCPRS038 | FailurePresenterFailed | Error | operationId, outlet, stage, error |
+| AUCPRS039 | WindowCleanupFailed | Error | windowId, closeOrigin, error |
+| AUCPRS040 | OutletQueueRejected | Warning | operationId, outlet, capacity, pending, rejected |
+| AUCPRS041 | InteractionQueueRejected | Warning | request/result type, windowId, capacity, pending, rejected |
+| AUCPRS042 | CandidateOwnershipViolation | Error | operationId, outlet, candidate state/owner, error |
+| AUCPRS043 | MultipleCloseConfirmations | Error | windowId, confirmationCount, viewModelTypes |
 
-推荐字段：`operationId`、`scopeId`、`module`、`pluginId`、`routeId`、`ownerId`、`viewModelType`、`viewType`、`viewKey`、`stateKey`、`eventType`、`handlerType`、`assembly`、`path`、`featureId`、`threadId`、`callingThreadId`、`dispatcherThreadId`、`targetAction`、`attempt`、`transportKind`。
+## 演进规则
 
-## 诊断缺口处理
-
-- 如果当前源码没有对应诊断码，必须在 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 中标记为 product gap。
-- 新增诊断码必须同时更新源码、本文档、测试矩阵和 compatibility。
-- 已存在诊断码不能因为重构改变语义。
-
-## 测试门禁
-
-`tests/AtomUI.City.Presentation.Tests` 必须断言当前源码诊断码；产品级目标诊断补齐后必须增加对应测试。
+`AUCPRS001-017`、`AUCPRS020-043` 是 1.0 active 集合；018/019 永久 reserved。新增 code 必须同步源码、Feature、API card、compatibility 和断言测试。

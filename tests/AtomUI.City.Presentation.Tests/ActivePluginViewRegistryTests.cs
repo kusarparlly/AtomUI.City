@@ -229,6 +229,10 @@ public sealed class ActivePluginViewRegistryTests
 
         public object? CurrentContent { get; set; }
 
+        public PresentationEntry? CurrentEntry => null;
+
+        public RouteOutletState State => RouteOutletState.Faulted;
+
         public ValueTask<RouteOutletCommitResult> CommitAsync(
             RouteOutletCommitPlan plan,
             CancellationToken cancellationToken = default)

@@ -1,43 +1,46 @@
 # AtomUI.City.Presentation Lifecycle
 
-## 生命周期范围
+## 状态机
 
-执行边界：Avalonia/AtomUI runtime bridge。
+Presentation 使用五套状态机：Runtime、WindowSession、RouteOutlet、candidate ownership 和 bounded serial lane。完整转换见 [industrial-design.md](industrial-design.md#5-五套状态机)。旧的 Presentation Localization 状态机已在 1.0 冻结前移除，因为 culture 与文案不属于本模块。
 
-AtomUI.City.Presentation 作为 Host 服务或模块贡献接入 Core 生命周期，必须在 Host start/stop/dispose 中遵守本模块状态机。
+非法转换不能被静默接受：普通操作失败进入 `OutOfSync`，恢复或不变量失败进入 `Faulted`，终态拒绝 mutation。
 
-## 模块特有状态机
+## 启动
 
-- PresentationRuntime: Created -> Starting -> Running -> Stopping -> Stopped -> Disposed
-- RouteOutlet: Empty -> Preparing -> Committing -> Committed 或 Failed
+```text
+Host Build/Start
+-> Avalonia framework initialization completed
+-> IPresentationRuntime.Attach
+-> RegisterWindow on UI thread before Show
+-> Attached Property or explicit RegisterOutlet
+-> Ready
+```
 
-## 生命周期流程
+`PresentationModule` 和 `AddPresentation` 注册同一服务。Attach 不增加服务、不运行 IO、不扫描程序集。
 
-- Routing 输出 ViewModelTargetDescriptor。
-- ViewLocator 找到 ViewDescriptor。
-- ViewFactory 创建 View。
-- RouteOutlet 在 UI dispatcher 上提交 View。
+## Outlet Entry
 
-## Host Shutdown / 执行结束行为
+```text
+adapter owns plan
+-> Outlet admission owns plan
+-> prepare/guard
+-> temporary physical attach
+-> activate
+-> final commit transfers ownership to Entry
+-> old Entry cleanup
+```
 
-- Host 停止时阻止新操作进入。
-- 取消未完成后台任务。
-- 从 leaf owner 到 root owner 释放资源。
-- 释放失败记录诊断并继续释放其他资源。
+最终提交前错误走 rollback；rollback 必须恢复旧 content 并释放候选。最终提交后只完成旧资源清理，不回滚。
 
-## 插件动态变更行为
+## Window 关闭
 
-- 插件来源对象必须绑定 plugin owner。
-- 插件停用时先拒绝新贡献，再撤销现有贡献，最后释放对象。
-- 跨插件 contract 类型必须来自 Host 共享程序集。
+用户或普通应用关闭：`Ready -> Closing -> Ready(rejected)` 或 `Ready -> Closing -> Closed`。Host/Dispose/OS 关闭不可拒绝。并发调用共享一个 transaction task；Window 消失后仍可继续清理，task 在清理完成后结束。
 
-## 异常中断行为
+## Host Stop
 
-- View 未注册：返回失败并诊断。
-- 非 UI 线程提交：拒绝并诊断。
-- View 创建失败：不替换现有 outlet。
-- 插件卸载 active view：detach 并撤销资源。
+Runtime 先进入 Stopping 并拒绝新 Window；已经接受的 Outlet/Interaction 及释放路径仍可使用 dispatcher。所有 WindowSession 都要尝试关闭，单个失败不阻断其他窗口；最后停止 PresentationScope。失败聚合后 Runtime 进入 Faulted，否则进入 Stopped。
 
-## 生命周期测试要求
+## 插件撤销
 
-生命周期测试必须覆盖：正常路径、重复调用、取消、失败中断、释放、插件撤销或执行边界结束。具体用例见 [testing.md](testing.md)。
+先阻止新 contribution，再关闭 active view，随后撤销 interaction、view descriptor、resource dictionary 和 resource lease。单项资源失败被收集，不跳过其余资源；仍有 active view 时拒绝插件卸载。

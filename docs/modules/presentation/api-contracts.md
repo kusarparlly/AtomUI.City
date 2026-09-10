@@ -1,155 +1,106 @@
 # AtomUI.City.Presentation API Contracts
 
-本文件是实现 public API 的行为合同。它不是源码目录索引；每个关键 API 必须说明用途、生命周期、失败行为、取消、并发和兼容性。
+本文记录 1.0 public API 的用途、前置条件、所有权、失败、取消、并发和释放语义。源码新增 public 类型时必须同步更新本文。
 
-## API Family 合同
+## 注册与 Runtime
 
-| API Family | 关键类型 | 职责 | 硬性行为 |
-| --- | --- | --- | --- |
-| Dispatcher | AvaloniaUiDispatcher, IUiDispatcher | UI 线程调度桥接。 | 所有 VisualTree 修改都通过 dispatcher。 |
-| View Resolution | ViewRegistry, IViewLocator, ViewFactory | ViewModel -> View 解析和创建。 | 优先 manifest 或显式注册，失败不反射兜底。 |
-| Outlet | IRouteOutlet, RouteOutlet | 提交 View 到 UI 容器。 | commit 事务失败不替换旧 visual。 |
-| Feedback | VisualLifecycleHub, UiStateFeedbackPolicy | VisualTree 变化反馈。 | 反馈失败不得破坏 VisualTree。 |
-| Plugin Resources | PresentationResourceRegistry, ActivePluginViewRegistry | 插件 UI 资源和 active view lease。 | 插件卸载必须可撤销或阻止。 |
+| API | 合同 |
+| --- | --- |
+| `PresentationServiceCollectionExtensions.AddPresentation` | 注册完整 Presentation 服务面；可重复调用；options 容量必须为正；不 Build provider。 |
+| `PresentationModule` | `UseModule<PresentationModule>()` 的 City Host 入口；服务注册必须等价于 `AddPresentation`；Host shutdown 调用 Runtime Stop。 |
+| `IPresentationRuntime.Attach` | Host 已启动、Avalonia 已初始化、UI lifetime 非空；创建 PresentationScope；同一 lifetime 重复调用幂等，换 lifetime 失败。 |
+| `IPresentationRuntime.RegisterWindow` | Runtime Ready、UI 线程、Window 尚未 Show 且未重复注册；返回唯一 WindowSession。 |
+| `IPresentationRuntime.StartAsync/CreateWindowScope` | headless/test/compatibility 低级入口，不附加 Avalonia lifetime，不替代桌面主路径。 |
+| `IPresentationRuntime.StopAsync` | 并发调用共享同一事务；caller token 只取消等待；尝试清理全部 Window 和 PresentationScope；聚合失败后 Runtime Faulted。 |
 
-## 关键方法合同
+## View 和 ViewModel
 
-| Method | Purpose | Parameters | Return | Failure Behavior | Cancellation | Concurrency / Idempotency |
-| --- | --- | --- | --- | --- | --- | --- |
-| AvaloniaUiDispatcher.InvokeAsync | 在 UI 线程执行 work。 | delegate 不得为 null。 | work result。 | dispatcher unavailable 映射 `PresentationError.DispatcherUnavailable`；work exception 原样传播并记录诊断。 | 取消后不得执行 work；非用户取消的 dispatcher shutdown 映射为 unavailable。 | UI work 串行，允许后台并发排队。 |
-| AvaloniaUiDispatcher.PostAsync | 投递异步 UI work。 | delegate 不得为 null。 | 投递完成 task。 | dispatcher unavailable 映射 `PresentationError.DispatcherUnavailable`；work exception 原样传播并记录诊断。 | 取消后不得执行 queued work item。 | 后台调用 marshal 到 dispatcher 线程执行。 |
-| ViewRegistry.RegisterManifest | 从 generated manifest 或显式 descriptor list 注册 ViewDescriptor。 | descriptors 不得为 null；同一 manifest 内 key 不得重复。 | void。 | 重复注册抛 `PresentationError.DuplicateView`，失败不产生部分注册；`ViewRegistrationOptions.ReplaceExisting` 可显式覆盖。 | 同步 API 无 token。 | 注册和撤销串行。 |
-| IViewLocator.Locate / TryLocate | 解析 ViewModel 对应 ViewDescriptor。 | ViewModel type、view key；`ViewLookupRequest` 可携带 route id 和 owner。 | ViewDescriptor 或失败结果。 | 未注册、重复、owner revoked 返回失败，不 fallback 到反射扫描或 assignable type 扫描。 | 同步 lookup 无 token。 | registry 读并发安全，lookup 使用精确 dictionary key。 |
-| ViewFactory.CreateAsync | 在 UI dispatcher 上创建 View。 | ViewDescriptor；descriptor 可携带 constructor parameter metadata。 | View object。 | 构造失败记录 `ViewCreationFailed` 并传播异常；取消前不得执行 factory。 | UI 创建必须支持取消前检查。 | 每次创建独立 View。 |
-| ViewBinder.Bind | 设置 DataContext 并建立 binding handle。 | ViewDescriptor、View、ViewModel。 | BoundViewHandle。 | binding 失败释放已创建 View；handle dispose 清理 DataContext 并发布 detach lifecycle。 | 同步 API 无 token。 | handle dispose 幂等。 |
-| IRouteOutlet.CommitAsync | 把 bound view 提交到 outlet。 | RouteOutletCommitPlan。 | RouteOutletCommitResult。 | 失败不替换旧 content；old deactivate 拒绝则中止。 | attach 前可取消；attach 后完成回滚或提交。 | 同一 outlet commit 串行。 |
-| VisualLifecycleHub.Notify | 发布 attach/detach/focus/visibility 等 visual 事件。 | view 不得为 null；VisualLifecycleEventKind 必须是声明值。 | void。 | handler 失败被隔离并诊断，不阻断后续 handler，不破坏 VisualTree。 | 同步 API 无 token；由 UI 捕获方保证 dispatcher 边界。 | 按 UI 捕获顺序和订阅顺序发布；unsubscribe 后不再接收事件。 |
-| InteractionHandlerRegistry.HandleAsync | 把 MVVM interaction request 交给当前 handler。 | request、result type 和 token。 | InteractionResult。 | 无 handler 返回 NotHandled；handler 异常返回 Failed；handler owner 撤销后不再调用。 | 预取消不调用 handler；运行中 owner revoke 或 activation scope dispose 返回 Canceled。 | 同 key 使用最后注册且未释放的 handler；plugin/contribution revoke 幂等移除。 |
-| ValidationVisualStateBinding.ApplyAsync | 把 ValidationScope snapshot 应用到 UI target。 | ValidationScope、IValidationVisualStateTarget 和 token。 | ValueTask。 | target apply 失败原样传播并记录诊断；disposed target 失败不吞掉。 | 预取消不调用 target 且不记录失败诊断。 | 每次 Apply 使用新的 immutable snapshot，target 接收消息变化。 |
-| PresentationLocalizationBridge.ApplyCultureAsync | 把 culture state 应用到 Presentation appliers。 | CultureState 和 token。 | LocalizationResult。 | 局部 applier 失败不会阻断后续 applier；返回首个失败。 | dispatcher work 前和每个 applier 前观察取消。 | applier 按注册顺序执行。 |
-| PresentationResourceRegistry.Register / Revoke | 注册和撤销 Presentation resource contribution。 | contribution、plugin id 或 contribution id。 | lease 或 revoked count。 | 单个 resource dispose 失败记录诊断并继续撤销其他资源。 | 同步 API 无 token。 | lease dispose 幂等；Contributions snapshot 不可外部修改。 |
-| PresentationResourceDictionaryRevoker.RevokeAsync | 插件卸载或贡献撤销时撤销 resource dictionary target。 | revocation 和 token。 | LocalizationResult。 | 局部 target 失败不会阻断后续 target；返回首个失败。 | dispatcher work 前和每个 target 前观察取消。 | target 按注册顺序执行。 |
-| ActivePluginViewRegistry.ClosePluginViewsAsync / CloseContributionViewsAsync | 关闭插件或 contribution 的 active view lease。 | plugin id 或 contribution id。 | closed view count。 | outlet clear 失败保留 active view 并记录诊断，继续关闭其他 view。 | 每个 outlet commit 前观察 token。 | lease dispose 幂等；ActiveViews snapshot 不可外部修改。 |
-| PresentationPluginUnloadCoordinator.CleanupAsync | 插件卸载前撤销 UI contribution。 | plugin id 和 unload request。 | PresentationPluginUnloadResult。 | active view 拒绝关闭时阻止 unload；其他 revoke 失败聚合 error 并继续清理可清理资源。 | 必须观察 token。 | 重复 cleanup 返回稳定 0-count 成功结果。 |
+| API | 合同 |
+| --- | --- |
+| `IViewModelFactory.AcquireAsync` | 优先当前 Entry 精确复用，其次创建 DI scope 解析，再使用显式/generated factory；不得反射猜测或写回 provider；返回 ownership lease。 |
+| `ViewModelLease` | 只实现 `IAsyncDisposable`；`EntryOwned` 释放实例，`ServiceScopeOwned` 释放 scope，`Borrowed` 不释放；重复释放幂等。 |
+| `IViewRegistry/IViewLocator` | `ViewModel Type + ViewKey` 精确键；无 assignable/name/assembly scan fallback；默认重复失败，显式 owner override 可撤销恢复。 |
+| `ViewFactory.CreateAsync` | 在 UI dispatcher 创建 View；factory 结果必须匹配 descriptor ViewType；取消前不执行 factory。 |
+| `ViewBinder.Bind` | Avalonia View 必须在 UI 线程绑定；设置 DataContext 并返回唯一 BoundViewHandle；失败清理部分绑定。Bind/Unbind 不发布 visual lifecycle。 |
+| `BoundViewHandle.Dispose` | 幂等；由 owning Entry 在 UI dispatcher 释放。`FromExisting` 的自定义 dispose callback 也在该线程执行。 |
 
-## Public 类型覆盖
+## Outlet 和 Entry
 
-| Type | 分类 | Review 规则 |
-| --- | --- | --- |
-| `ActivePluginView` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ActivePluginViewRegistry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ActivePluginViewRegistryServiceCollectionExtensions` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `AvaloniaUiDispatcher` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `AvaloniaUiDispatcherServiceCollectionExtensions` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `BoundViewHandle` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `CommandBinding` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `CommandTextDescriptor` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `CultureFlowDirectionApplier` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `CultureResourceDictionaryApplier` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `CurrentThreadCultureApplier` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ErrorMessageDescriptor` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IActivePluginViewLease` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IActivePluginViewRegistry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ICommandBindingHandle` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IInteractionHandlerRegistry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ILocalizedCommandTextTarget` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ILocalizedErrorMessageTarget` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ILocalizedInteractionTextTarget` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ILocalizedNotificationTextTarget` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ILocalizedRouteTextTarget` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ILocalizedTextTarget` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ILocalizedValidationMessageTarget` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ILocalizedWindowTextTarget` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IPresentationCultureApplier` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IPresentationFlowDirectionTarget` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IPresentationPluginUnloadCoordinator` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IPresentationResourceDictionaryRevoker` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IPresentationResourceDictionaryTarget` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IPresentationResourceLease` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IPresentationResourceRegistry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IPresentationRuntime` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IRouteOutlet` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IUiCommandSource` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IValidationVisualStateTarget` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IViewDataContextAware` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IViewLocator` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `IViewRegistry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `InteractionHandlerRegistrationOptions` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `InteractionHandlerRegistry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `InteractionTextDescriptor` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizedCommandTextBinding` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizedErrorMessageBinding` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizedInteractionTextBinding` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizedNotificationTextBinding` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizedRouteTextBinding` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizedTextBinding` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizedValidationMessageBinding` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizedWindowTextBinding` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `NotificationTextDescriptor` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationDiagnosticIds` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationError` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationException` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationFlowDirection` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationInteractionServiceCollectionExtensions` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationLocalizationBridge` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationLocalizationServiceCollectionExtensions` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationPluginUnloadCoordinator` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationPluginUnloadCoordinatorServiceCollectionExtensions` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationPluginUnloadError` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationPluginUnloadErrorKind` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationPluginUnloadRequest` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationPluginUnloadResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationResourceContribution` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationResourceDictionaryRevocation` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationResourceDictionaryRevoker` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationResourceRegistry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationResourceRegistryServiceCollectionExtensions` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationRuntime` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationRuntimeServiceCollectionExtensions` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationRuntimeState` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `RouteOutlet` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `RouteOutletCommitPlan` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `RouteOutletCommitResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `RouteOutletOperation` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `UiCommandState` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `UiStateFeedbackKind` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `UiStateFeedbackPolicy` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ValidationVisualStateBinding` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ValidationVisualStateSnapshot` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| API | 合同 |
+| --- | --- |
+| `RouteOutletCommitPlan.Replace/Clear` | plan 单次使用；Replace 必须带 handle；lifecycle token 控制最终提交前事务。 |
+| `IRouteOutlet.CommitAsync` | 可从任意线程调用；admission 立即转移候选 ownership；同 Outlet FIFO；caller token 入队后只取消等待。 |
+| `IRouteOutlet.QueueSnapshot` | 返回 capacity、pending、in-flight、peak pending、rejected count 的一致快照。 |
+| `PresentationEntry.DisposeAsync` | 幂等；deactivate、ActivationScope、UI 解绑、ViewModelLease 均尝试执行；聚合失败；最后释放 plan ownership。 |
+| `IRouteOutletTarget` | 物理 content target；Avalonia 实现的读写必须在 UI dispatcher。 |
 
-| `ViewBinder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ViewDescriptor` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ViewFactory` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ViewFactoryContext` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ViewForAttribute` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ViewLookupRequest` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ViewRegistry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ViewRegistryServiceCollectionExtensions` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ViewRegistrationOptions` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `VisualLifecycleEvent` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `VisualLifecycleEventKind` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `VisualLifecycleHub` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `WindowTextDescriptor` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+Outlet 失败语义：
 
-## Nullability 和参数规则
+- 名称错误、普通 guard/activation/temporary attach 失败返回 Failed，候选释放，Outlet `OutOfSync`。
+- rollback、candidate ownership 或 failure presenter 不变量失败使 Outlet `Faulted`。
+- final commit 后旧 Entry 清理失败只诊断，结果仍成功，新 Entry 保持 current。
+- pending 满载返回 `OutletQueueFull`，拒绝最新 plan 并释放候选。
 
-- 参数为 `null` 且合同不接受 `null` 时，抛出 `ArgumentNullException`。
-- 字符串 id、path、key、route、permission、culture、package id 必须在边界校验空值、空白和非法字符。
-- 文件路径必须规范化并限制在声明 root 下。
-- 枚举未知值必须拒绝或映射为明确失败结果。
+## Window
 
-## Cancellation 合同
+| API | 合同 |
+| --- | --- |
+| `WindowSession.RegisterOutlet/GetOutlet` | Window 未关闭；名称非空且唯一；registration dispose 撤销并异步停止 Outlet。 |
+| `WindowSession.CloseAsync()` | 等价于 `CloseAsync(Application)`；普通 Application close 可被 guard 拒绝。 |
+| `WindowSession.CloseAsync(WindowCloseOrigin)` | `User/Application/OperatingSystem` 必须为已定义值；OS 不可拒绝；并发调用共享事务。 |
+| `WindowSession.DisposeAsync` | 不可拒绝关闭并等待全部清理。 |
+| `WindowSession.Outlets` | 返回按名称稳定排序的快照，不暴露内部可变集合。 |
 
-- 接收 `CancellationToken` 的 API 必须在 IO、子进程、网络、dispatcher work、插件代码、handler 调用前后观察取消。
-- 取消后不得提交状态、缓存、事件、UI 或 manifest 输出。
-- 取消结果必须稳定：返回 Cancelled Result 或抛 `OperationCanceledException`，不能混用成功结果。
+可拒绝关闭先执行全部 `ICanDeactivate`，再执行最多一个 `IConfirmDeactivate`。多个 confirmation owner 返回 false、保持 Ready、记录 `AUCPRS043`。
 
-## Dispose 后行为
+## Interaction、Validation 和 Command
 
-- mutating API 在 Dispose 后必须失败。
-- 查询 immutable descriptor、manifest、snapshot、result 的 API 可以继续读取。
-- 重复 Dispose、Stop、Unload、Unsubscribe、Revoke 必须幂等。
+| API | 合同 |
+| --- | --- |
+| `IInteractionHandlerRegistry.Register` | registration 按 Activation/Route、Window、Presentation 分层；同层最后有效者生效；dispose/revoke 取消在途调用。 |
+| `HandleAsync` | handler 在 UI dispatcher；无 handler 为 NotHandled；取消为 Canceled；异常为 Failed。 |
+| `GetModalQueueSnapshot` | 每 Window 模态 lane 快照；默认 1 in-flight + 8 pending；满载拒绝最新并返回 `InteractionQueueFull`。 |
+| `ValidationVisualStateBinding.ApplyAsync` | 仅显式调用时把 snapshot 应用到 target；不发现规则、不决定文案/样式；UI target 失败传播。 |
+| `CommandBinding.BindAsync` | 可选自定义 command source bridge；刷新 visual state 在 dispatcher；handle dispose 解除事件。 |
 
-## Public API Review 门禁
+## Visual lifecycle
 
-以下改动必须先更新文档并 review：新增 public 类型或成员；修改异常、Result status、诊断码、默认 options、manifest/schema、generated output、MSBuild property、CLI JSON envelope 或模板变量。
+`VisualLifecycleHub.Subscribe` 注册带可选 Window/Outlet/Operation/Entry identity 过滤的 handler。真实 Avalonia attached/detached adapter 发布事件；单 handler 失败记录诊断并继续后续 handler。`ViewBinder` 不合成事件，事件不自动写 State/EventBus。
+
+## Resource 和 Plugin UI
+
+| API | 合同 |
+| --- | --- |
+| `IPresentationResourceRegistry` | owner-bound contribution 注册、按 plugin/contribution 撤销；lease/revoke 幂等；失败隔离。 |
+| `IPresentationResourceDictionaryRevoker.RevokeAsync` | 在 dispatcher 按序调用全部 target，聚合 Exception；无 culture/Localization 语义。 |
+| `IActivePluginViewRegistry` | 跟踪 active plugin view；close/revoke 后不能保留强引用。 |
+| `IPresentationPluginUnloadCoordinator.CleanupAsync` | active view 优先；仍有 active view 时阻断；其余类别按序撤销并聚合结果。 |
+
+## Public Enum
+
+| Enum | 值与语义 |
+| --- | --- |
+| `PresentationRuntimeState` | NotReady, Ready, Stopping, Stopped, Faulted |
+| `WindowSessionState` | Registered, Ready, Closing, Closed, Faulted |
+| `WindowCloseOrigin` | User, Application, OperatingSystem |
+| `RouteOutletState` | Empty, Preparing, TemporaryAttached, Committed, OutOfSync, Stopping, Stopped, Faulted |
+| `RouteOutletOperation` | Replace, Clear |
+| `ViewModelOwnership` | EntryOwned, ServiceScopeOwned, Borrowed |
+| `InteractionHandlerScope` | Presentation, Window, Route, Activation |
+| `PresentationFailureLevel` | Operation, Outlet, Window, Runtime |
+| `PresentationError` | 稳定错误分类；queue、ownership、close confirmation 均有独立值。 |
+
+内部 `CandidateOwnershipState` 和 bounded lane 状态不是 public enum，但转换规则属于运行时兼容合同。
+
+## Public 类型族
+
+- Runtime/DI：`PresentationModule`、`PresentationServiceCollectionExtensions`、`IPresentationRuntime`、`PresentationRuntime`、`WindowSession`、`PresentationQueueOptions/Snapshot`。
+- View：`ViewForAttribute`、`ViewDescriptor`、`ViewLookupRequest`、`IViewRegistry/IViewLocator`、`ViewFactory/Context`、`ViewBinder`、`BoundViewHandle`、`IViewModelFactory`、`ViewModelLease`。
+- Outlet/feedback：`IRouteOutlet`、`RouteOutlet`、`RouteOutletCommitPlan/Result`、`IRouteOutletTarget`、`AvaloniaRouteOutletTarget`、`PresentationEntry`、`VisualIdentity`、`VisualLifecycle*`。
+- Interaction/visual state：`IInteractionHandlerRegistry`、`InteractionDispatchContext`、`InteractionHandlerRegistrationOptions`、`CommandBinding`、`ValidationVisualStateBinding` 及其 target/handle/snapshot contracts。
+- Plugin UI：active view、resource registry/dictionary revoker、plugin unload coordinator 相关 public contracts。
+- Failure/diagnostics：`PresentationException`、`PresentationFailure`、`IPresentationFailurePresenter`、`PresentationDiagnosticIds`。
+
+## 通用规则
+
+必填引用使用 `ArgumentNullException`，空 identity 使用 `ArgumentException`，未知 enum 使用 `ArgumentOutOfRangeException`。终态 mutating API 返回稳定 Result/PresentationException/ObjectDisposedException。取消不得包装成普通失败，除非 API 的 Result 模型明确使用 Canceled 状态。

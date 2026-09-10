@@ -1,70 +1,56 @@
 # AtomUI.City.Presentation Architecture
 
-## 架构目标
+## 核心模型
 
-AtomUI.City.Presentation 的架构目标是把模块职责变成可实现、可测试、可 review 的产品级合同。
+```text
+City Host / Application DI
+  -> PresentationRuntime (PresentationScope)
+    -> WindowSession (WindowScope)
+      -> named RouteOutlet
+        -> PresentationEntry
+          -> ViewModelLease + BoundViewHandle + ActivationScope + visual subscription
+```
 
-- 完成 ViewModel Target -> View -> Outlet -> VisualTree。
-- 统一 UI Dispatcher、ViewLocator、ViewRegistry 和 RouteOutlet。
+Routing-Presentation adapter 是调用编排者，Router snapshot 是导航真相。Presentation 只执行 UI 提交，不反向修改 Router。
 
 ## 核心不变量
 
-- 所有 VisualTree 修改必须在 UI dispatcher 上执行。
-- ViewLocator 默认使用 generated manifest 或显式注册。
-- 插件 View、resource dictionary、localized binding 必须绑定 plugin lease。
-- VisualTree 变化必须反馈到 ViewModel/State。
+- 一个 managed Window 只对应一个 WindowSession；Window 必须在 Show 前注册。
+- 一个 Window 内 Outlet 名称唯一；一个 Outlet 同时只有一个 current Entry 和一个 in-flight 事务。
+- commit plan 单次使用，候选始终只有一个 owner，任何终止路径最终到 `Released`。
+- Avalonia 对象只能在 UI dispatcher 访问；用户 guard、activation、deactivation 和 DI 创建不在框架锁内执行。
+- final commit 前可以恢复旧 physical content；final commit 后不得回滚 Router 或新 Entry。
+- Bind/Unbind 不伪造 VisualTree 事件；回执必须来自真实 Avalonia 事件并匹配 identity。
+- Presentation 不含文案、多语言、语言包或 Localization 状态机。
 
-## 核心概念和所有权
+## 所有权表
 
-| 概念 | 职责 | 创建者 | 释放/失效规则 |
+| 对象 | 创建者 | Owner | 结束条件 |
 | --- | --- | --- | --- |
-| AvaloniaUiDispatcher | UI 线程调度。 | Presentation startup | Host stop 释放。 |
-| ViewRegistry | View manifest 和显式注册。 | DI/generator | 插件 view revoke 更新。 |
-| RouteOutlet | 提交 View 到容器。 | UI runtime | Dispose detach。 |
+| PresentationScope | PresentationRuntime | Runtime | Runtime Stop |
+| WindowScope | PresentationRuntime | WindowSession | Window close/Runtime Stop |
+| RouteOutlet | WindowSession | Outlet registration | detach/Window close |
+| commit plan candidate | application adapter | adapter -> Outlet -> Entry | reject/rollback/Entry dispose |
+| ViewModelLease | IViewModelFactory | PresentationEntry | Entry dispose |
+| BoundViewHandle | ViewBinder/application adapter | PresentationEntry | Entry dispose on UI dispatcher |
+| modal request | caller | per-Window lane after admission | handled/canceled/failed |
+| plugin contribution | plugin adapter | plugin/contribution lease | revoke/unload |
 
-## 产品级状态机
+## 故障域
 
-- PresentationRuntime: Created -> Starting -> Running -> Stopping -> Stopped -> Disposed
-- RouteOutlet: Empty -> Preparing -> Committing -> Committed 或 Failed
+| 故障 | 最小故障域 | 状态 |
+| --- | --- | --- |
+| lookup/create/bind/activation/guard 普通失败 | Operation/Outlet | OutOfSync |
+| pre-commit rollback 失败 | Outlet | Faulted |
+| failure presenter 失败 | Outlet | Faulted |
+| Window 关闭清理失败 | WindowSession | Faulted |
+| dispatcher/platform bridge 永久不可用 | Runtime | Faulted |
+| post-commit 旧 Entry 清理失败 | 诊断，不回滚新 Entry | Committed |
 
-## 关键运行流程
+## 扩展点
 
-- Routing 输出 ViewModelTargetDescriptor。
-- ViewLocator 找到 ViewDescriptor。
-- ViewFactory 创建 View。
-- RouteOutlet 在 UI dispatcher 上提交 View。
+公开扩展点只有 DI extension、`PresentationModule`、View attribute/generated registrar、View/Interaction/resource registration、Outlet target 和 failure presenter。新增扩展点必须同时更新 Feature、API card、诊断、测试与兼容性文档。
 
-## 失败矩阵
+## AOT
 
-- View 未注册：返回失败并诊断。
-- 非 UI 线程提交：拒绝并诊断。
-- View 创建失败：不替换现有 outlet。
-- 插件卸载 active view：detach 并撤销资源。
-
-## 性能和资源边界
-
-- ViewLocator registry lookup 接近 O(1)。
-- RouteOutlet commit 不做阻塞 IO。
-
-## 运行时对象模型
-
-```mermaid
-flowchart LR
-    Boundary["Avalonia/AtomUI runtime bridge"] --> Module["AtomUI.City.Presentation"]
-    Module --> Contracts["Public Contracts"]
-    Module --> State["State / Manifest / Snapshot"]
-    Module --> Diagnostics["Diagnostics"]
-    Module --> Tests["Product Contract Tests"]
-```
-
-## 扩展点模型
-
-- 扩展点只能通过 public API、DI、attribute、manifest、source generator 输出、MSBuild property、CLI command 或 template variable 暴露。
-- 新增扩展点必须同步更新 [features.md](features.md)、[api-contracts.md](api-contracts.md)、[testing.md](testing.md) 和 [compatibility.md](compatibility.md)。
-- 插件来源扩展点必须有 owner 和撤销路径。
-
-## AOT 和 Trimming 约束
-
-- 运行时发现能力优先通过 source generator 或 manifest。
-- 产品实现不得把运行时反射扫描作为唯一发现机制。
-- 生成输出和 manifest 必须稳定排序，便于 snapshot test 和增量构建。
+1.0 只生成 `ViewForAttribute` 对应的强类型 View registrar。运行时不得通过程序集扫描或构造函数猜测发现 View；生成顺序和 hint/type name 必须稳定。

@@ -1,13 +1,14 @@
 using System.Diagnostics;
 using System.Globalization;
 using AtomUI.City.Core.Diagnostics;
+using Avalonia;
+using Avalonia.Threading;
 
 namespace AtomUI.City.Presentation;
 
 public sealed class ViewBinder
 {
     private readonly IHostDiagnostics? _diagnostics;
-    private readonly VisualLifecycleHub? _lifecycleHub;
 
     public ViewBinder()
     {
@@ -20,7 +21,6 @@ public sealed class ViewBinder
     }
 
     public ViewBinder(VisualLifecycleHub lifecycleHub)
-        : this(diagnostics: null, lifecycleHub)
     {
         ArgumentNullException.ThrowIfNull(lifecycleHub);
     }
@@ -30,7 +30,6 @@ public sealed class ViewBinder
         VisualLifecycleHub? lifecycleHub)
     {
         _diagnostics = diagnostics;
-        _lifecycleHub = lifecycleHub;
     }
 
     public BoundViewHandle Bind(
@@ -38,9 +37,19 @@ public sealed class ViewBinder
         object view,
         object viewModel)
     {
+        return Bind(descriptor, view, viewModel, identity: null);
+    }
+
+    public BoundViewHandle Bind(
+        ViewDescriptor descriptor,
+        object view,
+        object viewModel,
+        VisualIdentity? identity)
+    {
         ArgumentNullException.ThrowIfNull(descriptor);
         ArgumentNullException.ThrowIfNull(view);
         ArgumentNullException.ThrowIfNull(viewModel);
+        EnsureAvaloniaThreadAccess(view);
 
         var stopwatch = Stopwatch.StartNew();
         IViewDataContextAware? dataContextAware = null;
@@ -56,7 +65,11 @@ public sealed class ViewBinder
 
             dataContextAware = aware;
             dataContextAware.DataContext = viewModel;
-            _lifecycleHub?.Notify(view, VisualLifecycleEventKind.Attached);
+            var visualIdentity = identity ?? new VisualIdentity(view);
+            if (!ReferenceEquals(visualIdentity.View, view))
+            {
+                throw new ArgumentException("Visual identity must reference the bound view.", nameof(identity));
+            }
 
             var handle = BoundViewHandle.Create(
                 descriptor,
@@ -64,8 +77,12 @@ public sealed class ViewBinder
                 viewModel,
                 () =>
                 {
+                    EnsureAvaloniaThreadAccess(view);
                     dataContextAware.DataContext = null;
-                    _lifecycleHub?.Notify(view, VisualLifecycleEventKind.Detached);
+                    if (view is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                    }
                 });
 
             stopwatch.Stop();
@@ -87,6 +104,7 @@ public sealed class ViewBinder
         object view,
         IViewDataContextAware? dataContextAware)
     {
+        EnsureAvaloniaThreadAccess(view);
         if (dataContextAware is not null)
         {
             dataContextAware.DataContext = null;
@@ -95,6 +113,16 @@ public sealed class ViewBinder
         if (view is IDisposable disposable)
         {
             disposable.Dispose();
+        }
+    }
+
+    private static void EnsureAvaloniaThreadAccess(object view)
+    {
+        if (view is AvaloniaObject && !Dispatcher.UIThread.CheckAccess())
+        {
+            throw new PresentationException(
+                PresentationError.DispatcherUnavailable,
+                "Avalonia views must be bound and unbound on the UI dispatcher thread.");
         }
     }
 

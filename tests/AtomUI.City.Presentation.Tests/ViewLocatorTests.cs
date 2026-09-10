@@ -109,6 +109,27 @@ public sealed class ViewLocatorTests
     }
 
     [Fact]
+    public void RevokingOverrideRestoresPreviousDescriptorLayer()
+    {
+        var registry = new ViewRegistry();
+        var hostDescriptor = Descriptor<SettingsViewModel, SettingsView>();
+        var pluginDescriptor = new ViewDescriptor(
+            typeof(SettingsViewModel),
+            typeof(AlternativeSettingsView),
+            viewKey: null,
+            _ => new AlternativeSettingsView(),
+            pluginId: "plugin.settings",
+            contributionId: "plugin.settings.view");
+
+        registry.Register(hostDescriptor);
+        registry.Register(pluginDescriptor, new ViewRegistrationOptions { ReplaceExisting = true });
+
+        Assert.Same(pluginDescriptor, registry.Locate(typeof(SettingsViewModel)));
+        Assert.Equal(1, registry.RevokePlugin("plugin.settings"));
+        Assert.Same(hostDescriptor, registry.Locate(typeof(SettingsViewModel)));
+    }
+
+    [Fact]
     public void RegistryRejectsDuplicateDefaultViews()
     {
         var registry = new ViewRegistry();

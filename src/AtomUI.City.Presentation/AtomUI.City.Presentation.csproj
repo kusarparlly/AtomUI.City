@@ -2,11 +2,11 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../AtomUI.City.Core/AtomUI.City.Core.csproj" />
-    <ProjectReference Include="../AtomUI.City.Localization/AtomUI.City.Localization.csproj" />
     <ProjectReference Include="../AtomUI.City.Mvvm/AtomUI.City.Mvvm.csproj" />
     <ProjectReference Include="../AtomUI.City.Routing/AtomUI.City.Routing.csproj" />
     <ProjectReference Include="../AtomUI.City.Security/AtomUI.City.Security.csproj" />
@@ -15,6 +15,9 @@
 
   <PropertyGroup>
     <TargetFrameworks>$(AtomUICityTargetFrameworks)</TargetFrameworks>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
+    <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017;RS0022;RS0024;RS0025;RS0027;RS0036;RS0041;RS0048</WarningsAsErrors>
   </PropertyGroup>
 
 </Project>

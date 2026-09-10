@@ -35,6 +35,8 @@ public sealed class EngineeringGateTests
 
         Assert.Contains("dotnet restore AtomUICity.slnx", workflow, StringComparison.Ordinal);
         Assert.Contains("bash engineering/check-release.sh --no-restore", workflow, StringComparison.Ordinal);
+        Assert.Contains("presentation-windows-release", workflow, StringComparison.Ordinal);
+        Assert.Contains("check-presentation-release.ps1", workflow, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -178,7 +180,7 @@ public sealed class EngineeringGateTests
     }
 
     [Fact]
-    public void PublicApiScriptBuildsAndPacksCoreAndEventBusAgainstTheirApiBaselines()
+    public void PublicApiScriptBuildsAndPacksFrozenModulesAgainstTheirApiBaselines()
     {
         var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
         var scriptPath = Path.Combine(repositoryRoot, EngineeringScriptsDirectoryName, "check-public-api.sh");
@@ -195,11 +197,14 @@ public sealed class EngineeringGateTests
         Assert.Contains("TreatWarningsAsErrors", script, StringComparison.Ordinal);
         Assert.Contains("AtomUI.City.Core", script, StringComparison.Ordinal);
         Assert.Contains("AtomUI.City.EventBus", script, StringComparison.Ordinal);
+        Assert.Contains("AtomUI.City.Presentation", script, StringComparison.Ordinal);
         Assert.Contains("$assembly_name.sourcelink.json", script, StringComparison.Ordinal);
         Assert.Contains("$assembly_name.*.nupkg", script, StringComparison.Ordinal);
         Assert.Contains("validate_build_artifacts", script, StringComparison.Ordinal);
         Assert.Contains("src/AtomUI.City.EventBus/PublicAPI.Shipped.txt", script, StringComparison.Ordinal);
         Assert.Contains("src/AtomUI.City.EventBus/PublicAPI.Unshipped.txt", script, StringComparison.Ordinal);
+        Assert.Contains("src/AtomUI.City.Presentation/PublicAPI.Shipped.txt", script, StringComparison.Ordinal);
+        Assert.Contains("src/AtomUI.City.Presentation/PublicAPI.Unshipped.txt", script, StringComparison.Ordinal);
         Assert.Contains("%s public API gate passed", script, StringComparison.Ordinal);
         Assert.Contains("https://raw.githubusercontent.com/", script, StringComparison.Ordinal);
         Assert.Contains("git rev-parse HEAD", script, StringComparison.Ordinal);
@@ -226,6 +231,65 @@ public sealed class EngineeringGateTests
         Assert.Contains("reports.Length == 0", program, StringComparison.Ordinal);
         Assert.Contains("report.ResultStatistics is null", program, StringComparison.Ordinal);
         Assert.Contains("EVENTBUS_BENCHMARK_GATE_OK", program, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PresentationBenchmarkGateCapturesAndComparesApprovedWindowsBaselines()
+    {
+        var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
+        var scriptPath = Path.Combine(repositoryRoot, EngineeringScriptsDirectoryName, "check-presentation-benchmarks.ps1");
+        var programPath = Path.Combine(
+            repositoryRoot,
+            "benchmarks",
+            "AtomUI.City.Presentation.Benchmarks",
+            "Program.cs");
+
+        Assert.True(File.Exists(scriptPath));
+        Assert.True(File.Exists(programPath));
+        var script = File.ReadAllText(scriptPath);
+        var program = File.ReadAllText(programPath);
+
+        Assert.Contains("ValidateSet(\"Verify\", \"Capture\", \"Compare\")", script, StringComparison.Ordinal);
+        Assert.Contains("PRESENTATION_CANDIDATE_FINGERPRINT", script, StringComparison.Ordinal);
+        Assert.Contains("baselines/windows-x64.json", script, StringComparison.Ordinal);
+        Assert.Contains("MaximumTimeRegression = 0.15", program, StringComparison.Ordinal);
+        Assert.Contains("MaximumAllocationRegression = 0.10", program, StringComparison.Ordinal);
+        Assert.Contains("AggregateMedian", program, StringComparison.Ordinal);
+        Assert.Contains("ValidateEnvironment", program, StringComparison.Ordinal);
+        Assert.Contains("PRESENTATION_BENCHMARK_GATE_OK", program, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PresentationPackageConsumerAndWindowsReleaseCandidateGatesAreComplete()
+    {
+        var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
+        var consumerScript = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            EngineeringScriptsDirectoryName,
+            "check-presentation-package-consumer.ps1"));
+        var releaseScript = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            EngineeringScriptsDirectoryName,
+            "check-presentation-release.ps1"));
+        var templateRoot = Path.Combine(
+            repositoryRoot,
+            EngineeringScriptsDirectoryName,
+            "package-consumers",
+            "presentation");
+        var project = File.ReadAllText(Path.Combine(templateRoot, "Presentation.PackageConsumer.csproj.template"));
+        var program = File.ReadAllText(Path.Combine(templateRoot, "Program.cs.template"));
+
+        Assert.DoesNotContain("ProjectReference", project, StringComparison.Ordinal);
+        Assert.Contains("AtomUI.City.Presentation", project, StringComparison.Ordinal);
+        Assert.Contains("PRESENTATION_PACKAGE_CONSUMER_OK", program, StringComparison.Ordinal);
+        Assert.Contains("AtomUI.City.Localization", consumerScript, StringComparison.Ordinal);
+        Assert.Contains("Presentation package contains a forbidden", consumerScript, StringComparison.Ordinal);
+        Assert.Contains("--no-http-cache", consumerScript, StringComparison.Ordinal);
+        Assert.Contains("Presentation unit, Headless, stress and desktop tests", releaseScript, StringComparison.Ordinal);
+        Assert.Contains("check-presentation-public-api.ps1", releaseScript, StringComparison.Ordinal);
+        Assert.Contains("check-presentation-package-consumer.ps1", releaseScript, StringComparison.Ordinal);
+        Assert.Contains("check-presentation-benchmarks.ps1", releaseScript, StringComparison.Ordinal);
+        Assert.Contains("PRESENTATION_RC_IDENTITY", releaseScript, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -299,7 +363,7 @@ public sealed class EngineeringGateTests
     }
 
     [Fact]
-    public void PackageMetadataUsesUpstreamProjectAndSourceControlledRepositoryUrl()
+    public void PackageMetadataUsesCanonicalUpstreamProjectAndRepositoryUrls()
     {
         var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
         var packageMetadataPath = Path.Combine(repositoryRoot, "build", "PackageMetaInfo.props");
@@ -309,7 +373,10 @@ public sealed class EngineeringGateTests
             "<ProjectUrl>https://github.com/AtomUI/AtomUI.City</ProjectUrl>",
             packageMetadata,
             StringComparison.Ordinal);
-        Assert.DoesNotContain("<RepositoryUrl>", packageMetadata, StringComparison.Ordinal);
+        Assert.Contains(
+            "<RepositoryUrl>https://github.com/AtomUI/AtomUI.City</RepositoryUrl>",
+            packageMetadata,
+            StringComparison.Ordinal);
         Assert.Contains("<PublishRepositoryUrl>true</PublishRepositoryUrl>", packageMetadata, StringComparison.Ordinal);
     }
 

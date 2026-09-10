@@ -160,7 +160,7 @@ public sealed class ViewBindingTests
     }
 
     [Fact]
-    public void ViewBinderPublishesLifecycleEventsOnBindAndDispose()
+    public void ViewBinderDoesNotSynthesizeVisualTreeLifecycleEvents()
     {
         var lifecycle = new VisualLifecycleHub();
         var events = new List<VisualLifecycleEvent>();
@@ -178,18 +178,7 @@ public sealed class ViewBindingTests
 
         handle.Dispose();
 
-        Assert.Collection(
-            events,
-            item =>
-            {
-                Assert.Same(view, item.View);
-                Assert.Equal(VisualLifecycleEventKind.Attached, item.Kind);
-            },
-            item =>
-            {
-                Assert.Same(view, item.View);
-                Assert.Equal(VisualLifecycleEventKind.Detached, item.Kind);
-            });
+        Assert.Empty(events);
     }
 
     [Fact]

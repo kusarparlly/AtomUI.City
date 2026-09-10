@@ -23,6 +23,7 @@
 - platform integration test。
 - analyzer/generator tests。
 - license 检查。
+- 对声明 Windows 正式支持的 Presentation 运行真实 desktop、隔离 NuGet consumer 和批准性能 baseline 比较。
 
 ## 3. 发布流程
 
@@ -76,3 +77,6 @@ Release notes 至少包含：
 | template smoke | Template test | 生成项目可 build/test。 |
 | plugin smoke | Integration | 插件安装、启用、停用、卸载链路可跑。 |
 | release notes | Docs | 版本变更可追踪。 |
+| Presentation Windows RC | Platform/Package/Benchmark | Headless 与 desktop 正常退出，包消费者成功，时间回退不超过 15%，分配回退不超过 10%。 |
+
+Presentation 1.0 的 Windows 模块发布入口为 `engineering/check-presentation-release.ps1`。共享 Windows CI 使用 benchmark `Verify` 模式；正式候选必须在批准开发机使用默认 `Compare` 模式，且不得自动重写 baseline。

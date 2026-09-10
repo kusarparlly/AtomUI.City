@@ -37,7 +37,7 @@ Localization 1.0 不公开状态枚举。源码使用下列隐式生命周期合
 - SetCulture 验证 culture 并计算 fallback chain。
 - Provider 懒加载 package。
 - LocalizationService 查找资源。
-- Presentation bridge 批量刷新。
+- 可选 application-owned bridge 回调与 `ILocalizedText` 批量刷新。
 
 ## 失败矩阵
 

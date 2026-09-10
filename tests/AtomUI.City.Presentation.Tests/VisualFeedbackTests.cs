@@ -44,6 +44,45 @@ public sealed class VisualFeedbackTests
     }
 
     [Fact]
+    public void ScopedSubscriptionRejectsStaleVisualIdentity()
+    {
+        var hub = new VisualLifecycleHub();
+        var events = new List<VisualLifecycleEvent>();
+        using var subscription = hub.Subscribe(
+            events.Add,
+            new VisualLifecycleSubscriptionOptions
+            {
+                WindowId = "main",
+                OutletName = "content",
+                OperationId = 42,
+            });
+
+        hub.Notify(new VisualIdentity(new SettingsView(), "main", "content", 41), VisualLifecycleEventKind.Loaded);
+        hub.Notify(new VisualIdentity(new SettingsView(), "other", "content", 42), VisualLifecycleEventKind.Loaded);
+        hub.Notify(new VisualIdentity(new SettingsView(), "main", "content", 42), VisualLifecycleEventKind.Loaded);
+
+        var lifecycleEvent = Assert.Single(events);
+        Assert.Equal(42, lifecycleEvent.Identity.OperationId);
+        Assert.Equal("main", lifecycleEvent.Identity.WindowId);
+    }
+
+    [Fact]
+    public void ActivationScopeDisposesVisualSubscription()
+    {
+        var scope = new AtomUI.City.Mvvm.ActivationScope();
+        var hub = new VisualLifecycleHub();
+        var callCount = 0;
+        hub.Subscribe(
+            _ => callCount++,
+            new VisualLifecycleSubscriptionOptions { ActivationScope = scope });
+
+        scope.Dispose();
+        hub.Notify(new SettingsView(), VisualLifecycleEventKind.Attached);
+
+        Assert.Equal(0, callCount);
+    }
+
+    [Fact]
     public void VisualLifecycleHubPublishesFocusAndVisibilityEventsInOrder()
     {
         var hub = new VisualLifecycleHub();

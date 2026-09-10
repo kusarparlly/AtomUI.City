@@ -91,7 +91,7 @@ atomui city new app SalesDesk
 | State | 数据写入产生一次通知；相等值不重复通知；scope dispose 后不通知。 |
 | Data | credential 在 transport 前注入；取消后不写缓存和 State；transport error 映射为 `DataResult`。 |
 | Security | 未授权 principal 被 guard 拒绝；授权变化刷新 command 可执行状态。 |
-| Localization | `Sales.Orders.Title` 成功 lookup；缺失 key 走 fallback；culture switch 通知 Presentation bridge。 |
+| Localization | `Sales.Orders.Title` 成功 lookup；缺失 key 走 fallback；culture switch 通知应用拥有的可选刷新 bridge。 |
 | Presentation | ViewLocator 不使用命名反射兜底；RouteOutlet commit 失败不替换旧 view；detach 触发 lifecycle feedback。 |
 | PluginSystem | 插件 contribution 有 lease；disable 先拒绝新入口再 revoke；unload 失败进入 UnloadPending。 |
 | CLI | JSON envelope 包含 command、status、diagnostics、artifacts 和 suggested next commands。 |

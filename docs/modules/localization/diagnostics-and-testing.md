@@ -44,7 +44,7 @@
 | AUC-LOCALIZATION-003 | Lazy Loading | LocalizationServiceTests |
 | AUC-LOCALIZATION-004 | Lookup and Fallback | LocalizationServiceTests |
 | AUC-LOCALIZATION-005 | Assembly Language Packages | LanguagePackageProviderTests; LocalizationDeclarationAttributeTests |
-| AUC-LOCALIZATION-006 | Presentation Bridge | LocalizationServiceTests |
+| AUC-LOCALIZATION-006 | Optional Application Refresh Hook | LocalizationServiceTests |
 | AUC-LOCALIZATION-007 | Plugin Package Revocation | LocalizationServiceTests |
 | AUC-LOCALIZATION-008 | Generated Localization Manifest | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationMetadataReaderTests; LocalizationManifestBuilderTests |
 
@@ -137,4 +137,4 @@ Localization 专用 `AtomUI.City.Testing` public helper 尚无 Feature ID，不�
 
 Localization Core 测试不依赖真实 AtomUI/Avalonia。
 
-Presentation integration 测试使用 fake bridge。真实 UI resource dictionary 测试放到 Presentation 平台集成测试中。
+Localization 使用 fake application bridge 验证通知合同。真实 UI resource dictionary 刷新由应用或独立可选适配包测试，不属于 Presentation 主模块测试责任。

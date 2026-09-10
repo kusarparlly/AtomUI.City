@@ -1,123 +1,25 @@
-# AtomUI.City.Presentation View Binding 合同
+# AtomUI.City.Presentation View Binding
 
-## 适用范围
+## 职责
 
-本专题属于 `AtomUI.City.Presentation` 模块文档体系，必须与 [overview.md](overview.md)、[features.md](features.md)、[api-contracts.md](api-contracts.md)、[testing.md](testing.md) 保持一致。它只细化 `View Binding` 相关实现决策，不重新定义模块边界。
+`ViewFactory` 在 UI dispatcher 使用 ViewDescriptor 的强类型 factory 创建 View。`ViewBinder` 把 ViewModel 设置为 `IViewDataContextAware.DataContext` 并返回 `BoundViewHandle`。ViewModel 不知道具体 View，View 不决定导航。
 
-## 设计决策
+## 线程与所有权
 
-- Presentation 负责 ViewModel -> View -> Outlet -> VisualTree。
-- VisualTree 变化必须通过生命周期事件或绑定反馈回 ViewModel/State。
-- View 创建和提交必须在 UI dispatcher 上执行。
+- Avalonia View 创建、DataContext 设置/清理和 View dispose 必须在 UI dispatcher。
+- `ViewBinder.Bind` 是同步低级 API；Avalonia View 在非 UI 线程调用时必须失败，不允许同步阻塞 marshal。
+- adapter 创建 handle 后在 plan admission 前持有；admission 后由 Outlet/Entry 持有。
+- handle dispose 幂等。binding 失败清理已设置的 DataContext 和已创建 View。
+- UI event subscription、ActivationScope 和 ViewModelLease 由 PresentationEntry 分别持有，不混入 BoundViewHandle。
 
-## Public Contract
+## Visual lifecycle
 
-- 只允许通过 `AtomUI.City.Presentation` 的 public API、attribute、options、manifest、generated output 或 DI extension 暴露本专题能力。
-- 新增 contract 必须进入 [api-contracts.md](api-contracts.md)。
-- 新增功能必须分配 Feature ID，并进入 [features.md](features.md)。
-- 修改失败行为、默认值、诊断码或生命周期状态必须进入 [compatibility.md](compatibility.md)。
+Bind 成功不等于 Attached，handle dispose 也不等于 Detached。ViewBinder 不发布 visual event。只有 View 真实进入/离开 Avalonia VisualTree 时，内部 adapter 才发布带 identity 的物理回执。
 
-## 运行时边界
+## AOT
 
-- Owner 必须明确：Host、Module、Plugin、Route、Operation、Connection、View 或 Test scope。
-- 释放必须幂等；释放后 mutating API 必须失败或返回声明的 Result。
-- Cancellation 必须在进入外部调用、用户 handler、插件代码、IO、dispatcher work 前后观察。
-- 插件来源对象必须可撤销，不能泄漏到 Host 根单例。
+ViewDescriptor factory 来自显式注册或 Presentation View source generator。运行时不扫描程序集，不猜测 constructor。`ConstructorParameterTypes` 用于生成与诊断，不用于反射 fallback。
 
-## 失败行为
+## 测试
 
-- 输入无效：使用标准参数异常或模块 Result。
-- 生命周期状态非法：返回失败 Result、模块异常或稳定诊断。
-- 依赖缺失：阻止当前功能启用，不影响无关功能。
-- 插件卸载中：拒绝创建新贡献，并撤销已有贡献。
-- 释放失败：记录诊断并继续释放其他资源。
-
-## 测试要求
-
-| Feature ID | 相关能力 | 测试文件 |
-| --- | --- | --- |
-| AUC-PRESENTATION-001 | UI Dispatcher | AvaloniaUiDispatcherTests |
-| AUC-PRESENTATION-002 | View Locator | ViewLocatorTests |
-| AUC-PRESENTATION-003 | View Binding | ViewBindingTests |
-| AUC-PRESENTATION-004 | Route Outlet | RouteOutletTests |
-| AUC-PRESENTATION-005 | Presentation Runtime | PresentationRuntimeTests |
-| AUC-PRESENTATION-006 | Localization Bridge | PresentationLocalizationBridgeTests |
-
-本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
-
-## 完成标准
-
-- 设计决策能回答对象由谁创建、谁持有、谁释放。
-- API contract、失败行为、诊断和测试矩阵一致。
-- 不出现业务领域假设。
-- 不引入 `AtomUI.City.PluginSystem 运行时直接依赖插件实现类型` 等禁止依赖。
-
-## 既有细化设计内容
-
-以下内容保留上一轮设计中的专题细节。后续修改必须与本页上方合同、Feature ID、API 行为、诊断和测试矩阵保持一致。
-
-## AtomUI.City.Presentation View 绑定设计
-
-适用范围：View 创建、DataContext、binding handle、View/ViewModel 生命周期和释放
-
-### 1. 定位
-
-View binding 把 ViewModel instance 安全绑定到 View，并把 View 侧资源挂入 ActivationScope。
-
-```text
-ViewModel instance
--> IViewLocator locate ViewDescriptor
--> IViewFactory create View on UI Thread
--> IViewBinder set DataContext
--> attach lifecycle adapter
--> register disposables into ActivationScope
--> return BoundViewHandle
-```
-
-### 2. ViewFactory
-
-规则：
-
-- View 创建必须在 UI Thread。
-- View 可以从 Application 或 Plugin service context 创建。
-- View 构造函数不应启动长期任务。
-- View 不能持有插件服务到 Host 静态对象。
-- 创建失败返回 Presentation commit failure。
-- `ViewDescriptor.ConstructorParameterTypes` 必须保留 generated registrar 的构造参数 metadata，用于诊断和 release review。
-
-Strict AOT 模式下，ViewFactory 应由 Source Generator 生成强类型工厂，避免反射构造。
-
-### 3. Binding 规则
-
-- ViewModel 不知道 View 类型。
-- View 不负责导航决策。
-- Binding 必须可释放。
-- Binding 成功发布 `Attached` lifecycle；handle dispose 清理 DataContext 并发布 `Detached` lifecycle。
-- ViewDataContext 变化必须受控，不能被外部任意覆盖。
-- View 和 ViewModel 生命周期不完全等同，但必须有关联释放策略。
-- UI 事件订阅、binding disposable 和 visual adapter 默认挂 ActivationScope。
-
-### 4. 失败处理
-
-Presentation 应提供诊断：
-
-- 找不到 View。
-- 找到多个默认 View。
-- View 创建失败。
-- Binding 失败。
-- 插件 View descriptor 已撤销。
-
-Binding 失败时，Presentation 必须释放已创建 View 和 provisional ActivationScope，并让 Routing 保持旧 Outlet 内容。
-
-### 5. 测试矩阵
-
-| 功能点 | 测试类型 | 断言 |
-|---|---|---|
-| View 创建 | Unit | ViewFactory 在 fake UI dispatcher 上创建 View。 |
-| 构造参数 | Unit/Generator | descriptor 诊断和 generated registrar 都保留 constructor parameter metadata。 |
-| DataContext 设置 | Unit | View 绑定到 ViewModel。 |
-| Binding 释放 | Unit | BoundViewHandle dispose 幂等并清理 DataContext。 |
-| Lifecycle 事件 | Unit | Bind 发布 Attached，Dispose 发布 Detached。 |
-| View 创建失败 | Unit | commit failure，旧内容保留。 |
-| Binding 失败 | Unit | 已创建 View 被释放。 |
-| 插件 View 泄漏 | Analyzer/Generator | 输出稳定诊断。 |
+覆盖 dispatcher 创建、错误 ViewType、DataContext、幂等释放、失败回滚、无合成 visual event、后台 Avalonia binding 拒绝和 generated factory。

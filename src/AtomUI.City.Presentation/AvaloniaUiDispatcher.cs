@@ -384,8 +384,7 @@ public sealed class AvaloniaUiDispatcher : IUiDispatcher
             PresentationRuntimeState.NotReady => new PresentationException(
                 PresentationError.RuntimeNotReady,
                 "Presentation runtime is not ready."),
-            PresentationRuntimeState.Stopping or
-                PresentationRuntimeState.Stopped or
+            PresentationRuntimeState.Stopped or
                 PresentationRuntimeState.Faulted => new PresentationException(
                     PresentationError.RuntimeStopping,
                     "Presentation runtime is not accepting UI dispatcher operations."),

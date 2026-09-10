@@ -1,5 +1,4 @@
 using AtomUI.City.Core.Diagnostics;
-using AtomUI.City.Localization;
 using AtomUI.City.Presentation;
 using AtomUI.City.Core.Threading;
 using Microsoft.Extensions.DependencyInjection;
@@ -293,9 +292,7 @@ public sealed class PresentationPluginUnloadCoordinatorTests
         };
         var resourceDictionaries = new RecordingResourceDictionaryRevoker(callOrder)
         {
-            Failure = new LocalizationError(
-                LocalizationErrorKind.PresentationApplyFailed,
-                "resource dictionary revoke failed"),
+            Failure = new InvalidOperationException("resource dictionary revoke failed"),
         };
         var coordinator = new PresentationPluginUnloadCoordinator(
             activeViews,
@@ -459,6 +456,14 @@ public sealed class PresentationPluginUnloadCoordinatorTests
             throw new NotSupportedException();
         }
 
+        public ValueTask<AtomUI.City.Mvvm.InteractionResult<TResult>> HandleAsync<TRequest, TResult>(
+            TRequest request,
+            InteractionDispatchContext context,
+            CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
         public int RevokePlugin(string pluginId)
         {
             _callOrder.Add($"revoke-interactions-plugin:{pluginId}");
@@ -566,11 +571,11 @@ public sealed class PresentationPluginUnloadCoordinatorTests
     {
         private readonly List<string> _callOrder = callOrder ?? [];
 
-        public LocalizationError? Failure { get; init; }
+        public Exception? Failure { get; init; }
 
         public int RevokeCount { get; private set; }
 
-        public ValueTask<LocalizationResult> RevokeAsync(
+        public ValueTask<PresentationResourceDictionaryRevokeResult> RevokeAsync(
             PresentationResourceDictionaryRevocation revocation,
             CancellationToken cancellationToken = default)
         {
@@ -580,8 +585,8 @@ public sealed class PresentationPluginUnloadCoordinatorTests
 
             return ValueTask.FromResult(
                 Failure is null
-                    ? LocalizationResult.Success()
-                    : LocalizationResult.Failed(Failure));
+                    ? PresentationResourceDictionaryRevokeResult.Success()
+                    : new PresentationResourceDictionaryRevokeResult([Failure]));
         }
     }
 
@@ -590,6 +595,10 @@ public sealed class PresentationPluginUnloadCoordinatorTests
         public string Name { get; } = name;
 
         public object? CurrentContent => null;
+
+        public PresentationEntry? CurrentEntry => null;
+
+        public RouteOutletState State => RouteOutletState.Empty;
 
         public ValueTask<RouteOutletCommitResult> CommitAsync(
             RouteOutletCommitPlan plan,

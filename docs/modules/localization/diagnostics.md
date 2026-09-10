@@ -15,7 +15,7 @@
 | AUCLOC001 | ResourceMissing | 当前 culture 和 fallback chain 均未找到 key。 | operationId、cultureName、resourceKey、errorKind。 |
 | AUCLOC002 | FallbackMissing | fallback chain 全部未命中。 | operationId、cultureName、fallbackCultureName、resourceKey。 |
 | AUCLOC003 | PackageLoadFailed | 语言包加载、完整性校验、16 MiB 大小限制或 critical key 校验失败。 | operationId、cultureName、packageId、scope、scopeId、providerKind、location、attempt、elapsedMilliseconds、errorKind；超限使用 `PackageTooLarge`。 |
-| AUCLOC004 | AtomUiApplyFailed | Presentation bridge 应用 culture 失败。 | cultureName、errorKind。 |
+| AUCLOC004 | AtomUiApplyFailed | 可选应用/UI 适配 bridge 应用 culture 失败（历史诊断名保留）。 | cultureName、errorKind。 |
 | AUCLOC005 | MessageFormatFailed | 本地化消息格式化失败。 | cultureName、resourceKey、errorKind。 |
 | AUCLOC006 | TextRefreshFailed | LocalizedText 刷新失败。 | cultureName、resourceKey、errorKind。 |
 | AUCLOC007 | CultureChanged | culture 切换提交成功。 | cultureName、fallbackCultureName。 |

@@ -1,122 +1,32 @@
-# AtomUI.City.Presentation Interaction And Validation 合同
+# AtomUI.City.Presentation Interaction And Validation
 
-## 适用范围
+## Interaction
 
-本专题属于 `AtomUI.City.Presentation` 模块文档体系，必须与 [overview.md](overview.md)、[features.md](features.md)、[api-contracts.md](api-contracts.md)、[testing.md](testing.md) 保持一致。它只细化 `Interaction And Validation` 相关实现决策，不重新定义模块边界。
+Presentation 把 MVVM Interaction request 交给应用注册的 UI handler。它负责 handler 定位、UI dispatch、生命周期、取消和模态排队，不实现确认框、输入框、Toast 或业务文案。
 
-## 设计决策
+解析顺序从近到远为 Activation/Route、Window、Presentation；同层最后一个仍有效的 registration 生效。插件 registration 必须携带 plugin/contribution owner 并可撤销。
 
-- Presentation 负责 ViewModel -> View -> Outlet -> VisualTree。
-- VisualTree 变化必须通过生命周期事件或绑定反馈回 ViewModel/State。
-- View 创建和提交必须在 UI dispatcher 上执行。
+同一 Window 的模态请求使用 1 in-flight + 默认 8 pending 的 FIFO 队列；不同 Window 可并行。满载拒绝最新请求并返回 Failed(`InteractionQueueFull`)，不静默丢弃、不自动重试。非模态请求不进入该队列。
 
-## Public Contract
+`GetModalQueueSnapshot(windowId)` 返回当前活动 lane 的容量与计数。Activity/registration token 取消排队或正在显示的请求，结果为 Canceled；handler 异常为 Failed；无 handler 为 NotHandled。
 
-- 只允许通过 `AtomUI.City.Presentation` 的 public API、attribute、options、manifest、generated output 或 DI extension 暴露本专题能力。
-- 新增 contract 必须进入 [api-contracts.md](api-contracts.md)。
-- 新增功能必须分配 Feature ID，并进入 [features.md](features.md)。
-- 修改失败行为、默认值、诊断码或生命周期状态必须进入 [compatibility.md](compatibility.md)。
+## 关闭确认约束
 
-## 运行时边界
+Window close 不是普通 Interaction 队列中的多个弹窗编排。WindowSession 先运行全部 `ICanDeactivate`，再要求当前 Entry 中最多只有一个 `IConfirmDeactivate`。多个确认 owner 时直接拒绝关闭并记录 `AUCPRS043`，不调用任意 confirmation。
 
-- Owner 必须明确：Host、Module、Plugin、Route、Operation、Connection、View 或 Test scope。
-- 释放必须幂等；释放后 mutating API 必须失败或返回声明的 Result。
-- Cancellation 必须在进入外部调用、用户 handler、插件代码、IO、dispatcher work 前后观察。
-- 插件来源对象必须可撤销，不能泄漏到 Host 根单例。
+## Validation
 
-## 失败行为
+Validation bridge 完全可选。`ValidationVisualStateBinding` 只把调用方显式提供的 `ValidationScope` snapshot 应用到 `IValidationVisualStateTarget`：
 
-- 输入无效：使用标准参数异常或模块 Result。
-- 生命周期状态非法：返回失败 Result、模块异常或稳定诊断。
-- 依赖缺失：阻止当前功能启用，不影响无关功能。
-- 插件卸载中：拒绝创建新贡献，并撤销已有贡献。
-- 释放失败：记录诊断并继续释放其他资源。
+- 不自动发现字段，不自动启用。
+- 不定义验证规则、成功/失败回调、错误文案或视觉样式。
+- 应用可不注册、不解析、不调用该 binding，现有业务代码不受影响。
+- target 更新在 UI dispatcher；取消原样传播，target 失败记录诊断并传播。
+
+## Command
+
+Avalonia 原生 command binding 是默认路径。`CommandBinding` 只用于自定义 `IUiCommandSource`、异步命令执行中状态和 ActivationScope 自动释放，不替代 Avalonia command system。
 
 ## 测试要求
 
-| Feature ID | 相关能力 | 测试文件 |
-| --- | --- | --- |
-| AUC-PRESENTATION-001 | UI Dispatcher | AvaloniaUiDispatcherTests |
-| AUC-PRESENTATION-002 | View Locator | ViewLocatorTests |
-| AUC-PRESENTATION-003 | View Binding | ViewBindingTests |
-| AUC-PRESENTATION-004 | Route Outlet | RouteOutletTests |
-| AUC-PRESENTATION-005 | Presentation Runtime | PresentationRuntimeTests |
-| AUC-PRESENTATION-006 | Localization Bridge | PresentationLocalizationBridgeTests |
-
-本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
-
-## 完成标准
-
-- 设计决策能回答对象由谁创建、谁持有、谁释放。
-- API contract、失败行为、诊断和测试矩阵一致。
-- 不出现业务领域假设。
-- 不引入 `AtomUI.City.PluginSystem 运行时直接依赖插件实现类型` 等禁止依赖。
-
-## 既有细化设计内容
-
-以下内容保留上一轮设计中的专题细节。后续修改必须与本页上方合同、Feature ID、API 行为、诊断和测试矩阵保持一致。
-
-## AtomUI.City.Presentation Interaction 与 Validation 设计
-
-适用范围：Interaction handler、Dialog/FilePicker/Toast、Validation visual state 和命令绑定
-
-### 1. Interaction Handler
-
-Presentation 负责把 MVVM Interaction Request 映射到 UI。
-
-支持场景：
-
-- 确认。
-- 输入。
-- 文件选择。
-- Dialog。
-- Toast / Notification。
-- Window 选择。
-
-规则：
-
-- Handler 运行在 UI Thread。
-- Handler 注册绑定 ActivationScope、WindowScope 或 ApplicationScope。
-- ViewModel 停用时，未完成 Interaction 返回 Canceled。
-- 插件停用时，插件 Interaction 返回 Canceled。
-- Handler 缺失返回 NotHandled，并记录诊断。
-
-Presentation 不把具体 Dialog 业务模型强加给应用。
-
-### 2. Validation 集成
-
-Mvvm 定义验证状态，Presentation 负责展示。
-
-Presentation 需要支持：
-
-- 读取 `ObservableValidator` 或框架验证状态。
-- 把错误映射到 AtomUI/Avalonia validation visual state。
-- Command 与验证状态变化后的 UI 刷新。
-- 插件 View 的验证资源释放。
-
-Validation failed 不是异常，不进入 fatal error。
-
-### 3. Command Binding
-
-Presentation 可以增强 Command Binding。
-
-职责：
-
-- 把 `IRelayCommand` / `IAsyncRelayCommand` 绑定到 UI command source。
-- 监听 CanExecute 变化。
-- 映射 busy / executing 状态。
-- 与 Security、Routing 当前状态联动后的可执行性刷新。
-- 释放 UI 事件订阅。
-
-长耗时命令仍由 Mvvm / Core Operation 管理，Presentation 不执行后台任务调度。
-
-### 4. 测试矩阵
-
-| 功能点 | 测试类型 | 断言 |
-|---|---|---|
-| Interaction completed | Unit | handler 返回结果。 |
-| Interaction canceled | Unit | Scope 停用时返回 Canceled。 |
-| Interaction missing | Unit | NotHandled 并记录诊断。 |
-| Validation visual state | Unit | 验证错误映射到 UI 状态。 |
-| Command CanExecute | Unit | UI command source 刷新可执行状态。 |
-| 插件停用 | Unit | 插件 Interaction 取消并释放 handler。 |
+测试必须覆盖作用域优先级、撤销、无 handler、handler 失败、取消、单 Window FIFO、跨 Window 并行、容量拒绝、Validation 可选性和 UI dispatcher。

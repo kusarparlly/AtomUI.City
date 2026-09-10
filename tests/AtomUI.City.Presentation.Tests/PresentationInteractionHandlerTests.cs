@@ -193,6 +193,112 @@ public sealed class PresentationInteractionHandlerTests
     }
 
     [Fact]
+    public async Task RegistrySelectsNearestMatchingScope()
+    {
+        using var activation = new ActivationScope();
+        var registry = new InteractionHandlerRegistry(new RecordingDispatcher());
+        registry.Register<ConfirmRequest, string>((_, _) => ValueTask.FromResult("presentation"));
+        registry.Register<ConfirmRequest, string>(
+            (_, _) => ValueTask.FromResult("window"),
+            new InteractionHandlerRegistrationOptions
+            {
+                Scope = InteractionHandlerScope.Window,
+                WindowId = "main",
+            });
+        registry.Register<ConfirmRequest, string>(
+            (_, _) => ValueTask.FromResult("route"),
+            new InteractionHandlerRegistrationOptions
+            {
+                Scope = InteractionHandlerScope.Route,
+                WindowId = "main",
+                RouteId = "orders",
+            });
+        registry.Register<ConfirmRequest, string>(
+            (_, _) => ValueTask.FromResult("activation"),
+            new InteractionHandlerRegistrationOptions
+            {
+                Scope = InteractionHandlerScope.Activation,
+                ActivationScope = activation,
+            });
+
+        var route = await registry.HandleAsync<ConfirmRequest, string>(
+            new ConfirmRequest("route"),
+            new InteractionDispatchContext("main", "orders", IsModal: false));
+        var nearest = await registry.HandleAsync<ConfirmRequest, string>(
+            new ConfirmRequest("activation"),
+            new InteractionDispatchContext("main", "orders", activation, IsModal: false));
+        var otherWindow = await registry.HandleAsync<ConfirmRequest, string>(
+            new ConfirmRequest("global"),
+            new InteractionDispatchContext("secondary", IsModal: false));
+
+        Assert.Equal("route", route.Value);
+        Assert.Equal("activation", nearest.Value);
+        Assert.Equal("presentation", otherWindow.Value);
+    }
+
+    [Fact]
+    public void RegistryRejectsIncompleteScopedRegistration()
+    {
+        var registry = new InteractionHandlerRegistry(new RecordingDispatcher());
+
+        Assert.Throws<ArgumentException>(
+            () => registry.Register<ConfirmRequest, bool>(
+                (_, _) => ValueTask.FromResult(true),
+                new InteractionHandlerRegistrationOptions { Scope = InteractionHandlerScope.Window }));
+        Assert.Throws<ArgumentException>(
+            () => registry.Register<ConfirmRequest, bool>(
+                (_, _) => ValueTask.FromResult(true),
+                new InteractionHandlerRegistrationOptions { Scope = InteractionHandlerScope.Route }));
+        Assert.Throws<ArgumentException>(
+            () => registry.Register<ConfirmRequest, bool>(
+                (_, _) => ValueTask.FromResult(true),
+                new InteractionHandlerRegistrationOptions { Scope = InteractionHandlerScope.Activation }));
+    }
+
+    [Fact]
+    public async Task ModalRequestsAreFifoPerWindowAndIndependentAcrossWindows()
+    {
+        var registry = new InteractionHandlerRegistry(new RecordingDispatcher());
+        var firstStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseFirst = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var starts = new List<int>();
+        var startsGate = new object();
+        registry.Register<int, int>(
+            async (context, cancellationToken) =>
+            {
+                lock (startsGate)
+                {
+                    starts.Add(context.Request);
+                }
+
+                if (context.Request == 1)
+                {
+                    firstStarted.TrySetResult();
+                    await releaseFirst.Task.WaitAsync(cancellationToken);
+                }
+
+                return context.Request;
+            });
+
+        var first = registry.HandleAsync<int, int>(
+            1,
+            new InteractionDispatchContext(WindowId: "main")).AsTask();
+        await firstStarted.Task;
+        var queued = registry.HandleAsync<int, int>(
+            2,
+            new InteractionDispatchContext(WindowId: "main")).AsTask();
+        var otherWindow = registry.HandleAsync<int, int>(
+            3,
+            new InteractionDispatchContext(WindowId: "secondary")).AsTask();
+
+        Assert.Equal(3, (await otherWindow).Value);
+        Assert.False(queued.IsCompleted);
+        releaseFirst.TrySetResult();
+        await Task.WhenAll(first, queued);
+        Assert.Equal([1, 3, 2], starts);
+    }
+
+    [Fact]
     public async Task RegistryRevokesHandlersByContributionId()
     {
         var registry = new InteractionHandlerRegistry(new RecordingDispatcher());

@@ -19,6 +19,11 @@
   <ItemGroup>
     <ProjectReference Include="../../src/AtomUI.City.Presentation/AtomUI.City.Presentation.csproj" />
     <ProjectReference Include="../../src/AtomUI.City.Testing/AtomUI.City.Testing.csproj" />
+    <ProjectReference Include="../../fixtures/AtomUI.City.Presentation.HeadlessApp/AtomUI.City.Presentation.HeadlessApp.csproj"
+                      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="../../fixtures/AtomUI.City.Presentation.DesktopApp/AtomUI.City.Presentation.DesktopApp.csproj"
+                      ReferenceOutputAssembly="false" />
+    <Compile Include="../Shared/ProcessTestRunner.cs" Link="ProcessTestRunner.cs" />
   </ItemGroup>
 
 </Project>

@@ -16,7 +16,19 @@ public interface IInteractionHandlerRegistry
         TRequest request,
         CancellationToken cancellationToken = default);
 
+    ValueTask<InteractionResult<TResult>> HandleAsync<TRequest, TResult>(
+        TRequest request,
+        InteractionDispatchContext context,
+        CancellationToken cancellationToken = default);
+
     int RevokePlugin(string pluginId);
 
     int RevokeContribution(string contributionId);
+
+    PresentationQueueSnapshot GetModalQueueSnapshot(string? windowId = null) => new(
+        PresentationQueueOptions.DefaultModalInteractionPendingCapacity,
+        PendingCount: 0,
+        InFlightCount: 0,
+        PeakPendingCount: 0,
+        RejectedCount: 0);
 }
