@@ -11,9 +11,12 @@ public static class DataServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddHttpClient();
-        services.TryAddSingleton<IAccessTokenProvider, UnavailableAccessTokenProvider>();
+        services.TryAddSingleton<UnavailableAccessTokenProvider>();
         services.TryAddSingleton<IDataDiagnostics, InMemoryDataDiagnostics>();
-        services.TryAddSingleton<IDataCredentialProvider, AccessTokenCredentialProvider>();
+        services.TryAddSingleton<IDataCredentialProvider>(serviceProvider =>
+            new AccessTokenCredentialProvider(
+                serviceProvider.GetService<IAccessTokenProvider>()
+                ?? serviceProvider.GetRequiredService<UnavailableAccessTokenProvider>()));
         services.TryAddSingleton<InMemoryDataRequestCache>();
         services.TryAddSingleton<IDataRequestCache>(serviceProvider =>
             serviceProvider.GetRequiredService<InMemoryDataRequestCache>());

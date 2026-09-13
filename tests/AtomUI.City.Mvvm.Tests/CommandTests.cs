@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using AtomUI.City.Mvvm;
 using CommunityToolkit.Mvvm.Input;
 
@@ -79,6 +80,53 @@ public sealed class CommandTests
         Assert.False(state.IsExecuting);
         Assert.Equal(OperationStatus.Completed, state.LastResult?.Status);
         Assert.Null(state.LastError);
+    }
+
+    [Fact]
+    public async Task AsyncCommandCompletesNotificationsOnCallingSynchronizationContext()
+    {
+        var result = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                using var context = new PumpSynchronizationContext();
+                SynchronizationContext.SetSynchronizationContext(context);
+                var callerThreadId = Environment.CurrentManagedThreadId;
+                var completionThreadId = 0;
+                var command = CommandFactory.CreateAsync(async _ =>
+                {
+                    await Task.Run(static () => { });
+                });
+                command.CanExecuteChanged += (_, _) =>
+                {
+                    if (!command.IsRunning)
+                    {
+                        completionThreadId = Environment.CurrentManagedThreadId;
+                    }
+                };
+
+                var execution = command.ExecuteAsync(null);
+                context.RunUntil(execution);
+                result.TrySetResult(completionThreadId == callerThreadId);
+            }
+            catch (Exception exception)
+            {
+                result.TrySetException(exception);
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(null);
+            }
+        })
+        {
+            IsBackground = true,
+            Name = "MVVM command synchronization context test",
+        };
+
+        thread.Start();
+        Assert.True(await result.Task.WaitAsync(TimeSpan.FromSeconds(10)));
+        Assert.True(thread.Join(TimeSpan.FromSeconds(10)));
     }
 
     [Fact]
@@ -277,6 +325,36 @@ public sealed class CommandTests
         group.Execute(null);
 
         Assert.Equal(0, calls);
+    }
+
+    private sealed class PumpSynchronizationContext : SynchronizationContext, IDisposable
+    {
+        private readonly BlockingCollection<(SendOrPostCallback Callback, object? State)> _queue = [];
+
+        public override void Post(SendOrPostCallback callback, object? state)
+        {
+            _queue.Add((callback, state));
+        }
+
+        public void RunUntil(Task task)
+        {
+            while (!task.IsCompleted)
+            {
+                if (!_queue.TryTake(out var work, TimeSpan.FromSeconds(5)))
+                {
+                    throw new TimeoutException("No synchronization-context continuation arrived.");
+                }
+
+                work.Callback(work.State);
+            }
+
+            task.GetAwaiter().GetResult();
+        }
+
+        public void Dispose()
+        {
+            _queue.Dispose();
+        }
     }
 
     private sealed class SaveViewModel;

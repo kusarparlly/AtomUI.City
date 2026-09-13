@@ -38,6 +38,42 @@ public sealed class AvaloniaUiDispatcherTests
     }
 
     [Fact]
+    public void ServiceCollectionReplacesCoreUnavailableDispatcherFallback()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<IUiDispatcher, UnavailableUiDispatcher>();
+
+        services.AddAvaloniaUiDispatcher();
+
+        using var provider = services.BuildServiceProvider();
+
+        Assert.IsType<AvaloniaUiDispatcher>(provider.GetRequiredService<IUiDispatcher>());
+        Assert.DoesNotContain(
+            services,
+            descriptor => descriptor.ServiceType == typeof(IUiDispatcher) &&
+                          descriptor.ImplementationType == typeof(UnavailableUiDispatcher));
+    }
+
+    [Fact]
+    public void ServiceCollectionPreservesCustomDispatcherAlongsideCoreFallback()
+    {
+        var existingDispatcher = new InlineUiDispatcher();
+        var services = new ServiceCollection();
+        services.AddSingleton<IUiDispatcher, UnavailableUiDispatcher>();
+        services.AddSingleton<IUiDispatcher>(existingDispatcher);
+
+        services.AddAvaloniaUiDispatcher();
+
+        using var provider = services.BuildServiceProvider();
+
+        Assert.Same(existingDispatcher, provider.GetRequiredService<IUiDispatcher>());
+        Assert.DoesNotContain(
+            services,
+            descriptor => descriptor.ServiceType == typeof(IUiDispatcher) &&
+                          descriptor.ImplementationType == typeof(UnavailableUiDispatcher));
+    }
+
+    [Fact]
     public async Task ServiceCollectionDispatcherUsesRegisteredPresentationRuntime()
     {
         var services = new ServiceCollection();

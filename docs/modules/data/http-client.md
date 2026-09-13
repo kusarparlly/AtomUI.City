@@ -137,6 +137,8 @@ Data 1.0 的 HTTP 大载荷由 `DataLargePayloadClient` 实现：
 | 504 | Timeout。 |
 | 5xx | ServerError。 |
 | network error | NetworkUnavailable 或 TransportError。 |
+| response body IO 中断 | TransportError；满足 retry 与幂等条件时可重试。 |
+| response payload 格式错误 | SerializationError。 |
 
 ### 7. 缓存
 
@@ -146,7 +148,7 @@ HTTP request/response 可以使用 Data cache。
 
 ### 8. 测试策略
 
-当前测试覆盖 named client、auth header、status mapping、取消、mapper failure、resilience 和大载荷传输：
+当前测试覆盖 named client、auth header、status mapping、取消、response body IO/mapper failure、resilience 和大载荷传输：
 
 - typed client。
 - auth header 注入。

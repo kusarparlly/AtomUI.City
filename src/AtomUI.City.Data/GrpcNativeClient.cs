@@ -335,8 +335,7 @@ public sealed class NativeGrpcClient
 
     private static DataResult<TResponse> MapRpcFailure<TResponse>(RpcException exception)
     {
-        var status = (GrpcStatusCode)(int)exception.StatusCode;
-        var error = DataErrorMapper.FromGrpcStatus(status, exception.Status.Detail) with { Exception = exception };
+        var error = GrpcRpcExceptionMapper.Map(exception);
         if (error.Kind == DataErrorKind.Cancelled)
         {
             return DataResult<TResponse>.Cancelled(error.Message);
@@ -349,13 +348,10 @@ public sealed class NativeGrpcClient
     {
         if (exception is RpcException rpcException)
         {
-            var mapped = DataErrorMapper.FromGrpcStatus(
-                (GrpcStatusCode)(int)rpcException.StatusCode,
-                rpcException.Status.Detail);
+            var mapped = GrpcRpcExceptionMapper.Map(rpcException);
             return mapped with
             {
                 Kind = mapped.Kind == DataErrorKind.Cancelled ? DataErrorKind.StreamCancelled : mapped.Kind,
-                Exception = rpcException,
             };
         }
 
@@ -506,10 +502,10 @@ internal sealed class GrpcClientStream<TRequest, TResponse>(
         }
         catch (RpcException exception)
         {
-            var error = DataErrorMapper.FromGrpcStatus((GrpcStatusCode)(int)exception.StatusCode, exception.Status.Detail);
+            var error = GrpcRpcExceptionMapper.Map(exception);
             transaction.TrySetResult(error.Kind == DataErrorKind.Cancelled
                 ? DataResult<TResponse>.Cancelled(error.Message)
-                : DataResult<TResponse>.Failed(error with { Exception = exception }));
+                : DataResult<TResponse>.Failed(error));
         }
         catch (OperationCanceledException)
         {
@@ -677,12 +673,26 @@ internal sealed class GrpcDuplexStream<TRequest, TResponse> : IGrpcDuplexStream<
 
     private static DataError MapDuplexError(RpcException exception)
     {
-        var mapped = DataErrorMapper.FromGrpcStatus(
-            (GrpcStatusCode)(int)exception.StatusCode,
-            exception.Status.Detail);
+        var mapped = GrpcRpcExceptionMapper.Map(exception);
         return mapped with
         {
             Kind = mapped.Kind == DataErrorKind.Cancelled ? DataErrorKind.StreamCancelled : mapped.Kind,
+        };
+    }
+}
+
+internal static class GrpcRpcExceptionMapper
+{
+    public static DataError Map(RpcException exception)
+    {
+        ArgumentNullException.ThrowIfNull(exception);
+        var detail = string.IsNullOrWhiteSpace(exception.Status.Detail)
+            ? null
+            : exception.Status.Detail;
+        return DataErrorMapper.FromGrpcStatus(
+            (GrpcStatusCode)(int)exception.StatusCode,
+            detail) with
+        {
             Exception = exception,
         };
     }

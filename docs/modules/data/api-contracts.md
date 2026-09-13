@@ -16,7 +16,7 @@
 | Plugin Contributions | DataContributionRegistry, DataContributionLease, IDataCapabilityAuthorizer | 插件数据能力租约。 | origin token 由 Host 签发；活性在 credential/cache 前校验；revoke 拒绝新请求、取消并等待在途请求、关闭连接并清除注册/缓存。 |
 | Large Payload | DataLargePayloadClient, DataTransferOptions, DataTemporaryFile | 固定内存上传下载。 | 固定缓冲区、进度节流、range/resume、声明长度完整性校验、取消清理；未 Commit 临时文件随 lease 删除。 |
 | Error Model | DataResult<T>, DataError, DataErrorKind | 统一结果和错误模型。 | success result 不携带 error；failed/cancelled/stale result 不携带 value；partial 同时携带可用 value 和 error，且不自动重试或缓存；DataError 拒绝未知 kind 和空白 message。 |
-| DI Registration | DataServiceCollectionExtensions | 默认 Data 服务注册。 | AddData 注册 pipeline、client factory、cache、connection manager、diagnostics 和 HTTP/gRPC/SignalR transports；重复调用不重复默认 transport；pre-registration override 保留优先级。 |
+| DI Registration | DataServiceCollectionExtensions | 默认 Data 服务注册。 | AddData 注册 pipeline、credential adapter、client factory、cache、connection manager、diagnostics 和 HTTP/gRPC/SignalR transports；未注册 `IAccessTokenProvider` 时 adapter 内部使用 unavailable fallback，但不占用全局 token provider 合同；因此模块注册顺序为 Data -> Security 时仍由 Security provider 接管；重复调用不重复默认 transport；pre-registration override 保留优先级。 |
 | Diagnostics | DataDiagnosticIds | 数据访问诊断。 | AUCDATA001-035 稳定。 |
 
 ## 关键方法合同

@@ -27,6 +27,17 @@ public sealed record StressInventoryPush(string Sku, int Quantity, long Sequence
 
 public sealed record StressShipmentPush(string ShipmentId, int Percent, long Sequence);
 
+public static class StressDataFaults
+{
+    public const string GrpcUnavailableSku = "fault-unavailable";
+
+    public const string GrpcDeadlineSku = "fault-deadline";
+
+    public const string GrpcServerStreamAbortSku = "fault-server-stream-abort";
+
+    public const string GrpcDuplexAbortSku = "fault-duplex-abort";
+}
+
 [DataClient("stress-operations", DataTransportKind.Http, Version = "1")]
 public interface IStressOperationsDataClient
 {

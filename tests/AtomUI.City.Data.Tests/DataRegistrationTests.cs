@@ -148,6 +148,23 @@ public sealed class DataRegistrationTests
     }
 
     [Fact]
+    public void AddDataBeforeAddSecurityUsesAccountSessionManagerAsTokenProvider()
+    {
+        var services = new ServiceCollection();
+
+        services.AddData();
+        services.AddSecurity();
+
+        using var serviceProvider = services.BuildServiceProvider();
+        var tokenProvider = serviceProvider.GetRequiredService<IAccessTokenProvider>();
+        var accountSessions = serviceProvider.GetRequiredService<IAccountSessionManager>();
+
+        Assert.Same(accountSessions, tokenProvider);
+        Assert.IsType<AccessTokenCredentialProvider>(
+            serviceProvider.GetRequiredService<IDataCredentialProvider>());
+    }
+
+    [Fact]
     public async Task PipelineCapturesTransportKindOnceDuringRegistration()
     {
         var transport = new ChangingKindTransport();

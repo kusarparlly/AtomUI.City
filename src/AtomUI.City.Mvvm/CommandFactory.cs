@@ -197,7 +197,8 @@ public static class CommandFactory
         {
             try
             {
-                await _execute(cancellation.Token).ConfigureAwait(false);
+                // Command state notifications belong to the caller context (normally the UI thread).
+                await _execute(cancellation.Token);
             }
             finally
             {

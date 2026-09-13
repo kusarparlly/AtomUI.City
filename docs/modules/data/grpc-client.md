@@ -133,6 +133,8 @@ gRPC channel 可以跨多个 call。
 | Unimplemented | 12 | ServerError。 |
 | Internal | 13 | ServerError。 |
 | Unavailable | 14 | ServiceUnavailable。 |
+
+原生 `RpcException.Status.Detail` 允许为空；native client 必须把空白 detail 视为未提供，并使用稳定的默认错误消息，不能让空 detail 击穿 status 映射。
 | DataLoss | 15 | ServerError。 |
 | Unauthenticated | 16 | AuthenticationRequired。 |
 

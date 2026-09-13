@@ -26,6 +26,7 @@
 - `DataCacheKey` 的 canonical identity/value equality、安全 revision 隔离、TTL、operation/client-version/policy-version 定向失效和 `IDataCacheInvalidator` 匹配维度进入 1.0 兼容承诺；插件请求自动采用 signed origin 的 contribution id，显式不匹配在 lookup 前拒绝；默认内存 cache 抑制跨 invalidation 的 stale write。
 - `DataResult<T>` 的 success/error 互斥语义、cancelled/stale 无 value、partial 同时携带 value/error，以及 `DataError` 对未知 kind 和空白 message 的拒绝行为进入 1.0 兼容承诺。
 - `DataServiceCollectionExtensions.AddData` 的默认服务集合、重复调用幂等行为和 pre-registration override 优先级进入 1.0 兼容承诺。
+- `AddData` 不注册全局 `IAccessTokenProvider` fallback；`AccessTokenCredentialProvider` 只在该合同缺失时内部使用 unavailable fallback，保证 Data -> Security 注册顺序不会遮蔽 Security 的真实 provider。
 - `DataModule` 在 Host shutdown 时关闭 runtime gate、取消并 drain 在途请求，再关闭全部连接并阻止新注册；诊断 sink 异常不得改变主流程结果。
 - 六种 `DataConcurrencyPolicy` 的排序、取消、抑制与 queue bound 进入 1.0 兼容承诺。
 - resilience admission 位于 credential/cache 之后；circuit/rate rejection 可进入显式 fallback。circuit/rate/fallback policy、ordered handler 和 credential/cache 前置的 contribution-aware capability gate 进入 1.0 兼容承诺。

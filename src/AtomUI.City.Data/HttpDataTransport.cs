@@ -89,6 +89,22 @@ public sealed class HttpDataTransport : IRequestResponseTransport
             {
                 return DataResult<TResponse>.Cancelled();
             }
+            catch (HttpRequestException exception)
+            {
+                return DataResult<TResponse>.Failed(
+                    new DataError(
+                        DataErrorKind.TransportError,
+                        DataErrorMessage.FromException(exception, "HTTP response body read failed."),
+                        Exception: exception));
+            }
+            catch (IOException exception)
+            {
+                return DataResult<TResponse>.Failed(
+                    new DataError(
+                        DataErrorKind.TransportError,
+                        DataErrorMessage.FromException(exception, "HTTP response body read failed."),
+                        Exception: exception));
+            }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
                 return DataResult<TResponse>.Failed(

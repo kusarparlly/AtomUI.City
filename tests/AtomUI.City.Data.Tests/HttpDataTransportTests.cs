@@ -184,6 +184,36 @@ public sealed class HttpDataTransportTests
         Assert.Same(parseException, result.Error?.Exception);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task HttpTransportMapsResponseBodyIoFailureToTransportError(bool useHttpRequestException)
+    {
+        var handler = new RecordingHttpMessageHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("partial"),
+            });
+        var transport = new HttpDataTransport(new RecordingHttpClientFactory("api", handler));
+        Exception readException = useHttpRequestException
+            ? new HttpRequestException("response ended prematurely")
+            : new IOException("response ended prematurely");
+        var request = new HttpDataRequest<string>(
+            "catalog",
+            "get-items",
+            "api",
+            _ => new HttpRequestMessage(HttpMethod.Get, "https://server/items"),
+            _ => ValueTask.FromException<string>(readException));
+
+        var result = await transport.SendAsync(
+            request,
+            DataRequestContext.Create(request, CancellationToken.None));
+
+        Assert.False(result.Succeeded);
+        Assert.Equal(DataErrorKind.TransportError, result.Error?.Kind);
+        Assert.Same(readException, result.Error?.Exception);
+    }
+
     [Fact]
     public async Task HttpTransportMapsSendFailureToTransportError()
     {
