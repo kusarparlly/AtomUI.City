@@ -5,6 +5,7 @@ namespace AtomUI.City.Templates;
 public sealed class ApplicationTemplateRenderer
 {
     private const string AtomUICityPackageVersion = "1.0.0";
+    private const string AvaloniaVersion = "12.0.4";
     private const string MicrosoftNetTestSdkVersion = "17.14.1";
     private const string XUnitVersion = "2.9.3";
     private const string XUnitRunnerVisualStudioVersion = "3.1.4";
@@ -182,6 +183,12 @@ public sealed class ApplicationTemplateRenderer
             CreateFile($"docs/{options.AppName}.md", CreateDocsEntry(options)),
             CreateFile($"src/{options.AppName}/{options.AppName}.csproj", CreateApplicationProject(options)),
             CreateFile($"src/{options.AppName}/Program.cs", CreateProgram(options)),
+            CreateFile($"src/{options.AppName}/App.axaml", CreateApplicationXaml(options)),
+            CreateFile($"src/{options.AppName}/App.axaml.cs", CreateApplicationCodeBehind(options)),
+            CreateFile($"src/{options.AppName}/DesktopBootstrap.cs", CreateDesktopBootstrap(options)),
+            CreateFile($"src/{options.AppName}/MainWindow.axaml", CreateMainWindowXaml(options)),
+            CreateFile($"src/{options.AppName}/MainWindow.axaml.cs", CreateMainWindowCodeBehind(options)),
+            CreateFile($"src/{options.AppName}/Properties/AssemblyInfo.cs", CreateAssemblyInfo(options)),
             CreateFile($"src/{options.AppName}/Modules/.gitkeep", string.Empty),
             CreateFile($"src/{options.AppName}/Routes/.gitkeep", string.Empty),
             CreateFile($"src/{options.AppName}/Resources/.gitkeep", string.Empty),
@@ -470,6 +477,12 @@ public sealed class ApplicationTemplateRenderer
             dotnet build {{options.AppName}}.slnx --no-restore
             dotnet test {{options.AppName}}.slnx --no-build
             ```
+
+            Run the desktop application with:
+
+            ```bash
+            dotnet run --project src/{{options.AppName}}/{{options.AppName}}.csproj
+            ```
             """;
     }
 
@@ -486,7 +499,7 @@ public sealed class ApplicationTemplateRenderer
             <Project Sdk="Microsoft.NET.Sdk">
 
               <PropertyGroup>
-                <OutputType>Exe</OutputType>
+                <OutputType>WinExe</OutputType>
                 <TargetFramework>{{options.TargetFramework}}</TargetFramework>
                 <RootNamespace>{{rootNamespace}}</RootNamespace>
                 <ImplicitUsings>enable</ImplicitUsings>
@@ -501,6 +514,9 @@ public sealed class ApplicationTemplateRenderer
                 <PackageReference Include="AtomUI.City.Mvvm" Version="{{AtomUICityPackageVersion}}" />
                 <PackageReference Include="AtomUI.City.Routing" Version="{{AtomUICityPackageVersion}}" />
                 <PackageReference Include="AtomUI.City.Localization" Version="{{AtomUICityPackageVersion}}" />
+                <PackageReference Include="AtomUI.City.Presentation" Version="{{AtomUICityPackageVersion}}" />
+                <PackageReference Include="Avalonia.Desktop" Version="{{AvaloniaVersion}}" />
+                <PackageReference Include="Avalonia.Themes.Fluent" Version="{{AvaloniaVersion}}" />
             {{dynamicPlugins}}
               </ItemGroup>
 
@@ -513,17 +529,24 @@ public sealed class ApplicationTemplateRenderer
         var rootNamespace = options.EffectiveRootNamespace;
 
         return $$"""
+            using Avalonia;
+            using Avalonia.Controls;
+            using Avalonia.Controls.ApplicationLifetimes;
             using AtomUI.City.Core.Hosting;
+            using AtomUI.City.Core.Modularity;
+            using AtomUI.City.Presentation;
+            using Microsoft.Extensions.DependencyInjection;
 
             namespace {{rootNamespace}};
 
             internal static class Program
             {
-                public static async Task<int> Main(string[] args)
+                [STAThread]
+                public static int Main(string[] args)
                 {
                     try
                     {
-                        return await RunAsync(args);
+                        return Run(args);
                     }
                     catch (Exception exception)
                     {
@@ -532,7 +555,7 @@ public sealed class ApplicationTemplateRenderer
                     }
                 }
 
-                private static async Task<int> RunAsync(string[] args)
+                internal static IApplicationHost CreateHost(string[] args)
                 {
                     var builder = ApplicationHost.CreateBuilder(args);
                     builder.ConfigureHost(options =>
@@ -540,14 +563,219 @@ public sealed class ApplicationTemplateRenderer
                         options.ApplicationId = "{{rootNamespace}}";
                         options.ApplicationName = "{{options.AppName}}";
                     });
+                    builder.UseModule<PresentationModule>();
+                    builder.ConfigureServices(services => services.AddSingleton<MainWindow>());
 
-                    await using var host = builder.Build();
+                    return builder.Build();
+                }
 
-                    await host.RunAsync();
+                internal static AppBuilder BuildAvaloniaApp() =>
+                    AppBuilder.Configure<App>()
+                        .UsePlatformDetect();
 
-                    return 0;
+                private static int Run(string[] args)
+                {
+                    using var host = CreateHost(args);
+                    host.StartAsync().GetAwaiter().GetResult();
+
+                    var attached = false;
+                    try
+                    {
+                        DesktopBootstrap.Attach(host);
+                        attached = true;
+                        return BuildAvaloniaApp()
+                            .StartWithClassicDesktopLifetime(args, ShutdownMode.OnExplicitShutdown);
+                    }
+                    finally
+                    {
+                        if (attached)
+                        {
+                            DesktopBootstrap.Detach(host);
+                        }
+
+                        Task.Run(async () => await host.StopAsync().ConfigureAwait(false))
+                            .GetAwaiter()
+                            .GetResult();
+                    }
                 }
             }
+            """;
+    }
+
+    private static string CreateApplicationXaml(ApplicationTemplateOptions options)
+    {
+        var rootNamespace = options.EffectiveRootNamespace;
+        return $$"""
+            <Application xmlns="https://github.com/avaloniaui"
+                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                         x:Class="{{rootNamespace}}.App"
+                         RequestedThemeVariant="Default">
+              <Application.Styles>
+                <FluentTheme />
+              </Application.Styles>
+            </Application>
+            """;
+    }
+
+    private static string CreateApplicationCodeBehind(ApplicationTemplateOptions options)
+    {
+        var rootNamespace = options.EffectiveRootNamespace;
+        return $$"""
+            using Avalonia;
+            using Avalonia.Controls;
+            using Avalonia.Controls.ApplicationLifetimes;
+            using Avalonia.Markup.Xaml;
+
+            namespace {{rootNamespace}};
+
+            public sealed partial class App : Application
+            {
+                public override void Initialize()
+                {
+                    AvaloniaXamlLoader.Load(this);
+                }
+
+                public override void OnFrameworkInitializationCompleted()
+                {
+                    if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktopLifetime)
+                    {
+                        throw new InvalidOperationException(
+                            "This application requires the Avalonia classic desktop lifetime.");
+                    }
+
+                    DesktopBootstrap.Initialize(desktopLifetime);
+                    base.OnFrameworkInitializationCompleted();
+                }
+            }
+            """;
+    }
+
+    private static string CreateDesktopBootstrap(ApplicationTemplateOptions options)
+    {
+        var rootNamespace = options.EffectiveRootNamespace;
+        return $$"""
+            using Avalonia.Controls.ApplicationLifetimes;
+            using Avalonia.Threading;
+            using AtomUI.City.Core.Hosting;
+            using AtomUI.City.Presentation;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace {{rootNamespace}};
+
+            internal static class DesktopBootstrap
+            {
+                private static IApplicationHost? _host;
+
+                internal static void Attach(IApplicationHost host)
+                {
+                    ArgumentNullException.ThrowIfNull(host);
+                    if (Interlocked.CompareExchange(ref _host, host, null) is not null)
+                    {
+                        throw new InvalidOperationException("A desktop application Host is already attached.");
+                    }
+                }
+
+                internal static void Initialize(IClassicDesktopStyleApplicationLifetime lifetime)
+                {
+                    ArgumentNullException.ThrowIfNull(lifetime);
+                    var host = Volatile.Read(ref _host)
+                        ?? throw new InvalidOperationException("The desktop application Host is not attached.");
+                    if (lifetime.MainWindow is not null)
+                    {
+                        throw new InvalidOperationException("The desktop lifetime already has a main window.");
+                    }
+
+                    var runtime = host.Services.GetRequiredService<IPresentationRuntime>();
+                    runtime.Attach(lifetime, host.HostScope);
+                    var mainWindow = host.Services.GetRequiredService<MainWindow>();
+                    var session = runtime.RegisterWindow(mainWindow, "main");
+                    mainWindow.Closed += (_, _) => _ = ShutdownWhenSessionCompletesAsync(session, lifetime);
+                    lifetime.MainWindow = mainWindow;
+                }
+
+                private static async Task ShutdownWhenSessionCompletesAsync(
+                    WindowSession session,
+                    IClassicDesktopStyleApplicationLifetime lifetime)
+                {
+                    while (session.State is not (WindowSessionState.Closed or WindowSessionState.Faulted))
+                    {
+                        await Task.Delay(10).ConfigureAwait(false);
+                    }
+
+                    var exitCode = session.State == WindowSessionState.Closed ? 0 : 1;
+                    Dispatcher.UIThread.Post(() => lifetime.Shutdown(exitCode));
+                }
+
+                internal static void Detach(IApplicationHost host)
+                {
+                    ArgumentNullException.ThrowIfNull(host);
+                    if (!ReferenceEquals(Interlocked.CompareExchange(ref _host, null, host), host))
+                    {
+                        throw new InvalidOperationException("The supplied desktop application Host is not attached.");
+                    }
+                }
+            }
+            """;
+    }
+
+    private static string CreateMainWindowXaml(ApplicationTemplateOptions options)
+    {
+        var rootNamespace = options.EffectiveRootNamespace;
+        return $$"""
+            <Window xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:presentation="clr-namespace:AtomUI.City.Presentation;assembly=AtomUI.City.Presentation"
+                    x:Class="{{rootNamespace}}.MainWindow"
+                    Title="{{options.AppName}}"
+                    Width="960"
+                    Height="640"
+                    MinWidth="640"
+                    MinHeight="420">
+              <Grid Margin="24">
+                <ContentControl presentation:RouteOutletProperties.Name="main">
+                  <StackPanel HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Spacing="8">
+                    <TextBlock Text="{{options.AppName}}"
+                               FontSize="28"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Text="Ready"
+                               Opacity="0.7"
+                               HorizontalAlignment="Center" />
+                  </StackPanel>
+                </ContentControl>
+              </Grid>
+            </Window>
+            """;
+    }
+
+
+    private static string CreateMainWindowCodeBehind(ApplicationTemplateOptions options)
+    {
+        var rootNamespace = options.EffectiveRootNamespace;
+        return $$"""
+            using Avalonia.Controls;
+            using Avalonia.Markup.Xaml;
+
+            namespace {{rootNamespace}};
+
+            public sealed partial class MainWindow : Window
+            {
+                public MainWindow()
+                {
+                    AvaloniaXamlLoader.Load(this);
+                }
+            }
+            """;
+    }
+
+    private static string CreateAssemblyInfo(ApplicationTemplateOptions options)
+    {
+        return $$"""
+            using System.Runtime.CompilerServices;
+
+            [assembly: InternalsVisibleTo("{{options.AppName}}.Tests")]
             """;
     }
 
@@ -568,6 +796,7 @@ public sealed class ApplicationTemplateRenderer
 
               <ItemGroup>
                 <PackageReference Include="Microsoft.NET.Test.Sdk" Version="{{MicrosoftNetTestSdkVersion}}" />
+                <PackageReference Include="Avalonia.Headless" Version="{{AvaloniaVersion}}" />
                 <PackageReference Include="xunit" Version="{{XUnitVersion}}" />
                 <PackageReference Include="xunit.runner.visualstudio" Version="{{XUnitRunnerVisualStudioVersion}}" PrivateAssets="all" />
               </ItemGroup>
@@ -591,7 +820,8 @@ public sealed class ApplicationTemplateRenderer
 
             | Feature | Unit Tests | Integration Tests | Notes |
             |---|---|---|---|
-            | Application startup | ApplicationSmokeTests | Pending | Generated by AtomUI.City template. |
+            | City Host lifecycle | ApplicationSmokeTests | Host start/stop | Generated by AtomUI.City template. |
+            | Avalonia desktop bootstrap | ApplicationSmokeTests | Headless Presentation attach and WindowSession registration | Generated by AtomUI.City template. |
             """;
     }
 
@@ -600,8 +830,14 @@ public sealed class ApplicationTemplateRenderer
         var rootNamespace = options.EffectiveRootNamespace;
 
         return $$"""
-            using AtomUI.City.Core.Hosting;
+            using Avalonia;
+            using Avalonia.Controls;
+            using Avalonia.Controls.ApplicationLifetimes;
+            using Avalonia.Headless;
+            using Avalonia.Threading;
             using AtomUI.City.Core.Lifecycle;
+            using AtomUI.City.Presentation;
+            using Microsoft.Extensions.DependencyInjection;
 
             namespace {{rootNamespace}}.Tests;
 
@@ -610,19 +846,59 @@ public sealed class ApplicationTemplateRenderer
                 [Fact]
                 public async Task ApplicationHostStartsAndStops()
                 {
-                    var builder = ApplicationHost.CreateBuilder();
-                    builder.ConfigureHost(hostOptions =>
-                    {
-                        hostOptions.ApplicationId = "{{rootNamespace}}.Tests";
-                        hostOptions.ApplicationName = "{{options.AppName}} Tests";
-                    });
-
-                    await using var host = builder.Build();
+                    using var host = Program.CreateHost([]);
                     await host.StartAsync();
                     Assert.Equal(LifecycleScopeState.Running, host.HostScope.State);
 
                     await host.StopAsync();
                     Assert.Equal(LifecycleScopeState.Stopped, host.HostScope.State);
+                }
+
+                [Fact]
+                public async Task DesktopBootstrapAttachesPresentationAndRegistersMainWindow()
+                {
+                    using var host = Program.CreateHost([]);
+                    await host.StartAsync();
+                    AppBuilder.Configure<Application>()
+                        .UseHeadless(new AvaloniaHeadlessPlatformOptions())
+                        .SetupWithoutStarting();
+                    var lifetime = new ClassicDesktopStyleApplicationLifetime
+                    {
+                        ShutdownMode = ShutdownMode.OnExplicitShutdown,
+                    };
+
+                    Assert.Throws<InvalidOperationException>(() => DesktopBootstrap.Initialize(lifetime));
+                    using var duplicateHost = Program.CreateHost([]);
+                    DesktopBootstrap.Attach(host);
+                    try
+                    {
+                        Assert.Throws<InvalidOperationException>(() => DesktopBootstrap.Attach(duplicateHost));
+                        DesktopBootstrap.Initialize(lifetime);
+                        var runtime = host.Services.GetRequiredService<IPresentationRuntime>();
+                        Assert.True(runtime.IsReady);
+                        Assert.IsType<MainWindow>(lifetime.MainWindow);
+                        Assert.Equal("main", Assert.Single(runtime.Windows).Id);
+                    }
+                    finally
+                    {
+                        DesktopBootstrap.Detach(host);
+                        PumpUntil(host.StopAsync());
+                    }
+
+                    Assert.Equal(LifecycleScopeState.Stopped, host.HostScope.State);
+                }
+
+                private static void PumpUntil(Task task)
+                {
+                    var deadline = DateTimeOffset.UtcNow.AddSeconds(10);
+                    while (!task.IsCompleted && DateTimeOffset.UtcNow < deadline)
+                    {
+                        Dispatcher.UIThread.RunJobs();
+                        Thread.Yield();
+                    }
+
+                    task.WaitAsync(TimeSpan.FromSeconds(1)).GetAwaiter().GetResult();
+                    Dispatcher.UIThread.RunJobs();
                 }
             }
             """;

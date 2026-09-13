@@ -15,7 +15,7 @@
 | AUC-TEMPLATES-007 | Page Template | Completed | GenerationTemplateRenderer, generated View/ViewModel/route source | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-008 | Localization Template | Completed | GenerationTemplateRenderer, generated localization package source | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-009 | Configuration Template | Completed | GenerationTemplateRenderer, generated Options source | GenerationTemplateRendererTests |
-| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | Planned | Presentation desktop bootstrap output | Pending |
+| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | Completed | Presentation desktop bootstrap output | ApplicationTemplateBuildSmokeTests, DotnetNewTemplateIntegrationTests, ApplicationTemplateDesktopProcessTests |
 
 ## Feature 硬门禁
 
@@ -150,18 +150,30 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 
 `AUC-TEMPLATES-006` 到 `AUC-TEMPLATES-009` 分别承接 [module-template.md](module-template.md)、[page-template.md](page-template.md)、[localization-template.md](localization-template.md) 和 [configuration-template.md](configuration-template.md) 中的设计。它们统一通过 `GenerationTemplateRenderer` 提供 create-only plan/render、取消、同根目录串行和失败回滚。
 
-`AUC-TEMPLATES-010` 承接真正的 Avalonia `Application`、desktop lifetime、主窗口和 Presentation bootstrap。该 Feature 必须在 Presentation 启动合同稳定后实现；当前 `atomui-city-app` 只生成可运行的无 UI Host 应用骨架。
+## AUC-TEMPLATES-010 Avalonia Desktop Application Template
+
+Feature ID: `AUC-TEMPLATES-010`
+Status: Completed
+Goal: 生成可独立 restore、build、test 和启动的 Avalonia classic desktop 应用，并给出 City Host 与 Presentation 的唯一标准组合顺序。
+Public Contract: `atomui-city-app` generated output、`ApplicationTemplateRenderer` generated output
+Runtime / Build Behavior: `Program` 构建并启动唯一 City Host，再启动 Avalonia classic desktop lifetime；`App` 从 bootstrap bridge 取得 Host，通过 DI 解析主窗口，在显示前 attach Presentation runtime 并注册 window `main`；UI loop 退出后撤销 bridge，并在线程池停止、释放 Host。
+Failure Behavior: 非 classic desktop lifetime、缺失或重复 Host、Presentation attach/窗口注册失败均阻止半初始化 UI，异常写入 stderr 且进程返回非零；Host stop/dispose 仍必须执行。
+Threading / Cancellation: Avalonia Application、主窗口创建和注册发生在 UI 线程；UI loop 是同步平台边界；退出后的 Host cleanup 不得等待已经停止的 Avalonia synchronization context。
+Diagnostics: 启动失败由生成入口写入 stderr，并保留 Core/Presentation 自有诊断；Templates 不新增运行时诊断系统。
+Tests: `ApplicationTemplateBuildSmokeTests`, `DotnetNewTemplateIntegrationTests`, `ApplicationTemplateDesktopProcessTests`，以及生成项目内 `ApplicationSmokeTests`
+Required Assertions: 两个模板入口输出同构桌面文件；生成项目 restore/build/test；Headless 下加载真实 XAML、attach runtime、从 DI 解析并注册主窗口；Windows 原生进程创建主窗口、响应关闭、Host 完整停止且零退出。
+Acceptance Criteria: 启停所有权、线程边界、失败清理、generated output 兼容面和三层测试证据均已成立。
 
 ## AUC-TEMPLATES-005 Test Template
 
 Feature ID: `AUC-TEMPLATES-005`
 Status: Completed
-Goal: 为模块、插件和应用生成符合 Testing 模块规范的测试项目。
+Goal: 为模块、插件和应用生成可独立 restore/build/test 的测试项目，并保持生产项目与 Testing 包隔离。
 Public Contract: ApplicationTemplateRenderer, test project template
-Runtime / Build Behavior: 输出 xUnit 项目、TestLayer 标记、Testing 包引用和基础 smoke tests。
-Failure Behavior: 测试项目名非法、生产项目误引用 Testing、缺失 TestLayer 失败。
+Runtime / Build Behavior: 输出 xUnit 项目、被测项目引用、必要的平台测试包、FeatureTestMatrix 和基础 smoke tests；默认不强制引入 `AtomUI.City.Testing` 或 `TestLayer`。
+Failure Behavior: 测试项目名非法、生产项目误引用 Testing、缺少测试矩阵或基础 smoke test 时失败。
 Threading / Cancellation: 渲染可取消；生成后可参与 solution test。
-Diagnostics: diagnostic 必须包含 test project path 和 layer。
+Diagnostics: diagnostic 必须包含 test project path 和 template kind。
 Tests: `ApplicationTemplateBuildSmokeTests`
-Required Assertions: 已断言测试项目 build/test、TestLayer、Testing 引用边界和命名规则。
+Required Assertions: 已断言测试项目 build/test、测试矩阵、基础 smoke test、Testing 引用边界和命名规则。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。

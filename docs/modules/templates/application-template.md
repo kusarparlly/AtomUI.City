@@ -45,7 +45,7 @@
 | AUC-TEMPLATES-007 | Page Template | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-008 | Localization Template | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-009 | Configuration Template | GenerationTemplateRendererTests |
-| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | Pending |
+| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | ApplicationTemplateBuildSmokeTests, DotnetNewTemplateIntegrationTests, ApplicationTemplateDesktopProcessTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -66,7 +66,7 @@
 
 ### 1. 目标
 
-当前应用模板用于创建一个可运行的 AtomUI.City Host 应用工作区。它体现框架默认启动、工程和测试范式，但不伪造尚未接线的 UI；真正的 Avalonia desktop lifetime 由 `AUC-TEMPLATES-010` 承接。
+应用模板用于创建一个可运行的 AtomUI.City Avalonia 桌面应用工作区。它体现框架默认 Host、Presentation、桌面 lifetime、工程和测试范式；Templates 只生成启动组合，不参与生成应用的运行时。
 
 ### 2. 默认结构
 
@@ -78,6 +78,12 @@ docs/<AppName>.md
 src/<AppName>/
   <AppName>.csproj
   Program.cs
+  App.axaml
+  App.axaml.cs
+  DesktopBootstrap.cs
+  MainWindow.axaml
+  MainWindow.axaml.cs
+  Properties/AssemblyInfo.cs
   Modules/
   Routes/
   Resources/
@@ -92,15 +98,17 @@ tests/<AppName>.Tests/
 
 应用模板默认包含：
 
-- GenericHost 启动入口。
+- Avalonia classic desktop lifetime 和真实 `Application`/主窗口。
+- City Host 启动入口。
 - AtomUI.City Core 配置。
 - Lifecycle 接入。
 - ModuleSystem 接入。
 - Routing 接入。
 - Localization 接入。
+- Presentation 接入。
 - `AtomUI.City.Build` 引用。
 - 测试项目。
-- 可运行的 Host 入口。
+- 可运行的 desktop 入口。
 - solution、Directory.Build、Directory.Packages 隔离项和 docs entry。
 - 生成内容不包含机器绝对路径。
 
@@ -122,7 +130,20 @@ Security、Data、EventBus 等业务模块当前由开发者在生成后显式�
 - 不在入口中写业务代码。
 - 不直接构建 ServiceProvider 做服务解析。
 - 不在入口中执行插件加载细节。
-- 生命周期通过 Host 接入；Presentation runtime 在 `AUC-TEMPLATES-010` 完成后接入。
+- `Program` 是 City Host 的唯一 owner：创建、启动、停止和释放 Host。
+- `Program` 必须先完成 `host.StartAsync()`，再进入 Avalonia classic desktop lifetime。
+- `Program` 通过进程内一次性 bootstrap bridge 把当前 Host 交给 Avalonia `Application`；bridge 不复制服务、不创建第二个 provider，且 UI loop 退出后必须撤销。
+- Avalonia UI loop 退出后不得依赖已经停止的 Avalonia synchronization context；Host stop/dispose 必须从线程池等待完成。
+
+### 4.1 Avalonia Application 与 Presentation
+
+- `App.Initialize()` 只加载 `App.axaml` 资源。
+- `App.OnFrameworkInitializationCompleted()` 只接受 `IClassicDesktopStyleApplicationLifetime`；其他 lifetime 以 `InvalidOperationException` 明确失败。
+- `App` 从 bootstrap bridge 取得已经运行的 Host，从根 DI 解析 `IPresentationRuntime` 和 `MainWindow`。
+- `MainWindow` 必须由 Host DI 创建，不能由 Templates、Router 或 Presentation 自行 `new`。
+- `App` 在窗口显示前依次调用 `IPresentationRuntime.Attach(lifetime, host.HostScope)`、`RegisterWindow(mainWindow, "main")`，再设置 `lifetime.MainWindow`。
+- Avalonia 持有原生 Window lifetime；Presentation 持有 `WindowSession` 和对应 lifecycle scope；Host shutdown 负责停止 Presentation module。
+- 默认关闭策略为 `ShutdownMode.OnExplicitShutdown`。用户、应用和操作系统关闭来源由 Presentation 的窗口状态机裁决；主窗口关闭后，bootstrap 观察公开的 `WindowSession.State`，只有状态达到 `Closed` 或 `Faulted` 才请求 Avalonia lifetime 退出，避免 Host shutdown 等待已经停止的 Dispatcher。
 
 ### 5. 项目文件
 
@@ -132,7 +153,10 @@ Security、Data、EventBus 等业务模块当前由开发者在生成后显式�
 - `AtomUI.City.Mvvm`
 - `AtomUI.City.Routing`
 - `AtomUI.City.Localization`
+- `AtomUI.City.Presentation`
 - `AtomUI.City.Build`
+- `Avalonia.Desktop`
+- `Avalonia.Themes.Fluent`
 
 可选引用：
 
@@ -163,6 +187,7 @@ tests/<AppName>.Tests/
 
 - `FeatureTestMatrix.md`
 - 真实 Host start/stop smoke test。
+- Avalonia Headless 下的 Presentation attach、DI 主窗口解析和 WindowSession 注册 smoke test。
 
 ### 8. Sample 策略
 
@@ -177,7 +202,8 @@ tests/<AppName>.Tests/
 | 应用生成 | Smoke | 文件结构完整。 |
 | Solution 和工程对齐 | Smoke | `.slnx`、`Directory.Build.props`、`Directory.Packages.props`、docs entry 均存在并只使用相对路径；父级 CPM 不得改变生成项目语义。 |
 | Host 启动 | Framework integration | 真实 Host 能启动并停止。 |
-| Avalonia desktop 启动 | Platform integration | 归属 `AUC-TEMPLATES-010`，当前为 Planned。 |
+| Avalonia Headless 启动 | Framework integration | 真实 XAML 可加载，Presentation runtime 可 attach，DI 主窗口可注册且 Host 可完整停止。 |
+| Avalonia desktop 启动 | Platform integration | Windows 上生成项目能够创建原生主窗口、响应关闭并以零退出码完成 Host 清理。 |
 | Build 接入 | Build | manifest 生成、Build 包和 analyzer 资产接入。 |
 | 测试项目 | Unit | `FeatureTestMatrix.md` 和 smoke test 存在。 |
 | 可选能力 | Unit/Build | tests、sample、AOT metadata 和 dynamic plugin 开关影响 plan、文件或项目引用。 |

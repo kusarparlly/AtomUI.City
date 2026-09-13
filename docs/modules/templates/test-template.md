@@ -47,7 +47,7 @@ Feature：`AUC-TEMPLATES-005`。状态：Completed。当前随应用和插件工
 | AUC-TEMPLATES-007 | Page Template | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-008 | Localization Template | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-009 | Configuration Template | GenerationTemplateRendererTests |
-| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | Pending |
+| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | ApplicationTemplateBuildSmokeTests, DotnetNewTemplateIntegrationTests, ApplicationTemplateDesktopProcessTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -106,14 +106,16 @@ tests/<ProjectName>.PlatformIntegrationTests/
 - 新增页面、模块、插件时必须补矩阵。
 - 集成测试条目不能替代单元测试条目。
 
-### 4. TestHost
+### 4. 测试运行入口
 
 测试项目默认引用：
 
-- `AtomUI.City.Testing`
 - 被测项目。
+- xUnit 与必要的平台测试包。
 
-默认生成 TestHost 使用入口：
+默认生成物不强制引用 `AtomUI.City.Testing`。需要框架级 `TestHost`、分层标记或专用测试工具时，由开发者显式加入该包；生产项目不得引用 Testing。
+
+默认生成 smoke/host 测试入口：
 
 - application smoke。
 - module host。

@@ -29,7 +29,7 @@ public sealed class CliNewAppTests
     }
 
     [Fact]
-    public async Task NewAppCreatesMinimalApplicationAndTestProject()
+    public async Task NewAppCreatesDesktopApplicationAndTestProject()
     {
         using var host = new CliTestHost();
 
@@ -47,7 +47,9 @@ public sealed class CliNewAppTests
         Assert.Equal(0, run.ExitCode);
         Assert.True(File.Exists(Path.Combine(host.WorkingDirectory, "src", "SalesClient", "SalesClient.csproj")));
         Assert.True(File.Exists(Path.Combine(host.WorkingDirectory, "src", "SalesClient", "Program.cs")));
-        Assert.False(File.Exists(Path.Combine(host.WorkingDirectory, "src", "SalesClient", "App.axaml")));
+        Assert.True(File.Exists(Path.Combine(host.WorkingDirectory, "src", "SalesClient", "App.axaml")));
+        Assert.True(File.Exists(Path.Combine(host.WorkingDirectory, "src", "SalesClient", "DesktopBootstrap.cs")));
+        Assert.True(File.Exists(Path.Combine(host.WorkingDirectory, "src", "SalesClient", "MainWindow.axaml")));
         Assert.True(File.Exists(Path.Combine(host.WorkingDirectory, "tests", "SalesClient.Tests", "FeatureTestMatrix.md")));
         Assert.True(File.Exists(Path.Combine(host.WorkingDirectory, "tests", "SalesClient.Tests", "ApplicationSmokeTests.cs")));
     }

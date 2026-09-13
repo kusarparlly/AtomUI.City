@@ -14,7 +14,7 @@
 | Core / Hosting | AtomUI.City.Templates | Templates 生成 Host 应用骨架，但不参与 Host 运行时。 | Core -> Module 或执行边界 -> Module | 见 lifecycle.md | 见 threading.md | 启动/执行失败必须有 Result、异常或诊断。 | tests/AtomUI.City.TemplateSmokeTests |
 | PluginSystem | AtomUI.City.Templates | 本模块通过 manifest、包布局、模板、CLI 或 generator 支持插件开发和检查；不直接持有运行时插件对象。 | Plugin owner/manifest -> Module | load/enable/disable/unload 或 package/template/generator 边界 | 插件后台任务必须可取消 | 贡献撤销失败必须隔离。 | tests/AtomUI.City.TemplateSmokeTests |
 | CLI / dotnet new | AtomUI.City.Templates | CLI 调用 public renderer；NuGet Template Engine 使用包内静态模板。二者共同变量的默认语义必须一致，但输出不要求逐字节相同。 | Tooling -> Templates | 单次 plan/render/instantiate | 同目标 renderer 调用串行；dotnet new 由工具进程管理 | 任一入口失败不得报告伪成功或覆盖已有文件。 | CliNewAppTests; DotnetNewTemplateIntegrationTests |
-| Presentation / Avalonia | Planned AUC-TEMPLATES-010 | 当前 Host 模板不启动 UI；未来由 Presentation 稳定合同提供 desktop bootstrap。 | Templates generated output -> Presentation | 应用启动/退出 | UI 生命周期遵循 Presentation | 未接线前禁止生成伪 App root。 | Pending |
+| Presentation / Avalonia | AUC-TEMPLATES-010 | 生成真实 `Application`、classic desktop lifetime、DI 主窗口和 Presentation bootstrap；Templates 不进入运行时依赖图。 | Templates generated output -> Presentation | Host start -> runtime attach/window register -> UI loop -> Host stop/dispose | UI 对象只在 Avalonia UI 线程创建和注册；Host 清理不依赖已停止的 UI context。 | 非 desktop lifetime、缺失 Host、重复 attach 或窗口注册失败时进程非零退出且不得保留半初始化 UI。 | Completed |
 | Testing | AtomUI.City.Templates | Feature ID 和产品合同测试。 | Testing -> Module | 构造 -> 执行 -> 断言 -> 释放 | fake dispatcher / deterministic scheduler / snapshot | 测试失败阻止完成状态。 | tests/AtomUI.City.TemplateSmokeTests |
 
 ## 集成硬约束

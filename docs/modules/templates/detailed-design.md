@@ -45,7 +45,7 @@
 | AUC-TEMPLATES-007 | Page Template | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-008 | Localization Template | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-009 | Configuration Template | GenerationTemplateRendererTests |
-| AUC-TEMPLATES-010 | Avalonia Desktop Application Template（Planned） | Pending |
+| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | ApplicationTemplateBuildSmokeTests, DotnetNewTemplateIntegrationTests, ApplicationTemplateDesktopProcessTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -113,14 +113,14 @@ Templates 不负责：
 
 | 模板 | 用途 |
 |---|---|
-| Application template | 已实现：创建可运行的 AtomUI.City Host 应用工作区。 |
-| Module template | 已规划、未实现：创建模块骨架。 |
-| Page template | 已规划、未实现：创建 Route -> ViewModel Target -> View 的页面结构。 |
+| Application template | 已实现：创建可运行的 AtomUI.City Avalonia 桌面应用工作区。 |
+| Module template | 已实现：创建模块、依赖声明、服务注册和测试骨架。 |
+| Page template | 已实现：创建 Route -> ViewModel Target -> View 的页面结构。 |
 | Plugin template | 创建一个插件项目，一个插件一个主程序集，一个 NuGet 包。 |
 | Test template | 创建符合功能点测试门禁的测试项目。 |
-| Localization template | 已规划、未实现：创建语言资源和懒加载语言包结构。 |
-| Configuration template | 已规划、未实现：创建 Options、配置 section、验证和测试结构。 |
-| Avalonia desktop template | 已规划、未实现：创建 Application、desktop lifetime、主窗口和 Presentation bootstrap。 |
+| Localization template | 已实现：创建语言资源和语言包结构。 |
+| Configuration template | 已实现：创建 Options、配置 section、验证和测试结构。 |
+| Avalonia desktop template | 已实现：创建 Application、desktop lifetime、DI 主窗口和 Presentation bootstrap。 |
 
 ### 5. 生成结果边界
 
@@ -132,7 +132,7 @@ Templates 不负责：
 - `AtomUI.City.*` 只属于框架。
 - 模板生成的代码必须能被 source generator 识别。
 - 模板生成的项目必须引用 `AtomUI.City.Build`。
-- 模板生成的测试项目必须引用 `AtomUI.City.Testing`。
+- 模板生成的测试项目默认只引用被测项目和必要测试包；需要 `AtomUI.City.Testing` 能力时显式引入。
 - 默认不生成业务页面和业务服务。
 
 ### 6. 应用结构
@@ -143,6 +143,12 @@ Templates 不负责：
 src/<AppName>/
   <AppName>.csproj
   Program.cs
+  App.axaml
+  App.axaml.cs
+  DesktopBootstrap.cs
+  MainWindow.axaml
+  MainWindow.axaml.cs
+  Properties/AssemblyInfo.cs
   Modules/
   Routes/
   Resources/
@@ -213,7 +219,7 @@ Templates 必须落实全局测试门禁：
 - 每个功能点必须有单元测试。
 - 集成测试不能替代单元测试。
 - 生成 `FeatureTestMatrix.md`。
-- 默认引用 `AtomUI.City.Testing`。
+- 默认引用被测项目和必要测试包，不强制引入 `AtomUI.City.Testing`。
 - 页面模板默认生成 routing 和 activation 测试入口。
 - 插件模板默认生成 package、lease、cancellation、unload 测试入口。
 
@@ -243,13 +249,13 @@ Templates 必须落实全局测试门禁：
 | 功能点 | 测试类型 | 测试工具 | 必测场景 |
 |---|---|---|---|
 | application template | Smoke/Build | TemplateSmokeTestHost | restore、build、test、Host start/stop、manifest 生成。 |
-| module template（Planned） | Unit/Build | TemplateOutputAssertions | 模块图、服务注册、source generator 输入。 |
-| page template（Planned） | Unit | RoutingTestHost | route match、ViewModel target、activation。 |
+| module template | Unit/Build | GenerationTemplateRendererTests | 模块图、服务注册、source generator 输入。 |
+| page template | Unit/Build | GenerationTemplateRendererTests | route match、ViewModel target、Presentation binding。 |
 | plugin template | Build/Plugin | DotnetNewTemplateIntegrationTests | pack/install/instantiate、plugin.json、单主程序集、package layout、token 隔离。 |
-| test template | Unit | TemplateOutputAssertions | 测试矩阵、TestHost 引用。 |
-| localization template（Planned） | Unit/Build | LocalizationTestKit | culture 目录、resource manifest、fallback。 |
-| configuration template（Planned） | Unit | ConfigurationTestHost | Options binding、validation、PreConfigure。 |
-| Avalonia desktop template（Planned） | Platform | Headless/desktop smoke | Application、desktop lifetime、主窗口、Presentation bootstrap。 |
+| test template | Unit/Build | ApplicationTemplateBuildSmokeTests | 测试矩阵、项目引用边界、基础 smoke test。 |
+| localization template | Unit/Build | GenerationTemplateRendererTests | culture 目录、resource manifest、fallback。 |
+| configuration template | Unit/Build | GenerationTemplateRendererTests | Options binding、validation、reload policy。 |
+| Avalonia desktop template | Headless/Platform | ApplicationTemplateBuildSmokeTests, ApplicationTemplateDesktopProcessTests | Application、desktop lifetime、主窗口、Presentation bootstrap。 |
 
 完整测试规则见：[诊断和测试设计](diagnostics-and-testing.md)。
 

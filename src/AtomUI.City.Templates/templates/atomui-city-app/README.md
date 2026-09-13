@@ -7,3 +7,9 @@ dotnet restore AtomUICityApplication.slnx
 dotnet build AtomUICityApplication.slnx --no-restore
 dotnet test AtomUICityApplication.slnx --no-build
 ```
+
+Run the desktop application with:
+
+```bash
+dotnet run --project src/AtomUICityApplication/AtomUICityApplication.csproj
+```

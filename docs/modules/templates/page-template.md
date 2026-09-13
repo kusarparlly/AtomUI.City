@@ -47,7 +47,7 @@ Feature：`AUC-TEMPLATES-007`。状态：Completed。公开入口为 `Generation
 | AUC-TEMPLATES-007 | Page Template | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-008 | Localization Template | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-009 | Configuration Template | GenerationTemplateRendererTests |
-| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | Pending |
+| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | ApplicationTemplateBuildSmokeTests, DotnetNewTemplateIntegrationTests, ApplicationTemplateDesktopProcessTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 

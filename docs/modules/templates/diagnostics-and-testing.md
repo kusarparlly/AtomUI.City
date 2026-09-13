@@ -45,7 +45,7 @@
 | AUC-TEMPLATES-007 | Page Template | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-008 | Localization Template | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-009 | Configuration Template | GenerationTemplateRendererTests |
-| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | Pending |
+| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | ApplicationTemplateBuildSmokeTests, DotnetNewTemplateIntegrationTests, ApplicationTemplateDesktopProcessTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -82,7 +82,7 @@ Templates 的生成结果必须可构建、可测试、符合 Build 约定，并
 
 ### 3. 错误码登记
 
-下表中 `Current` 由当前源码产生；`Planned` 只为对应未实现 Feature 预留，不属于可依赖的 1.0 诊断合同。
+下表中 `Current` 由当前源码产生；`Planned` 只表示未来可选的诊断细化，不属于可依赖的 1.0 诊断合同，也不影响对应 Feature 的完成状态。
 
 | Code | 含义 | 状态 |
 |---|---|---|
@@ -126,7 +126,7 @@ Templates 的生成结果必须可构建、可测试、符合 Build 约定，并
 - manifest 生成。
 - 插件包 layout validation。
 
-模块、页面、本地化和配置已由 `GenerationTemplateRendererTests` 覆盖同一工作区真实 restore/build/test；Avalonia desktop application smoke 仍等待 `AUC-TEMPLATES-010`。
+模块、页面、本地化和配置由 `GenerationTemplateRendererTests` 覆盖同一工作区真实 restore/build/test；Avalonia desktop application 已由 `AUC-TEMPLATES-010` 覆盖生成结构、Headless XAML/Presentation 和 Windows 原生进程三层 smoke。
 
 ### 6. 禁止事项测试
 

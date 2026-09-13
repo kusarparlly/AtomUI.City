@@ -56,17 +56,32 @@ public sealed class ApplicationTemplateBuildSmokeTests
         var appProjectPath = Path.Combine(workspace.Root, "src", "SalesClient", "SalesClient.csproj");
         var testProjectPath = Path.Combine(workspace.Root, "tests", "SalesClient.Tests", "SalesClient.Tests.csproj");
         var programPath = Path.Combine(workspace.Root, "src", "SalesClient", "Program.cs");
+        var appXamlPath = Path.Combine(workspace.Root, "src", "SalesClient", "App.axaml");
+        var appCodeBehindPath = Path.Combine(workspace.Root, "src", "SalesClient", "App.axaml.cs");
+        var bootstrapPath = Path.Combine(workspace.Root, "src", "SalesClient", "DesktopBootstrap.cs");
+        var mainWindowPath = Path.Combine(workspace.Root, "src", "SalesClient", "MainWindow.axaml");
+        var mainWindowCodeBehindPath = Path.Combine(workspace.Root, "src", "SalesClient", "MainWindow.axaml.cs");
 
         Assert.True(File.Exists(appProjectPath), $"Expected application project at {appProjectPath}.");
         Assert.True(File.Exists(testProjectPath), $"Expected test project at {testProjectPath}.");
+        Assert.True(File.Exists(appXamlPath), $"Expected Avalonia Application at {appXamlPath}.");
+        Assert.True(File.Exists(appCodeBehindPath), $"Expected Avalonia Application code at {appCodeBehindPath}.");
+        Assert.True(File.Exists(bootstrapPath), $"Expected desktop bootstrap at {bootstrapPath}.");
+        Assert.True(File.Exists(mainWindowPath), $"Expected main Window at {mainWindowPath}.");
+        Assert.True(File.Exists(mainWindowCodeBehindPath), $"Expected main Window code at {mainWindowCodeBehindPath}.");
 
         var appProject = File.ReadAllText(appProjectPath);
         Assert.Contains("<ImplicitUsings>enable</ImplicitUsings>", appProject, StringComparison.Ordinal);
         Assert.Contains("<Nullable>enable</Nullable>", appProject, StringComparison.Ordinal);
+        Assert.Contains("<OutputType>WinExe</OutputType>", appProject, StringComparison.Ordinal);
         Assert.Contains("""<PackageReference Include="AtomUI.City.Core" Version="1.0.0" />""", appProject, StringComparison.Ordinal);
         Assert.Contains("""<PackageReference Include="AtomUI.City.Build" Version="1.0.0" PrivateAssets="all" />""", appProject, StringComparison.Ordinal);
+        Assert.Contains("""<PackageReference Include="AtomUI.City.Presentation" Version="1.0.0" />""", appProject, StringComparison.Ordinal);
+        Assert.Contains("""<PackageReference Include="Avalonia.Desktop" Version="12.0.4" />""", appProject, StringComparison.Ordinal);
+        Assert.Contains("""<PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.4" />""", appProject, StringComparison.Ordinal);
 
         var testProject = File.ReadAllText(testProjectPath);
+        Assert.Contains("Avalonia.Headless", testProject, StringComparison.Ordinal);
         Assert.Contains("""<PackageReference Include="Microsoft.NET.Test.Sdk" Version=""", testProject, StringComparison.Ordinal);
         Assert.Contains("""<PackageReference Include="xunit" Version=""", testProject, StringComparison.Ordinal);
         Assert.Contains("""<ProjectReference Include="../../src/SalesClient/SalesClient.csproj" />""", testProject, StringComparison.Ordinal);
@@ -76,7 +91,23 @@ public sealed class ApplicationTemplateBuildSmokeTests
         Assert.Contains("ApplicationHost.CreateBuilder(args)", program, StringComparison.Ordinal);
         Assert.Contains("options.ApplicationId = \"Company.SalesClient\";", program, StringComparison.Ordinal);
         Assert.Contains("options.ApplicationName = \"SalesClient\";", program, StringComparison.Ordinal);
-        Assert.Contains("await using var host = builder.Build();", program, StringComparison.Ordinal);
+        Assert.Contains("[STAThread]", program, StringComparison.Ordinal);
+        Assert.Contains("builder.UseModule<PresentationModule>();", program, StringComparison.Ordinal);
+        Assert.Contains("services.AddSingleton<MainWindow>()", program, StringComparison.Ordinal);
+        Assert.Contains("host.StartAsync().GetAwaiter().GetResult();", program, StringComparison.Ordinal);
+        Assert.Contains("StartWithClassicDesktopLifetime(args, ShutdownMode.OnExplicitShutdown)", program, StringComparison.Ordinal);
+        Assert.Contains("Task.Run(async () => await host.StopAsync().ConfigureAwait(false))", program, StringComparison.Ordinal);
+
+        var appCodeBehind = File.ReadAllText(appCodeBehindPath);
+        Assert.Contains("DesktopBootstrap.Initialize(desktopLifetime);", appCodeBehind, StringComparison.Ordinal);
+        var bootstrap = File.ReadAllText(bootstrapPath);
+        Assert.Contains("runtime.Attach(lifetime, host.HostScope);", bootstrap, StringComparison.Ordinal);
+        Assert.Contains("runtime.RegisterWindow(mainWindow, \"main\");", bootstrap, StringComparison.Ordinal);
+        Assert.Contains("mainWindow.Closed", bootstrap, StringComparison.Ordinal);
+        Assert.Contains("WindowSessionState.Closed", bootstrap, StringComparison.Ordinal);
+        Assert.Contains("lifetime.Shutdown(exitCode)", bootstrap, StringComparison.Ordinal);
+        Assert.Contains("host.Services.GetRequiredService<MainWindow>()", bootstrap, StringComparison.Ordinal);
+        Assert.Contains("presentation:RouteOutletProperties.Name=\"main\"", File.ReadAllText(mainWindowPath), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -118,6 +149,8 @@ public sealed class ApplicationTemplateBuildSmokeTests
         Assert.DoesNotContain("using AtomUI.City.Testing;", smokeTest, StringComparison.Ordinal);
         Assert.DoesNotContain("[TestLayer(", smokeTest, StringComparison.Ordinal);
         Assert.Contains("host.HostScope.State", smokeTest, StringComparison.Ordinal);
+        Assert.Contains("UseHeadless", smokeTest, StringComparison.Ordinal);
+        Assert.Contains("DesktopBootstrap.Initialize(lifetime);", smokeTest, StringComparison.Ordinal);
         Assert.Contains("namespace Company.SalesClient.Tests;", smokeTest, StringComparison.Ordinal);
     }
 
@@ -218,11 +251,23 @@ public sealed class ApplicationTemplateBuildSmokeTests
         Assert.True(Directory.Exists(packageSource), $"Expected local package source at {packageSource}.");
         var corePackagePath = Path.Combine(packageSource, "AtomUI.City.Core.1.0.0.nupkg");
         Assert.True(File.Exists(corePackagePath), $"Expected Core package at {corePackagePath}.");
+        var presentationPackagePath = Path.Combine(packageSource, "AtomUI.City.Presentation.1.0.0.nupkg");
+        Assert.True(
+            File.Exists(presentationPackagePath),
+            $"Expected Presentation package at {presentationPackagePath}.");
         var packageCacheKey = File.GetLastWriteTimeUtc(corePackagePath).Ticks.ToString(CultureInfo.InvariantCulture);
         var nugetPackagesPath = Path.Combine(
             Path.GetTempPath(),
             "AtomUICityTemplateSmokePackages",
             packageCacheKey);
+        var globalPackagesSource = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
+        if (string.IsNullOrWhiteSpace(globalPackagesSource))
+        {
+            globalPackagesSource = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                ".nuget",
+                "packages");
+        }
         var nugetConfigPath = Path.Combine(workspace.Root, "NuGet.Config");
         new XDocument(
             new XElement(
@@ -231,10 +276,32 @@ public sealed class ApplicationTemplateBuildSmokeTests
                     "packageSources",
                     new XElement("clear"),
                     new XElement("add", new XAttribute("key", "AtomUICityLocal"), new XAttribute("value", packageSource)),
-                    new XElement("add", new XAttribute("key", "nuget.org"), new XAttribute("value", "https://api.nuget.org/v3/index.json")))))
+                    new XElement("add", new XAttribute("key", "LocalPackageCache"), new XAttribute("value", globalPackagesSource)),
+                    new XElement("add", new XAttribute("key", "nuget.org"), new XAttribute("value", "https://api.nuget.org/v3/index.json"))),
+                new XElement(
+                    "packageSourceMapping",
+                    new XElement(
+                        "packageSource",
+                        new XAttribute("key", "AtomUICityLocal"),
+                        new XElement("package", new XAttribute("pattern", "AtomUI.City.*"))),
+                    new XElement(
+                        "packageSource",
+                        new XAttribute("key", "LocalPackageCache"),
+                        new XElement("package", new XAttribute("pattern", "*"))),
+                    new XElement(
+                        "packageSource",
+                        new XAttribute("key", "nuget.org"),
+                        new XElement("package", new XAttribute("pattern", "*"))))))
             .Save(nugetConfigPath);
 
-        await RunDotnetAsync(workspace.Root, nugetPackagesPath, "restore", "SalesClient.slnx", "--configfile", nugetConfigPath);
+        await RunDotnetAsync(
+            workspace.Root,
+            nugetPackagesPath,
+            "restore",
+            "SalesClient.slnx",
+            "--configfile",
+            nugetConfigPath,
+            "--ignore-failed-sources");
         await RunDotnetAsync(workspace.Root, nugetPackagesPath, "build", "SalesClient.slnx", "--no-restore");
         await RunDotnetAsync(workspace.Root, nugetPackagesPath, "test", "SalesClient.slnx", "--no-build");
         await RunDotnetAsync(workspace.Root, nugetPackagesPath, "build-server", "shutdown");
@@ -559,9 +626,11 @@ public sealed class ApplicationTemplateBuildSmokeTests
     {
         var environment = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
+            ["AVALONIA_TELEMETRY_OPTOUT"] = "1",
             ["DOTNET_CLI_USE_MSBUILD_SERVER"] = "0",
             ["MSBUILDDISABLENODEREUSE"] = "1",
             ["NUGET_PACKAGES"] = nugetPackagesPath,
+            ["NuGetAudit"] = "false",
             ["UseSharedCompilation"] = "false",
         };
 

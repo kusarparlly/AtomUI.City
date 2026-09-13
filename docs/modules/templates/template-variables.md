@@ -45,7 +45,7 @@
 | AUC-TEMPLATES-007 | Page Template | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-008 | Localization Template | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-009 | Configuration Template | GenerationTemplateRendererTests |
-| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | Pending |
+| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | ApplicationTemplateBuildSmokeTests, DotnetNewTemplateIntegrationTests, ApplicationTemplateDesktopProcessTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -70,7 +70,7 @@
 
 ### 2. 核心变量
 
-当前 public renderer/CLI 已实现 `AppName`、`RootNamespace`、`TargetFramework`、`UseAot`、`UseDynamicPlugins`、`IncludeTests` 和 `IncludeSample`。NuGet application template 暴露 name、`TargetFramework`、`IncludeSample`；NuGet plugin template 暴露 name、`PluginId`、`TargetFramework`。`ModuleName`、`PageName`、`RoutePath` 和独立 `PackageId` 属于 Planned Feature，不能视为现有 API。
+`ApplicationTemplateOptions` 已实现 `AppName`、`RootNamespace`、`TargetFramework`、`UseAot`、`UseDynamicPlugins`、`IncludeTests` 和 `IncludeSample`。`GenerationTemplateOptions` 以 `Kind + Name` 表达模块名、页面名、本地化包名或配置名，并实现 `RoutePath`、`Cultures`、`ModuleDependencies`、`IncludeTests` 和 `ReloadableConfiguration`。NuGet application template 暴露 name、`TargetFramework`、`IncludeSample`；NuGet plugin template 暴露 name、`PluginId`、`TargetFramework`。独立 `PackageId` 不属于当前 public renderer/CLI 参数，包名由模板名称派生。
 
 | 变量 | 说明 |
 |---|---|

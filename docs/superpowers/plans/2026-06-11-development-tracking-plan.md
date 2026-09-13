@@ -4,10 +4,10 @@
 
 ## 当前结论
 
-- 1.0 总包发布状态：暂不可发布，仅 `AUC-TEMPLATES-010` Avalonia Desktop Application Template 尚待实现。
+- 1.0 总包发布状态：已具备发布条件；全部 1.0 Feature 和最终门禁均完成，尚未执行远端 NuGet 发布。
 - 运行时本地候选状态：Build、Core、EventBus、State、MVVM、Routing、Data、Localization、Security、Presentation 共 10 个包已通过隔离本地 NuGet consumer；尚未执行远端 NuGet 发布。
-- 全局进度：143/144。
-- 模块 Feature 合同：133/134。
+- 全局进度：144/144。
+- 模块 Feature 合同：134/134。
 - 最终发布门禁：10/10。
 - 最近校准日期：2026-09-13。
 
@@ -48,7 +48,7 @@
 | Localization | 8 | 0 | 8 | 已完成 |
 | Security | 9 | 0 | 9 | 已完成 |
 | CLI | 7 | 0 | 7 | 已完成 |
-| Templates | 9 | 1 | 10 | 进行中 |
+| Templates | 10 | 0 | 10 | 已完成 |
 | Release Gates | 10 | 0 | 10 | 已完成 |
 
 ## Core
@@ -223,12 +223,12 @@
 - [x] AUC-TEMPLATES-002 Package Layout。验收重点：required files、路径规范化、重复文件、路径逃逸和 package id。
 - [x] AUC-TEMPLATES-003 Template Variables。验收重点：变量默认值、非法值、命名空间生成和错误消息。
 - [x] AUC-TEMPLATES-004 Plugin Template。验收重点：单 assembly、NuGet metadata、manifest、msbuild 属性和测试项目。
-- [x] AUC-TEMPLATES-005 Test Template。验收重点：测试项目 build/test、TestLayer、Testing 引用边界和命名规则。
+- [x] AUC-TEMPLATES-005 Test Template。验收重点：测试项目 build/test、测试矩阵、基础 smoke test、Testing 引用边界和命名规则。
 - [x] AUC-TEMPLATES-006 Module Template。验收重点：模块类型、依赖声明、服务注册、manifest/source generator 输入和 build test。
 - [x] AUC-TEMPLATES-007 Page Template。验收重点：View/ViewModel、route declaration、Presentation 绑定和激活测试。
 - [x] AUC-TEMPLATES-008 Localization Template。验收重点：culture package、fallback、generated manifest 和 Localization 测试。
 - [x] AUC-TEMPLATES-009 Configuration Template。验收重点：Options binding、validation、reload policy 和配置测试。
-- [ ] AUC-TEMPLATES-010 Avalonia Desktop Application Template。验收重点：Avalonia Application、desktop lifetime、主窗口、Presentation bootstrap 和 headless/platform smoke。
+- [x] AUC-TEMPLATES-010 Avalonia Desktop Application Template。验收重点：Avalonia Application、desktop lifetime、DI 主窗口、Presentation bootstrap、Headless smoke 和 Windows 原生进程启动/关闭。
 
 ## Release Gates
 

@@ -25,6 +25,12 @@ public sealed class TemplatePackageLayoutTests
         Assert.Contains(plan.Changes, change => change.Path == "Directory.Packages.props");
         Assert.Contains(plan.Changes, change => change.Path == "docs/SalesClient.md");
         Assert.Contains(plan.Changes, change => change.Path == "src/SalesClient/SalesClient.csproj");
+        Assert.Contains(plan.Changes, change => change.Path == "src/SalesClient/App.axaml");
+        Assert.Contains(plan.Changes, change => change.Path == "src/SalesClient/App.axaml.cs");
+        Assert.Contains(plan.Changes, change => change.Path == "src/SalesClient/DesktopBootstrap.cs");
+        Assert.Contains(plan.Changes, change => change.Path == "src/SalesClient/MainWindow.axaml");
+        Assert.Contains(plan.Changes, change => change.Path == "src/SalesClient/MainWindow.axaml.cs");
+        Assert.Contains(plan.Changes, change => change.Path == "src/SalesClient/Properties/AssemblyInfo.cs");
         Assert.Contains(plan.Changes, change => change.Path == "tests/SalesClient.Tests/SalesClient.Tests.csproj");
         Assert.All(plan.Changes, change =>
         {
@@ -161,6 +167,34 @@ public sealed class TemplatePackageLayoutTests
         Assert.Equal(identity, metadata.RootElement.GetProperty("identity").GetString());
         Assert.Equal(templateName, metadata.RootElement.GetProperty("shortName").GetString());
         Assert.False(string.IsNullOrWhiteSpace(metadata.RootElement.GetProperty("sourceName").GetString()));
+    }
+
+    [Fact]
+    public void ApplicationTemplatePackageContainsDesktopBootstrapAndHeadlessTest()
+    {
+        var root = GetTemplateRoot("atomui-city-app");
+        var appRoot = Path.Combine(root, "src", "AtomUICityApplication");
+        var testRoot = Path.Combine(root, "tests", "AtomUICityApplication.Tests");
+
+        Assert.True(File.Exists(Path.Combine(appRoot, "App.axaml")));
+        Assert.True(File.Exists(Path.Combine(appRoot, "App.axaml.cs")));
+        Assert.True(File.Exists(Path.Combine(appRoot, "DesktopBootstrap.cs")));
+        Assert.True(File.Exists(Path.Combine(appRoot, "MainWindow.axaml")));
+        Assert.True(File.Exists(Path.Combine(appRoot, "MainWindow.axaml.cs")));
+        Assert.True(File.Exists(Path.Combine(appRoot, "Properties", "AssemblyInfo.cs")));
+
+        var project = File.ReadAllText(Path.Combine(appRoot, "AtomUICityApplication.csproj"));
+        Assert.Contains("AtomUI.City.Presentation", project, StringComparison.Ordinal);
+        Assert.Contains("Avalonia.Desktop", project, StringComparison.Ordinal);
+        Assert.Contains("Avalonia.Themes.Fluent", project, StringComparison.Ordinal);
+        Assert.Contains(
+            "Avalonia.Headless",
+            File.ReadAllText(Path.Combine(testRoot, "AtomUICityApplication.Tests.csproj")),
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "DesktopBootstrapAttachesPresentationAndRegistersMainWindow",
+            File.ReadAllText(Path.Combine(testRoot, "ApplicationSmokeTests.cs")),
+            StringComparison.Ordinal);
     }
 
     [Fact]

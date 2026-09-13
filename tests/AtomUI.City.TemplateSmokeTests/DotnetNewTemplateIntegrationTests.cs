@@ -94,7 +94,40 @@ public sealed class DotnetNewTemplateIntegrationTests
             workspace.HiveRoot);
 
         Assert.True(File.Exists(Path.Combine(workspace.ApplicationRoot, "SalesDesk.slnx")));
-        Assert.False(File.Exists(Path.Combine(workspace.ApplicationRoot, "src", "SalesDesk", "App.axaml")));
+        Assert.True(File.Exists(Path.Combine(workspace.ApplicationRoot, "src", "SalesDesk", "App.axaml")));
+        Assert.True(File.Exists(Path.Combine(workspace.ApplicationRoot, "src", "SalesDesk", "App.axaml.cs")));
+        Assert.True(File.Exists(Path.Combine(workspace.ApplicationRoot, "src", "SalesDesk", "DesktopBootstrap.cs")));
+        Assert.True(File.Exists(Path.Combine(workspace.ApplicationRoot, "src", "SalesDesk", "MainWindow.axaml")));
+        Assert.True(File.Exists(Path.Combine(workspace.ApplicationRoot, "src", "SalesDesk", "MainWindow.axaml.cs")));
+        var generatedProgram = File.ReadAllText(Path.Combine(
+            workspace.ApplicationRoot,
+            "src",
+            "SalesDesk",
+            "Program.cs"));
+        var generatedBootstrap = File.ReadAllText(Path.Combine(
+            workspace.ApplicationRoot,
+            "src",
+            "SalesDesk",
+            "DesktopBootstrap.cs"));
+        var generatedApplication = File.ReadAllText(Path.Combine(
+            workspace.ApplicationRoot,
+            "src",
+            "SalesDesk",
+            "App.axaml"));
+        var generatedMainWindow = File.ReadAllText(Path.Combine(
+            workspace.ApplicationRoot,
+            "src",
+            "SalesDesk",
+            "MainWindow.axaml"));
+        Assert.Contains("UseModule<PresentationModule>()", generatedProgram, StringComparison.Ordinal);
+        Assert.Contains("ShutdownMode.OnExplicitShutdown", generatedProgram, StringComparison.Ordinal);
+        Assert.Contains("runtime.Attach(lifetime, host.HostScope)", generatedBootstrap, StringComparison.Ordinal);
+        Assert.Contains("WindowSessionState.Closed", generatedBootstrap, StringComparison.Ordinal);
+        Assert.Contains("x:Class=\"SalesDesk.App\"", generatedApplication, StringComparison.Ordinal);
+        Assert.Contains("x:Class=\"SalesDesk.MainWindow\"", generatedMainWindow, StringComparison.Ordinal);
+        Assert.Contains("Title=\"SalesDesk\"", generatedMainWindow, StringComparison.Ordinal);
+        Assert.DoesNotContain("AtomUICityApplication", generatedProgram, StringComparison.Ordinal);
+        Assert.DoesNotContain("AtomUICityApplication", generatedApplication, StringComparison.Ordinal);
         Assert.True(File.Exists(Path.Combine(
             workspace.ApplicationRoot,
             "src",

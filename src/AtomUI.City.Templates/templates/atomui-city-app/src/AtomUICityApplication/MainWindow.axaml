@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:presentation="clr-namespace:AtomUI.City.Presentation;assembly=AtomUI.City.Presentation"
+        x:Class="AtomUICityApplication.MainWindow"
+        Title="AtomUICityApplication"
+        Width="960"
+        Height="640"
+        MinWidth="640"
+        MinHeight="420">
+  <Grid Margin="24">
+    <ContentControl presentation:RouteOutletProperties.Name="main">
+      <StackPanel HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Spacing="8">
+        <TextBlock Text="AtomUICityApplication"
+                   FontSize="28"
+                   FontWeight="SemiBold"
+                   HorizontalAlignment="Center" />
+        <TextBlock Text="Ready"
+                   Opacity="0.7"
+                   HorizontalAlignment="Center" />
+      </StackPanel>
+    </ContentControl>
+  </Grid>
+</Window>

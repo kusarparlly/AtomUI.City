@@ -1,7 +1,7 @@
 # AtomUI.City.Templates
 
 文档等级：Level 2
-成熟度：Partially Implemented
+成熟度：Verified
 执行边界：Template render and package boundary
 程序集：`AtomUI.City.Templates`
 源码：`src/AtomUI.City.Templates`
@@ -9,7 +9,7 @@
 
 ## 模块定位
 
-项目模板包和确定性模板渲染辅助。当前已交付 Host 应用、插件、测试、模块、页面、本地化和配置骨架；Avalonia desktop bootstrap 仍为规划能力。
+项目模板包和确定性模板渲染辅助。当前已交付 Avalonia desktop 应用、插件、测试、模块、页面、本地化和配置骨架；桌面模板遵循已冻结的 Host/Presentation 启停合同。
 
 ## 产品级硬性约束
 
@@ -66,6 +66,6 @@ Templates 生成 Host 应用骨架，但不参与 Host 运行时。
 
 ## 当前成熟度状态
 
-Partially Implemented
+Verified
 
-当前 10 个已登记 Feature 中 9 个 Completed、1 个 Planned。已完成 Feature 已通过真实生成、事务回滚和 restore/build/test 门禁；`AUC-TEMPLATES-010` 不得由详细设计文档冒充实现。单个功能点状态以 [features.md](features.md) 和 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。
+当前 10 个已登记 Feature 均为 Completed。应用模板已通过真实生成、事务回滚、restore/build/test、Avalonia Headless 和 Windows 原生 desktop process 门禁；单个功能点状态以 [features.md](features.md) 和 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。
