@@ -173,14 +173,15 @@ public sealed class PackagingReleaseGateTests
     }
 
     [Fact]
-    public void ReleaseNotesDescribeStableOneDotZeroPackageLine()
+    public void ReleaseNotesDescribeUnreleasedOneDotZeroCandidate()
     {
         var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
         var releaseNotes = File.ReadAllText(Path.Combine(repositoryRoot, "RELEASE_NOTES.md"));
 
-        Assert.Contains("## 1.0.0", releaseNotes, StringComparison.Ordinal);
+        Assert.Contains("## 1.0.0 (unreleased candidate)", releaseNotes, StringComparison.Ordinal);
         Assert.Contains("Plugin API compatibility", releaseNotes, StringComparison.Ordinal);
-        Assert.Contains("Plugin API compatibility starts at `1.0`", releaseNotes, StringComparison.Ordinal);
+        Assert.Contains("Plugin API compatibility starts only when stable `1.0` is published", releaseNotes, StringComparison.Ordinal);
+        Assert.Contains("full 1.0 package family is not publishable yet", releaseNotes, StringComparison.Ordinal);
         Assert.DoesNotContain("pre-1.0", releaseNotes, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("may change before the first stable release", releaseNotes, StringComparison.OrdinalIgnoreCase);
     }
@@ -194,12 +195,14 @@ public sealed class PackagingReleaseGateTests
         var templateSmokeScriptPath = Path.Combine(repositoryRoot, EngineeringScriptsDirectoryName, "check-template-smoke.sh");
         var releaseNotesScriptPath = Path.Combine(repositoryRoot, EngineeringScriptsDirectoryName, "generate-release-notes.sh");
         var publicApiScriptPath = Path.Combine(repositoryRoot, EngineeringScriptsDirectoryName, "check-public-api.sh");
+        var localPackageConsumerScriptPath = Path.Combine(repositoryRoot, EngineeringScriptsDirectoryName, "check-local-package-consumer.ps1");
 
         Assert.True(File.Exists(packScriptPath), "Expected package generation script at engineering/pack.sh.");
         Assert.True(File.Exists(validatePackagesScriptPath), "Expected package validation script at engineering/validate-packages.sh.");
         Assert.True(File.Exists(templateSmokeScriptPath), "Expected template smoke script at engineering/check-template-smoke.sh.");
         Assert.True(File.Exists(releaseNotesScriptPath), "Expected release notes script at engineering/generate-release-notes.sh.");
         Assert.True(File.Exists(publicApiScriptPath), "Expected public API review script at engineering/check-public-api.sh.");
+        Assert.True(File.Exists(localPackageConsumerScriptPath), "Expected local package consumer gate at engineering/check-local-package-consumer.ps1.");
 
         var packScript = File.ReadAllText(packScriptPath);
         Assert.Contains("dotnet pack", packScript, StringComparison.Ordinal);
@@ -245,6 +248,12 @@ public sealed class PackagingReleaseGateTests
         Assert.Contains("dotnet pack", publicApiScript, StringComparison.Ordinal);
         Assert.Contains("EnablePackageValidation", publicApiScript, StringComparison.Ordinal);
         Assert.Contains("$assembly_name.xml", publicApiScript, StringComparison.Ordinal);
+
+        var localPackageConsumerScript = File.ReadAllText(localPackageConsumerScriptPath);
+        Assert.Contains("-local-gate", localPackageConsumerScript, StringComparison.Ordinal);
+        Assert.Contains("NUGET_PACKAGES", localPackageConsumerScript, StringComparison.Ordinal);
+        Assert.Contains("must not contain ProjectReference", localPackageConsumerScript, StringComparison.Ordinal);
+        Assert.Contains("did not originate from the candidate local feed", localPackageConsumerScript, StringComparison.Ordinal);
     }
 
     [Fact]
