@@ -43,6 +43,8 @@
 | AUC-SECURITY-005 | Route Guard | RouteAuthorizationGuardTests |
 | AUC-SECURITY-006 | Command Authorization | CommandAuthorizationSourceTests |
 | AUC-SECURITY-007 | Access Token Provider | SecurityRegistrationTests; AccessTokenCredentialProviderTests |
+| AUC-SECURITY-008 | Multi-Account File Persistence | AccountPersistenceTests; FileCredentialStoreTests |
+| AUC-SECURITY-009 | Active Account Switching and Restore | AccountSessionManagerTests; AccountSwitchIntegrationTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -126,7 +128,8 @@ Security 不负责：
 | `AuthenticationStateStore` | 保存并有序发布当前认证状态快照；应用认证适配器显式调用其状态变更方法。 |
 | `PermissionRegistry` / in-memory providers | 管理当前 Host 中权限、Policy、Route 和 Command descriptor；通过 contribution id 撤销。 |
 | `SecurityDiagnosticIds` + Core `IHostDiagnostics` | 输出稳定认证和授权诊断；Security 不另造诊断存储。 |
-| `IAccountSessionStore` / `IAccountSessionManager` | 多账号持久化与切换目标合同；属于 Planned 的 `AUC-SECURITY-008/009`，当前源码不存在。 |
+| `IAccountSessionStore` / `ICredentialStore` | 可替换的多账号资料、权限和凭据持久化合同；默认实现为版本化原子文件 Provider。 |
+| `IAccountSessionManager` | 枚举、恢复、切换、显式刷新和删除账号，并发布唯一完整活动 session。 |
 
 命名不加 `City` 前缀。
 
@@ -279,7 +282,7 @@ Security 专属 generator 是未来候选能力，不属于 `AUC-SECURITY-001~00
 |---|---|
 | 未登录访问受保护路由 | 配置登录 route 时 Redirect，否则 Reject/AuthenticationRequired。 |
 | 权限不足 | Reject / Forbidden。 |
-| Token 过期 | 具体应用/provider 决定 refresh；当前 Security 不自动刷新或登出。 |
+| Token 过期 | 具体应用/provider 决定 refresh；当前 Security 不自动刷新或登出。`OfflineRestricted` session 对所有 resource 返回 Expired，不得签发仍有效的次级 token。 |
 | Policy 抛异常 | Failed，进入 diagnostics。 |
 | 跨 provider 的插件权限撤销失败 | 未来 PluginSystem 编排应聚合错误并继续清理；当前 provider 仅返回 bool/count。 |
 | Data 401 | Data/应用认证编排器决定 refresh、challenge 或退出登录。 |
@@ -308,6 +311,6 @@ Security 错误不能静默吞掉，必须进入授权结果或诊断。
 - Data 401 / 403 映射。
 - 当前 contribution 注册、批量撤销和 tombstone；完整插件生命周期由未来 PluginSystem Feature 覆盖。
 - 当前显式注册的重复权限、撤销和诊断。
-- Planned 多账号持久化与切换在实现后增加文件、并发和恢复测试。
+- 多账号持久化与切换覆盖文件、并发、失败、取消和恢复测试。
 
 详细规则见：[diagnostics-and-testing.md](diagnostics-and-testing.md)。

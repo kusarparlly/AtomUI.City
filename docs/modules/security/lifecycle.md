@@ -11,7 +11,7 @@ AtomUI.City.Security 作为 Host 服务或模块贡献接入 Core 生命周期�
 - Authentication 使用 Unknown、Anonymous、Authenticating、Authenticated、Refreshing、Expired、SignedOut、Failed 状态词汇；箭头流程由应用认证编排器决定，Store 只校验单个 snapshot 内容，不强制转换图。
 - Authorization 是无状态评估，结果为 Allowed / Denied / Forbidden / Challenge / Failed / Cancelled；源码没有 Created/Evaluating 生命周期对象。
 - CommandAuthorizationSource: Constructing -> Subscribed -> Disposed；构造期任一订阅失败时先隔离 source，再逆序回滚所有已尝试订阅并聚合/诊断回滚失败；Dispose 幂等，尝试释放全部 Authentication/Permission/Descriptor 订阅、完成通知队列，并聚合退订失败。
-- Account session 的 Restoring/Switching/Active 状态属于 Planned `AUC-SECURITY-009`，当前源码不产生。
+- Account session 公开稳定状态为 Anonymous、Online、OfflineRestricted；Restoring/Switching 是 manager 内部异步事务，不发布半完成 snapshot，失败保持原 session。
 
 ## 生命周期流程
 
@@ -21,13 +21,14 @@ AtomUI.City.Security 作为 Host 服务或模块贡献接入 Core 生命周期�
 - RouteGuard 映射 result。
 - CommandAuthorizationSource 订阅上游 revision；Dispose 后停止发布。
 - Security diagnostics 写入 Core `IHostDiagnostics`，但不拥有或 Complete 它。
+- AccountSessionManager 可在 Host 启动编排中调用 `RestoreAsync`，运行期调用 `SwitchAccountAsync`；远端认证/权限刷新落盘后调用 `RefreshAccountAsync`，删除活动账号后发布 Anonymous/SignedOut。
 
 ## Host Shutdown / 执行结束行为
 
 - DI 容器释放 `CommandAuthorizationSource`，它先标记 Disposed，再尝试解除全部上游订阅并完成自己的通知队列；退订失败在清理完成后以 `AggregateException` 报告并写诊断。
 - AuthenticationStateStore、PermissionRegistry 和内存 provider 不拥有后台任务或外部资源，由 Host singleton 生命周期回收。
 - 具体认证/token provider 如创建后台 refresh，必须由其 owner 取消；当前默认 provider 不创建后台任务。
-- Planned 文件 store/session manager 必须在 Host 停止时取消 IO 和切换事务。
+- 文件 store/session manager 不创建后台任务；调用方通过每次操作的 `CancellationToken` 取消尚未到达原子提交点的 IO 或切换事务。
 
 ## 插件动态变更行为
 

@@ -26,13 +26,20 @@
 | `AUCSEC403` | Info/Warning/Error | Command 授权评估完成。 | `commandId`, `policyName`, `resultStatus`, `failureKind`, `contributionId` |
 | `AUCSEC500` | Info/Error | Access token 请求完成；delegate 返回 Failed 时为 Error。 | `resourceName`, `scheme`, `operationName`, `status`, `expiresAt` |
 | `AUCSEC501` | Error | Access token provider 抛出未声明异常或返回非法结果。 | `resourceName`, `scheme`, `operationName`, `status`, `exceptionType` |
+| `AUCSEC600` | Info | 账号资料、权限或活动指针文件操作成功。 | `operation`, `storeKind`, `accountIdHash`, `schemaVersion`, `resultStatus` |
+| `AUCSEC601` | Error | 账号资料、权限或活动指针文件损坏、schema 不兼容或 IO 失败。 | `operation`, `storeKind`, `accountIdHash`, `schemaVersion`, `resultStatus`, `exceptionType` |
+| `AUCSEC610` | Info | 凭据文件操作成功。 | `operation`, `storeKind`, `accountIdHash`, `schemaVersion`, `resultStatus` |
+| `AUCSEC611` | Error | 凭据文件损坏、schema 不兼容或 IO 失败。 | `operation`, `storeKind`, `accountIdHash`, `schemaVersion`, `resultStatus`, `exceptionType` |
+| `AUCSEC700` | Info | 账号恢复、切换或删除成功完成。 | `operation`, `operationId`, `previousAccountIdHash`, `targetAccountIdHash`, `mode`, `resultStatus` |
+| `AUCSEC701` | Error | 账号恢复、切换或删除失败。 | `operation`, `operationId`, `previousAccountIdHash`, `targetAccountIdHash`, `mode`, `resultStatus`, `failureStage`, `exceptionType` |
+| `AUCSEC702` | Error | 账号 session 观察者抛出异常。 | `eventType`, `observerType`, `exceptionType` |
 
 这些 code 由 `SecurityDiagnosticIds` 公开并写入 Core 的 `IHostDiagnostics`。诊断写入失败不能改变认证状态、授权结果、Route/Command 结果或 token 结果。
 
 ## 产品级必须诊断的失败
 
-- 多账号文件损坏、schema 过高和原子提交失败：随 `AUC-SECURITY-008` 实现时分配新 code。
-- 账号切换失败阶段和回滚结果：随 `AUC-SECURITY-009` 实现时分配新 code。
+- 多账号文件损坏、schema 过高和原子提交失败使用 `AUCSEC601/AUCSEC611`。
+- 账号切换失败阶段和原 session 保留结果使用 `AUCSEC701`。
 
 ## 上下文字段
 

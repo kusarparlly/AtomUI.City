@@ -29,17 +29,20 @@
 - `SecurityDiagnosticIds` 中由 [diagnostics.md](diagnostics.md) 逐项登记的 code 与语义属于兼容面；编号区间中的空号不构成已发布诊断。诊断不得包含 token、refresh token、密码、完整 principal 或用户 claims。
 - 当前内存 Policy、Command descriptor 和 Route policy provider 按 contribution 撤销后，拒绝同一 contribution 在该实例中重新注册。
 
-## Planned Multi-Account Compatibility
+## Multi-Account Compatibility
 
-以下规则随 `AUC-SECURITY-008/009` 实现后进入兼容性承诺；在 Feature 完成前不表示对应 API 已发布。
+以下规则已随 `AUC-SECURITY-008/009` 进入兼容性承诺。
 
-- `SecurityAccountKey` 的 scheme、authority、tenant id、subject id 组成和规范化规则属于持久化 identity，发布后不得无迁移地改变。
+- `SecurityAccountKey` 的 scheme、authority、tenant id、subject id 组成和规范化规则属于持久化 identity：scheme 与绝对 URI 的 scheme/host 规范化为小写，非 URI authority、tenant 和 subject 保持大小写；发布后不得无迁移地改变。
 - 账号资料与权限快照必须携带 schema version；reader 必须拒绝无法理解的高版本，升级必须提供原子迁移或保留旧数据。
 - Token 和 refresh token 只允许进入声明的账号凭据文件，不得复制到普通配置、State、日志或诊断；凭据文件路径、schema version 和原子替换语义属于稳定合同。
-- `IAccountSessionManager` 采用一个 Host 一个全局活动账号；切换失败或取消保留原 session，成功只发布一次完整 revision，不得改变为部分提交。
+- `IAccountSessionManager` 采用一个 Host 一个全局活动账号；切换或刷新失败/取消保留原 session，成功只发布一次完整 revision，不得改变为部分提交。普通同账号切换保持幂等；`RefreshAccountAsync` 是远端认证/权限缓存更新后强制重载当前账号的唯一显式入口，并以传入 account key 防止账号切换竞态。
 - 离线权限快照只用于 UI 和客户端预检查；其过期语义、受限模式和重新联网后由服务器结果覆盖的行为属于兼容性合同。
 - 删除当前账号进入 Anonymous/SignedOut 且不自动选择其他账号；删除非当前账号不得改变 active session。
 - 诊断、迁移和备份输出必须使用脱敏账号 identity，任何凭据字段进入可观察文本都属于安全缺陷而非兼容行为。
+- `AddSecurity()` 默认注册文件 store、`IAccountSessionManager`，并把该 manager 作为默认 `IAccessTokenProvider`；应用可在 DI 中替换 store 或 token provider。
+- 默认 `AccountSessionManager` 只允许 Online session 签发 token；`OfflineRestricted` session 对所有 resource 稳定返回 Expired，不能因某个次级 resource 的本地凭据尚未到期而绕过离线限制。
+- 当前文件 schema version 为 `1`；账号目录和资源文件名由稳定 SHA-256 编码产生，改变 identity 规范化或编码必须提供迁移。
 
 当前版本的默认文件 Provider 不承诺抵御同一操作系统用户权限下的本地读取。系统安全保险库属于后续版本增强项；未来 Provider 必须继续实现 `ICredentialStore`，并在成功迁移后删除旧凭据文件，不能让同一凭据长期保留两份持久化副本。
 

@@ -43,8 +43,8 @@
 | AUC-SECURITY-005 | Route Guard | RouteAuthorizationGuardTests |
 | AUC-SECURITY-006 | Command Authorization | CommandAuthorizationSourceTests |
 | AUC-SECURITY-007 | Access Token Provider | SecurityRegistrationTests; AccessTokenCredentialProviderTests |
-| AUC-SECURITY-008 | Multi-Account File Persistence (Planned) | AccountPersistenceTests; FileCredentialStoreTests |
-| AUC-SECURITY-009 | Active Account Switching and Restore (Planned) | AccountSessionManagerTests; AccountSwitchIntegrationTests |
+| AUC-SECURITY-008 | Multi-Account File Persistence | AccountPersistenceTests; FileCredentialStoreTests |
+| AUC-SECURITY-009 | Active Account Switching and Restore | AccountSessionManagerTests; AccountSwitchIntegrationTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -147,16 +147,17 @@ Data 管线通过 `IAccessTokenProvider` 获取认证信息。
 - Token 不能作为普通全局状态随意暴露。
 - Token 获取必须支持取消。
 - 具体应用 token provider 可以在 token 快过期时触发 refresh；当前默认 provider 不实现 refresh。
+- 默认 `AccountSessionManager` 在当前会话为 `OfflineRestricted` 时不签发任何 resource 的 token，即使凭据文件中某个次级 resource 尚未到期；需要服务器确认的操作必须等应用完成联网刷新并提交新的 Online session。
 - 具体 provider 如实现 refresh，必须明确并发请求合并或拒绝策略。
 - 具体认证编排器负责在 refresh 失败后发布 Expired、SignedOut 或 Failed。
 - Provider 失败进入 Failed 时必须清理 principal、scheme 和 expiry，不能保留半认证状态。
-- `AUC-SECURITY-008/009` 目标定义凭据存储抽象、账号隔离规则和会话编排；实现后提供应用本地数据目录中的默认文件 Provider，应用可以替换 Provider。
-- 目标文件 Provider 允许 access token 和 refresh token 进入声明的账号凭据文件，以支持跨进程恢复；凭据不得复制到普通配置、State、日志或诊断。
+- `AUC-SECURITY-008/009` 定义凭据存储抽象、账号隔离规则和会话编排；默认提供应用本地数据目录中的文件 Provider，应用可以在 DI 中替换 Provider。
+- 默认文件 Provider 允许 access token 和 refresh token 进入声明的账号凭据文件，以支持跨进程恢复；凭据不得复制到普通配置、State、日志或诊断。
 - Security 不保存用户密码。当前文件 Provider 不承诺抵御同一操作系统用户权限下的恶意进程或本地文件读取，该限制必须在安全模型中明确声明。
 
 ### 6. 多账号持久化与切换
 
-本节是 `AUC-SECURITY-008/009` 的 Planned 合同，当前源码尚未实现。完成后，Security 必须支持在磁盘上持久化多个账号，但一个 City Host 进程同一时刻只能发布一个全局活动账号，所有窗口共享该活动主体。
+本节是已实现的 `AUC-SECURITY-008/009` 合同。Security 支持在磁盘上持久化多个账号，但一个 City Host 进程同一时刻只发布一个全局活动账号，所有窗口共享该活动主体。
 
 稳定账号身份由以下字段组成：
 
@@ -177,17 +178,16 @@ AuthenticationScheme + Authority + TenantId + SubjectId
 
 ```text
 Switch requested
--> load account profile
+-> atomically load account profile and permission snapshot
 -> load credential file
--> load and validate permission snapshot
--> cancel or invalidate old account work
+-> drain manager-owned old credential resolution before switch commit
 -> atomically publish active session and authentication snapshot
 -> notify Route / Command / Data / State / Presentation
 ```
 
-加载、验证、取消或凭据文件读写任一步失败时，原活动账号保持不变。成功切换只能发布一次 session/authentication revision，不允许观察到新 principal 配旧 token 或旧权限的中间状态。删除当前活动账号后进入 Anonymous/SignedOut，不自动选择其他账号。
+加载、验证、取消或凭据文件读写任一步失败时，原活动账号保持不变。成功切换或刷新只能发布一次 session/authentication revision，不允许观察到新 principal 配旧 token 或旧权限的通知中间状态。manager 自己的 token 读取与恢复/切换/刷新/删除使用同一事务 gate：已经开始的读取先完成，事务提交后新读取只能看到新账号 revision；读取返回前仍复核 session revision。应用自行创建的账号绑定业务任务必须捕获 revision 或使用自己的 cancellation owner，在 revision 改变后拒绝提交。删除当前活动账号后进入 Anonymous/SignedOut，不自动选择其他账号。
 
-离线时允许切换到已缓存账号，但会话必须标记为受限模式。受限模式可以驱动本地 UI、菜单和命令预检查；过期 token、未缓存授权以及需要服务器确认的业务操作必须拒绝。重新联网后必须刷新认证和权限，并以服务器结果替换缓存。
+离线时允许切换到已缓存账号，但会话必须标记为受限模式。受限模式可以驱动本地 UI、菜单和命令预检查；缺失或过期凭据把 authentication 标记为 Expired；过期权限快照保留在 session 供展示和故障说明，但不得复制为当前 principal 的有效 permission claims。过期 token、过期/未缓存授权以及需要服务器确认的业务操作必须拒绝。重新联网后必须刷新认证和权限，并以服务器结果替换缓存。应用/provider 原子保存服务器返回的账号与权限快照后，必须调用 `IAccountSessionManager.RefreshAccountAsync` 强制重载当前账号；普通同账号 `SwitchAccountAsync` 保持幂等，不承担刷新职责。
 
 操作系统安全保险库不属于当前版本目标。后续版本可以为同一 `ICredentialStore` 合同增加 Windows Credential Manager 或数据保护、macOS Keychain、Linux Secret Service Provider，并提供从文件 Provider 原子迁移后删除旧凭据文件的流程。
 
@@ -246,7 +246,7 @@ Security 不决定这些策略的具体 UI，只提供状态、错误和扩展�
 - 并发状态变更按 revision 通知，观察者异常不破坏提交。
 - 状态变化触发 Command 刷新；Route/Data 在下一次操作中读取最新状态。
 - 具体认证 Provider 在提供 refresh 时必须自行覆盖并发合并和失败状态变化；这不是当前默认 Provider 的既有能力。
-- `AUC-SECURITY-008/009` 实现后覆盖多账号持久化、删除、重启恢复和跨账号隔离。
+- 覆盖多账号持久化、删除、重启恢复和跨账号隔离。
 - token、refresh token 只出现在声明的凭据文件中，不得进入普通配置、State、日志或诊断。
 - 账号切换成功、失败回滚、取消、并发和单次 revision 发布。
 - 离线受限切换、过期权限快照和重新联网刷新。

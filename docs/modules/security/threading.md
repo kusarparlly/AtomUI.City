@@ -16,7 +16,7 @@
 - 观察者异常被逐个隔离并记录诊断，不能阻断后续观察者或回滚 mutation。
 - CommandAuthorizationSource 的 authentication、permission 和 descriptor 并发变化由同一 revision 序列归并；Dispose 后拒绝新通知入队。
 - 当前事件 publisher 是逐条 FIFO 单消费者队列，不合批且不设容量上限。观察者必须短时、非阻塞；持续并发 mutation 遇到阻塞观察者会让队列增长，调用方需要把慢 IO/长任务转交到自己的受控执行器。
-- Planned account file mutation 与账号切换分别按账号和 Host 串行化；在 `AUC-SECURITY-008/009` 实现前不宣称已具备。
+- 默认文件 store singleton 串行化账号/凭据 IO；`AccountSessionManager` 通过独立 gate 按 Host 串行化 token 读取、恢复、切换、刷新和删除，避免读取账号凭据时与删除/切换形成半状态。所有文件 await、认证/会话观察者均在内部锁外执行。
 
 ## UI 线程规则
 

@@ -116,7 +116,7 @@ Data 管线根据结果决定继续请求、challenge、失败或取消。
 | 401 | 认证无效、过期或需要登录。 | Data/应用认证编排器决定 refresh 或 challenge；Security 不自动刷新。 |
 | 403 | 认证有效但权限不足。 | 返回 authorization failure，不自动重试。 |
 
-具体 token provider 如支持 401 refresh，应声明并发合并策略；Security 当前默认 `UnavailableAccessTokenProvider` 不实现 refresh。
+具体 token provider 如支持 401 refresh，应声明并发合并策略；Security 默认 `AccountSessionManager` 从当前 Online 活动账号的 credential store 读取 token，但不实现 refresh；无活动账号时返回 Unavailable，`OfflineRestricted` 时对所有 resource 返回 Expired 且不得返回仍在有效期内的次级凭据。
 
 403 不应自动 refresh，除非 Host 显式配置。
 

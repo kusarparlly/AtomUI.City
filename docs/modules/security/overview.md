@@ -1,7 +1,7 @@
 # AtomUI.City.Security
 
 文档等级：Level 2
-成熟度：Partially Implemented
+成熟度：Implemented
 执行边界：Host runtime security service
 程序集：`AtomUI.City.Security`
 源码：`src/AtomUI.City.Security`
@@ -27,7 +27,7 @@
 - 集中表达当前用户和认证状态。
 - 统一权限、策略、路由和命令授权。
 - 通过 Core `IHostDiagnostics` 提供稳定诊断码，并隔离事件观察者失败。
-- 规划多账号文件持久化与全局活动账号切换（`AUC-SECURITY-008/009`）。
+- 提供多账号文件持久化与全局活动账号切换（`AUC-SECURITY-008/009`）。
 
 ## 明确非目标
 
@@ -70,6 +70,6 @@ AtomUI.City.Security 作为 Host 服务或模块贡献接入 Core 生命周期�
 
 ## 当前成熟度状态
 
-Partially Implemented
+Implemented
 
-`AUC-SECURITY-001~007` 已有实现与合同测试；`AUC-SECURITY-008/009` 仅完成设计登记，文件 Provider、账号 session manager 和对应测试尚不存在。Security generator、Plugin capability/ContributionLease 和 Testing helper 也不是当前已实现能力。单个功能点状态以 [features.md](features.md) 和 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。
+`AUC-SECURITY-001~009` 已有实现与合同测试。多账号能力提供默认跨平台文件 Provider、活动账号恢复/切换、离线受限模式和稳定诊断；默认凭据文件不承诺抵御同一操作系统用户权限下的本地读取。Security generator、Plugin capability/ContributionLease、系统安全保险库 Provider 和 Testing helper 不是当前已实现能力。单个功能点状态以 [features.md](features.md) 和 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。

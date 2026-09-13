@@ -30,8 +30,8 @@
 | AUC-SECURITY-005 | Contract | RouteAuthorizationGuardTests | 断言 allow、deny、redirect login、取消、contribution 撤销、诊断和 Routing 无 Security 反向依赖。 | 无权限、需要登录、provider 异常、非调用方取消异常。 | Completed |
 | AUC-SECURITY-006 | Contract; Concurrency | CommandAuthorizationSourceTests | 断言状态变化、禁用/隐藏、失败构造隔离与订阅回滚、Dispose 全量退订与失败聚合、descriptor/policy contribution 继承与冲突拒绝、contribution 撤销、观察者隔离和诊断。 | descriptor 缺失、contribution 冲突、订阅/回滚/退订失败、权限撤销、provider 异常、非调用方取消异常、重复 Dispose。 | Completed |
 | AUC-SECURITY-007 | Contract; Integration | SecurityRegistrationTests; AccessTokenCredentialProviderTests | 断言成功、null result、异常、不可用、调用前后取消、诊断脱敏、DI 默认 provider 和 Data 前置条件。 | token 缺失、provider 不可用、非调用方取消异常、token 泄漏。 | Completed |
-| AUC-SECURITY-008 | Contract; RuntimeLifecycle | AccountPersistenceTests; FileCredentialStoreTests | 断言多账号 round-trip、进程重启恢复、账号隔离、路径约束、原子写入、删除无残留，以及凭据不进入普通配置、State、日志或诊断。 | 文件损坏、高版本 schema、非法路径、IO 失败、凭据缺失、写入取消和部分删除。 | Planned |
-| AUC-SECURITY-009 | Contract; Integration | AccountSessionManagerTests; AccountSwitchIntegrationTests | 断言恢复、成功/重复/并发切换、失败/取消回滚、单次 revision/通知、离线受限模式和账号删除。 | 账号不存在、凭据/权限加载失败、过期权限、旧账号在途 refresh 和删除活动账号。 | Planned |
+| AUC-SECURITY-008 | Contract; RuntimeLifecycle | AccountPersistenceTests; FileCredentialStoreTests | 断言多账号 round-trip、进程重启恢复、账号隔离、路径约束、原子写入、删除无残留，以及凭据不进入普通配置、State、日志或诊断。 | 文件损坏、高版本 schema、非法路径、IO 失败、凭据缺失、写入取消和部分删除。 | Completed |
+| AUC-SECURITY-009 | Contract; Integration | AccountSessionManagerTests; AccountSwitchIntegrationTests | 断言恢复、成功/重复/并发切换、显式刷新、失败/取消回滚、单次 revision/通知、离线受限模式和账号删除。 | 账号不存在、凭据/权限加载失败、过期权限、刷新非当前账号、刷新预取消、离线 session 的有效次级 resource token、旧账号在途 token 读取失效和删除活动账号。 | Completed |
 
 ## 缺口处理
 

@@ -29,4 +29,18 @@ public static class SecurityDiagnosticIds
     public const string AccessTokenResolved = "AUCSEC500";
 
     public const string AccessTokenProviderFailed = "AUCSEC501";
+
+    public const string AccountPersistenceCompleted = "AUCSEC600";
+
+    public const string AccountPersistenceFailed = "AUCSEC601";
+
+    public const string CredentialPersistenceCompleted = "AUCSEC610";
+
+    public const string CredentialPersistenceFailed = "AUCSEC611";
+
+    public const string AccountSessionChanged = "AUCSEC700";
+
+    public const string AccountSessionOperationFailed = "AUCSEC701";
+
+    public const string AccountSessionObserverFailed = "AUCSEC702";
 }

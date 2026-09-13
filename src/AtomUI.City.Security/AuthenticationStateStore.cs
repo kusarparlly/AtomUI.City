@@ -90,6 +90,43 @@ public sealed class AuthenticationStateStore :
             preserveCurrentTokenHints: true);
     }
 
+    internal AuthenticationStateTransition SetAuthenticatedForAccountDeferred(
+        ClaimsPrincipal principal,
+        string? scheme,
+        DateTimeOffset? expiresAt)
+    {
+        ArgumentNullException.ThrowIfNull(principal);
+        ThrowIfNotAuthenticated(principal);
+
+        return SetCoreDeferred(AuthenticationState.Authenticated, principal, scheme, expiresAt);
+    }
+
+    internal AuthenticationStateTransition SetExpiredForAccountDeferred(
+        ClaimsPrincipal principal,
+        string? scheme,
+        DateTimeOffset? expiresAt)
+    {
+        ArgumentNullException.ThrowIfNull(principal);
+        ThrowIfNotAuthenticated(principal);
+
+        return SetCoreDeferred(AuthenticationState.Expired, principal, scheme, expiresAt);
+    }
+
+    internal AuthenticationStateTransition SetAnonymousForAccountDeferred(bool signedOut)
+    {
+        return SetCoreDeferred(
+            signedOut ? AuthenticationState.SignedOut : AuthenticationState.Anonymous,
+            SecurityPrincipals.Anonymous);
+    }
+
+    internal void DrainDeferredNotifications(AuthenticationStateTransition transition)
+    {
+        if (transition.ShouldDrain)
+        {
+            _eventPublisher.Drain(this);
+        }
+    }
+
     public AuthenticationStateSnapshot SetSignedOut()
     {
         return SetCore(AuthenticationState.SignedOut, SecurityPrincipals.Anonymous);
@@ -115,6 +152,25 @@ public sealed class AuthenticationStateStore :
         string? failureMessage = null,
         bool preserveCurrentTokenHints = false)
     {
+        var transition = SetCoreDeferred(
+            state,
+            principal,
+            scheme,
+            expiresAt,
+            failureMessage,
+            preserveCurrentTokenHints);
+        DrainDeferredNotifications(transition);
+        return transition.Snapshot;
+    }
+
+    private AuthenticationStateTransition SetCoreDeferred(
+        AuthenticationState state,
+        ClaimsPrincipal principal,
+        string? scheme = null,
+        DateTimeOffset? expiresAt = null,
+        string? failureMessage = null,
+        bool preserveCurrentTokenHints = false)
+    {
         var principalSnapshot = SecurityPrincipalSnapshot.Clone(principal);
         AuthenticationStateSnapshot previous;
         AuthenticationStateSnapshot current;
@@ -132,7 +188,7 @@ public sealed class AuthenticationStateStore :
 
             if (Matches(previous, state, principalSnapshot, scheme, expiresAt, failureMessage))
             {
-                return previous;
+                return new AuthenticationStateTransition(previous, ShouldDrain: false);
             }
 
             current = new AuthenticationStateSnapshot(
@@ -164,12 +220,7 @@ public sealed class AuthenticationStateStore :
                     : "Anonymous",
             });
 
-        if (shouldDrain)
-        {
-            _eventPublisher.Drain(this);
-        }
-
-        return current;
+        return new AuthenticationStateTransition(current, shouldDrain);
     }
 
     private static bool Matches(
@@ -292,4 +343,8 @@ public sealed class AuthenticationStateStore :
                 nameof(principal));
         }
     }
+
+    internal readonly record struct AuthenticationStateTransition(
+        AuthenticationStateSnapshot Snapshot,
+        bool ShouldDrain);
 }

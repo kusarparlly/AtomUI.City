@@ -25,13 +25,14 @@ AtomUI.City.Security 的架构目标是把模块职责变成可实现、可测�
 | AuthorizationEvaluator | 策略评估。 | DI | 无状态。 |
 | CommandAuthorizationSource | 把认证、权限和 descriptor revision 汇总为命令授权状态。 | DI singleton | Dispose 释放上游订阅并停止新通知。 |
 | IHostDiagnostics | 承接 Security 稳定诊断码。 | Core Host | Security 不拥有或完成该实例。 |
-| Account persistence/session contracts | 多账号文件和全局活动账号。 | 规划中的 DI singleton | `AUC-SECURITY-008/009` 实现前不存在运行时对象。 |
+| FileAccountSessionStore / FileCredentialStore | 多账号资料、权限、凭据和活动指针的版本化原子文件存储。 | DI singleton | Host 生命周期；文件在显式删除前跨进程保留。 |
+| AccountSessionManager | 枚举、恢复、切换、刷新和删除账号，发布唯一活动会话。 | DI singleton | Host 生命周期；账号事务按 Host 串行化。 |
 
 ## 产品级状态机
 
 - Authentication 使用 Unknown、Anonymous、Authenticating、Authenticated、Refreshing、Expired、SignedOut、Failed 状态词汇；当前 Store 校验每个 snapshot 的内容一致性，但不强制业务流程的转换图，认证编排器负责选择下一状态。
 - Authorization result: Allowed / Denied / Forbidden / Challenge / Failed / Cancelled
-- Planned account session: Empty -> Restoring / Switching -> Active 或保持原 session；删除活动账号后进入 SignedOut
+- Account session: Anonymous -> Restoring / Switching -> Online 或 OfflineRestricted；失败保持原 session；删除活动账号后进入 Anonymous/SignedOut。
 
 ## 关键运行流程
 
@@ -41,6 +42,7 @@ AtomUI.City.Security 的架构目标是把模块职责变成可实现、可测�
 - RouteGuard 映射 result。
 - CommandAuthorizationSource 汇总 revision 并发布有序通知。
 - IAccessTokenProvider 返回稳定 result，诊断中不包含凭据。
+- IAccountSessionManager 先加载同一账号的资料、权限和凭据，验证完成后才发布完整活动会话。
 
 ## 失败矩阵
 
@@ -56,7 +58,7 @@ AtomUI.City.Security 的架构目标是把模块职责变成可实现、可测�
 - AuthorizationEvaluator 不做网络 IO。
 - 认证、权限和命令通知使用有序单消费者 drain；用户观察者在内部锁外执行。
 - CLR 事件观察者必须保持短小且不得阻塞；持续并发写入遇到阻塞观察者时，待发布通知会在内存中排队。
-- 多账号文件 IO、原子替换和切换串行化属于 `AUC-SECURITY-008/009`，当前尚未实现。
+- 多账号文件 IO 由 store singleton 串行化；写入通过同目录临时文件原子替换；账号恢复、切换、刷新和删除由 manager 按 Host 串行化。
 
 ## 运行时对象模型
 
@@ -78,5 +80,6 @@ flowchart LR
 ## AOT 和 Trimming 约束
 
 - 当前 Security runtime 不执行程序集反射扫描；权限、policy、route 和 command descriptor 通过显式 API/DI provider 注册。
+- 多账号文件 Provider 使用 `System.Text.Json` source-generated metadata 序列化固定 schema DTO，不依赖运行时反射发现持久化类型。
 - Security 专属 source generator/manifest 尚未分配 Feature ID，也没有源码实现，不属于当前完成能力。
 - 后续如引入 generated manifest，必须先登记 Feature ID，并定义稳定排序、诊断、AOT 和增量构建测试。

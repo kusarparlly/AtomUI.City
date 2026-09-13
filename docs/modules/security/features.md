@@ -13,8 +13,8 @@
 | AUC-SECURITY-005 | Route Authorization Guard | Completed | SecurityRouteGuard, IRouteAuthorizationPolicyProvider | RouteAuthorizationGuardTests |
 | AUC-SECURITY-006 | Command Authorization | Completed | CommandAuthorizationSource, CommandAuthorizationDescriptor | CommandAuthorizationSourceTests |
 | AUC-SECURITY-007 | Access Token Provider | Completed | IAccessTokenProvider, AccessTokenResult | SecurityRegistrationTests; AccessTokenCredentialProviderTests |
-| AUC-SECURITY-008 | Multi-Account File Persistence | Planned | SecurityAccountKey, IAccountSessionStore, ICredentialStore | AccountPersistenceTests; FileCredentialStoreTests |
-| AUC-SECURITY-009 | Active Account Switching and Restore | Planned | IAccountSessionManager, AccountSessionSnapshot, AccountSwitchResult | AccountSessionManagerTests; AccountSwitchIntegrationTests |
+| AUC-SECURITY-008 | Multi-Account File Persistence | Completed | SecurityAccountKey, IAccountSessionStore, ICredentialStore | AccountPersistenceTests; FileCredentialStoreTests |
+| AUC-SECURITY-009 | Active Account Switching and Restore | Completed | IAccountSessionManager, AccountSessionSnapshot, AccountSwitchResult | AccountSessionManagerTests; AccountSwitchIntegrationTests |
 
 ## Feature 硬门禁
 
@@ -24,8 +24,8 @@
 | 认证状态以 immutable snapshot 发布，跨线程读取必须一致。 | 必须有实现、测试或工程门禁证据。 |
 | 授权评估不操作 UI、不执行导航、不访问 VisualTree。 | 必须有实现、测试或工程门禁证据。 |
 | Route、Command、Data 只通过 Security public contract 集成。 | 必须有实现、测试或工程门禁证据。 |
-| `AUC-SECURITY-008` 实现后，Token 和 refresh token 只能写入声明的账号凭据文件，不得进入普通配置、State、日志或诊断。 | 当前诊断先保证不泄漏 token；文件能力完成时必须增加路径隔离、原子写入和可观察输出泄漏检查。 |
-| `AUC-SECURITY-009` 实现后，一个 City Host 同一时刻只允许发布一个全局活动账号。 | 切换能力完成时必须原子提交，失败或取消不得暴露半切换状态。 |
+| Token 和 refresh token 只能写入声明的账号凭据文件，不得进入普通配置、State、日志或诊断。 | 必须由路径隔离、原子写入和可观察输出泄漏测试持续证明。 |
+| 一个 City Host 同一时刻只允许发布一个全局活动账号。 | 切换必须原子提交，失败或取消不得暴露半切换状态。 |
 
 ## Feature 实现合同
 
@@ -136,10 +136,10 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 ## AUC-SECURITY-008 Multi-Account File Persistence
 
 Feature ID: `AUC-SECURITY-008`
-Status: Planned
+Status: Completed
 Goal: 按稳定账号身份把多个账号的资料、认证凭据和权限快照持久化到应用本地数据目录，并保证账号间数据隔离。
 Public Contract: SecurityAccountKey, AccountProfileSnapshot, PersistedPermissionSnapshot, IAccountSessionStore, ICredentialStore
-Runtime / Build Behavior: 账号 identity 由 scheme、authority、tenant id 和 subject id 组成；账号资料、token、refresh token 和权限快照使用相互隔离、带 schema version 的原子替换文件；权限快照携带 revision、签发时间和过期时间。
+Runtime / Build Behavior: 账号 identity 由 scheme、authority、tenant id 和 subject id 组成；默认 `FileAccountSessionStore` 把资料和权限写入 `accounts/<account-hash>/account.json`，默认 `FileCredentialStore` 把每个资源的 token/refresh token 写入 `credentials/<account-hash>/<resource-hash>.json`；全部文档带 schema version，并通过同目录临时文件原子替换；权限快照携带 revision、签发时间和过期时间。
 Failure Behavior: 持久化格式损坏、格式版本过高、路径非法、账号不存在、凭据缺失或 IO 失败必须返回稳定失败；删除账号必须删除其凭据、权限快照和资料。
 Threading / Cancellation: 同一账号的写入和删除必须串行化；取消后不得提交部分文件、活动账号指针或凭据引用；并发读取只能观察旧版本或完整新版本。
 Diagnostics: 持久化诊断必须包含脱敏 account identity、operation、store kind、schema version 和 failure kind，严禁包含 token、refresh token 或密码。
@@ -150,13 +150,13 @@ Acceptance Criteria: Security 提供跨平台文件存储合同和默认文件 P
 ## AUC-SECURITY-009 Active Account Switching and Restore
 
 Feature ID: `AUC-SECURITY-009`
-Status: Planned
-Goal: 在已持久化的多个账号之间恢复或切换唯一的全局活动账号，并原子发布对应 principal、token 上下文和权限快照。
+Status: Completed
+Goal: 在已持久化的多个账号之间恢复、切换或刷新唯一的全局活动账号，并原子发布对应 principal、token 上下文和权限快照。
 Public Contract: IAccountSessionManager, AccountSessionSnapshot, AccountSwitchResult, AccountSwitchResultStatus
-Runtime / Build Behavior: 一个 City Host 进程同一时刻只有一个活动账号，所有窗口共享；启动时可恢复最后活动账号；成功切换只提交一次 session/authentication revision，并触发 Route、Command、Data、State 和 Presentation 重新计算。
-Failure Behavior: 目标账号不存在、凭据或权限加载失败、权限快照不兼容、切换取消时保留原活动账号；删除当前账号后进入 Anonymous/SignedOut，不自动选择其他账号。
+Runtime / Build Behavior: `AccountSessionManager` 作为 DI singleton 让一个 City Host 同一时刻只有一个活动账号；`RestoreAsync` 恢复最后活动账号；`SwitchAccountAsync` 先完整读取并验证资料、权限和凭据，再更新活动指针并发布一个 immutable session；同账号普通切换保持幂等。应用/provider 从服务器更新账号与权限缓存后，调用 `RefreshAccountAsync` 强制重载当前账号并发布一个新 revision；传入的 account key 用于阻止账号切换竞态，刷新不修改活动指针。session 与 authentication 使用同一 revision。Route、Command、Data、State 和 Presentation 的联动仍由各模块读取合同或应用 bridge 完成，Security 不直接引用这些上层模块。
+Failure Behavior: 目标账号不存在、凭据或权限加载失败、权限快照不兼容、操作取消或刷新目标已不再是当前账号时保留原活动账号；删除当前账号后进入 Anonymous/SignedOut，不自动选择其他账号。
 Threading / Cancellation: 切换作为单一异步事务串行执行；取消、失败或并发竞争不得产生混合账号数据；旧账号在途 refresh 和账号绑定操作必须在提交切换前取消或失效。
 Diagnostics: 切换诊断必须包含脱敏 previous/target account identity、operation id、online/offline mode、result status 和 failure stage。
 Tests: `AccountSessionManagerTests; AccountSwitchIntegrationTests`
-Required Assertions: 断言启动恢复、成功切换、重复切换幂等、失败/取消回滚、并发切换、单次 revision/通知、token/权限隔离、删除活动账号和离线受限切换。
-Acceptance Criteria: 离线时只允许加载未损坏的缓存身份和权限用于 UI 与客户端预检查；过期 token 和需要服务器确认的操作必须拒绝；重新联网后必须刷新并以服务器结果替换缓存。
+Required Assertions: 断言启动恢复、成功切换、重复切换幂等、失败/取消回滚、并发切换、单次 revision/通知、token/权限隔离、删除活动账号和离线受限切换；离线受限 session 必须拒绝默认及仍有效的次级 resource token。
+Acceptance Criteria: 离线时只允许加载未损坏的缓存身份和权限用于 UI 与客户端预检查；缺失/过期凭据发布 Expired authentication，过期权限不得进入 principal permission claims；过期 token 和需要服务器确认的操作必须拒绝；重新联网后应用/provider 必须先原子替换服务器结果缓存，再通过 `RefreshAccountAsync` 发布一个完整的新 session revision。

@@ -23,6 +23,9 @@ public sealed class SecurityRegistrationTests
         var commandDescriptorProvider = serviceProvider.GetRequiredService<ICommandAuthorizationDescriptorProvider>();
         var commandAuthorizationSource = serviceProvider.GetRequiredService<ICommandAuthorizationSource>();
         var tokenProvider = serviceProvider.GetRequiredService<IAccessTokenProvider>();
+        var accountSessionManager = serviceProvider.GetRequiredService<IAccountSessionManager>();
+        var accountStore = serviceProvider.GetRequiredService<IAccountSessionStore>();
+        var credentialStore = serviceProvider.GetRequiredService<ICredentialStore>();
 
         Assert.Same(stateProvider, principalAccessor);
         Assert.IsType<PermissionRegistry>(registry);
@@ -31,7 +34,10 @@ public sealed class SecurityRegistrationTests
         Assert.IsType<AuthorizationEvaluator>(evaluator);
         Assert.IsType<InMemoryCommandAuthorizationDescriptorProvider>(commandDescriptorProvider);
         Assert.IsType<CommandAuthorizationSource>(commandAuthorizationSource);
-        Assert.IsType<UnavailableAccessTokenProvider>(tokenProvider);
+        Assert.Same(accountSessionManager, tokenProvider);
+        Assert.IsType<AccountSessionManager>(accountSessionManager);
+        Assert.IsType<FileAccountSessionStore>(accountStore);
+        Assert.IsType<FileCredentialStore>(credentialStore);
     }
 
     [Fact]
