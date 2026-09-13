@@ -4,7 +4,7 @@
 
 本专题属于 `AtomUI.City.Templates` 模块文档体系，必须与 [overview.md](overview.md)、[features.md](features.md)、[api-contracts.md](api-contracts.md)、[testing.md](testing.md) 保持一致。它只细化 `Page Template` 相关实现决策，不重新定义模块边界。
 
-Feature：`AUC-TEMPLATES-007`。状态：Planned。当前只有设计，必须等待 Presentation 生成合同稳定后实现和验收。
+Feature：`AUC-TEMPLATES-007`。状态：Completed。公开入口为 `GenerationTemplateRenderer` 的 Page kind，Presentation 生成合同已稳定。
 
 ## 设计决策
 
@@ -43,6 +43,11 @@ Feature：`AUC-TEMPLATES-007`。状态：Planned。当前只有设计，必须�
 | AUC-TEMPLATES-003 | Template Variables | ApplicationTemplateBuildSmokeTests |
 | AUC-TEMPLATES-004 | Plugin Template | TemplatePackageLayoutTests |
 | AUC-TEMPLATES-005 | Test Template | ApplicationTemplateBuildSmokeTests |
+| AUC-TEMPLATES-006 | Module Template | GenerationTemplateRendererTests |
+| AUC-TEMPLATES-007 | Page Template | GenerationTemplateRendererTests |
+| AUC-TEMPLATES-008 | Localization Template | GenerationTemplateRendererTests |
+| AUC-TEMPLATES-009 | Configuration Template | GenerationTemplateRendererTests |
+| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | Pending |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 

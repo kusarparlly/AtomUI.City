@@ -4,10 +4,10 @@
 
 ## 当前结论
 
-- 1.0 总包发布状态：暂不可发布，CLI Generation 与 Templates 共 6 项规划能力尚待实现。
+- 1.0 总包发布状态：暂不可发布，仅 `AUC-TEMPLATES-010` Avalonia Desktop Application Template 尚待实现。
 - 运行时本地候选状态：Build、Core、EventBus、State、MVVM、Routing、Data、Localization、Security、Presentation 共 10 个包已通过隔离本地 NuGet consumer；尚未执行远端 NuGet 发布。
-- 全局进度：138/144。
-- 模块 Feature 合同：128/134。
+- 全局进度：143/144。
+- 模块 Feature 合同：133/134。
 - 最终发布门禁：10/10。
 - 最近校准日期：2026-09-13。
 
@@ -47,8 +47,8 @@
 | Data | 20 | 0 | 20 | 已完成 |
 | Localization | 8 | 0 | 8 | 已完成 |
 | Security | 9 | 0 | 9 | 已完成 |
-| CLI | 6 | 1 | 7 | 进行中 |
-| Templates | 5 | 5 | 10 | 进行中 |
+| CLI | 7 | 0 | 7 | 已完成 |
+| Templates | 9 | 1 | 10 | 进行中 |
 | Release Gates | 10 | 0 | 10 | 已完成 |
 
 ## Core
@@ -215,7 +215,7 @@
 - [x] AUC-CLI-004 Plugin Inspect and Doctor。验收重点：合法插件、manifest 缺失、版本非法、layout 错误和 JSON diagnostics。
 - [x] AUC-CLI-005 AI-Friendly Envelope。验收重点：schema、纯 JSON、artifact 列表、suggested commands、retryable 语义。
 - [x] AUC-CLI-006 Non-Interactive and CI Mode。验收重点：CI、non-interactive、stdin unavailable、需要确认时失败。
-- [ ] AUC-CLI-007 Generation Commands。验收重点：真实生成、dry-run、冲突、取消、回滚和产物可构建。
+- [x] AUC-CLI-007 Generation Commands。验收重点：真实生成、dry-run、冲突、取消、回滚和产物可构建。
 
 ## Templates
 
@@ -224,10 +224,10 @@
 - [x] AUC-TEMPLATES-003 Template Variables。验收重点：变量默认值、非法值、命名空间生成和错误消息。
 - [x] AUC-TEMPLATES-004 Plugin Template。验收重点：单 assembly、NuGet metadata、manifest、msbuild 属性和测试项目。
 - [x] AUC-TEMPLATES-005 Test Template。验收重点：测试项目 build/test、TestLayer、Testing 引用边界和命名规则。
-- [ ] AUC-TEMPLATES-006 Module Template。验收重点：模块类型、依赖声明、服务注册、manifest/source generator 输入和 build test。
-- [ ] AUC-TEMPLATES-007 Page Template。验收重点：View/ViewModel、route declaration、Presentation 绑定和激活测试。
-- [ ] AUC-TEMPLATES-008 Localization Template。验收重点：culture package、fallback、generated manifest 和 Localization 测试。
-- [ ] AUC-TEMPLATES-009 Configuration Template。验收重点：Options binding、validation、reload policy 和配置测试。
+- [x] AUC-TEMPLATES-006 Module Template。验收重点：模块类型、依赖声明、服务注册、manifest/source generator 输入和 build test。
+- [x] AUC-TEMPLATES-007 Page Template。验收重点：View/ViewModel、route declaration、Presentation 绑定和激活测试。
+- [x] AUC-TEMPLATES-008 Localization Template。验收重点：culture package、fallback、generated manifest 和 Localization 测试。
+- [x] AUC-TEMPLATES-009 Configuration Template。验收重点：Options binding、validation、reload policy 和配置测试。
 - [ ] AUC-TEMPLATES-010 Avalonia Desktop Application Template。验收重点：Avalonia Application、desktop lifetime、主窗口、Presentation bootstrap 和 headless/platform smoke。
 
 ## Release Gates

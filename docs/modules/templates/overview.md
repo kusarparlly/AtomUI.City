@@ -9,7 +9,7 @@
 
 ## 模块定位
 
-项目模板包和确定性模板渲染辅助。当前已交付 Host 应用、插件和测试骨架；模块、页面、本地化、配置及 Avalonia desktop bootstrap 仍为规划能力。
+项目模板包和确定性模板渲染辅助。当前已交付 Host 应用、插件、测试、模块、页面、本地化和配置骨架；Avalonia desktop bootstrap 仍为规划能力。
 
 ## 产品级硬性约束
 
@@ -68,4 +68,4 @@ Templates 生成 Host 应用骨架，但不参与 Host 运行时。
 
 Partially Implemented
 
-当前 10 个已登记 Feature 中 5 个 Completed、5 个 Planned。已完成 Feature 必须满足真实 `dotnet new` 实例化和 restore/build/test 门禁；规划 Feature 不得由详细设计文档冒充实现。单个功能点状态以 [features.md](features.md) 和 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。
+当前 10 个已登记 Feature 中 9 个 Completed、1 个 Planned。已完成 Feature 已通过真实生成、事务回滚和 restore/build/test 门禁；`AUC-TEMPLATES-010` 不得由详细设计文档冒充实现。单个功能点状态以 [features.md](features.md) 和 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。

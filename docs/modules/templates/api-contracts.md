@@ -7,6 +7,7 @@
 | API Family | 关键类型 | 职责 | 硬性行为 |
 | --- | --- | --- | --- |
 | Options | ApplicationTemplateOptions | 模板输入和命名规则。 | 非法名称不写文件。 |
+| Generation Options | GenerationTemplateOptions, GenerationTemplateKind | module/page/test/config/localization 输入和类型。 | kind、名称、工程、namespace、route 和 culture 在 plan 前验证。 |
 | Planning | ApplicationTemplateRenderer, TemplatePlan | 生成可 review 的文件变更计划。 | plan 先于写入；可校验重复路径和路径逃逸。 |
 | Rendering | TemplateChange, TemplateRenderResult | 应用模板文件变更。 | 路径必须规范化为 `/` 分隔的可移植相对路径；冲突、路径逃逸、写入失败有稳定 result；成功结果的 AppliedPaths 与 plan 完全一致。 |
 | Generated Application | `.slnx`, `Directory.Build.props`, `Directory.Packages.props`, docs entry, Host app/test projects | 生成可独立 restore/build/test/run 的无 UI Host 应用工作区。 | 输出只包含相对路径，不写入机器绝对路径；`ManagePackageVersionsCentrally=false` 隔离父目录 CPM；Avalonia desktop bootstrap 由 AUC-TEMPLATES-010 承接。 |
@@ -27,6 +28,8 @@
 | TemplateRenderResult.Failed | 创建失败结果。 | 可选 plan、至少一个 diagnostic。 | TemplateRenderResult。 | 零 diagnostic 或 null diagnostic 抛 `ArgumentException`。 | 无 token。 | immutable；Succeeded 恒为 false，AppliedPaths 为空。 |
 | Generated application solution | 表达应用和测试项目 build graph。 | AppName、IncludeTests。 | `<AppName>.slnx`。 | 缺少 app/test project 时 smoke test 失败。 | 随 Render 观察 token。 | path 固定为相对路径。 |
 | Plugin template package | 表达插件模板包布局。 | `atomui-city-plugin` template package。 | solution、plugin project、manifest、module、test project。 | 缺少必需文件、metadata 或未替换 token 时 smoke test 失败。 | 文件读取测试无 token。 | `sourceName=TemplatePlugin` 只负责项目命名；`__PLUGIN_ID__` 只负责 PluginId，禁止改写 `AtomUICityPlugin*` MSBuild 属性。 |
+| GenerationTemplateRenderer.CreatePlan | 生成非插件工作区增量计划。 | GenerationTemplateOptions。 | TemplatePlan。 | null 抛 `ArgumentNullException`；非法 options 抛 `ArgumentException`。 | 纯 CPU。 | 无 IO、可重复调用。 |
+| GenerationTemplateRenderer.Render | 执行 create-only 增量事务。 | options、CancellationToken。 | TemplateRenderResult。 | 非法变量返回 `AUCTPL2001~2005`；冲突/IO/回滚复用 `AUCTPL1004~1006`。 | 写入前后观察；取消回滚后抛 `OperationCanceledException`。 | 同一 output root 串行；不同 root 可并发。 |
 
 ## Public 类型覆盖
 
@@ -38,6 +41,9 @@
 | `TemplatePlan` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `TemplateRenderResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `TemplateDiagnostic` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `GenerationTemplateKind` | 关键 contract | 枚举值固定为 Module、Page、Test、Configuration、Localization。 |
+| `GenerationTemplateOptions` | 支持类型 | 默认 culture、IncludeTests 和 reload policy 变化必须 review。 |
+| `GenerationTemplateRenderer` | 支持类型 | plan、输出路径、失败和回滚语义变化必须 review。 |
 
 ## Nullability 和参数规则
 

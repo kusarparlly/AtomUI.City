@@ -18,9 +18,19 @@
 | `AUCTPL1001` | InvalidTemplatePath | `src/AtomUI.City.Templates/TemplatePlan.cs` |
 | `AUCTPL1002` | DuplicateTemplatePath | `src/AtomUI.City.Templates/TemplatePlan.cs` |
 | `AUCTPL1003` | UnsupportedTemplateChangeType | `src/AtomUI.City.Templates/TemplatePlan.cs` |
-| `AUCTPL1004` | TemplateOutputConflict | `src/AtomUI.City.Templates/ApplicationTemplateRenderer.cs` |
-| `AUCTPL1005` | TemplateOutputFailure | `src/AtomUI.City.Templates/ApplicationTemplateRenderer.cs` |
-| `AUCTPL1006` | TemplateRollbackFailure | `src/AtomUI.City.Templates/ApplicationTemplateRenderer.cs` |
+| `AUCTPL1004` | TemplateOutputConflict | `ApplicationTemplateRenderer`, `GenerationTemplateRenderer` |
+| `AUCTPL1005` | TemplateOutputFailure | `ApplicationTemplateRenderer`, `GenerationTemplateRenderer` |
+| `AUCTPL1006` | TemplateRollbackFailure | `ApplicationTemplateRenderer`, `GenerationTemplateRenderer` |
+
+## Generation 当前诊断码
+
+| Code | Name | Required Context |
+| --- | --- | --- |
+| `AUCTPL2001` | InvalidGenerationName | `templateId`, `variable`, `rawValue`, `rule` |
+| `AUCTPL2002` | InvalidGenerationProject | `templateId`, `variable`, `rawValue`, `rule` |
+| `AUCTPL2003` | InvalidGenerationNamespace | `templateId`, `variable`, `rawValue`, `rule` |
+| `AUCTPL2004` | GenerationRouteRequired | `templateId`, `variable`, `rawValue`, `rule` |
+| `AUCTPL2005` | InvalidGenerationCulture | `templateId`, `variable`, `rawValue`, `rule` |
 
 ## 产品级必须诊断的失败
 

@@ -1,7 +1,7 @@
 # AtomUI.City.Cli
 
 文档等级：Level 2
-成熟度：Partially Implemented
+成熟度：Verified
 执行边界：Command process boundary
 程序集：`AtomUI.City.Cli`
 源码：`src/AtomUI.City.Cli`
@@ -66,6 +66,6 @@ CLI 默认不启动桌面 Host；只创建工程、调用构建、检查插件�
 
 ## 当前成熟度状态
 
-Partially Implemented
+Verified
 
-该状态表示模块已有实现基线，但还需要按产品级合同补齐实现和测试。单个功能点状态以 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。
+当前 7 个已登记 Feature 均已完成。非插件 generation 已通过命令合同、事务回滚、并发和真实生成产物 restore/build/test 门禁；plugin generation 随 PluginSystem 后续迭代处理，不属于 `AUC-CLI-007`。

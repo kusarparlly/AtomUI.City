@@ -42,6 +42,7 @@
 | AUC-CLI-004 | Plugin Inspect Doctor | CliInspectDoctorPluginTests |
 | AUC-CLI-005 | AI Envelope | CliCommandArchitectureTests |
 | AUC-CLI-006 | Non-Interactive and CI Mode | CliCommandArchitectureTests |
+| AUC-CLI-007 | Generation Commands | CliGenerationCommandTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 

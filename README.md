@@ -7,7 +7,7 @@ AtomUI.City is a full-stack application framework for building modular desktop b
 
 It provides an opinionated application model for the AtomUI/Avalonia ecosystem: hosting, lifecycle, modularity, MVVM, routing, state management, data access, security, localization, plugin infrastructure, build integration, templates, CLI workflows, and testing utilities.
 
-> Status: pre-release. The runtime local candidate has passed build, test, two-hour Dogfood, and isolated local NuGet consumer gates. The full 1.0 package family is not publishable until the remaining CLI generation and template contracts are complete. See the [release tracking plan](docs/superpowers/plans/2026-06-11-development-tracking-plan.md) and [candidate evidence](docs/engineering/runtime-release-candidate.md).
+> Status: pre-release. The runtime local candidate has passed build, test, two-hour Dogfood, and isolated local NuGet consumer gates. CLI generation and the module/page/localization/configuration templates are complete; the full 1.0 package family remains blocked only by the Avalonia desktop application template. See the [release tracking plan](docs/superpowers/plans/2026-06-11-development-tracking-plan.md) and [candidate evidence](docs/engineering/runtime-release-candidate.md).
 
 ## Architecture Vision
 

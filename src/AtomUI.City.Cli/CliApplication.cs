@@ -15,6 +15,11 @@ public static class CliApplication
     [
         "atomui city doctor",
         "atomui city new app <AppName>",
+        "atomui city generate module <Name>",
+        "atomui city generate page <Name> --route <Path>",
+        "atomui city generate test <Name>",
+        "atomui city generate config <Name>",
+        "atomui city generate localization <Name>",
         "atomui city build",
         "atomui city test",
         "atomui city inspect workspace",
@@ -119,6 +124,7 @@ public static class CliApplication
         {
             "doctor" => await DoctorAsync(commandLine, environment, output).ConfigureAwait(false),
             "new" => await NewAsync(commandLine, environment, output, cancellationToken).ConfigureAwait(false),
+            "generate" => await GenerateAsync(commandLine, environment, output, cancellationToken).ConfigureAwait(false),
             "build" or "test" or "pack" or "publish" => await DotnetCommandAsync(command, commandLine, environment, output, cancellationToken, processRunner).ConfigureAwait(false),
             "inspect" => await InspectAsync(commandLine, environment, output).ConfigureAwait(false),
             "plugin" => await PluginAsync(commandLine, environment, output, cancellationToken).ConfigureAwait(false),
@@ -393,6 +399,342 @@ public static class CliApplication
                         ["artifacts"] = artifacts,
                     }))
             .ConfigureAwait(false);
+    }
+
+    private static async ValueTask<int> GenerateAsync(
+        CliCommandLine commandLine,
+        CliExecutionEnvironment environment,
+        TextWriter output,
+        CancellationToken cancellationToken)
+    {
+        var positionals = commandLine.Positionals;
+        var requestedKind = positionals.Count > 2 ? positionals[2] : null;
+        var name = positionals.Count > 3 ? positionals[3] : null;
+        var command = requestedKind is null
+            ? "atomui city generate"
+            : $"atomui city generate {requestedKind}";
+
+        if (requestedKind is null || string.IsNullOrWhiteSpace(name))
+        {
+            var argumentData = CreateUsageData();
+            argumentData["kind"] = requestedKind;
+            argumentData["name"] = name;
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.FailedWithData(
+                        command,
+                        CliExitCodes.ArgumentError,
+                        argumentData,
+                        CliDiagnostic.Error(
+                            "AUCCLI0501",
+                            "Generation kind and name are required.",
+                            name ?? requestedKind)))
+                .ConfigureAwait(false);
+        }
+
+        if (!TryResolveGenerationKind(requestedKind, out var kind))
+        {
+            var message = requestedKind.Equals("plugin", StringComparison.OrdinalIgnoreCase)
+                ? "Plugin generation is deferred with the PluginSystem release and is not available in this version."
+                : $"Generation kind '{requestedKind}' is not supported.";
+            var unsupportedData = CreateUsageData();
+            unsupportedData["kind"] = requestedKind;
+            unsupportedData["name"] = name;
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.FailedWithData(
+                        command,
+                        CliExitCodes.ArgumentError,
+                        unsupportedData,
+                        CliDiagnostic.Error("AUCCLI0502", message, requestedKind, 2)))
+                .ConfigureAwait(false);
+        }
+
+        string outputPath;
+        try
+        {
+            outputPath = Path.GetFullPath(
+                commandLine.GetOptionValue("--output") ?? environment.WorkingDirectory,
+                environment.WorkingDirectory);
+        }
+        catch (Exception exception) when (exception is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.Failed(
+                        command,
+                        CliExitCodes.ArgumentError,
+                        CliDiagnostic.Error("AUCTPL0001", "Output path is invalid.", commandLine.GetOptionValue("--output"))))
+                .ConfigureAwait(false);
+        }
+
+        var projectResolution = ResolveGenerationProject(
+            outputPath,
+            commandLine.GetOptionValue("--project"));
+        if (!projectResolution.Succeeded)
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.FailedWithData(
+                        command,
+                        CliExitCodes.ArgumentError,
+                        new Dictionary<string, object?>
+                        {
+                            ["workingDirectory"] = environment.WorkingDirectory,
+                            ["outputPath"] = outputPath,
+                            ["candidates"] = projectResolution.Candidates,
+                        },
+                        CliDiagnostic.Error(
+                            "AUCCLI0503",
+                            projectResolution.Message!,
+                            commandLine.GetOptionValue("--project"))))
+                .ConfigureAwait(false);
+        }
+
+        var rootNamespace = commandLine.GetOptionValue("--namespace") ??
+            ReadRootNamespace(projectResolution.ProjectPath!) ??
+            projectResolution.ProjectName!;
+        var cultures = SplitOptionValues(commandLine.GetOptionValue("--culture"), ["en-US", "zh-CN"]);
+        var dependencies = SplitOptionValues(commandLine.GetOptionValue("--depends-on"), []);
+        var options = new GenerationTemplateOptions
+        {
+            Kind = kind,
+            Name = name,
+            ProjectName = projectResolution.ProjectName!,
+            RootNamespace = rootNamespace,
+            OutputPath = outputPath,
+            RoutePath = commandLine.GetOptionValue("--route"),
+            Cultures = cultures,
+            ModuleDependencies = dependencies,
+            IncludeTests = !commandLine.HasOption("--no-tests"),
+            ReloadableConfiguration = commandLine.HasOption("--reloadable"),
+        };
+
+        var optionDiagnostics = options.Validate();
+        if (optionDiagnostics.Count > 0)
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.Failed(
+                        command,
+                        CliExitCodes.ArgumentError,
+                        optionDiagnostics.Select(ToCliGenerationDiagnostic).ToArray()))
+                .ConfigureAwait(false);
+        }
+
+        var renderer = new GenerationTemplateRenderer();
+        var plan = renderer.CreatePlan(options);
+        var artifacts = CreateArtifacts(plan);
+        var data = new Dictionary<string, object?>
+        {
+            ["plan"] = plan,
+            ["artifacts"] = artifacts,
+            ["projectPath"] = projectResolution.ProjectPath,
+            ["kind"] = kind.ToString(),
+            ["name"] = name,
+            ["operationId"] = plan.OperationId,
+            ["dryRun"] = commandLine.HasOption("--dry-run"),
+        };
+
+        if (commandLine.HasOption("--dry-run"))
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.Succeeded(command, data))
+                .ConfigureAwait(false);
+        }
+
+        TemplateRenderResult renderResult;
+        try
+        {
+            renderResult = renderer.Render(options, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.FailedWithData(
+                        command,
+                        CliExitCodes.Failure,
+                        data,
+                        CliDiagnostic.Error("AUCCLI0504", "Generation was cancelled.", name, 3)))
+                .ConfigureAwait(false);
+        }
+
+        if (!renderResult.Succeeded)
+        {
+            var exitCode = renderResult.Diagnostics.Any(static diagnostic =>
+                diagnostic.Code is "AUCTPL1004" or "AUCTPL2001" or "AUCTPL2002" or "AUCTPL2003" or "AUCTPL2004" or "AUCTPL2005")
+                ? CliExitCodes.ArgumentError
+                : CliExitCodes.Failure;
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.FailedWithData(
+                        command,
+                        exitCode,
+                        data,
+                        renderResult.Diagnostics.Select(ToCliGenerationDiagnostic).ToArray()))
+                .ConfigureAwait(false);
+        }
+
+        data["changedFiles"] = renderResult.AppliedPaths;
+        return await WriteAsync(
+                output,
+                commandLine,
+                command,
+                CliEnvelope.Succeeded(command, data))
+            .ConfigureAwait(false);
+    }
+
+    private static bool TryResolveGenerationKind(
+        string value,
+        out GenerationTemplateKind kind)
+    {
+        switch (value.ToLowerInvariant())
+        {
+            case "module":
+                kind = GenerationTemplateKind.Module;
+                return true;
+            case "page":
+                kind = GenerationTemplateKind.Page;
+                return true;
+            case "test":
+                kind = GenerationTemplateKind.Test;
+                return true;
+            case "config":
+            case "configuration":
+                kind = GenerationTemplateKind.Configuration;
+                return true;
+            case "localization":
+                kind = GenerationTemplateKind.Localization;
+                return true;
+            default:
+                kind = default;
+                return false;
+        }
+    }
+
+    private static ProjectResolution ResolveGenerationProject(
+        string outputPath,
+        string? requestedProject)
+    {
+        try
+        {
+            var sourceRoot = Path.Combine(outputPath, "src");
+            var candidates = Directory.Exists(sourceRoot)
+                ? Directory
+                    .EnumerateFiles(sourceRoot, "*.csproj", SearchOption.AllDirectories)
+                    .OrderBy(static path => path, StringComparer.OrdinalIgnoreCase)
+                    .ToArray()
+                : [];
+            var relativeCandidates = candidates
+                .Select(path => Path.GetRelativePath(outputPath, path).Replace('\\', '/'))
+                .ToArray();
+
+            if (!string.IsNullOrWhiteSpace(requestedProject))
+            {
+                var matches = candidates
+                    .Where(path =>
+                        Path.GetFileNameWithoutExtension(path).Equals(requestedProject, StringComparison.OrdinalIgnoreCase) ||
+                        Path.GetRelativePath(outputPath, path).Replace('\\', '/').Equals(requestedProject, StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
+                if (matches.Length == 1)
+                {
+                    return IsCanonicalGenerationProject(outputPath, matches[0])
+                        ? ProjectResolution.Success(matches[0], relativeCandidates)
+                        : ProjectResolution.Failure(
+                            "Generation requires the project layout src/<Project>/<Project>.csproj.",
+                            relativeCandidates);
+                }
+
+                return ProjectResolution.Failure(
+                    matches.Length == 0
+                        ? $"Project '{requestedProject}' was not found under the workspace src directory."
+                        : $"Project '{requestedProject}' is ambiguous under the workspace src directory.",
+                    relativeCandidates);
+            }
+
+            return candidates.Length == 1
+                ? IsCanonicalGenerationProject(outputPath, candidates[0])
+                    ? ProjectResolution.Success(candidates[0], relativeCandidates)
+                    : ProjectResolution.Failure(
+                        "Generation requires the project layout src/<Project>/<Project>.csproj.",
+                        relativeCandidates)
+                : ProjectResolution.Failure(
+                    candidates.Length == 0
+                        ? "No project was found under the workspace src directory."
+                        : "Multiple projects were found; specify one with --project.",
+                    relativeCandidates);
+        }
+        catch (Exception exception) when (
+            exception is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            return ProjectResolution.Failure(
+                $"Project discovery failed: {exception.GetType().Name}.",
+                []);
+        }
+    }
+
+    private static bool IsCanonicalGenerationProject(string outputPath, string projectPath)
+    {
+        var projectName = Path.GetFileNameWithoutExtension(projectPath);
+        var expectedPath = Path.GetFullPath(Path.Combine(
+            outputPath,
+            "src",
+            projectName,
+            projectName + ".csproj"));
+        return string.Equals(
+            Path.GetFullPath(projectPath),
+            expectedPath,
+            OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+    }
+
+    private static string? ReadRootNamespace(string projectPath)
+    {
+        try
+        {
+            return XDocument
+                .Load(projectPath)
+                .Descendants("RootNamespace")
+                .Select(static element => element.Value.Trim())
+                .FirstOrDefault(static value => !string.IsNullOrWhiteSpace(value));
+        }
+        catch (Exception exception) when (
+            exception is IOException or UnauthorizedAccessException or System.Xml.XmlException)
+        {
+            return null;
+        }
+    }
+
+    private static IReadOnlyList<string> SplitOptionValues(
+        string? value,
+        IReadOnlyList<string> defaultValues)
+    {
+        if (value is null)
+        {
+            return Array.AsReadOnly(defaultValues.ToArray());
+        }
+
+        return Array.AsReadOnly(
+            value
+                .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .ToArray());
     }
 
     private static async ValueTask<int> DotnetCommandAsync(
@@ -831,6 +1173,16 @@ public static class CliApplication
         return CliDiagnostic.Error(code, diagnostic.Message, target);
     }
 
+    private static CliDiagnostic ToCliGenerationDiagnostic(TemplateDiagnostic diagnostic)
+    {
+        var target = diagnostic.Context.TryGetValue("path", out var path)
+            ? path?.ToString()
+            : diagnostic.Context.TryGetValue("rawValue", out var rawValue)
+                ? rawValue?.ToString()
+                : null;
+        return CliDiagnostic.Error(diagnostic.Code, diagnostic.Message, target);
+    }
+
     private static string ResolvePluginPackageRoot(string packageInput, string workingDirectory)
     {
         var path = Path.GetFullPath(packageInput, workingDirectory);
@@ -1145,6 +1497,38 @@ public static class CliApplication
         }
 
         return envelope.ExitCode;
+    }
+
+    private sealed record ProjectResolution(
+        bool Succeeded,
+        string? ProjectPath,
+        string? ProjectName,
+        string? Message,
+        IReadOnlyList<string> Candidates)
+    {
+        public static ProjectResolution Success(
+            string projectPath,
+            IReadOnlyList<string> candidates)
+        {
+            return new ProjectResolution(
+                true,
+                projectPath,
+                Path.GetFileNameWithoutExtension(projectPath),
+                null,
+                Array.AsReadOnly(candidates.ToArray()));
+        }
+
+        public static ProjectResolution Failure(
+            string message,
+            IReadOnlyList<string> candidates)
+        {
+            return new ProjectResolution(
+                false,
+                null,
+                null,
+                message,
+                Array.AsReadOnly(candidates.ToArray()));
+        }
     }
 
     private static bool TryGetUsage(

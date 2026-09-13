@@ -27,6 +27,8 @@
 - 删除、重命名、改变默认行为、异常类型、Result status 或诊断码语义属于 breaking change。
 - 新增 API 可以 minor 版本发布，但必须有文档、测试和迁移说明。
 - `ApplicationTemplateRenderer.Render(ApplicationTemplateOptions, CancellationToken)` 是 1.0 兼容承诺；预取消 token 必须在写入任何文件前抛 `OperationCanceledException`。
+- `GenerationTemplateKind` 的五个枚举值、`GenerationTemplateOptions` 默认 culture/IncludeTests/reload policy、各 kind 的 generated path、`GenerationTemplateRenderer.CreatePlan/Render` 进入 1.0 兼容承诺。
+- `AUCTPL2001~2005` 的语义与 context 字段进入 1.0 兼容承诺；增量 renderer 的冲突、IO 和 rollback 继续使用 `AUCTPL1004~1006`。
 
 ## 数据格式兼容
 

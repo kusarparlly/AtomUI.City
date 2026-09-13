@@ -42,6 +42,7 @@
 | AUC-CLI-004 | Plugin Inspect Doctor | CliInspectDoctorPluginTests |
 | AUC-CLI-005 | AI Envelope | CliCommandArchitectureTests |
 | AUC-CLI-006 | Non-Interactive and CI Mode | CliCommandArchitectureTests |
+| AUC-CLI-007 | Generation Commands | CliGenerationCommandTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -83,14 +84,13 @@ atomui city <command>
 
 ### 3. 命令树
 
-下列 `generate` 子树是 `AUC-CLI-007` 的 Planned 目标，当前版本不会执行生成，也不会返回空变更的成功结果。
+下列非插件 `generate` 子树属于 `AUC-CLI-007`。`generate plugin` 不属于当前 1.0 范围。
 
 ```text
 atomui city
   new app
   generate module
   generate page
-  generate plugin
   generate test
   generate config
   generate localization

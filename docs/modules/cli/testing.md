@@ -27,6 +27,7 @@
 | AUC-CLI-004 | Unit | CliInspectDoctorPluginTests | 断言合法插件、manifest 缺失、版本非法、layout 错误和 JSON diagnostics。 | 缺 path 返回 `AUCCLI0302`；manifest 缺失、版本非法和 layout 错误输出 PluginSystem diagnostics 且不加载插件 assembly。 | Completed |
 | AUC-CLI-005 | Unit | CliCommandArchitectureTests | 断言 schema、纯 JSON、artifact 列表、suggested commands、retryable 语义。 | JSON envelope 缺少 AI 字段、普通日志混入 JSON、artifact 未提升、retryable 语义错误必须失败。 | Completed |
 | AUC-CLI-006 | Unit | CliCommandArchitectureTests | 断言 CI、non-interactive、stdin unavailable、需要确认时失败。 | `--non-interactive`、`--ci` 或 stdin unavailable 下需要确认且缺少 `--yes` 返回 `AUCCLI0401`，不能等待 stdin。 | Completed |
+| AUC-CLI-007 | Unit/TemplateSmoke/Build | CliGenerationCommandTests, GenerationTemplateRendererTests | 五类真实生成、dry-run、project 推导、artifacts、产物 build/test。 | 缺参、plugin/未知 kind、多项目歧义、变量非法、冲突、取消、IO 失败和回滚。 | Completed |
 
 ## 缺口处理
 

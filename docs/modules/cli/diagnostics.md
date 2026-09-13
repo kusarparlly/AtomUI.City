@@ -30,6 +30,17 @@
 | `AUCCLI0302` | PluginInspectPathRequired | `src/AtomUI.City.Cli/CliApplication.cs` |
 | `AUCCLI0401` | ExplicitConfirmationRequired | `src/AtomUI.City.Cli/CliApplication.cs` |
 
+## Generation 当前诊断码
+
+| Code | Name | Required Context |
+| --- | --- | --- |
+| `AUCCLI0501` | GenerationArgumentsRequired | `kind`, `name` |
+| `AUCCLI0502` | GenerationKindUnsupported | `kind` |
+| `AUCCLI0503` | GenerationProjectResolutionFailed | `workingDirectory`, `candidates` |
+| `AUCCLI0504` | GenerationCancelled | `kind`, `name`, `operationId` |
+
+模板验证与事务失败保持原始 `AUCTPL...` code，不包装成新的 CLI code。
+
 ## 产品级必须诊断的失败
 
 - 输入非法：拒绝执行并输出诊断。

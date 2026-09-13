@@ -1,6 +1,6 @@
 # AtomUI.City.Cli Generation 合同
 
-> Status: Planned (`AUC-CLI-007`). 本页描述目标合同；当前 CLI 不执行 `generate`，且不得以空变更返回成功。
+> Status: Completed (`AUC-CLI-007`). 1.0 范围为 module、page、test、config 和 localization；plugin generation 延期到 PluginSystem 后续迭代。
 
 ## 适用范围
 
@@ -44,6 +44,7 @@
 | AUC-CLI-004 | Plugin Inspect Doctor | CliInspectDoctorPluginTests |
 | AUC-CLI-005 | AI Envelope | CliCommandArchitectureTests |
 | AUC-CLI-006 | Non-Interactive and CI Mode | CliCommandArchitectureTests |
+| AUC-CLI-007 | Generation Commands | CliGenerationCommandTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -60,7 +61,7 @@
 
 ## CLI 生成命令设计
 
-适用范围：module、page、plugin、test、config、localization 的生成命令和模板调用
+适用范围：module、page、test、config、localization 的生成命令和模板调用
 
 ### 1. 目标
 
@@ -71,7 +72,6 @@
 ```bash
 atomui city generate module Sales
 atomui city generate page Sales/List --route /sales
-atomui city generate plugin com.company.sales
 atomui city generate test Sales/List
 atomui city generate config Sales
 atomui city generate localization Sales
@@ -117,23 +117,7 @@ Parse command
 - Routing 只生成 Route -> ViewModel Target。
 - Presentation 负责 ViewModel -> View。
 
-### 5. Plugin
-
-`generate plugin` 生成：
-
-- 插件项目。
-- 插件模块。
-- 插件测试项目。
-- plugin package test。
-- lifecycle/unload test。
-
-规则：
-
-- 一个插件一个主业务程序集。
-- 默认生成 `AtomUICityPluginId`。
-- 默认启用 package layout validation。
-
-### 6. Test
+### 5. Test
 
 `generate test` 生成：
 
@@ -141,11 +125,23 @@ Parse command
 - FeatureTestMatrix 条目。
 - TestHost 使用入口。
 
-### 7. Config 和 Localization
+### 6. Config 和 Localization
 
 `generate config` 生成 Options、validator 和测试。
 
 `generate localization` 生成 culture 目录、resource key 和本地化测试入口。
+
+### 7. 事务、项目解析和诊断
+
+- CLI 通过 `--project` 和 `--namespace` 接收显式目标；未提供时只允许在 `src/` 下恰好存在一个项目时推导。
+- 增量输出固定采用 `src/<Project>/<Project>.csproj` 工作区布局；非标准嵌套工程返回 `AUCCLI0503`，不得静默写入另一个目录。
+- `--dry-run` 只返回 `TemplatePlan` 和 artifacts，不读取或写入目标文件。
+- apply 前统一预检全部目标；任一冲突都不得写入文件。
+- 写入中途取消或 IO 失败必须逆序删除本次创建的文件和空目录。
+- 同一规范化 output root 的进程内生成事务串行，不同 root 可并发。
+- `generate plugin` 返回 `AUCCLI0502`，不得调用现有插件模板或返回成功。
+- 缺少 kind/name 返回 `AUCCLI0501`；项目无法唯一解析返回 `AUCCLI0503`；取消返回 `AUCCLI0504`。
+- Templates 的 `AUCTPL...` 诊断原样进入 CLI envelope。
 
 ### 8. 测试矩阵
 
@@ -153,7 +149,8 @@ Parse command
 |---|---|---|
 | module generation | CLI/Template | 文件、测试、矩阵。 |
 | page generation | CLI/Template | route、VM、View、测试。 |
-| plugin generation | CLI/Template | plugin csproj、manifest 输入、测试。 |
 | test generation | CLI/Template | 测试文件和矩阵条目。 |
 | dry-run | Unit/CLI | 不写文件。 |
 | plan/apply | CLI | plan 可执行。 |
+| cancellation/rollback | CLI/Template | 无半成品文件和目录。 |
+| generated workspace | Build | module、page、test、config、localization 产物可编译，测试可执行。 |

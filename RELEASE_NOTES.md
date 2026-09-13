@@ -8,7 +8,7 @@
 - Product-level contracts for Core host lifecycle, module ordering, diagnostics, DI markers, and dispatcher abstraction.
 - Runtime modules for Routing, Presentation, MVVM, State, EventBus, Localization, Security, Data, and PluginSystem.
 - Build and source generator integration plus implemented CLI, template, and testing baselines with local release gates.
-- Implemented application, plugin, and test templates generate buildable/testable projects with Testing layer metadata.
+- Implemented application, plugin, test, module, page, localization, and configuration templates; incremental generation uses create-only plans, cancellation, conflict detection, and rollback.
 
 ### Breaking changes
 
@@ -22,7 +22,7 @@
 
 ### Known limitations
 
-- The full 1.0 package family is not publishable yet: CLI Generation and the Module, Page, Localization, Configuration, and Avalonia Desktop templates remain incomplete.
+- The full 1.0 package family is not publishable yet: the Avalonia Desktop application template (`AUC-TEMPLATES-010`) remains incomplete.
 - The isolated local package consumer currently validates Build, Core, EventBus, State, MVVM, Routing, Data, Localization, Security, and Presentation. PluginSystem, Testing, CLI, and Templates are outside that consumer's scope and retain their own gates.
 - Platform integration coverage is intentionally narrow in 1.0 and currently validates the Avalonia dispatcher bridge contract.
 - Templates target the current AtomUI.City package family and are not a replacement for application-specific architecture decisions.

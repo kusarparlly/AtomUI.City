@@ -10,6 +10,7 @@
 | Envelope | CliEnvelope, CliDiagnostic, CliExitCodes | 机器可读输出和诊断。 | `--json` 只能输出 JSON envelope。 |
 | Process Invocation | DotnetInvocation, ProcessRunner | 调用 dotnet 子进程。 | 保留 exit code 和 stdout/stderr 摘要。 |
 | Environment | CliExecutionEnvironment | CI、非交互、stdin availability 和工作目录。 | 非交互不等待输入；CI 自动启用非交互。 |
+| Generation | CliApplication, GenerationTemplateRenderer, TemplatePlan | 解析目标工程并调用 Templates 生成非插件产物。 | dry-run 不写文件；冲突、取消和失败不保留半成品。 |
 
 ## 关键方法合同
 
@@ -23,6 +24,7 @@
 | DotnetInvocation | 表达 `dotnet build/test/pack/publish` 调用。 | command、project、configuration、framework、working directory、CI mode。 | executable、arguments、workingDirectory、ciMode。 | 参数缺失由命令解析层拒绝；未知 option 不生成 invocation。 | 纯数据，无 token。 | arguments 不可被外部 mutation 改写。 |
 | `atomui city plugin inspect/doctor` handler | 读取插件 manifest 和校验 package layout。 | package root 或 `atomui-city/plugin.json` path。 | CliEnvelope，manifest，pluginDiagnostics。 | 缺 path 返回 `AUCCLI0302`；PluginSystem `AUCPLG...` diagnostics 原样映射到 CLI diagnostics。 | 文件读取前观察 token。 | 只读；不得加载插件 assembly。 |
 | Non-interactive confirmation | 防止 CI/agent 被 prompt 阻塞。 | CliExecutionEnvironment、`--ci`、`--non-interactive`、`--yes`。 | CliEnvelope。 | 需要确认且缺少 `--yes` 返回 `AUCCLI0401`，不读取 stdin。 | 纯 CPU，无 token。 | 同一 argv 结果稳定。 |
+| `atomui city generate` handler | 生成 module/page/test/config/localization。 | kind、name、project、namespace、output、route/culture/dependency/reload options。 | CliEnvelope 中包含 plan 和 artifacts。 | `AUCCLI0501~0504` 或原样 `AUCTPL...`；`generate plugin` 明确失败。 | render 前后及每个文件写入前后观察 token。 | dry-run 幂等；同 output root 的 apply 串行。 |
 
 ## Public 类型覆盖
 

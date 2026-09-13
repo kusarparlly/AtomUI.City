@@ -65,21 +65,6 @@ public sealed class CliCommandArchitectureTests
     }
 
     [Fact]
-    public async Task GenerateCommandCannotReportSuccessBeforeFeatureIsImplemented()
-    {
-        using var host = new CliTestHost();
-
-        var run = await host.RunAsync("city", "generate", "module", "Sales", "--json");
-
-        Assert.Equal(2, run.ExitCode);
-        using var json = run.ReadJson();
-        var root = json.RootElement;
-        Assert.False(root.GetProperty("success").GetBoolean());
-        Assert.Equal("AUCCLI0002", root.GetProperty("diagnostics")[0].GetProperty("code").GetString());
-        Assert.Equal("generate", root.GetProperty("diagnostics")[0].GetProperty("target").GetString());
-    }
-
-    [Fact]
     public async Task RuntimeFailureEnvelopeIsRetryable()
     {
         var missingDirectory = Path.Combine(Path.GetTempPath(), "AtomUICityCliTests", Guid.NewGuid().ToString("N"));

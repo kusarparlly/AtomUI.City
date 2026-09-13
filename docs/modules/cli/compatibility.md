@@ -26,6 +26,9 @@
 - CLI JSON envelope 顶层 `status`、`artifacts`、`suggestedCommands`、`changedFiles` 和 `retryable` 字段进入 1.0 兼容承诺；`suggestedActions` 保留为兼容 alias。
 - `retryable=false` 用于成功和参数错误，`retryable=true` 用于运行时失败；每个 diagnostic code 必须生成 `atomui city explain <code> --json` suggested command。
 - `AUCCLI0401` 表示非交互或 CI 模式下命令需要显式 `--yes` 确认。
+- `AUCCLI0501` 表示 generate 缺少 kind/name，`AUCCLI0502` 表示未知或延期的 generation kind，`AUCCLI0503` 表示目标工程无法唯一解析，`AUCCLI0504` 表示生成事务取消。
+- `atomui city generate <kind> <name> --json` 的 `data.plan`、`data.artifacts`、顶层 `changedFiles` 进入 1.0 兼容承诺；`generate plugin` 在当前范围稳定返回 `AUCCLI0502`。
+- CLI 不改写 Templates 诊断码；`AUCTPL2001~2005` 与 `AUCTPL1004~1006` 原样输出。
 - `CliExecutionEnvironment` 的 `isCi`、`isNonInteractive` 和 `isStdinAvailable` 语义进入 1.0 兼容承诺；`--ci` 必须启用非交互并传递给 dotnet invocation。
 - `--json` 模式失败时只输出 JSON envelope；非 JSON 解析失败输出 `Usage:` 文本块。
 

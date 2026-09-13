@@ -11,10 +11,10 @@
 | AUC-TEMPLATES-003 | Template Variables | Completed | ApplicationTemplateOptions, TemplateRenderResult | ApplicationTemplateBuildSmokeTests |
 | AUC-TEMPLATES-004 | Plugin Template | Completed | Plugin template package | TemplatePackageLayoutTests |
 | AUC-TEMPLATES-005 | Test Template | Completed | ApplicationTemplateRenderer, test project template | ApplicationTemplateBuildSmokeTests |
-| AUC-TEMPLATES-006 | Module Template | Planned | generated module source | Pending |
-| AUC-TEMPLATES-007 | Page Template | Planned | generated View/ViewModel/route source | Pending |
-| AUC-TEMPLATES-008 | Localization Template | Planned | generated localization package source | Pending |
-| AUC-TEMPLATES-009 | Configuration Template | Planned | generated Options source | Pending |
+| AUC-TEMPLATES-006 | Module Template | Completed | GenerationTemplateRenderer, generated module source | GenerationTemplateRendererTests |
+| AUC-TEMPLATES-007 | Page Template | Completed | GenerationTemplateRenderer, generated View/ViewModel/route source | GenerationTemplateRendererTests |
+| AUC-TEMPLATES-008 | Localization Template | Completed | GenerationTemplateRenderer, generated localization package source | GenerationTemplateRendererTests |
+| AUC-TEMPLATES-009 | Configuration Template | Completed | GenerationTemplateRenderer, generated Options source | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-010 | Avalonia Desktop Application Template | Planned | Presentation desktop bootstrap output | Pending |
 
 ## Feature 硬门禁
@@ -47,6 +47,62 @@ Diagnostics: diagnostic 必须包含 template id、target path 和 variable。
 Tests: `ApplicationTemplateBuildSmokeTests`
 Required Assertions: 已断言生成、restore/build/test、命名空间、包引用、solution、Directory.Build、Directory.Packages、docs entry、无绝对路径、冲突、回滚和同目录并发。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+
+## AUC-TEMPLATES-006 Module Template
+
+Feature ID: `AUC-TEMPLATES-006`
+Status: Completed
+Goal: 生成 Module、Options、Contribution identity、可选依赖和模块测试骨架。
+Public Contract: `GenerationTemplateRenderer`, `GenerationTemplateOptions`, `GenerationTemplateKind.Module`
+Runtime / Build Behavior: 输出可被 Core 与 Generators 识别的 `ModuleBase` 类型，服务注册只写入 `ServiceConfigurationContext.Services`，不构建临时 provider。
+Failure Behavior: 非法名称、工程或 namespace 在 plan 前失败；目标冲突不覆盖；IO 失败和取消回滚本次输出。
+Threading / Cancellation: 同一 output root 串行；每个文件写入前后观察 token。
+Diagnostics: `AUCTPL2001~2003` 和 `AUCTPL1004~1006`。
+Tests: `GenerationTemplateRendererTests`
+Required Assertions: 依赖声明、服务注册、FeatureTestMatrix、冲突、取消、IO 回滚、同根并发和真实 build/test。
+Acceptance Criteria: 生成物在真实临时工作区与 Core、Generators 一起编译并通过生成测试。
+
+## AUC-TEMPLATES-007 Page Template
+
+Feature ID: `AUC-TEMPLATES-007`
+Status: Completed
+Goal: 生成 RouteMap、ViewModel、Avalonia View、Presentation mapping 和页面测试骨架。
+Public Contract: `GenerationTemplateRenderer`, `GenerationTemplateOptions`, `GenerationTemplateKind.Page`
+Runtime / Build Behavior: Route 只声明 ViewModel target；View 使用 `[ViewFor]` 进入 Presentation manifest；ViewModel 使用 MVVM activation contract。
+Failure Behavior: 缺失或非法绝对 route 返回 `AUCTPL2004` 且不写文件；事务失败遵循统一回滚合同。
+Threading / Cancellation: 生成阶段无 UI 线程要求；写入观察 token，生成的 ViewModel activation 观察调用方 token。
+Diagnostics: `AUCTPL2001~2004` 和 `AUCTPL1004~1006`。
+Tests: `GenerationTemplateRendererTests`
+Required Assertions: RouteMap/route generator、ViewFor mapping、activate/deactivate/cancel、FeatureTestMatrix 和真实 Avalonia build/test。
+Acceptance Criteria: 生成物由 Router 与 Presentation generator 成功处理，生成测试通过。
+
+## AUC-TEMPLATES-008 Localization Template
+
+Feature ID: `AUC-TEMPLATES-008`
+Status: Completed
+Goal: 生成强类型 key、assembly language package 声明和每 culture 的资源文件。
+Public Contract: `GenerationTemplateRenderer`, `GenerationTemplateOptions`, `GenerationTemplateKind.Localization`
+Runtime / Build Behavior: culture 列表形成不可变输入快照；资源使用标准 `.resx`，声明进入 Localization manifest generator。
+Failure Behavior: 空、非法或重复 culture 返回 `AUCTPL2005`；失败不保留部分 culture 目录。
+Threading / Cancellation: 同根串行，跨根可并发；资源文件写入前后观察 token。
+Diagnostics: `AUCTPL2001~2003`, `AUCTPL2005` 和 `AUCTPL1004~1006`。
+Tests: `GenerationTemplateRendererTests`
+Required Assertions: culture 目录、LanguagePackage、稳定 key、manifest 编译、冲突、回滚和真实 build/test。
+Acceptance Criteria: 多 culture 生成物可由 Localization generator 处理并通过生成测试。
+
+## AUC-TEMPLATES-009 Configuration Template
+
+Feature ID: `AUC-TEMPLATES-009`
+Status: Completed
+Goal: 生成带稳定 section、显式 reload policy、Options validator 和测试的配置骨架。
+Public Contract: `GenerationTemplateRenderer`, `GenerationTemplateOptions`, `GenerationTemplateKind.Configuration`
+Runtime / Build Behavior: reload 默认关闭，只有显式输入才生成 `ReloadOnChange=true`；validator 同时生成成功和失败测试。
+Failure Behavior: 非法名称、工程或 namespace 在 plan 前失败；事务失败遵循统一冲突和回滚合同。
+Threading / Cancellation: plan 为纯 CPU；render 同根串行并观察 token。
+Diagnostics: `AUCTPL2001~2003` 和 `AUCTPL1004~1006`。
+Tests: `GenerationTemplateRendererTests`
+Required Assertions: section、validation 成功/失败、reload policy、FeatureTestMatrix 和真实 build/test。
+Acceptance Criteria: 生成 Options 与测试在真实工作区编译并执行通过。
 
 ## AUC-TEMPLATES-002 Package Layout
 
@@ -90,9 +146,9 @@ Tests: `TemplatePackageLayoutTests`, `DotnetNewTemplateIntegrationTests`
 Required Assertions: 已断言单 assembly、NuGet metadata、manifest、MSBuild 属性、测试项目、真实 `dotnet new install`、项目重命名和 PluginId 替换。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
 
-## Planned Features
+## Incremental Generation Features
 
-`AUC-TEMPLATES-006` 到 `AUC-TEMPLATES-009` 分别承接 [module-template.md](module-template.md)、[page-template.md](page-template.md)、[localization-template.md](localization-template.md) 和 [configuration-template.md](configuration-template.md) 中的设计。它们已有设计稿，但当前没有 renderer、CLI command、模板包或测试，不得按 Completed 宣称。
+`AUC-TEMPLATES-006` 到 `AUC-TEMPLATES-009` 分别承接 [module-template.md](module-template.md)、[page-template.md](page-template.md)、[localization-template.md](localization-template.md) 和 [configuration-template.md](configuration-template.md) 中的设计。它们统一通过 `GenerationTemplateRenderer` 提供 create-only plan/render、取消、同根目录串行和失败回滚。
 
 `AUC-TEMPLATES-010` 承接真正的 Avalonia `Application`、desktop lifetime、主窗口和 Presentation bootstrap。该 Feature 必须在 Presentation 启动合同稳定后实现；当前 `atomui-city-app` 只生成可运行的无 UI Host 应用骨架。
 

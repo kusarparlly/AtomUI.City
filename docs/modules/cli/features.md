@@ -12,7 +12,7 @@
 | AUC-CLI-004 | Plugin Inspect and Doctor | Completed | CliApplication, PluginManifestReader, PluginDiagnostic | CliInspectDoctorPluginTests |
 | AUC-CLI-005 | AI-Friendly Envelope | Completed | CliEnvelope, CliDiagnostic, CliExecutionEnvironment | CliCommandArchitectureTests |
 | AUC-CLI-006 | Non-Interactive and CI Mode | Completed | CliExecutionEnvironment, CliExitCodes | CliCommandArchitectureTests |
-| AUC-CLI-007 | Generation Commands | Planned | CLI -> Templates generation contract | Pending |
+| AUC-CLI-007 | Generation Commands | Completed | CliApplication -> GenerationTemplateRenderer | CliGenerationCommandTests |
 
 ## Feature 硬门禁
 
@@ -118,13 +118,13 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 ## AUC-CLI-007 Generation Commands
 
 Feature ID: `AUC-CLI-007`
-Status: Planned
-Goal: 调用 Templates 生成 module、page、plugin、test、configuration 和 localization 产物。
-Public Contract: 尚未进入 1.0 public contract。
-Runtime / Build Behavior: 未实现前，`generate` 按未知命令失败，不得返回空变更的成功 envelope。
-Failure Behavior: 当前返回 `AUCCLI0002`，不写文件。
-Threading / Cancellation: 实现时必须贯穿 CLI cancellation，并复用 Templates 的事务写入合同。
-Diagnostics: Pending；实现后分配专用诊断码。
-Tests: Pending；当前由 `GenerateCommandCannotReportSuccessBeforeFeatureIsImplemented` 锁定不得虚假成功。
+Status: Completed
+Goal: 调用 Templates 生成 module、page、test、configuration 和 localization 产物；plugin generation 不属于本阶段。
+Public Contract: CliApplication -> GenerationTemplateRenderer、TemplatePlan、CliEnvelope。
+Runtime / Build Behavior: CLI 解析目标工程和 namespace，Templates 负责内容、plan、事务写入与回滚；dry-run 不写文件。
+Failure Behavior: 缺少 kind/name、plugin/未知 kind、工程无法唯一解析、模板变量非法、目标冲突、取消和写入失败均返回稳定失败 envelope，不保留半成品。
+Threading / Cancellation: cancellation 贯穿 CLI 和 Templates；同一 output root 的 apply 串行。
+Diagnostics: `AUCCLI0501` 到 `AUCCLI0504`，Templates 诊断保持 `AUCTPL...` code。
+Tests: `CliGenerationCommandTests` 和 `GenerationTemplateRendererTests`。
 Required Assertions: 真实变更、dry-run、冲突、取消、回滚和生成产物可构建。
-Acceptance Criteria: Templates 对应 Feature 完成后，生成命令具备真实 plan、render、diagnostic 与 smoke test 闭环。
+Acceptance Criteria: 五类非插件命令具备真实 plan、render、diagnostic、rollback 和 build/test smoke 闭环。

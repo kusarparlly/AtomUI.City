@@ -14,6 +14,9 @@ internal sealed class CliCommandLine
         "--project",
         "--output-root",
         "--plugins-root",
+        "--route",
+        "--culture",
+        "--depends-on",
     ];
 
     private static readonly HashSet<string> FlagOptions =
@@ -29,6 +32,7 @@ internal sealed class CliCommandLine
         "--use-aot",
         "--use-dynamic-plugins",
         "--yes",
+        "--reloadable",
     ];
 
     private readonly Dictionary<string, string?> _options;

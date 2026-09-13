@@ -12,6 +12,7 @@
 | Provider Module | Consumer Module | Contract | Direction | Lifecycle | Threading | Failure Behavior | Tests |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Core / Hosting | AtomUI.City.Cli | CLI 默认不启动桌面 Host；只创建工程、调用构建、检查插件和输出诊断。 | Core -> Module 或执行边界 -> Module | 见 lifecycle.md | 见 threading.md | 启动/执行失败必须有 Result、异常或诊断。 | tests/AtomUI.City.Cli.Tests |
+| Templates | AtomUI.City.Cli | CLI 只解析命令和目标工程；文件内容、plan、冲突预检、事务写入与回滚由 Templates 提供。 | Templates -> CLI | 单次 generation operation | 同 root 串行，不同 root 可并发 | Templates diagnostics 原样进入 CLI envelope。 | CliGenerationCommandTests, GenerationTemplateRendererTests |
 | PluginSystem | AtomUI.City.Cli | 本模块通过 manifest、包布局、模板、CLI 或 generator 支持插件开发和检查；不直接持有运行时插件对象。 | Plugin owner/manifest -> Module | load/enable/disable/unload 或 package/template/generator 边界 | 插件后台任务必须可取消 | 贡献撤销失败必须隔离。 | tests/AtomUI.City.Cli.Tests |
 | Testing | AtomUI.City.Cli | Feature ID 和产品合同测试。 | Testing -> Module | 构造 -> 执行 -> 断言 -> 释放 | fake dispatcher / deterministic scheduler / snapshot | 测试失败阻止完成状态。 | tests/AtomUI.City.Cli.Tests |
 

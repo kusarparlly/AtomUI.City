@@ -18,7 +18,7 @@ The isolated consumer validates these packages as one application dependency gra
 - `AtomUI.City.Security`
 - `AtomUI.City.Presentation`
 
-`AtomUI.City.PluginSystem`, `AtomUI.City.Testing`, `AtomUI.City.Cli`, and `AtomUI.City.Templates` are not part of this isolated consumer. This scope does not change their module Feature status. The full 1.0 package family remains blocked by `AUC-CLI-007` and `AUC-TEMPLATES-006` through `AUC-TEMPLATES-010`.
+`AtomUI.City.PluginSystem`, `AtomUI.City.Testing`, `AtomUI.City.Cli`, and `AtomUI.City.Templates` are not part of this isolated consumer. This scope does not change their module Feature status. CLI generation and Templates incremental generation have their own build/test gates; the full 1.0 package family remains blocked only by `AUC-TEMPLATES-010`.
 
 ## Package Gate
 
@@ -61,4 +61,4 @@ The two-hour run predates only PluginSystem test hardening, the package-consumer
 
 ## Release Decision
 
-The scoped runtime packages are suitable for local consumer evaluation and continued Dogfood use. This is not approval to publish the full AtomUI.City 1.0 package family: the six open CLI/Templates Features must be implemented and all final gates rerun before a stable tag or remote NuGet publication.
+The scoped runtime packages are suitable for local consumer evaluation and continued Dogfood use. This is not approval to publish the full AtomUI.City 1.0 package family: `AUC-TEMPLATES-010` must be implemented and all final gates rerun before a stable tag or remote NuGet publication.

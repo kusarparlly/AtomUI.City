@@ -2,7 +2,7 @@
 
 ## 架构目标
 
-AtomUI.City.Templates 的目标是提供应用、模块、插件、页面、配置、测试和本地化模板，让 CLI 与 `dotnet new` 生成符合框架工程约束的项目骨架。当前只交付 Host 应用、插件和测试骨架，其余能力以 Feature 状态为准。
+AtomUI.City.Templates 的目标是提供应用、模块、插件、页面、配置、测试和本地化模板，让 CLI 与 `dotnet new` 生成符合框架工程约束的项目骨架。`GenerationTemplateRenderer` 承接非插件的工作区增量生成；插件生成仍只保留现有独立 `dotnet new` 模板。
 
 - 模板输出必须能直接 restore/build/test。
 - 模板默认命名、包引用、目录结构和 license 与仓库规范一致。
@@ -24,6 +24,8 @@ AtomUI.City.Templates 的目标是提供应用、模块、插件、页面、配�
 | --- | --- | --- | --- |
 | ApplicationTemplateOptions | 应用模板输入和命名规则。 | CLI 或测试 | 单次渲染只读。 |
 | ApplicationTemplateRenderer | 生成 TemplatePlan 并执行渲染。 | DI 或 CLI | 业务无状态，可复用；内部 keyed gate 只在进行中的同目标 render 期间存在。 |
+| GenerationTemplateOptions | module/page/test/config/localization 的工作区增量输入。 | CLI 或测试 | 单次 operation 只读。 |
+| GenerationTemplateRenderer | 生成增量 plan 并执行 create-only 事务。 | CLI 或测试 | 无状态；同 output root 的 gate 在事务结束后释放。 |
 | TemplatePlan | 待创建、修改、跳过和冲突的文件清单。 | renderer | 执行前不可变。 |
 | TemplateChange | 单个文件变更 contract。 | renderer | 应用后进入结果。 |
 | TemplateRenderResult | 渲染结果、diagnostics 和 artifact 列表。 | renderer | 输出后不可变。 |

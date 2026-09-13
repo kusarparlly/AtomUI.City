@@ -41,6 +41,11 @@
 | AUC-TEMPLATES-003 | Template Variables | ApplicationTemplateBuildSmokeTests |
 | AUC-TEMPLATES-004 | Plugin Template | TemplatePackageLayoutTests |
 | AUC-TEMPLATES-005 | Test Template | ApplicationTemplateBuildSmokeTests |
+| AUC-TEMPLATES-006 | Module Template | GenerationTemplateRendererTests |
+| AUC-TEMPLATES-007 | Page Template | GenerationTemplateRendererTests |
+| AUC-TEMPLATES-008 | Localization Template | GenerationTemplateRendererTests |
+| AUC-TEMPLATES-009 | Configuration Template | GenerationTemplateRendererTests |
+| AUC-TEMPLATES-010 | Avalonia Desktop Application Template | Pending |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -83,7 +88,11 @@ Templates 的生成结果必须可构建、可测试、符合 Build 约定，并
 |---|---|---|
 | `AUCTPL0001` | 模板变量无效。 | Current |
 | `AUCTPL0002` | `RootNamespace` 不能使用框架命名空间。 | Current |
-| `AUCTPL0101` | RoutePath 无效。 | Planned / AUC-TEMPLATES-007 |
+| `AUCTPL2001` | generation 名称或依赖类型无效。 | Current |
+| `AUCTPL2002` | generation 工程名无效。 | Current |
+| `AUCTPL2003` | generation namespace 无效。 | Current |
+| `AUCTPL2004` | page RoutePath 缺失或无效。 | Current |
+| `AUCTPL2005` | localization culture 缺失、重复或无效。 | Current |
 | `AUCTPL0201` | PluginId 无效。 | Planned；当前由 PluginSystem Build 校验承接 |
 | `AUCTPL0301` | AOT 模式和动态插件配置冲突。 | Current |
 | `AUCTPL0401` | 生成结果缺少测试矩阵。 | Planned |
@@ -117,7 +126,7 @@ Templates 的生成结果必须可构建、可测试、符合 Build 约定，并
 - manifest 生成。
 - 插件包 layout validation。
 
-模块、页面、本地化、配置和 Avalonia desktop smoke 在对应 Planned Feature 实现前不得列为已覆盖。
+模块、页面、本地化和配置已由 `GenerationTemplateRendererTests` 覆盖同一工作区真实 restore/build/test；Avalonia desktop application smoke 仍等待 `AUC-TEMPLATES-010`。
 
 ### 6. 禁止事项测试
 
