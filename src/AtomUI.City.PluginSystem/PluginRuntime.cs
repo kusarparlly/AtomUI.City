@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
 
 namespace AtomUI.City.PluginSystem;
@@ -98,15 +99,29 @@ public sealed class PluginRuntime
 
         _leases.Clear();
         _mainAssembly = null;
-        var loadContext = _loadContext;
+        var unloadReference = BeginUnload(_loadContext);
         _loadContext = null;
-        loadContext?.Unload();
 
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
-        GC.Collect();
+        for (var attempt = 0; unloadReference?.IsAlive == true && attempt < 10; attempt++)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
 
         State = PluginRuntimeState.Unloaded;
         return PluginUnloadResult.Success;
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static WeakReference? BeginUnload(AssemblyLoadContext? loadContext)
+    {
+        if (loadContext is null)
+        {
+            return null;
+        }
+
+        var unloadReference = new WeakReference(loadContext, trackResurrection: true);
+        loadContext.Unload();
+        return unloadReference;
     }
 }

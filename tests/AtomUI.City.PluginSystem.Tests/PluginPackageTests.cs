@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Text.Json;
 using AtomUI.City.PluginSystem;
 
 namespace AtomUI.City.PluginSystem.Tests;
@@ -132,17 +133,13 @@ public sealed class PluginPackageTests
         var manifestPath = Path.Combine(installedRootPath, "atomui-city", "plugin.json");
         Directory.CreateDirectory(Path.GetDirectoryName(manifestPath)!);
         var installRecordPath = Path.Combine(installedVersionPath, "install.json");
-        await File.WriteAllTextAsync(
+        await WriteInstallRecordAsync(
             installRecordPath,
-            $$"""
-            {
-              "pluginId": "com.company.sales",
-              "packageId": "Company.Sales.Plugin",
-              "version": "1.0.0",
-              "rootPath": "{{installedRootPath}}",
-              "manifestPath": "{{manifestPath}}"
-            }
-            """);
+            "com.company.sales",
+            "Company.Sales.Plugin",
+            "1.0.0",
+            installedRootPath,
+            manifestPath);
 
         var installation = PluginInstallationReader.Read(installRecordPath);
 
@@ -182,17 +179,13 @@ public sealed class PluginPackageTests
         var installedRootPath = Path.Combine(installedVersionPath, "root");
         var manifestPath = Path.Combine(installedRootPath, "atomui-city", "plugin.json");
         Directory.CreateDirectory(installedVersionPath);
-        await File.WriteAllTextAsync(
+        await WriteInstallRecordAsync(
             Path.Combine(installedVersionPath, "install.json"),
-            $$"""
-            {
-              "pluginId": "com.company.sales",
-              "packageId": "Company.Sales.Plugin",
-              "version": "1.0.0",
-              "rootPath": "{{installedRootPath}}",
-              "manifestPath": "{{manifestPath}}"
-            }
-            """);
+            "com.company.sales",
+            "Company.Sales.Plugin",
+            "1.0.0",
+            installedRootPath,
+            manifestPath);
 
         var discovery = PluginDiscoveryScanner.DiscoverInstalled(pluginsRoot);
 
@@ -287,17 +280,13 @@ public sealed class PluginPackageTests
         var installedVersionPath = Path.Combine(pluginsRoot, "installed", "com.company.sales", "1.0.0");
         var installRecordPath = Path.Combine(installedVersionPath, "install.json");
         Directory.CreateDirectory(installedVersionPath);
-        await File.WriteAllTextAsync(
+        await WriteInstallRecordAsync(
             installRecordPath,
-            $$"""
-            {
-              "pluginId": "com.company.sales",
-              "packageId": "Company.Sales.Plugin",
-              "version": "1.0.0",
-              "rootPath": "{{workspace.Root}}",
-              "manifestPath": "{{workspace.ManifestPath}}"
-            }
-            """);
+            "com.company.sales",
+            "Company.Sales.Plugin",
+            "1.0.0",
+            workspace.Root,
+            workspace.ManifestPath);
 
         var discovery = PluginDiscoveryScanner.DiscoverInstalled(pluginsRoot);
 
@@ -321,17 +310,13 @@ public sealed class PluginPackageTests
         var installedRootPath = Path.Combine(installedVersionPath, "root");
         var installRecordPath = Path.Combine(installedVersionPath, "install.json");
         Directory.CreateDirectory(installedRootPath);
-        await File.WriteAllTextAsync(
+        await WriteInstallRecordAsync(
             installRecordPath,
-            $$"""
-            {
-              "pluginId": "com.company.sales",
-              "packageId": "Company.Sales.Plugin",
-              "version": "1.0.0",
-              "rootPath": "{{installedRootPath}}",
-              "manifestPath": "{{workspace.ManifestPath}}"
-            }
-            """);
+            "com.company.sales",
+            "Company.Sales.Plugin",
+            "1.0.0",
+            installedRootPath,
+            workspace.ManifestPath);
 
         var discovery = PluginDiscoveryScanner.DiscoverInstalled(pluginsRoot);
 
@@ -403,17 +388,13 @@ public sealed class PluginPackageTests
               "aotCompatible": false
             }
             """);
-        await File.WriteAllTextAsync(
+        await WriteInstallRecordAsync(
             Path.Combine(installedVersionPath, "install.json"),
-            $$"""
-            {
-              "pluginId": "com.company.sales",
-              "packageId": "Company.Sales.Plugin",
-              "version": "1.0.0",
-              "rootPath": "{{installedRootPath}}",
-              "manifestPath": "{{manifestPath}}"
-            }
-            """);
+            "com.company.sales",
+            "Company.Sales.Plugin",
+            "1.0.0",
+            installedRootPath,
+            manifestPath);
 
         var discovery = PluginDiscoveryScanner.DiscoverInstalled(pluginsRoot);
 
@@ -441,17 +422,13 @@ public sealed class PluginPackageTests
         var manifestPath = Path.Combine(installedRootPath, "atomui-city", "plugin.json");
         Directory.CreateDirectory(Path.GetDirectoryName(manifestPath)!);
         await File.WriteAllTextAsync(manifestPath, "not json");
-        await File.WriteAllTextAsync(
+        await WriteInstallRecordAsync(
             Path.Combine(installedVersionPath, "install.json"),
-            $$"""
-            {
-              "pluginId": "com.company.broken",
-              "packageId": "Company.Broken.Plugin",
-              "version": "1.0.0",
-              "rootPath": "{{installedRootPath}}",
-              "manifestPath": "{{manifestPath}}"
-            }
-            """);
+            "com.company.broken",
+            "Company.Broken.Plugin",
+            "1.0.0",
+            installedRootPath,
+            manifestPath);
 
         var discovery = PluginDiscoveryScanner.DiscoverInstalled(pluginsRoot);
 
@@ -491,17 +468,13 @@ public sealed class PluginPackageTests
               "aotCompatible": false
             }
             """);
-        await File.WriteAllTextAsync(
+        await WriteInstallRecordAsync(
             Path.Combine(installedVersionPath, "install.json"),
-            $$"""
-            {
-              "pluginId": "com.company.sales",
-              "packageId": "Company.Sales.Plugin",
-              "version": "1.0.0",
-              "rootPath": "{{installedRootPath}}",
-              "manifestPath": "{{manifestPath}}"
-            }
-            """);
+            "com.company.sales",
+            "Company.Sales.Plugin",
+            "1.0.0",
+            installedRootPath,
+            manifestPath);
 
         var discovery = PluginDiscoveryScanner.DiscoverInstalled(pluginsRoot);
 
@@ -540,17 +513,13 @@ public sealed class PluginPackageTests
               "aotCompatible": false
             }
             """);
-        await File.WriteAllTextAsync(
+        await WriteInstallRecordAsync(
             Path.Combine(installedVersionPath, "install.json"),
-            $$"""
-            {
-              "pluginId": "com.company.sales",
-              "packageId": "Company.Sales.Plugin",
-              "version": "1.0.0",
-              "rootPath": "{{installedRootPath}}",
-              "manifestPath": "{{manifestPath}}"
-            }
-            """);
+            "com.company.sales",
+            "Company.Sales.Plugin",
+            "1.0.0",
+            installedRootPath,
+            manifestPath);
 
         var discovery = PluginDiscoveryScanner.DiscoverInstalled(pluginsRoot);
 
@@ -589,17 +558,13 @@ public sealed class PluginPackageTests
               "aotCompatible": false
             }
             """);
-        await File.WriteAllTextAsync(
+        await WriteInstallRecordAsync(
             Path.Combine(installedVersionPath, "install.json"),
-            $$"""
-            {
-              "pluginId": "com.company.sales",
-              "packageId": "Company.Sales.Plugin",
-              "version": "1.0.0",
-              "rootPath": "{{installedRootPath}}",
-              "manifestPath": "{{manifestPath}}"
-            }
-            """);
+            "com.company.sales",
+            "Company.Sales.Plugin",
+            "1.0.0",
+            installedRootPath,
+            manifestPath);
 
         var discovery = PluginDiscoveryScanner.DiscoverInstalled(pluginsRoot);
 
@@ -680,4 +645,22 @@ public sealed class PluginPackageTests
 
         Assert.False(Directory.Exists(Path.Combine(pluginsRoot, PluginPackagePaths.StagingDirectoryName)));
     }
+
+    private static Task WriteInstallRecordAsync(
+        string path,
+        string pluginId,
+        string packageId,
+        string version,
+        string rootPath,
+        string manifestPath) =>
+        File.WriteAllTextAsync(
+            path,
+            JsonSerializer.Serialize(new
+            {
+                pluginId,
+                packageId,
+                version,
+                rootPath,
+                manifestPath,
+            }));
 }

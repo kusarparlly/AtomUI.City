@@ -79,9 +79,22 @@ internal sealed class PluginTestWorkspace : IDisposable
 
     public void Dispose()
     {
-        if (Directory.Exists(Temp))
+        const int maximumAttempts = 40;
+        for (var attempt = 1; Directory.Exists(Temp); attempt++)
         {
-            Directory.Delete(Temp, recursive: true);
+            try
+            {
+                Directory.Delete(Temp, recursive: true);
+                return;
+            }
+            catch (Exception exception) when (
+                exception is IOException or UnauthorizedAccessException &&
+                attempt < maximumAttempts)
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                Thread.Sleep(50);
+            }
         }
     }
 }

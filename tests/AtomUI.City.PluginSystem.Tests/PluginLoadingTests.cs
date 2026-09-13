@@ -1,11 +1,12 @@
 using AtomUI.City.PluginSystem;
+using System.Runtime.CompilerServices;
 
 namespace AtomUI.City.PluginSystem.Tests;
 
 public sealed class PluginLoadingTests
 {
     [Fact]
-    public async Task LoaderLoadsMainAssemblyFromPluginRoot()
+    public void LoaderLoadsMainAssemblyFromPluginRoot()
     {
         using var workspace = new PluginTestWorkspace();
         workspace.WriteStandardManifest(mainAssembly: "AtomUI.City.PluginSystem.dll");
@@ -13,15 +14,25 @@ public sealed class PluginLoadingTests
         var descriptor = PluginDescriptor.FromManifest(
             PluginManifestReader.Read(workspace.ManifestPath),
             workspace.Root);
-        var loader = new PluginLoader();
 
-        var result = await loader.LoadAsync(descriptor);
+        LoadAssertAndUnload(descriptor);
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void LoadAssertAndUnload(PluginDescriptor descriptor)
+    {
+        var loader = new PluginLoader();
+        var result = loader.LoadAsync(descriptor).GetAwaiter().GetResult();
 
         Assert.True(result.Succeeded);
         Assert.Equal(PluginRuntimeState.Loaded, result.State);
         var runtime = Assert.IsType<PluginRuntime>(result.Runtime);
         Assert.Equal(PluginRuntimeState.Loaded, runtime.State);
         Assert.Equal("AtomUI.City.PluginSystem", runtime.MainAssembly.GetName().Name);
+        Assert.True(runtime.UnloadAsync().GetAwaiter().GetResult().Succeeded);
     }
 
     [Fact]
@@ -56,10 +67,13 @@ public sealed class PluginLoadingTests
         var loader = new PluginLoader();
         var result = await loader.LoadAsync(descriptor);
         var runtime = Assert.IsType<PluginRuntime>(result.Runtime);
+        var revokeAttempts = 0;
         var lease = runtime.RegisterUnloadLease(
             "routes:main",
             "route",
-            _ => throw new InvalidOperationException("route still active"));
+            _ => Interlocked.Increment(ref revokeAttempts) == 1
+                ? throw new InvalidOperationException("route still active")
+                : ValueTask.CompletedTask);
 
         var unload = await runtime.UnloadAsync();
 
@@ -73,6 +87,7 @@ public sealed class PluginLoadingTests
                 && diagnostic.PluginId == "com.company.sales"
                 && diagnostic.Field == "route"
                 && diagnostic.Path == "routes:main");
+        Assert.True((await runtime.UnloadAsync()).Succeeded);
     }
 
     [Fact]
