@@ -4,11 +4,12 @@
 
 ## 当前结论
 
-- 1.0 发布状态：暂不可发布，CLI Generation 与 Templates 共 6 项规划能力尚待实现。
-- 全局进度：137/143。
+- 1.0 总包发布状态：暂不可发布，CLI Generation 与 Templates 共 6 项规划能力尚待实现。
+- 运行时本地候选状态：Build、Core、EventBus、State、MVVM、Routing、Data、Localization、Security、Presentation 共 10 个包已通过隔离本地 NuGet consumer；尚未执行远端 NuGet 发布。
+- 全局进度：138/144。
 - 模块 Feature 合同：128/134。
-- 最终发布门禁：9/9。
-- 最近校准日期：2026-09-11。
+- 最终发布门禁：10/10。
+- 最近校准日期：2026-09-13。
 
 ## 统计规则
 
@@ -48,7 +49,7 @@
 | Security | 9 | 0 | 9 | 已完成 |
 | CLI | 6 | 1 | 7 | 进行中 |
 | Templates | 5 | 5 | 10 | 进行中 |
-| Release Gates | 9 | 0 | 9 | 已完成 |
+| Release Gates | 10 | 0 | 10 | 已完成 |
 
 ## Core
 
@@ -240,6 +241,7 @@
 - [x] AUC-RELEASE-007 Template smoke gate。通过 `bash engineering/check-template-smoke.sh`。
 - [x] AUC-RELEASE-008 CI-equivalent local gate。通过 `bash engineering/test-ci.sh` 和必要的 platform integration gate。
 - [x] AUC-RELEASE-009 Release notes and versioning。通过 `bash engineering/generate-release-notes.sh`，并完成 1.0 版本号、包元数据和发布说明审阅。
+- [x] AUC-RELEASE-010 Isolated Local Package Consumer。通过 `./engineering/check-local-package-consumer.ps1 -Configuration Release`；Build 与九个运行时包使用唯一候选版本打入本地源，consumer 不含 `ProjectReference`，从隔离缓存恢复并在 `net8.0`/`net10.0` 编译、在可用运行时上执行跨模块合同。
 
 ## 后续维护规则
 

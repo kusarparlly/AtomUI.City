@@ -27,6 +27,14 @@
 - Build 包可以包含 buildTransitive assets。
 - Generator/Analyzer 作为 build/analyzer 资产进入应用项目，不进入 runtime 主链路。
 
+候选包不得只通过仓库内 `ProjectReference` 验证。Windows 本地候选版必须运行：
+
+```powershell
+./engineering/check-local-package-consumer.ps1 -Configuration Release
+```
+
+该门禁使用唯一的 `1.0.0-local-gate` 版本、独立 package cache 和本次生成的本地 NuGet 源；第三方依赖允许从用户缓存或 NuGet.org 恢复，但 `AtomUI.City.*` 必须来自候选本地源。门禁不会向任何远端源发布包。
+
 ## 4. 插件包规则
 
 插件包规则见：
@@ -59,6 +67,7 @@
 |---|---|---|
 | runtime package | Pack test | 包含 runtime assets，不包含测试资产。 |
 | Build package | Pack test | buildTransitive assets 正确。 |
+| isolated consumer | Package/Integration | 无 `ProjectReference`，候选包来源可追踪，`net8.0`/`net10.0` 可编译且当前运行时目标可执行。 |
 | Template package | Template smoke | 模板可安装并生成项目。 |
 | CLI package | Tool smoke | `atomui city` 可执行。 |
 | Plugin package | Package layout test | one main assembly 和 plugin.json 有效。 |
