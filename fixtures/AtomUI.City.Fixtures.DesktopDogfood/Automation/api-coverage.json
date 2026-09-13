@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "modules": [
+    { "module": "Core", "assembly": "AtomUI.City.Core", "classification": "INDIRECT", "evidenceCategory": "scenario", "expectedSha256": "82A52949A118B646F23BC835E221B45BB468374296362119C85D415D2F422D55" },
+    { "module": "EventBus", "assembly": "AtomUI.City.EventBus", "classification": "RT", "evidenceCategory": "event-cycle", "expectedSha256": "735A14FDEE00A7505781DBE235A1CD3FF0BA0EEC1A4D5A98B4AA9868CA2FC6F8" },
+    { "module": "State", "assembly": "AtomUI.City.State", "classification": "RT", "evidenceCategory": "state-write", "expectedSha256": "6C5738CECC3F7658348A79DEED15D7FBC7F20DDCA5FF066D8737D4CC76019746" },
+    { "module": "Routing", "assembly": "AtomUI.City.Routing", "classification": "RT", "evidenceCategory": "navigation-cycle", "expectedSha256": "FE330708716EA1087A078D88495587AE50D5253492A8C9799C7242F4282C3DA5" },
+    { "module": "Mvvm", "assembly": "AtomUI.City.Mvvm", "classification": "RT", "evidenceCategory": "command", "expectedSha256": "F7A5102F3B67C01316C7AB8B498A026C3310B658BF444C407F2FAA09AD43B5E9" },
+    { "module": "Data", "assembly": "AtomUI.City.Data", "classification": "RT", "evidenceCategory": "data", "expectedSha256": "984CFC27A5EDFDEA31E689C97020D715A7CBD76242EA2DD14F42619ADC030D85" },
+    { "module": "Localization", "assembly": "AtomUI.City.Localization", "classification": "RT", "evidenceCategory": "localization", "expectedSha256": "095ED3D6DE67A6C569B816ECB3553ED52C43B7ADE531F0A1BD7349D2C54ED9E7" },
+    { "module": "Security", "assembly": "AtomUI.City.Security", "classification": "RT", "evidenceCategory": "scenario-security", "expectedSha256": "31AD1259A8FEA24B1C07E5254CC193ECF9CBD45F85A5A00F426154DC0DD6CBDB" },
+    { "module": "Presentation", "assembly": "AtomUI.City.Presentation", "classification": "UI", "evidenceCategory": "navigation-cycle", "expectedSha256": "475A486F84EEC152C0A94732F3E06645BDF84CD49DA60731C271E60B767FF8C2" }
+  ]
+}

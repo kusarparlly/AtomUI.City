@@ -23,6 +23,12 @@
                       ReferenceOutputAssembly="false" />
     <ProjectReference Include="../../fixtures/AtomUI.City.Presentation.DesktopApp/AtomUI.City.Presentation.DesktopApp.csproj"
                       ReferenceOutputAssembly="false" />
+    <ProjectReference Include="../../fixtures/AtomUI.City.Fixtures.DesktopDogfood/AtomUI.City.Fixtures.DesktopDogfood.csproj"
+                      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="../../fixtures/AtomUI.City.Fixtures.DesktopDogfood.GuiAutomation/AtomUI.City.Fixtures.DesktopDogfood.GuiAutomation.csproj"
+                      ReferenceOutputAssembly="false"
+                      SkipGetTargetFrameworkProperties="true"
+                      Condition="$([MSBuild]::IsOSPlatform('Windows'))" />
     <Compile Include="../Shared/ProcessTestRunner.cs" Link="ProcessTestRunner.cs" />
   </ItemGroup>
 

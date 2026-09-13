@@ -4,11 +4,11 @@
 
 ## 当前结论
 
-- 1.0 发布状态：暂不可发布，Security 多账号能力、CLI Generation 和 Templates 的 5 项规划能力尚待实现。
-- 全局进度：135/143。
-- 模块 Feature 合同：126/134。
+- 1.0 发布状态：暂不可发布，CLI Generation 与 Templates 共 6 项规划能力尚待实现。
+- 全局进度：137/143。
+- 模块 Feature 合同：128/134。
 - 最终发布门禁：9/9。
-- 最近校准日期：2026-09-09。
+- 最近校准日期：2026-09-11。
 
 ## 统计规则
 
@@ -45,7 +45,7 @@
 | PluginSystem | 8 | 0 | 8 | 已完成 |
 | Data | 20 | 0 | 20 | 已完成 |
 | Localization | 8 | 0 | 8 | 已完成 |
-| Security | 7 | 2 | 9 | 进行中 |
+| Security | 9 | 0 | 9 | 已完成 |
 | CLI | 6 | 1 | 7 | 进行中 |
 | Templates | 5 | 5 | 10 | 进行中 |
 | Release Gates | 9 | 0 | 9 | 已完成 |
@@ -203,8 +203,8 @@
 - [x] AUC-SECURITY-005 Route Authorization Guard。验收重点：allow、deny、redirect login、contribution 撤销、异常取消、诊断和 Routing 无 Security 反向依赖。
 - [x] AUC-SECURITY-006 Command Authorization。验收重点：状态变化、有序 revision、禁用/隐藏、contribution 继承/冲突、失败构造隔离、订阅回滚/释放聚合、contribution 撤销、观察者隔离和诊断。
 - [x] AUC-SECURITY-007 Access Token Provider。验收重点：成功、null/异常失败、不可用、调用前后取消、诊断脱敏、DI 默认 provider 和 Data 集成前置条件。
-- [ ] AUC-SECURITY-008 Multi-Account File Persistence。验收重点：多账号文件持久化、账号隔离、路径约束、原子写入、重启恢复、删除无残留，以及凭据不进入普通配置、State、日志或诊断。
-- [ ] AUC-SECURITY-009 Active Account Switching and Restore。验收重点：全局单活动账号、启动恢复、原子切换、失败/取消回滚、单次 revision/通知和离线受限模式。
+- [x] AUC-SECURITY-008 Multi-Account File Persistence。验收重点：多账号文件持久化、账号隔离、路径约束、原子写入、重启恢复、删除无残留，以及凭据不进入普通配置、State、日志或诊断。
+- [x] AUC-SECURITY-009 Active Account Switching and Restore。验收重点：全局单活动账号、启动恢复、原子切换、失败/取消回滚、单次 revision/通知和离线受限模式。
 
 ## CLI
 

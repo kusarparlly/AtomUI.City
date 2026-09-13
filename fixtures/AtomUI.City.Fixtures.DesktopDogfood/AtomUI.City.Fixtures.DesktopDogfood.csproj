@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>$(AtomUICityDevelopTargetFramework)</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Headless" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Google.Protobuf" />
+    <PackageReference Include="Grpc.AspNetCore" />
+    <PackageReference Include="Grpc.Net.Client" />
+    <PackageReference Include="Grpc.Tools" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/AtomUI.City.Core/AtomUI.City.Core.csproj" />
+    <ProjectReference Include="../../src/AtomUI.City.Data/AtomUI.City.Data.csproj" />
+    <ProjectReference Include="../../src/AtomUI.City.EventBus/AtomUI.City.EventBus.csproj" />
+    <ProjectReference Include="../../src/AtomUI.City.State/AtomUI.City.State.csproj" />
+    <ProjectReference Include="../../src/AtomUI.City.Mvvm/AtomUI.City.Mvvm.csproj" />
+    <ProjectReference Include="../../src/AtomUI.City.Routing/AtomUI.City.Routing.csproj" />
+    <ProjectReference Include="../../src/AtomUI.City.Security/AtomUI.City.Security.csproj" />
+    <ProjectReference Include="../../src/AtomUI.City.Localization/AtomUI.City.Localization.csproj" />
+    <ProjectReference Include="../../src/AtomUI.City.Presentation/AtomUI.City.Presentation.csproj" />
+    <ProjectReference Include="../../src/AtomUI.City.Generators/AtomUI.City.Generators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+    <Compile Include="../Shared/ProcessEntryPoint.cs" Link="ProcessEntryPoint.cs" />
+    <Compile Include="../AtomUI.City.Fixtures.StressCli/DataIntegration/StressDataContracts.cs"
+             Link="Data/Loopback/StressDataContracts.cs" />
+    <Compile Include="../AtomUI.City.Fixtures.StressCli/DataIntegration/StressDataServer.cs"
+             Link="Data/Loopback/StressDataServer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="../AtomUI.City.Fixtures.StressCli/DataIntegration/Protos/stress_data.proto"
+              Link="Data/Loopback/stress_data.proto"
+              GrpcServices="Both" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Automation/api-coverage.json" CopyToOutputDirectory="PreserveNewest" TargetPath="api-coverage.json" />
+  </ItemGroup>
+
+</Project>
