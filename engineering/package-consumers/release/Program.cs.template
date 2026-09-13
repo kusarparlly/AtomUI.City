@@ -1,0 +1,263 @@
+using System.Globalization;
+using AtomUI.City.Core.Hosting;
+using AtomUI.City.Core.Lifecycle;
+using AtomUI.City.Core.Modularity;
+using AtomUI.City.Core.Threading;
+using AtomUI.City.Data;
+using AtomUI.City.EventBus;
+using AtomUI.City.Localization;
+using AtomUI.City.Mvvm;
+using AtomUI.City.Presentation;
+using AtomUI.City.Routing;
+using AtomUI.City.Security;
+using AtomUI.City.State;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Release.PackageConsumer;
+
+[ApplicationModule]
+[DependsOn(typeof(EventBusModule))]
+[DependsOn(typeof(RoutingModule))]
+[DependsOn(typeof(DataModule))]
+[DependsOn(typeof(PresentationModule))]
+public sealed class ConsumerModule : ModuleBase;
+
+[EventContract("atomui.city.release.package-consumer.v1", typeof(ConsumerModule), SchemaVersion = 1)]
+[EventChannel("release-consumer", Capacity = 8, BackpressurePolicy = EventChannelBackpressurePolicy.Wait)]
+public sealed record ConsumerEvent(int Value);
+
+[EventHandler(typeof(ConsumerModule), ChannelName = "release-consumer")]
+public sealed class ConsumerEventHandler : IEventHandler<ConsumerEvent>
+{
+    private static readonly TaskCompletionSource<int> Delivery =
+        new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    public static Task<int> WaitAsync() => Delivery.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+    public ValueTask HandleAsync(EventContext<ConsumerEvent> context)
+    {
+        Delivery.TrySetResult(context.Event.Value);
+        return ValueTask.CompletedTask;
+    }
+}
+
+[RouteMap]
+public static partial class ConsumerRoutes
+{
+    [Route("home", typeof(ConsumerViewModel), Id = "release.consumer.home")]
+    public static partial RouteReference Home();
+}
+
+internal static class Program
+{
+    public static async Task<int> Main(string[] args)
+    {
+        var securityRoot = Path.Combine(Path.GetTempPath(), "AtomUI.City.ReleaseConsumer", Guid.NewGuid().ToString("N"));
+        try
+        {
+            await RunAsync(args, securityRoot);
+            return 0;
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine(exception);
+            return 1;
+        }
+        finally
+        {
+            if (Directory.Exists(securityRoot))
+            {
+                Directory.Delete(securityRoot, recursive: true);
+            }
+        }
+    }
+
+    private static async Task RunAsync(string[] args, string securityRoot)
+    {
+        var culture = CultureInfo.GetCultureInfo("en-US");
+        var builder = ApplicationHost.CreateBuilder(args);
+        builder
+            .UseModule<EventBusModule>()
+            .UseModule<RoutingModule>()
+            .UseModule<DataModule>()
+            .UseModule<PresentationModule>()
+            .UseModule<ConsumerModule>();
+        builder.ConfigureHost(options =>
+        {
+            options.ApplicationId = "AtomUI.City.Release.PackageConsumer";
+            options.ApplicationName = "AtomUI.City.Release.PackageConsumer";
+            options.ApplicationVersion = "1.0.0";
+        });
+        builder.ConfigureServices(services =>
+        {
+            services.AddState();
+            services.AddSecurity(new SecurityPersistenceOptions(securityRoot, "release-api"));
+            services.AddLocalization(options =>
+            {
+                options.DefaultCulture = culture;
+                options.DefaultUICulture = culture;
+                options.LanguagePackages.Add(new LanguagePackageDescriptor("Release.Consumer", culture, ResourceScope.Host)
+                {
+                    ProviderKind = LanguagePackageProviderKind.InMemory,
+                    InMemoryResources = new Dictionary<string, string>(StringComparer.Ordinal)
+                    {
+                        ["Release.Hello"] = "Package consumer ready",
+                    },
+                });
+            });
+            services.AddRouting(AtomUI.City.Generated.GeneratedRoutingRouteManifest.CreateDescriptors());
+            services.AddSingleton<IUiDispatcher>(InlineUiDispatcher.Instance);
+            services.AddSingleton<ConsumerViewModel>();
+        });
+
+        await using var host = builder.Build();
+        await host.StartAsync();
+
+        var eventBus = host.Services.GetRequiredService<IEventBus>();
+        var publication = await eventBus.PublishAsync(
+            new EventChannel<ConsumerEvent>("release-consumer"),
+            new ConsumerEvent(42));
+        var deliveredValue = await ConsumerEventHandler.WaitAsync();
+
+        var stateKey = new StateKey<int>("release.consumer.counter");
+        host.Services.GetRequiredService<IStateRegistry>().Add(
+            StateDefinition.Create(stateKey, 0, access: StateAccessPolicy.HostWrite));
+        var stateWriter = host.Services.GetRequiredService<IApplicationStateWriter>();
+        stateWriter.Set(stateKey, deliveredValue);
+        var stateValue = host.Services.GetRequiredService<IApplicationState>().Get(stateKey).Value;
+
+        var commandValue = 0;
+        var command = CommandFactory.Create(() => commandValue = stateValue + 1);
+        command.Execute(null);
+
+        using var navigationServices = host.Services.CreateScope();
+        var navigation = await navigationServices.ServiceProvider
+            .GetRequiredService<IRouter>()
+            .NavigateAsync(ConsumerRoutes.Home());
+
+        using var dataPipeline = new DataRequestPipeline(new ConsumerTransport());
+        var dataResult = await dataPipeline.SendAsync(
+            new DataRequest<int>("release-consumer", "answer", DataTransportKind.Http));
+        var registeredTransportKinds = host.Services
+            .GetServices<IRequestResponseTransport>()
+            .Select(static transport => transport.Kind)
+            .Distinct()
+            .Count();
+
+        var localized = await host.Services
+            .GetRequiredService<ILocalizationService>()
+            .GetStringAsync("Release.Hello");
+
+        var now = DateTimeOffset.UtcNow;
+        var accountKey = new SecurityAccountKey("oidc", "https://identity.example.test", "tenant", "release-user");
+        var accountStore = host.Services.GetRequiredService<IAccountSessionStore>();
+        var credentialStore = host.Services.GetRequiredService<ICredentialStore>();
+        await accountStore.SaveAsync(new AccountRecordSnapshot(
+            new AccountProfileSnapshot(accountKey, "Release User", lastUsedAt: now),
+            new PersistedPermissionSnapshot(accountKey, ["release.run"], 1, now.AddMinutes(-1), now.AddHours(1))));
+        await credentialStore.SaveAsync(new AccountCredentialSnapshot(
+            accountKey,
+            "release-api",
+            "local-package-token",
+            "Bearer",
+            expiresAt: now.AddHours(1)));
+        var accountManager = host.Services.GetRequiredService<IAccountSessionManager>();
+        var accountSwitch = await accountManager.SwitchAccountAsync(accountKey);
+        var accessToken = await host.Services.GetRequiredService<IAccessTokenProvider>()
+            .GetTokenAsync(new AccessTokenRequest("release-api"));
+
+        var viewRegistry = host.Services.GetRequiredService<IViewRegistry>();
+        viewRegistry.Register(new ViewDescriptor(
+            typeof(ConsumerViewModel),
+            typeof(ConsumerView),
+            "main",
+            static _ => new ConsumerView()));
+        var viewDescriptor = viewRegistry.Locate(typeof(ConsumerViewModel), "main");
+        var outletTarget = new ConsumerOutletTarget();
+        await using var outlet = new RouteOutlet("primary", InlineUiDispatcher.Instance, outletTarget);
+        var viewModel = host.Services.GetRequiredService<ConsumerViewModel>();
+        var view = viewDescriptor.CreateView(new ViewFactoryContext(host.Services));
+        var presentationCommit = await outlet.CommitAsync(RouteOutletCommitPlan.Replace(
+            "primary",
+            BoundViewHandle.FromExisting(view, viewModel)));
+
+        var succeeded = publication.Succeeded &&
+                        deliveredValue == 42 &&
+                        stateValue == 42 &&
+                        commandValue == 43 &&
+                        navigation.Status == NavigationResultStatus.Success &&
+                        dataResult.Succeeded && dataResult.Value == 42 &&
+                        registeredTransportKinds == 3 &&
+                        !localized.IsMissing && localized.Value == "Package consumer ready" &&
+                        accountSwitch.Succeeded && accessToken.Succeeded &&
+                        presentationCommit.Succeeded && ReferenceEquals(outletTarget.Content, view);
+        if (!succeeded)
+        {
+            throw new InvalidOperationException("The isolated release package consumer contract failed.");
+        }
+
+        await host.StopAsync();
+        Console.WriteLine(
+            "RELEASE_PACKAGE_CONSUMER_OK host=stopped eventbus=delivered state=written mvvm=executed " +
+            "routing=navigated data=completed localization=resolved security=switched presentation=committed");
+    }
+}
+
+internal sealed class ConsumerTransport : IRequestResponseTransport
+{
+    public DataTransportKind Kind => DataTransportKind.Http;
+
+    public ValueTask<DataResult<TResponse>> SendAsync<TResponse>(
+        DataRequest<TResponse> request,
+        DataRequestContext context,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (typeof(TResponse) != typeof(int))
+        {
+            return ValueTask.FromResult(DataResult<TResponse>.Failed(
+                new DataError(DataErrorKind.SerializationError, "Unexpected response type.")));
+        }
+
+        return ValueTask.FromResult((DataResult<TResponse>)(object)DataResult<int>.Success(42));
+    }
+}
+
+public sealed class ConsumerViewModel;
+
+internal sealed class ConsumerView;
+
+internal sealed class ConsumerOutletTarget : IRouteOutletTarget
+{
+    public object? Content { get; private set; }
+
+    public void SetContent(object? content) => Content = content;
+}
+
+internal sealed class InlineUiDispatcher : IUiDispatcher
+{
+    public static InlineUiDispatcher Instance { get; } = new();
+
+    public bool CheckAccess() => true;
+
+    public ValueTask InvokeAsync(Action callback, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        callback();
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask<T> InvokeAsync<T>(Func<T> callback, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return ValueTask.FromResult(callback());
+    }
+
+    public ValueTask PostAsync(
+        Func<CancellationToken, ValueTask> callback,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return callback(cancellationToken);
+    }
+}

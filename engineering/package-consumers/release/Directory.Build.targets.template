@@ -1,0 +1,5 @@
+<Project>
+  <Target Name="RejectProjectReferences" BeforeTargets="PrepareForBuild" Condition="'@(ProjectReference)' != ''">
+    <Error Text="The release package consumer must not use ProjectReference." />
+  </Target>
+</Project>
