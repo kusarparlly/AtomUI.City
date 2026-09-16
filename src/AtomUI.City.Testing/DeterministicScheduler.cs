@@ -1,5 +1,8 @@
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents deterministic scheduler.
+/// </summary>
 public sealed class DeterministicScheduler : IDisposable
 {
     private readonly PriorityQueue<DeterministicScheduledWorkItem, ScheduledWorkPriority> _scheduledWork = new();
@@ -7,20 +10,35 @@ public sealed class DeterministicScheduler : IDisposable
     private long _nextWorkItemId;
     private bool _disposed;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>DeterministicScheduler</c> type.
+    /// </summary>
     public DeterministicScheduler()
         : this(new TestDiagnostics())
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>DeterministicScheduler</c> type.
+    /// </summary>
     public DeterministicScheduler(TestDiagnostics diagnostics)
     {
         _diagnostics = diagnostics ?? throw new ArgumentNullException(nameof(diagnostics));
     }
 
+    /// <summary>
+    /// Gets or sets now.
+    /// </summary>
     public DateTimeOffset Now { get; private set; } = DateTimeOffset.UnixEpoch;
 
+    /// <summary>
+    /// Gets scheduled count.
+    /// </summary>
     public int ScheduledCount => _scheduledWork.Count;
 
+    /// <summary>
+    /// Executes the schedule operation.
+    /// </summary>
     public DeterministicScheduledWorkItem Schedule(TimeSpan delay, Action callback)
     {
         ArgumentNullException.ThrowIfNull(callback);
@@ -43,6 +61,9 @@ public sealed class DeterministicScheduler : IDisposable
         return scheduledWorkItem;
     }
 
+    /// <summary>
+    /// Executes the advance by operation.
+    /// </summary>
     public void AdvanceBy(TimeSpan duration)
     {
         ThrowIfDisposed();
@@ -56,6 +77,9 @@ public sealed class DeterministicScheduler : IDisposable
         RunDueWork();
     }
 
+    /// <summary>
+    /// Executes the run due work operation.
+    /// </summary>
     public void RunDueWork()
     {
         ThrowIfDisposed();
@@ -67,6 +91,9 @@ public sealed class DeterministicScheduler : IDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         if (_disposed)
@@ -116,6 +143,9 @@ public sealed class DeterministicScheduler : IDisposable
     }
 }
 
+/// <summary>
+/// Represents deterministic scheduled work item.
+/// </summary>
 public sealed class DeterministicScheduledWorkItem
 {
     private readonly Action _callback;
@@ -127,18 +157,39 @@ public sealed class DeterministicScheduledWorkItem
         DueAt = dueAt;
     }
 
+    /// <summary>
+    /// Gets id.
+    /// </summary>
     public long Id { get; }
 
+    /// <summary>
+    /// Gets due at.
+    /// </summary>
     public DateTimeOffset DueAt { get; }
 
+    /// <summary>
+    /// Gets or sets is canceled.
+    /// </summary>
     public bool IsCanceled { get; private set; }
 
+    /// <summary>
+    /// Gets or sets is completed.
+    /// </summary>
     public bool IsCompleted { get; private set; }
 
+    /// <summary>
+    /// Gets or sets is faulted.
+    /// </summary>
     public bool IsFaulted { get; private set; }
 
+    /// <summary>
+    /// Gets or sets exception.
+    /// </summary>
     public Exception? Exception { get; private set; }
 
+    /// <summary>
+    /// Executes the cancel operation.
+    /// </summary>
     public void Cancel()
     {
         if (IsCompleted)

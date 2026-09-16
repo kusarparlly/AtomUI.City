@@ -160,9 +160,9 @@ Tests:
 - `PublicAPI.Shipped.txt` 保存已经审阅并冻结的签名；删除、改名、移动或修改签名会使编译失败。
 - `PublicAPI.Unshipped.txt` 只保存本轮尚未随版本发布的新签名。新增 API 不允许通过关闭分析器或手工忽略诊断绕过 review。
 - `Microsoft.CodeAnalysis.PublicApiAnalyzers` 的 API diff、可选参数、重载和兼容性诊断按编译错误处理。
-- Core 单独重新启用 `CS1591` 并按错误处理；其他模块的 XML documentation 完整性在独立文档门禁议题中收口，不影响签名 diff 已经对全部产品项目生效。
+- 全部产品项目统一启用 `CS1591` 并按错误处理；测试、fixture 与私有构建辅助项目不属于发布 XML documentation 合同。
 - Release 构建同时编译 `net10.0` 和生产基线 `net8.0`；SDK package validation 以 strict compatible-framework 模式比较两个程序集的 API。
-- `engineering/check-public-api.sh` 必须真实执行三个冻结模块的 Release build 与 pack，不能只检查 baseline 或 XML 文件是否存在。
+- `engineering/check-public-api.sh` 必须真实执行全部产品模块的 Release build 与 pack，确认每个目标框架生成包含公开成员的 XML 文档，不能只检查 baseline 或 XML 文件是否存在。
 
 由于当前仍处于首次公开发布前，尚未完成语义 review 的签名只进入 `PublicAPI.Unshipped.txt`。统一版本保持 prerelease；稳定版本必须配置 `AtomUICityApiBaselineVersion`，由 SDK package validation 将候选包与上一已发布 preview/rc/stable 包进行二进制兼容比较。
 

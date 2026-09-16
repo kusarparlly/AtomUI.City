@@ -1,7 +1,13 @@
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents state snapshot.
+/// </summary>
 public sealed class StateSnapshot
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>StateSnapshot</c> type.
+    /// </summary>
     public StateSnapshot(IReadOnlyList<StateSnapshotEntry> entries)
     {
         ArgumentNullException.ThrowIfNull(entries);
@@ -16,5 +22,8 @@ public sealed class StateSnapshot
         Entries = Array.AsReadOnly(snapshotEntries);
     }
 
+    /// <summary>
+    /// Gets entries.
+    /// </summary>
     public IReadOnlyList<StateSnapshotEntry> Entries { get; }
 }

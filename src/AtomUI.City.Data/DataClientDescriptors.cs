@@ -1,8 +1,14 @@
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents data client.
+/// </summary>
 [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class, Inherited = false)]
 public sealed class DataClientAttribute : Attribute
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>DataClientAttribute</c> type.
+    /// </summary>
     public DataClientAttribute(string clientId, DataTransportKind transportKind)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clientId);
@@ -15,16 +21,31 @@ public sealed class DataClientAttribute : Attribute
         TransportKind = transportKind;
     }
 
+    /// <summary>
+    /// Gets client id.
+    /// </summary>
     public string ClientId { get; }
 
+    /// <summary>
+    /// Gets transport kind.
+    /// </summary>
     public DataTransportKind TransportKind { get; }
 
+    /// <summary>
+    /// Gets or sets version.
+    /// </summary>
     public string Version { get; init; } = "1";
 }
 
+/// <summary>
+/// Represents data operation.
+/// </summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
 public sealed class DataOperationAttribute : Attribute
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>DataOperationAttribute</c> type.
+    /// </summary>
     public DataOperationAttribute(
         string operationName,
         DataAccessMode accessMode = DataAccessMode.Query)
@@ -39,23 +60,50 @@ public sealed class DataOperationAttribute : Attribute
         AccessMode = accessMode;
     }
 
+    /// <summary>
+    /// Gets operation name.
+    /// </summary>
     public string OperationName { get; }
 
+    /// <summary>
+    /// Gets access mode.
+    /// </summary>
     public DataAccessMode AccessMode { get; }
 
+    /// <summary>
+    /// Gets or sets concurrency policy.
+    /// </summary>
     public DataConcurrencyPolicy ConcurrencyPolicy { get; init; }
 
+    /// <summary>
+    /// Gets or sets timeout milliseconds.
+    /// </summary>
     public int TimeoutMilliseconds { get; init; }
 
+    /// <summary>
+    /// Gets or sets max retry attempts.
+    /// </summary>
     public int MaxRetryAttempts { get; init; }
 
+    /// <summary>
+    /// Gets or sets cache enabled.
+    /// </summary>
     public bool CacheEnabled { get; init; }
 
+    /// <summary>
+    /// Gets or sets authentication policy.
+    /// </summary>
     public string AuthenticationPolicy { get; init; } = "Anonymous";
 }
 
+/// <summary>
+/// Represents data operation descriptor.
+/// </summary>
 public sealed class DataOperationDescriptor
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>DataOperationDescriptor</c> type.
+    /// </summary>
     public DataOperationDescriptor(
         string operationName,
         Type requestType,
@@ -105,27 +153,60 @@ public sealed class DataOperationDescriptor
         AuthenticationPolicy = authenticationPolicy;
     }
 
+    /// <summary>
+    /// Gets operation name.
+    /// </summary>
     public string OperationName { get; }
 
+    /// <summary>
+    /// Gets request type.
+    /// </summary>
     public Type RequestType { get; }
 
+    /// <summary>
+    /// Gets response type.
+    /// </summary>
     public Type ResponseType { get; }
 
+    /// <summary>
+    /// Gets access mode.
+    /// </summary>
     public DataAccessMode AccessMode { get; }
 
+    /// <summary>
+    /// Gets concurrency policy.
+    /// </summary>
     public DataConcurrencyPolicy ConcurrencyPolicy { get; }
 
+    /// <summary>
+    /// Gets timeout.
+    /// </summary>
     public TimeSpan? Timeout { get; }
 
+    /// <summary>
+    /// Gets max retry attempts.
+    /// </summary>
     public int MaxRetryAttempts { get; }
 
+    /// <summary>
+    /// Gets cache enabled.
+    /// </summary>
     public bool CacheEnabled { get; }
 
+    /// <summary>
+    /// Gets authentication policy.
+    /// </summary>
     public string AuthenticationPolicy { get; }
 }
 
+/// <summary>
+/// Represents data client descriptor.
+/// </summary>
 public sealed class DataClientDescriptor
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>DataClientDescriptor</c> type.
+    /// </summary>
     public DataClientDescriptor(
         string clientId,
         Type clientType,
@@ -166,18 +247,39 @@ public sealed class DataClientDescriptor
         PluginContributionId = pluginContributionId;
     }
 
+    /// <summary>
+    /// Gets client id.
+    /// </summary>
     public string ClientId { get; }
 
+    /// <summary>
+    /// Gets client type.
+    /// </summary>
     public Type ClientType { get; }
 
+    /// <summary>
+    /// Gets transport kind.
+    /// </summary>
     public DataTransportKind TransportKind { get; }
 
+    /// <summary>
+    /// Gets version.
+    /// </summary>
     public string Version { get; }
 
+    /// <summary>
+    /// Gets operations.
+    /// </summary>
     public IReadOnlyList<DataOperationDescriptor> Operations { get; }
 
+    /// <summary>
+    /// Gets plugin contribution id.
+    /// </summary>
     public string? PluginContributionId { get; }
 
+    /// <summary>
+    /// Gets with plugin contribution.
+    /// </summary>
     public DataClientDescriptor WithPluginContribution(string contributionId) => new(
         ClientId,
         ClientType,
@@ -187,16 +289,31 @@ public sealed class DataClientDescriptor
         contributionId);
 }
 
+/// <summary>
+/// Defines the contract for idata client descriptor registrar.
+/// </summary>
 public interface IDataClientDescriptorRegistrar
 {
+    /// <summary>
+    /// Executes the register operation.
+    /// </summary>
     void Register(DataClientDescriptorCatalog catalog);
 }
 
+/// <summary>
+/// Represents generated data client manifest.
+/// </summary>
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
 public sealed class GeneratedDataClientManifestAttribute : Attribute
 {
+    /// <summary>
+    /// Represents the current version value.
+    /// </summary>
     public const int CurrentVersion = 1;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>GeneratedDataClientManifestAttribute</c> type.
+    /// </summary>
     public GeneratedDataClientManifestAttribute(Type registrarType, int version = CurrentVersion)
     {
         RegistrarType = registrarType ?? throw new ArgumentNullException(nameof(registrarType));
@@ -208,17 +325,29 @@ public sealed class GeneratedDataClientManifestAttribute : Attribute
         Version = version;
     }
 
+    /// <summary>
+    /// Gets registrar type.
+    /// </summary>
     public Type RegistrarType { get; }
 
+    /// <summary>
+    /// Gets version.
+    /// </summary>
     public int Version { get; }
 }
 
+/// <summary>
+/// Represents data client descriptor catalog.
+/// </summary>
 public sealed class DataClientDescriptorCatalog
 {
     private readonly object _syncRoot = new();
     private readonly Dictionary<string, Registration> _descriptors = new(StringComparer.Ordinal);
     private readonly AsyncLocal<GeneratedRegistrationTransaction?> _currentGeneratedRegistration = new();
 
+    /// <summary>
+    /// Represents the snapshot value.
+    /// </summary>
     public IReadOnlyList<DataClientDescriptor> Snapshot
     {
         get
@@ -230,6 +359,9 @@ public sealed class DataClientDescriptorCatalog
         }
     }
 
+    /// <summary>
+    /// Executes the register operation.
+    /// </summary>
     public IDisposable Register(DataClientDescriptor descriptor)
     {
         ArgumentNullException.ThrowIfNull(descriptor);
@@ -249,6 +381,9 @@ public sealed class DataClientDescriptorCatalog
         return lease;
     }
 
+    /// <summary>
+    /// Executes the register generated&lt;tregistrar&gt; operation.
+    /// </summary>
     public void RegisterGenerated<TRegistrar>()
         where TRegistrar : IDataClientDescriptorRegistrar, new()
     {
@@ -271,6 +406,9 @@ public sealed class DataClientDescriptorCatalog
         }
     }
 
+    /// <summary>
+    /// Executes the try get operation.
+    /// </summary>
     public bool TryGet(string clientId, out DataClientDescriptor? descriptor)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clientId);

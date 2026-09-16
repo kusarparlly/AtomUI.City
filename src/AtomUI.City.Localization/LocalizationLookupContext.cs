@@ -1,9 +1,18 @@
 namespace AtomUI.City.Localization;
 
+/// <summary>
+/// Represents localization lookup context.
+/// </summary>
 public sealed class LocalizationLookupContext
 {
+    /// <summary>
+    /// Gets global.
+    /// </summary>
     public static LocalizationLookupContext Global { get; } = new();
 
+    /// <summary>
+    /// Initializes a new instance of the <c>LocalizationLookupContext</c> type.
+    /// </summary>
     public LocalizationLookupContext(
         string? moduleId = null,
         string? pluginId = null,
@@ -16,12 +25,24 @@ public sealed class LocalizationLookupContext
         WindowId = Normalize(windowId, nameof(windowId));
     }
 
+    /// <summary>
+    /// Gets module id.
+    /// </summary>
     public string? ModuleId { get; }
 
+    /// <summary>
+    /// Gets plugin id.
+    /// </summary>
     public string? PluginId { get; }
 
+    /// <summary>
+    /// Gets route id.
+    /// </summary>
     public string? RouteId { get; }
 
+    /// <summary>
+    /// Gets window id.
+    /// </summary>
     public string? WindowId { get; }
 
     internal IReadOnlyList<LocalizationScopeKey> GetScopeKeys()

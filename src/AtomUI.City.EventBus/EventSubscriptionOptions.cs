@@ -2,6 +2,9 @@ using AtomUI.City.Core.Threading;
 
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event subscription options.
+/// </summary>
 public sealed class EventSubscriptionOptions
 {
     private EventSubscriptionOptions(
@@ -20,6 +23,9 @@ public sealed class EventSubscriptionOptions
         DisableSubscriptionAfterFailures = ValidateDisableThreshold(disableSubscriptionAfterFailures);
     }
 
+    /// <summary>
+    /// Gets serialized.
+    /// </summary>
     public static EventSubscriptionOptions Serialized { get; } = new(
         EventDispatchPolicy.Serialized,
         EventDispatchMode.InlineIfAllowed,
@@ -28,6 +34,9 @@ public sealed class EventSubscriptionOptions
         handlerTimeout: TimeSpan.FromSeconds(30),
         disableSubscriptionAfterFailures: 3);
 
+    /// <summary>
+    /// Gets current.
+    /// </summary>
     public static EventSubscriptionOptions Current { get; } = new(
         EventDispatchPolicy.Current,
         EventDispatchMode.InlineIfAllowed,
@@ -36,18 +45,39 @@ public sealed class EventSubscriptionOptions
         handlerTimeout: TimeSpan.FromSeconds(30),
         disableSubscriptionAfterFailures: 3);
 
+    /// <summary>
+    /// Gets dispatch policy.
+    /// </summary>
     public EventDispatchPolicy DispatchPolicy { get; }
 
+    /// <summary>
+    /// Gets dispatch mode.
+    /// </summary>
     public EventDispatchMode DispatchMode { get; }
 
+    /// <summary>
+    /// Gets ui dispatcher.
+    /// </summary>
     public IUiDispatcher? UiDispatcher { get; }
 
+    /// <summary>
+    /// Gets error policy.
+    /// </summary>
     public EventErrorPolicy ErrorPolicy { get; }
 
+    /// <summary>
+    /// Gets handler timeout.
+    /// </summary>
     public TimeSpan? HandlerTimeout { get; }
 
+    /// <summary>
+    /// Gets disable subscription after failures.
+    /// </summary>
     public int DisableSubscriptionAfterFailures { get; }
 
+    /// <summary>
+    /// Executes the ui thread operation.
+    /// </summary>
     public static EventSubscriptionOptions UiThread(
         IUiDispatcher dispatcher,
         EventDispatchMode dispatchMode = EventDispatchMode.Post)
@@ -64,6 +94,9 @@ public sealed class EventSubscriptionOptions
             disableSubscriptionAfterFailures: 3);
     }
 
+    /// <summary>
+    /// Executes the background operation.
+    /// </summary>
     public static EventSubscriptionOptions Background()
     {
         return new EventSubscriptionOptions(
@@ -75,6 +108,9 @@ public sealed class EventSubscriptionOptions
             disableSubscriptionAfterFailures: 3);
     }
 
+    /// <summary>
+    /// Executes the with error policy operation.
+    /// </summary>
     public EventSubscriptionOptions WithErrorPolicy(EventErrorPolicy errorPolicy)
     {
         if (!Enum.IsDefined(errorPolicy))
@@ -94,6 +130,9 @@ public sealed class EventSubscriptionOptions
             DisableSubscriptionAfterFailures);
     }
 
+    /// <summary>
+    /// Executes the with handler timeout operation.
+    /// </summary>
     public EventSubscriptionOptions WithHandlerTimeout(TimeSpan? handlerTimeout)
     {
         return new EventSubscriptionOptions(
@@ -105,6 +144,9 @@ public sealed class EventSubscriptionOptions
             DisableSubscriptionAfterFailures);
     }
 
+    /// <summary>
+    /// Executes the with disable subscription after failures operation.
+    /// </summary>
     public EventSubscriptionOptions WithDisableSubscriptionAfterFailures(int failureCount)
     {
         return new EventSubscriptionOptions(

@@ -4,6 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents generated event handler descriptor.
+/// </summary>
 public sealed class GeneratedEventHandlerDescriptor
 {
     private readonly Func<IServiceProvider, LifecycleScope, IEventSubscriber, IEventSubscription> _activate;
@@ -22,14 +25,29 @@ public sealed class GeneratedEventHandlerDescriptor
         _activate = activate ?? throw new ArgumentNullException(nameof(activate));
     }
 
+    /// <summary>
+    /// Gets owner module type.
+    /// </summary>
     public Type OwnerModuleType { get; }
 
+    /// <summary>
+    /// Gets event type.
+    /// </summary>
     public Type EventType { get; }
 
+    /// <summary>
+    /// Gets handler type.
+    /// </summary>
     public Type HandlerType { get; }
 
+    /// <summary>
+    /// Gets channel name.
+    /// </summary>
     public string ChannelName { get; }
 
+    /// <summary>
+    /// Executes the create&lt;tevent, thandler&gt; operation.
+    /// </summary>
     public static GeneratedEventHandlerDescriptor Create<TEvent, THandler>(
         Type ownerModuleType,
         string channelName,

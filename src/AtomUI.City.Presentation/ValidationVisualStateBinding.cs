@@ -4,16 +4,25 @@ using AtomUI.City.Core.Threading;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents validation visual state binding.
+/// </summary>
 public sealed class ValidationVisualStateBinding
 {
     private readonly IUiDispatcher _dispatcher;
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ValidationVisualStateBinding</c> type.
+    /// </summary>
     public ValidationVisualStateBinding(IUiDispatcher dispatcher)
         : this(dispatcher, diagnostics: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ValidationVisualStateBinding</c> type.
+    /// </summary>
     public ValidationVisualStateBinding(
         IUiDispatcher dispatcher,
         IHostDiagnostics? diagnostics)
@@ -24,6 +33,9 @@ public sealed class ValidationVisualStateBinding
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the apply async operation.
+    /// </summary>
     public async ValueTask ApplyAsync(
         ValidationScope scope,
         IValidationVisualStateTarget target,

@@ -77,6 +77,7 @@ public sealed class PackagingReleaseGateTests
     {
         var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
         var centralPackages = XDocument.Load(Path.Combine(repositoryRoot, "Directory.Packages.props"));
+        var commonProperties = XDocument.Load(Path.Combine(repositoryRoot, "build", "Common.props"));
         var coreProject = XDocument.Load(Path.Combine(repositoryRoot, "src", "AtomUI.City.Core", "AtomUI.City.Core.csproj"));
         var coreProperties = ReadProperties(coreProject);
         var shippedApiPath = Path.Combine(repositoryRoot, "src", "AtomUI.City.Core", "PublicAPI.Shipped.txt");
@@ -94,7 +95,12 @@ public sealed class PackagingReleaseGateTests
         Assert.Equal("all", analyzerReference.Attribute("PrivateAssets")?.Value);
         Assert.Equal("true", coreProperties["EnablePackageValidation"]);
         Assert.Equal("true", coreProperties["EnableStrictModeForCompatibleFrameworksInPackage"]);
-        Assert.Contains("CS1591", coreProperties["WarningsAsErrors"], StringComparison.Ordinal);
+        Assert.Contains(
+            commonProperties.Descendants("WarningsAsErrors"),
+            property => property.Value.Contains("CS1591", StringComparison.Ordinal) &&
+                        property.Attribute("Condition")?.Value.Contains(
+                            "AtomUICityPublicApiDocumentationRequired",
+                            StringComparison.Ordinal) is true);
         Assert.Contains("RS0016", coreProperties["WarningsAsErrors"], StringComparison.Ordinal);
         Assert.Contains("RS0017", coreProperties["WarningsAsErrors"], StringComparison.Ordinal);
         Assert.True(File.Exists(shippedApiPath));

@@ -1,5 +1,8 @@
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents route outlet commit plan.
+/// </summary>
 public sealed class RouteOutletCommitPlan
 {
     private int _ownershipState = (int)CandidateOwnershipState.AdapterOwned;
@@ -27,18 +30,39 @@ public sealed class RouteOutletCommitPlan
         LeaveApproved = leaveApproved;
     }
 
+    /// <summary>
+    /// Gets outlet name.
+    /// </summary>
     public string OutletName { get; }
 
+    /// <summary>
+    /// Gets operation.
+    /// </summary>
     public RouteOutletOperation Operation { get; }
 
+    /// <summary>
+    /// Gets handle.
+    /// </summary>
     public BoundViewHandle? Handle { get; }
 
+    /// <summary>
+    /// Gets view model lease.
+    /// </summary>
     public ViewModelLease? ViewModelLease { get; }
 
+    /// <summary>
+    /// Gets route id.
+    /// </summary>
     public string? RouteId { get; }
 
+    /// <summary>
+    /// Gets reuse key.
+    /// </summary>
     public string? ReuseKey { get; }
 
+    /// <summary>
+    /// Gets lifecycle token.
+    /// </summary>
     public CancellationToken LifecycleToken { get; }
 
     internal bool LeaveApproved { get; }
@@ -116,6 +140,9 @@ public sealed class RouteOutletCommitPlan
         }
     }
 
+    /// <summary>
+    /// Executes the replace operation.
+    /// </summary>
     public static RouteOutletCommitPlan Replace(
         string outletName,
         BoundViewHandle handle,
@@ -137,6 +164,9 @@ public sealed class RouteOutletCommitPlan
             leaveApproved: false);
     }
 
+    /// <summary>
+    /// Executes the clear operation.
+    /// </summary>
     public static RouteOutletCommitPlan Clear(string outletName)
     {
         return new RouteOutletCommitPlan(

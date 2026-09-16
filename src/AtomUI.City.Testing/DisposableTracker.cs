@@ -1,10 +1,16 @@
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents disposable tracker.
+/// </summary>
 public sealed class DisposableTracker : IDisposable, IAsyncDisposable
 {
     private readonly List<object> _resources = [];
     private bool _disposed;
 
+    /// <summary>
+    /// Executes the track&lt;t&gt; operation.
+    /// </summary>
     public T Track<T>(T resource)
         where T : notnull
     {
@@ -20,6 +26,9 @@ public sealed class DisposableTracker : IDisposable, IAsyncDisposable
         return resource;
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         if (_disposed)
@@ -56,6 +65,9 @@ public sealed class DisposableTracker : IDisposable, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         if (_disposed)

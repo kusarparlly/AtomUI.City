@@ -1,7 +1,13 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event channel descriptor.
+/// </summary>
 public sealed class EventChannelDescriptor
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EventChannelDescriptor"/> type.
+    /// </summary>
     public EventChannelDescriptor(
         Type eventType,
         string channelName,
@@ -13,12 +19,24 @@ public sealed class EventChannelDescriptor
         Options.Validate();
     }
 
+    /// <summary>
+    /// Gets event type.
+    /// </summary>
     public Type EventType { get; }
 
+    /// <summary>
+    /// Gets channel name.
+    /// </summary>
     public string ChannelName { get; }
 
+    /// <summary>
+    /// Gets options.
+    /// </summary>
     public EventChannelOptions Options { get; }
 
+    /// <summary>
+    /// Executes the create&lt;tevent&gt; operation.
+    /// </summary>
     public static EventChannelDescriptor Create<TEvent>(
         EventChannel<TEvent> channel,
         EventChannelOptions options)

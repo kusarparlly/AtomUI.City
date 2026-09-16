@@ -2,8 +2,14 @@ using System.Collections.ObjectModel;
 
 namespace AtomUI.City.Mvvm;
 
+/// <summary>
+/// Represents activation context.
+/// </summary>
 public sealed class ActivationContext
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ActivationContext"/> type.
+    /// </summary>
     public ActivationContext(
         IActivationScope scope,
         string? source = null,
@@ -19,9 +25,18 @@ public sealed class ActivationContext
                 : new Dictionary<string, object?>(properties, StringComparer.Ordinal));
     }
 
+    /// <summary>
+    /// Gets scope.
+    /// </summary>
     public IActivationScope Scope { get; }
 
+    /// <summary>
+    /// Gets source.
+    /// </summary>
     public string? Source { get; }
 
+    /// <summary>
+    /// Gets properties.
+    /// </summary>
     public IReadOnlyDictionary<string, object?> Properties { get; }
 }

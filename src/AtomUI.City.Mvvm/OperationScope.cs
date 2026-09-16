@@ -2,6 +2,9 @@ using System.Diagnostics;
 
 namespace AtomUI.City.Mvvm;
 
+/// <summary>
+/// Represents operation scope.
+/// </summary>
 public sealed class OperationScope : IDisposable
 {
     private readonly object _gate = new();
@@ -28,10 +31,19 @@ public sealed class OperationScope : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets id.
+    /// </summary>
     public Guid Id { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether cancellation token.
+    /// </summary>
     public CancellationToken CancellationToken => _cancellationToken;
 
+    /// <summary>
+    /// Represents the status value.
+    /// </summary>
     public OperationStatus Status
     {
         get
@@ -43,6 +55,9 @@ public sealed class OperationScope : IDisposable
         }
     }
 
+    /// <summary>
+    /// Represents the result value.
+    /// </summary>
     public OperationResult? Result
     {
         get
@@ -54,6 +69,9 @@ public sealed class OperationScope : IDisposable
         }
     }
 
+    /// <summary>
+    /// Represents the error value.
+    /// </summary>
     public Exception? Error
     {
         get
@@ -65,6 +83,9 @@ public sealed class OperationScope : IDisposable
         }
     }
 
+    /// <summary>
+    /// Represents the elapsed value.
+    /// </summary>
     public TimeSpan Elapsed
     {
         get
@@ -76,6 +97,9 @@ public sealed class OperationScope : IDisposable
         }
     }
 
+    /// <summary>
+    /// Represents the is disposed value.
+    /// </summary>
     public bool IsDisposed
     {
         get
@@ -87,21 +111,33 @@ public sealed class OperationScope : IDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the start operation.
+    /// </summary>
     public static OperationScope Start(CancellationToken cancellationToken)
     {
         return new OperationScope(cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the complete operation.
+    /// </summary>
     public OperationResult Complete()
     {
         return Finish(OperationStatus.Completed, null, requestCancellation: false, throwIfDisposed: true);
     }
 
+    /// <summary>
+    /// Executes the cancel operation.
+    /// </summary>
     public OperationResult Cancel()
     {
         return Finish(OperationStatus.Canceled, null, requestCancellation: true, throwIfDisposed: true);
     }
 
+    /// <summary>
+    /// Executes the fail operation.
+    /// </summary>
     public OperationResult Fail(Exception exception)
     {
         ArgumentNullException.ThrowIfNull(exception);
@@ -109,11 +145,17 @@ public sealed class OperationScope : IDisposable
         return Finish(OperationStatus.Failed, exception, requestCancellation: false, throwIfDisposed: true);
     }
 
+    /// <summary>
+    /// Executes the reject operation.
+    /// </summary>
     public OperationResult Reject()
     {
         return Finish(OperationStatus.Rejected, null, requestCancellation: false, throwIfDisposed: true);
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         var shouldCancel = false;

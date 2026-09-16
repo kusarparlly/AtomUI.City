@@ -2,6 +2,9 @@ using System.Text;
 
 namespace AtomUI.City.Templates;
 
+/// <summary>
+/// Represents application template renderer.
+/// </summary>
 public sealed class ApplicationTemplateRenderer
 {
     private const string AtomUICityPackageVersion = "1.0.0-preview.1";
@@ -12,6 +15,9 @@ public sealed class ApplicationTemplateRenderer
     private static readonly object RenderGatesSyncRoot = new();
     private static readonly Dictionary<string, RenderGate> RenderGates = new(GetPathComparer());
 
+    /// <summary>
+    /// Executes the create plan operation.
+    /// </summary>
     public TemplatePlan CreatePlan(ApplicationTemplateOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -57,11 +63,17 @@ public sealed class ApplicationTemplateRenderer
             rollback: files.Select(static file => file.Change.Path).Reverse().ToArray());
     }
 
+    /// <summary>
+    /// Executes the render operation.
+    /// </summary>
     public TemplateRenderResult Render(ApplicationTemplateOptions options)
     {
         return Render(options, CancellationToken.None);
     }
 
+    /// <summary>
+    /// Executes the render operation.
+    /// </summary>
     public TemplateRenderResult Render(ApplicationTemplateOptions options, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(options);

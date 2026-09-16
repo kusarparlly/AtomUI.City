@@ -1,7 +1,13 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event contract id.
+/// </summary>
 public readonly record struct EventContractId
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EventContractId"/> type.
+    /// </summary>
     public EventContractId(string value)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(value);
@@ -18,8 +24,14 @@ public readonly record struct EventContractId
         Value = value;
     }
 
+    /// <summary>
+    /// Gets value.
+    /// </summary>
     public string Value { get; }
 
+    /// <summary>
+    /// Gets to string.
+    /// </summary>
     public override string ToString() => Value;
 
     internal static void ThrowIfDefault(EventContractId contractId, string? paramName = null)

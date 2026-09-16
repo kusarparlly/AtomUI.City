@@ -199,12 +199,11 @@ public sealed class EngineeringGateTests
         Assert.Contains("AtomUI.City.EventBus", script, StringComparison.Ordinal);
         Assert.Contains("AtomUI.City.Presentation", script, StringComparison.Ordinal);
         Assert.Contains("$assembly_name.sourcelink.json", script, StringComparison.Ordinal);
-        Assert.Contains("$assembly_name.*.nupkg", script, StringComparison.Ordinal);
+        Assert.Contains("$assembly_name.$version.nupkg", script, StringComparison.Ordinal);
         Assert.Contains("validate_build_artifacts", script, StringComparison.Ordinal);
-        Assert.Contains("src/AtomUI.City.EventBus/PublicAPI.Shipped.txt", script, StringComparison.Ordinal);
-        Assert.Contains("src/AtomUI.City.EventBus/PublicAPI.Unshipped.txt", script, StringComparison.Ordinal);
-        Assert.Contains("src/AtomUI.City.Presentation/PublicAPI.Shipped.txt", script, StringComparison.Ordinal);
-        Assert.Contains("src/AtomUI.City.Presentation/PublicAPI.Unshipped.txt", script, StringComparison.Ordinal);
+        Assert.Contains("for product_name in \"${product_names[@]}\"", script, StringComparison.Ordinal);
+        Assert.Contains("product_shipped=\"src/$assembly_name/PublicAPI.Shipped.txt\"", script, StringComparison.Ordinal);
+        Assert.Contains("product_unshipped=\"src/$assembly_name/PublicAPI.Unshipped.txt\"", script, StringComparison.Ordinal);
         Assert.Contains("%s public API gate passed", script, StringComparison.Ordinal);
         Assert.Contains("https://raw.githubusercontent.com/", script, StringComparison.Ordinal);
         Assert.Contains("git rev-parse HEAD", script, StringComparison.Ordinal);

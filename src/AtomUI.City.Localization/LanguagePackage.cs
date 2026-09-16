@@ -1,5 +1,8 @@
 namespace AtomUI.City.Localization;
 
+/// <summary>
+/// Represents language package.
+/// </summary>
 public sealed class LanguagePackage : IDisposable
 {
     private readonly IReadOnlyDictionary<string, string> _strings;
@@ -13,10 +16,19 @@ public sealed class LanguagePackage : IDisposable
         _strings = new Dictionary<string, string>(strings, StringComparer.Ordinal);
     }
 
+    /// <summary>
+    /// Gets descriptor.
+    /// </summary>
     public LanguagePackageDescriptor Descriptor { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether is disposed.
+    /// </summary>
     public bool IsDisposed => Volatile.Read(ref _disposed) != 0;
 
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static LanguagePackage Create(
         LanguagePackageDescriptor descriptor,
         IReadOnlyDictionary<string, string> strings)
@@ -33,6 +45,9 @@ public sealed class LanguagePackage : IDisposable
         return new LanguagePackage(descriptor, strings);
     }
 
+    /// <summary>
+    /// Executes the try get string operation.
+    /// </summary>
     public bool TryGetString(string key, out string value)
     {
         if (IsDisposed)
@@ -45,6 +60,9 @@ public sealed class LanguagePackage : IDisposable
         return _strings.TryGetValue(key, out value!);
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         Interlocked.Exchange(ref _disposed, 1);

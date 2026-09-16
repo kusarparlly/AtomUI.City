@@ -2,11 +2,17 @@ namespace AtomUI.City.Testing;
 
 using AtomUI.City.Routing;
 
+/// <summary>
+/// Represents routing test host builder.
+/// </summary>
 public sealed class RoutingTestHostBuilder
 {
     private readonly List<RouteTestDefinition> _routes = [];
     private bool _built;
 
+    /// <summary>
+    /// Executes the map route operation.
+    /// </summary>
     public RoutingTestHostBuilder MapRoute(string name, string pattern, Type viewModelType)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -19,6 +25,9 @@ public sealed class RoutingTestHostBuilder
         return this;
     }
 
+    /// <summary>
+    /// Executes the build operation.
+    /// </summary>
     public RoutingTestHost Build()
     {
         ThrowIfBuilt();

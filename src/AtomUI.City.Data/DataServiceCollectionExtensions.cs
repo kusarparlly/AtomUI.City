@@ -4,8 +4,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents data service collection extensions.
+/// </summary>
 public static class DataServiceCollectionExtensions
 {
+    /// <summary>
+    /// Executes the add data operation.
+    /// </summary>
     public static IServiceCollection AddData(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);

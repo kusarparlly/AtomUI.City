@@ -1,5 +1,8 @@
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents test directory.
+/// </summary>
 public sealed class TestDirectory : IDisposable
 {
     private bool _disposed;
@@ -12,10 +15,19 @@ public sealed class TestDirectory : IDisposable
         Directory.CreateDirectory(RootPath);
     }
 
+    /// <summary>
+    /// Gets root path.
+    /// </summary>
     public string RootPath { get; }
 
+    /// <summary>
+    /// Gets keep on dispose.
+    /// </summary>
     public bool KeepOnDispose { get; }
 
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static TestDirectory Create(string? name = null, bool keepOnDispose = false)
     {
         var safeName = string.IsNullOrWhiteSpace(name) ? "test" : name;
@@ -24,6 +36,9 @@ public sealed class TestDirectory : IDisposable
         return new TestDirectory(rootPath, keepOnDispose);
     }
 
+    /// <summary>
+    /// Executes the get path operation.
+    /// </summary>
     public string GetPath(params string[] segments)
     {
         var path = segments.Length == 0
@@ -39,6 +54,9 @@ public sealed class TestDirectory : IDisposable
         return path;
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         if (_disposed)

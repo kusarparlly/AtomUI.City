@@ -2,8 +2,14 @@ using System.Text.Json;
 
 namespace AtomUI.City.PluginSystem;
 
+/// <summary>
+/// Represents plugin manifest reader.
+/// </summary>
 public static class PluginManifestReader
 {
+    /// <summary>
+    /// Executes the read operation.
+    /// </summary>
     public static PluginManifest Read(string manifestPath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(manifestPath);

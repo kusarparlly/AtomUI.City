@@ -1,5 +1,8 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event post result.
+/// </summary>
 public sealed record EventPostResult(
     Guid EventId,
     EventContractId ContractId,
@@ -8,6 +11,9 @@ public sealed record EventPostResult(
 {
     private Guid _eventId = ValidateEventId(EventId);
 
+    /// <summary>
+    /// Represents the event id value.
+    /// </summary>
     public Guid EventId
     {
         get => _eventId;
@@ -16,6 +22,9 @@ public sealed record EventPostResult(
 
     private EventContractId _contractId = ValidateContractId(ContractId);
 
+    /// <summary>
+    /// Represents the contract id value.
+    /// </summary>
     public EventContractId ContractId
     {
         get => _contractId;
@@ -24,6 +33,9 @@ public sealed record EventPostResult(
 
     private bool _accepted = ValidateAccepted(Accepted, RejectionReason);
 
+    /// <summary>
+    /// Represents the accepted value.
+    /// </summary>
     public bool Accepted
     {
         get => _accepted;
@@ -32,6 +44,9 @@ public sealed record EventPostResult(
 
     private string? _rejectionReason = ValidateRejectionReason(Accepted, RejectionReason);
 
+    /// <summary>
+    /// Represents the rejection reason value.
+    /// </summary>
     public string? RejectionReason
     {
         get => _rejectionReason;

@@ -1,5 +1,8 @@
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents route graph snapshot.
+/// </summary>
 public sealed class RouteGraphSnapshot
 {
     private readonly IReadOnlyDictionary<string, IReadOnlyList<RouteDescriptor>> _childrenByParentId;
@@ -21,17 +24,32 @@ public sealed class RouteGraphSnapshot
         Matcher = new RouteMatcher(this);
     }
 
+    /// <summary>
+    /// Gets version.
+    /// </summary>
     public long Version { get; }
 
+    /// <summary>
+    /// Gets routes.
+    /// </summary>
     public IReadOnlyList<RouteDescriptor> Routes { get; }
 
+    /// <summary>
+    /// Gets matcher.
+    /// </summary>
     public RouteMatcher Matcher { get; }
 
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static RouteGraphSnapshot Create(IReadOnlyList<RouteDescriptor> routes)
     {
         return Create(routes, version: 1);
     }
 
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static RouteGraphSnapshot Create(IReadOnlyList<RouteDescriptor> routes, long version)
     {
         ArgumentNullException.ThrowIfNull(routes);
@@ -101,6 +119,9 @@ public sealed class RouteGraphSnapshot
             routesByContributionId);
     }
 
+    /// <summary>
+    /// Executes the get required route operation.
+    /// </summary>
     public RouteDescriptor GetRequiredRoute(string routeId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(routeId);
@@ -110,6 +131,9 @@ public sealed class RouteGraphSnapshot
             : throw new KeyNotFoundException($"Route '{routeId}' was not found.");
     }
 
+    /// <summary>
+    /// Executes the try get route operation.
+    /// </summary>
     public bool TryGetRoute(string routeId, out RouteDescriptor? route)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(routeId);
@@ -117,6 +141,9 @@ public sealed class RouteGraphSnapshot
         return _routesById.TryGetValue(routeId, out route);
     }
 
+    /// <summary>
+    /// Executes the get children operation.
+    /// </summary>
     public IReadOnlyList<RouteDescriptor> GetChildren(string parentRouteId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(parentRouteId);
@@ -126,6 +153,9 @@ public sealed class RouteGraphSnapshot
             : [];
     }
 
+    /// <summary>
+    /// Executes the get contribution routes operation.
+    /// </summary>
     public IReadOnlyList<RouteDescriptor> GetContributionRoutes(string contributionId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(contributionId);
@@ -135,6 +165,9 @@ public sealed class RouteGraphSnapshot
             : [];
     }
 
+    /// <summary>
+    /// Executes the without contribution operation.
+    /// </summary>
     public RouteGraphSnapshot WithoutContribution(string contributionId, long? version = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(contributionId);
@@ -148,6 +181,9 @@ public sealed class RouteGraphSnapshot
             nextVersion);
     }
 
+    /// <summary>
+    /// Executes the with contribution operation.
+    /// </summary>
     public RouteGraphSnapshot WithContribution(
         string contributionId,
         IReadOnlyList<RouteDescriptor> routes,

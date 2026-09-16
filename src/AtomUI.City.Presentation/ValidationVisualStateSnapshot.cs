@@ -3,6 +3,9 @@ using AtomUI.City.Mvvm;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents validation visual state snapshot.
+/// </summary>
 public sealed class ValidationVisualStateSnapshot
 {
     private ValidationVisualStateSnapshot(
@@ -17,14 +20,29 @@ public sealed class ValidationVisualStateSnapshot
         Exception = exception;
     }
 
+    /// <summary>
+    /// Gets status.
+    /// </summary>
     public ValidationStatus Status { get; }
 
+    /// <summary>
+    /// Gets errors.
+    /// </summary>
     public IReadOnlyDictionary<string, IReadOnlyList<string>> Errors { get; }
 
+    /// <summary>
+    /// Gets messages.
+    /// </summary>
     public IReadOnlyDictionary<string, IReadOnlyList<ValidationMessage>> Messages { get; }
 
+    /// <summary>
+    /// Gets exception.
+    /// </summary>
     public Exception? Exception { get; }
 
+    /// <summary>
+    /// Executes the from operation.
+    /// </summary>
     public static ValidationVisualStateSnapshot From(ValidationScope scope)
     {
         ArgumentNullException.ThrowIfNull(scope);

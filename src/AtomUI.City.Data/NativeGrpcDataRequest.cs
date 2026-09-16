@@ -2,10 +2,16 @@ using Grpc.Core;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents native grpc data request&lt;trequest, tresponse&gt;.
+/// </summary>
 public sealed class NativeGrpcDataRequest<TRequest, TResponse> : GrpcDataRequest<TResponse>
     where TRequest : class
     where TResponse : class
 {
+    /// <summary>
+    /// Executes the native grpc data request operation.
+    /// </summary>
     public NativeGrpcDataRequest(
         string clientId,
         string operationName,
@@ -32,12 +38,24 @@ public sealed class NativeGrpcDataRequest<TRequest, TResponse> : GrpcDataRequest
         Options = options ?? GrpcCallOptions.Default;
     }
 
+    /// <summary>
+    /// Gets client.
+    /// </summary>
     public NativeGrpcClient Client { get; }
 
+    /// <summary>
+    /// Gets method.
+    /// </summary>
     public Method<TRequest, TResponse> Method { get; }
 
+    /// <summary>
+    /// Gets payload.
+    /// </summary>
     public TRequest Payload { get; }
 
+    /// <summary>
+    /// Gets options.
+    /// </summary>
     public GrpcCallOptions Options { get; }
 
     private static async ValueTask<GrpcCallResult<TResponse>> InvokeAsync(

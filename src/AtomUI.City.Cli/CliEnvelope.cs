@@ -1,5 +1,8 @@
 namespace AtomUI.City.Cli;
 
+/// <summary>
+/// Represents cli envelope.
+/// </summary>
 public sealed class CliEnvelope
 {
     private CliEnvelope(
@@ -23,37 +26,82 @@ public sealed class CliEnvelope
         Retryable = !success && exitCode == CliExitCodes.Failure;
     }
 
+    /// <summary>
+    /// Gets schema version.
+    /// </summary>
     public string SchemaVersion { get; } = "1.0";
 
+    /// <summary>
+    /// Gets command.
+    /// </summary>
     public string Command { get; }
 
+    /// <summary>
+    /// Gets status.
+    /// </summary>
     public string Status { get; }
 
+    /// <summary>
+    /// Gets success.
+    /// </summary>
     public bool Success { get; }
 
+    /// <summary>
+    /// Gets exit code.
+    /// </summary>
     public int ExitCode { get; }
 
+    /// <summary>
+    /// Gets diagnostics.
+    /// </summary>
     public IReadOnlyList<CliDiagnostic> Diagnostics { get; }
 
+    /// <summary>
+    /// Gets data.
+    /// </summary>
     public object Data { get; }
 
+    /// <summary>
+    /// Gets artifacts.
+    /// </summary>
     public IReadOnlyList<object?> Artifacts { get; }
 
+    /// <summary>
+    /// Gets suggested commands.
+    /// </summary>
     public IReadOnlyList<string> SuggestedCommands { get; }
 
+    /// <summary>
+    /// Gets changed files.
+    /// </summary>
     public IReadOnlyList<string> ChangedFiles { get; }
 
+    /// <summary>
+    /// Gets retryable.
+    /// </summary>
     public bool Retryable { get; }
 
+    /// <summary>
+    /// Gets suggested actions.
+    /// </summary>
     public IReadOnlyList<string> SuggestedActions { get; }
 
+    /// <summary>
+    /// Gets documentation links.
+    /// </summary>
     public IReadOnlyList<string> DocumentationLinks { get; }
 
+    /// <summary>
+    /// Executes the succeeded operation.
+    /// </summary>
     public static CliEnvelope Succeeded(string command, object? data)
     {
         return new CliEnvelope(command, success: true, CliExitCodes.Success, [], data);
     }
 
+    /// <summary>
+    /// Executes the failed operation.
+    /// </summary>
     public static CliEnvelope Failed(
         string command,
         int exitCode,
@@ -62,6 +110,9 @@ public sealed class CliEnvelope
         return new CliEnvelope(command, success: false, exitCode, diagnostics, data: new Dictionary<string, object?>());
     }
 
+    /// <summary>
+    /// Executes the failed with data operation.
+    /// </summary>
     public static CliEnvelope FailedWithData(
         string command,
         int exitCode,

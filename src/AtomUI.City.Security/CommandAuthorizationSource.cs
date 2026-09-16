@@ -2,6 +2,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents command authorization source.
+/// </summary>
 public sealed class CommandAuthorizationSource : ICommandAuthorizationSource, IDisposable
 {
     private readonly IAuthorizationEvaluator _authorizationEvaluator;
@@ -15,6 +18,9 @@ public sealed class CommandAuthorizationSource : ICommandAuthorizationSource, ID
     private long _revision;
     private bool _disposed;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>CommandAuthorizationSource</c> type.
+    /// </summary>
     public CommandAuthorizationSource(
         IAuthorizationEvaluator authorizationEvaluator,
         ICurrentPrincipalAccessor principalAccessor,
@@ -31,6 +37,9 @@ public sealed class CommandAuthorizationSource : ICommandAuthorizationSource, ID
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>CommandAuthorizationSource</c> type.
+    /// </summary>
     public CommandAuthorizationSource(
         IAuthorizationEvaluator authorizationEvaluator,
         ICurrentPrincipalAccessor principalAccessor,
@@ -123,8 +132,14 @@ public sealed class CommandAuthorizationSource : ICommandAuthorizationSource, ID
         }
     }
 
+    /// <summary>
+    /// Occurs when authorization changed.
+    /// </summary>
     public event EventHandler<CommandAuthorizationChangedEventArgs>? AuthorizationChanged;
 
+    /// <summary>
+    /// Executes the get state async operation.
+    /// </summary>
     public async ValueTask<CommandAuthorizationState> GetStateAsync(
         CommandAuthorizationContext context,
         CancellationToken cancellationToken = default)
@@ -188,6 +203,9 @@ public sealed class CommandAuthorizationSource : ICommandAuthorizationSource, ID
         }
     }
 
+    /// <summary>
+    /// Executes the check execution async operation.
+    /// </summary>
     public async ValueTask<AuthorizationResult> CheckExecutionAsync(
         CommandAuthorizationContext context,
         CancellationToken cancellationToken = default)
@@ -231,6 +249,9 @@ public sealed class CommandAuthorizationSource : ICommandAuthorizationSource, ID
         }
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         lock (_syncRoot)

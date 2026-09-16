@@ -6,25 +6,40 @@ using Avalonia.Threading;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents view binder.
+/// </summary>
 public sealed class ViewBinder
 {
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ViewBinder</c> type.
+    /// </summary>
     public ViewBinder()
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ViewBinder</c> type.
+    /// </summary>
     public ViewBinder(IHostDiagnostics diagnostics)
         : this(diagnostics, lifecycleHub: null)
     {
         ArgumentNullException.ThrowIfNull(diagnostics);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ViewBinder</c> type.
+    /// </summary>
     public ViewBinder(VisualLifecycleHub lifecycleHub)
     {
         ArgumentNullException.ThrowIfNull(lifecycleHub);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ViewBinder</c> type.
+    /// </summary>
     public ViewBinder(
         IHostDiagnostics? diagnostics,
         VisualLifecycleHub? lifecycleHub)
@@ -32,6 +47,9 @@ public sealed class ViewBinder
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the bind operation.
+    /// </summary>
     public BoundViewHandle Bind(
         ViewDescriptor descriptor,
         object view,
@@ -40,6 +58,9 @@ public sealed class ViewBinder
         return Bind(descriptor, view, viewModel, identity: null);
     }
 
+    /// <summary>
+    /// Executes the bind operation.
+    /// </summary>
     public BoundViewHandle Bind(
         ViewDescriptor descriptor,
         object view,

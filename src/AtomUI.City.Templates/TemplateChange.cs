@@ -1,7 +1,13 @@
 namespace AtomUI.City.Templates;
 
+/// <summary>
+/// Represents template change.
+/// </summary>
 public sealed record TemplateChange(string Type, string Path)
 {
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static TemplateChange Create(string path)
     {
         return new TemplateChange("create", NormalizePath(path));

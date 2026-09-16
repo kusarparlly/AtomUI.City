@@ -2,12 +2,18 @@ using AtomUI.City.Routing;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents in memory route authorization policy provider.
+/// </summary>
 public sealed class InMemoryRouteAuthorizationPolicyProvider : IRouteAuthorizationPolicyProvider
 {
     private readonly Dictionary<string, AuthorizationPolicy> _policies = new(StringComparer.Ordinal);
     private readonly HashSet<string> _revokedContributions = new(StringComparer.Ordinal);
     private readonly object _syncRoot = new();
 
+    /// <summary>
+    /// Executes the add operation.
+    /// </summary>
     public bool Add(string routeId, AuthorizationPolicy policy)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(routeId);
@@ -32,6 +38,9 @@ public sealed class InMemoryRouteAuthorizationPolicyProvider : IRouteAuthorizati
         }
     }
 
+    /// <summary>
+    /// Executes the remove operation.
+    /// </summary>
     public bool Remove(string routeId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(routeId);
@@ -42,6 +51,9 @@ public sealed class InMemoryRouteAuthorizationPolicyProvider : IRouteAuthorizati
         }
     }
 
+    /// <summary>
+    /// Executes the remove by contribution operation.
+    /// </summary>
     public int RemoveByContribution(string contributionId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(contributionId);
@@ -66,6 +78,9 @@ public sealed class InMemoryRouteAuthorizationPolicyProvider : IRouteAuthorizati
         }
     }
 
+    /// <summary>
+    /// Executes the get policy async operation.
+    /// </summary>
     public ValueTask<AuthorizationPolicy?> GetPolicyAsync(
         RouteGuardContext context,
         CancellationToken cancellationToken = default)

@@ -4,20 +4,44 @@ using AtomUI.City.Core.Lifecycle;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Defines the supported data backpressure policy values.
+/// </summary>
 public enum DataBackpressurePolicy
 {
+    /// <summary>
+    /// Represents the buffer value.
+    /// </summary>
     Buffer,
+    /// <summary>
+    /// Represents the drop oldest value.
+    /// </summary>
     DropOldest,
+    /// <summary>
+    /// Represents the drop newest value.
+    /// </summary>
     DropNewest,
+    /// <summary>
+    /// Represents the latest only value.
+    /// </summary>
     LatestOnly,
+    /// <summary>
+    /// Represents the block producer value.
+    /// </summary>
     BlockProducer,
 }
 
+/// <summary>
+/// Represents data stream options.
+/// </summary>
 public sealed class DataStreamOptions
 {
     private int _capacity = 64;
     private DataBackpressurePolicy _backpressurePolicy = DataBackpressurePolicy.Buffer;
 
+    /// <summary>
+    /// Represents the capacity value.
+    /// </summary>
     public int Capacity
     {
         get => _capacity;
@@ -28,6 +52,9 @@ public sealed class DataStreamOptions
         }
     }
 
+    /// <summary>
+    /// Represents the backpressure policy value.
+    /// </summary>
     public DataBackpressurePolicy BackpressurePolicy
     {
         get => _backpressurePolicy;
@@ -42,18 +69,36 @@ public sealed class DataStreamOptions
         }
     }
 
+    /// <summary>
+    /// Gets or sets parent scope.
+    /// </summary>
     public LifecycleScope? ParentScope { get; init; }
 
+    /// <summary>
+    /// Gets default.
+    /// </summary>
     public static DataStreamOptions Default { get; } = new();
 }
 
+/// <summary>
+/// Defines the contract for idata stream&lt;t&gt;.
+/// </summary>
 public interface IDataStream<T> : IAsyncEnumerable<DataResult<T>>, IAsyncDisposable
 {
+    /// <summary>
+    /// Gets stream id.
+    /// </summary>
     Guid StreamId { get; }
 
+    /// <summary>
+    /// Gets completion.
+    /// </summary>
     Task Completion { get; }
 }
 
+/// <summary>
+/// Represents data stream&lt;t&gt;.
+/// </summary>
 public sealed class DataStream<T> : IDataStream<T>
 {
     private readonly Channel<DataResult<T>> _channel;
@@ -103,10 +148,19 @@ public sealed class DataStream<T> : IDataStream<T>
         Completion = PumpAsync(source);
     }
 
+    /// <summary>
+    /// Gets stream id.
+    /// </summary>
     public Guid StreamId { get; }
 
+    /// <summary>
+    /// Gets completion.
+    /// </summary>
     public Task Completion { get; }
 
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static DataStream<T> Create(
         IAsyncEnumerable<T> source,
         DataStreamOptions? options = null,
@@ -122,6 +176,9 @@ public sealed class DataStream<T> : IDataStream<T>
         Func<ValueTask> release) =>
         new(source, options, diagnostics, errorMapper, release);
 
+    /// <summary>
+    /// Executes the get async enumerator operation.
+    /// </summary>
     public async IAsyncEnumerator<DataResult<T>> GetAsyncEnumerator(
         CancellationToken cancellationToken = default)
     {
@@ -140,6 +197,9 @@ public sealed class DataStream<T> : IDataStream<T>
         }
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public ValueTask DisposeAsync()
     {
         Task disposeTask;

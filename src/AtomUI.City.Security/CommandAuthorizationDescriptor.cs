@@ -1,7 +1,13 @@
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents command authorization descriptor.
+/// </summary>
 public sealed class CommandAuthorizationDescriptor
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>CommandAuthorizationDescriptor</c> type.
+    /// </summary>
     public CommandAuthorizationDescriptor(
         string commandId,
         AuthorizationPolicy policy,
@@ -46,13 +52,28 @@ public sealed class CommandAuthorizationDescriptor
         ContributionId = contributionId ?? policy.ContributionId;
     }
 
+    /// <summary>
+    /// Gets command id.
+    /// </summary>
     public string CommandId { get; }
 
+    /// <summary>
+    /// Gets policy.
+    /// </summary>
     public AuthorizationPolicy Policy { get; }
 
+    /// <summary>
+    /// Gets unauthorized behavior.
+    /// </summary>
     public CommandUnauthorizedBehavior UnauthorizedBehavior { get; }
 
+    /// <summary>
+    /// Gets denied message key.
+    /// </summary>
     public string? DeniedMessageKey { get; }
 
+    /// <summary>
+    /// Gets contribution id.
+    /// </summary>
     public string? ContributionId { get; }
 }

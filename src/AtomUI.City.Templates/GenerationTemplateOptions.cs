@@ -2,6 +2,9 @@ using System.Globalization;
 
 namespace AtomUI.City.Templates;
 
+/// <summary>
+/// Represents generation template options.
+/// </summary>
 public sealed class GenerationTemplateOptions
 {
     private static readonly HashSet<string> ReservedIdentifiers = new(StringComparer.Ordinal)
@@ -20,18 +23,39 @@ public sealed class GenerationTemplateOptions
     private IReadOnlyList<string> _cultures = Array.AsReadOnly(["en-US", "zh-CN"]);
     private IReadOnlyList<string> _moduleDependencies = Array.Empty<string>();
 
+    /// <summary>
+    /// Gets or sets kind.
+    /// </summary>
     public required GenerationTemplateKind Kind { get; init; }
 
+    /// <summary>
+    /// Gets or sets name.
+    /// </summary>
     public required string Name { get; init; }
 
+    /// <summary>
+    /// Gets or sets project name.
+    /// </summary>
     public required string ProjectName { get; init; }
 
+    /// <summary>
+    /// Gets or sets root namespace.
+    /// </summary>
     public required string RootNamespace { get; init; }
 
+    /// <summary>
+    /// Gets or sets output path.
+    /// </summary>
     public required string OutputPath { get; init; }
 
+    /// <summary>
+    /// Gets or sets route path.
+    /// </summary>
     public string? RoutePath { get; init; }
 
+    /// <summary>
+    /// Represents the cultures value.
+    /// </summary>
     public IReadOnlyList<string> Cultures
     {
         get => _cultures;
@@ -42,6 +66,9 @@ public sealed class GenerationTemplateOptions
         }
     }
 
+    /// <summary>
+    /// Represents the module dependencies value.
+    /// </summary>
     public IReadOnlyList<string> ModuleDependencies
     {
         get => _moduleDependencies;
@@ -52,10 +79,19 @@ public sealed class GenerationTemplateOptions
         }
     }
 
+    /// <summary>
+    /// Gets or sets include tests.
+    /// </summary>
     public bool IncludeTests { get; init; } = true;
 
+    /// <summary>
+    /// Gets or sets reloadable configuration.
+    /// </summary>
     public bool ReloadableConfiguration { get; init; }
 
+    /// <summary>
+    /// Executes the validate operation.
+    /// </summary>
     public IReadOnlyList<TemplateDiagnostic> Validate()
     {
         var diagnostics = new List<TemplateDiagnostic>();

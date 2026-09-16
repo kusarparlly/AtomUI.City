@@ -1,5 +1,8 @@
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents aot compatibility check.
+/// </summary>
 public sealed class AotCompatibilityCheck
 {
     private readonly List<ForbiddenAotPattern> _forbiddenPatterns = [];
@@ -8,11 +11,17 @@ public sealed class AotCompatibilityCheck
     {
     }
 
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static AotCompatibilityCheck Create()
     {
         return new AotCompatibilityCheck();
     }
 
+    /// <summary>
+    /// Executes the forbid pattern operation.
+    /// </summary>
     public AotCompatibilityCheck ForbidPattern(string diagnosticId, string pattern)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(diagnosticId);
@@ -28,6 +37,9 @@ public sealed class AotCompatibilityCheck
         return this;
     }
 
+    /// <summary>
+    /// Executes the forbid default aot patterns operation.
+    /// </summary>
     public AotCompatibilityCheck ForbidDefaultAotPatterns()
     {
         ForbidPattern("AOT001", "Assembly.GetTypes");
@@ -37,6 +49,9 @@ public sealed class AotCompatibilityCheck
         return this;
     }
 
+    /// <summary>
+    /// Executes the evaluate operation.
+    /// </summary>
     public IReadOnlyList<AotCompatibilityDiagnostic> Evaluate(
         IEnumerable<SourceFile> sources,
         CancellationToken cancellationToken = default)

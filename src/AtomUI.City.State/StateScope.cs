@@ -2,6 +2,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents state scope.
+/// </summary>
 public sealed class StateScope : IStateScope
 {
     private readonly IHostDiagnostics? _diagnostics;
@@ -10,6 +13,9 @@ public sealed class StateScope : IStateScope
     private bool _disposed;
     private StateScopeState _state = StateScopeState.Active;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>StateScope</c> type.
+    /// </summary>
     public StateScope(string id, IHostDiagnostics? diagnostics = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(id);
@@ -18,8 +24,14 @@ public sealed class StateScope : IStateScope
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Gets id.
+    /// </summary>
     public string Id { get; }
 
+    /// <summary>
+    /// Represents the state value.
+    /// </summary>
     public StateScopeState State
     {
         get
@@ -31,6 +43,9 @@ public sealed class StateScope : IStateScope
         }
     }
 
+    /// <summary>
+    /// Executes the add operation.
+    /// </summary>
     public void Add(IDisposable subscription)
     {
         ArgumentNullException.ThrowIfNull(subscription);
@@ -47,6 +62,9 @@ public sealed class StateScope : IStateScope
         DisposeSubscription(subscription);
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         IDisposable[] subscriptions;

@@ -1,17 +1,35 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event bus diagnostics options.
+/// </summary>
 public sealed class EventBusDiagnosticsOptions
 {
+    /// <summary>
+    /// Represents the default memory buffer capacity value.
+    /// </summary>
     public const int DefaultMemoryBufferCapacity = 2048;
+    /// <summary>
+    /// Represents the default maximum payload field count value.
+    /// </summary>
     public const int DefaultMaximumPayloadFieldCount = 16;
+    /// <summary>
+    /// Represents the default maximum payload value length value.
+    /// </summary>
     public const int DefaultMaximumPayloadValueLength = 512;
 
     private double _traceSamplingRate = 1d;
     private int _maximumPayloadFieldCount = DefaultMaximumPayloadFieldCount;
     private int _maximumPayloadValueLength = DefaultMaximumPayloadValueLength;
 
+    /// <summary>
+    /// Gets default.
+    /// </summary>
     public static EventBusDiagnosticsOptions Default { get; } = new();
 
+    /// <summary>
+    /// Represents the trace sampling rate value.
+    /// </summary>
     public double TraceSamplingRate
     {
         get => _traceSamplingRate;
@@ -29,8 +47,14 @@ public sealed class EventBusDiagnosticsOptions
         }
     }
 
+    /// <summary>
+    /// Gets or sets enable payload projection.
+    /// </summary>
     public bool EnablePayloadProjection { get; init; }
 
+    /// <summary>
+    /// Represents the maximum payload field count value.
+    /// </summary>
     public int MaximumPayloadFieldCount
     {
         get => _maximumPayloadFieldCount;
@@ -48,6 +72,9 @@ public sealed class EventBusDiagnosticsOptions
         }
     }
 
+    /// <summary>
+    /// Represents the maximum payload value length value.
+    /// </summary>
     public int MaximumPayloadValueLength
     {
         get => _maximumPayloadValueLength;

@@ -2,21 +2,33 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents presentation resource registry.
+/// </summary>
 public sealed class PresentationResourceRegistry : IPresentationResourceRegistry
 {
     private readonly object _gate = new();
     private readonly List<PresentationResourceLease> _leases = [];
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>PresentationResourceRegistry</c> type.
+    /// </summary>
     public PresentationResourceRegistry()
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>PresentationResourceRegistry</c> type.
+    /// </summary>
     public PresentationResourceRegistry(IHostDiagnostics? diagnostics)
     {
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Represents the contributions value.
+    /// </summary>
     public IReadOnlyList<PresentationResourceContribution> Contributions
     {
         get
@@ -32,6 +44,9 @@ public sealed class PresentationResourceRegistry : IPresentationResourceRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the register operation.
+    /// </summary>
     public IPresentationResourceLease Register(PresentationResourceContribution contribution)
     {
         ArgumentNullException.ThrowIfNull(contribution);
@@ -48,6 +63,9 @@ public sealed class PresentationResourceRegistry : IPresentationResourceRegistry
         return lease;
     }
 
+    /// <summary>
+    /// Executes the revoke plugin operation.
+    /// </summary>
     public int RevokePlugin(string pluginId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(pluginId);
@@ -55,6 +73,9 @@ public sealed class PresentationResourceRegistry : IPresentationResourceRegistry
         return Revoke(contribution => string.Equals(contribution.PluginId, pluginId, StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Executes the revoke contribution operation.
+    /// </summary>
     public int RevokeContribution(string contributionId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(contributionId);

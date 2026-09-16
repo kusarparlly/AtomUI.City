@@ -4,6 +4,9 @@ using AtomUI.City.Core.Threading;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents interaction handler registry.
+/// </summary>
 public sealed class InteractionHandlerRegistry : IInteractionHandlerRegistry
 {
     private readonly object _gate = new();
@@ -13,11 +16,17 @@ public sealed class InteractionHandlerRegistry : IInteractionHandlerRegistry
     private readonly IHostDiagnostics? _diagnostics;
     private readonly PresentationQueueOptions _queueOptions;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>InteractionHandlerRegistry</c> type.
+    /// </summary>
     public InteractionHandlerRegistry(IUiDispatcher dispatcher)
         : this(dispatcher, diagnostics: null, queueOptions: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>InteractionHandlerRegistry</c> type.
+    /// </summary>
     public InteractionHandlerRegistry(
         IUiDispatcher dispatcher,
         IHostDiagnostics? diagnostics)
@@ -25,6 +34,9 @@ public sealed class InteractionHandlerRegistry : IInteractionHandlerRegistry
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>InteractionHandlerRegistry</c> type.
+    /// </summary>
     public InteractionHandlerRegistry(
         IUiDispatcher dispatcher,
         IHostDiagnostics? diagnostics,
@@ -40,6 +52,9 @@ public sealed class InteractionHandlerRegistry : IInteractionHandlerRegistry
         _queueOptions = queueOptions;
     }
 
+    /// <summary>
+    /// Executes the register&lt;trequest, tresult&gt; operation.
+    /// </summary>
     public IDisposable Register<TRequest, TResult>(
         Func<InteractionContext<TRequest>, CancellationToken, ValueTask<TResult>> handler,
         IActivationScope? activationScope = null)
@@ -52,6 +67,9 @@ public sealed class InteractionHandlerRegistry : IInteractionHandlerRegistry
             });
     }
 
+    /// <summary>
+    /// Executes the register&lt;trequest, tresult&gt; operation.
+    /// </summary>
     public IDisposable Register<TRequest, TResult>(
         Func<InteractionContext<TRequest>, CancellationToken, ValueTask<TResult>> handler,
         InteractionHandlerRegistrationOptions options)
@@ -83,6 +101,9 @@ public sealed class InteractionHandlerRegistry : IInteractionHandlerRegistry
         return registration;
     }
 
+    /// <summary>
+    /// Executes the handle async&lt;trequest, tresult&gt; operation.
+    /// </summary>
     public async ValueTask<InteractionResult<TResult>> HandleAsync<TRequest, TResult>(
         TRequest request,
         CancellationToken cancellationToken = default)
@@ -93,6 +114,9 @@ public sealed class InteractionHandlerRegistry : IInteractionHandlerRegistry
             cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the handle async&lt;trequest, tresult&gt; operation.
+    /// </summary>
     public async ValueTask<InteractionResult<TResult>> HandleAsync<TRequest, TResult>(
         TRequest request,
         InteractionDispatchContext context,
@@ -152,6 +176,9 @@ public sealed class InteractionHandlerRegistry : IInteractionHandlerRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the get modal queue snapshot operation.
+    /// </summary>
     public PresentationQueueSnapshot GetModalQueueSnapshot(string? windowId = null)
     {
         var laneId = NormalizeWindowId(windowId);
@@ -168,6 +195,9 @@ public sealed class InteractionHandlerRegistry : IInteractionHandlerRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the revoke plugin operation.
+    /// </summary>
     public int RevokePlugin(string pluginId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(pluginId);
@@ -175,6 +205,9 @@ public sealed class InteractionHandlerRegistry : IInteractionHandlerRegistry
         return Revoke(registration => string.Equals(registration.PluginId, pluginId, StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Executes the revoke contribution operation.
+    /// </summary>
     public int RevokeContribution(string contributionId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(contributionId);

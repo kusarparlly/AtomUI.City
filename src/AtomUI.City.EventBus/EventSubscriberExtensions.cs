@@ -2,8 +2,14 @@ using AtomUI.City.Core.Lifecycle;
 
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event subscriber extensions.
+/// </summary>
 public static class EventSubscriberExtensions
 {
+    /// <summary>
+    /// Executes the subscribe&lt;tevent&gt; operation.
+    /// </summary>
     public static IEventSubscription Subscribe<TEvent>(
         this IEventSubscriber subscriber,
         LifecycleScope owner,
@@ -24,6 +30,9 @@ public static class EventSubscriberExtensions
             options);
     }
 
+    /// <summary>
+    /// Executes the subscribe&lt;tevent&gt; operation.
+    /// </summary>
     public static IEventSubscription Subscribe<TEvent>(
         this IEventSubscriber subscriber,
         LifecycleScope owner,

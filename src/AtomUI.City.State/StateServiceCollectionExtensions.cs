@@ -4,8 +4,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents state service collection extensions.
+/// </summary>
 public static class StateServiceCollectionExtensions
 {
+    /// <summary>
+    /// Executes the add state operation.
+    /// </summary>
     public static IServiceCollection AddState(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);

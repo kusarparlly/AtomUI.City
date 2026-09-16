@@ -2,8 +2,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents default view model factory.
+/// </summary>
 public sealed class DefaultViewModelFactory : IViewModelFactory
 {
+    /// <summary>
+    /// Executes the acquire async operation.
+    /// </summary>
     public async ValueTask<ViewModelLease> AcquireAsync(
         ViewModelAcquisitionRequest request,
         CancellationToken cancellationToken = default)

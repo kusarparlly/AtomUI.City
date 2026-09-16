@@ -6,6 +6,9 @@ using AtomUI.City.Templates;
 
 namespace AtomUI.City.Cli;
 
+/// <summary>
+/// Represents cli application.
+/// </summary>
 public static class CliApplication
 {
     private const int ProcessOutputSummaryLimit = 4096;
@@ -29,6 +32,9 @@ public static class CliApplication
         "atomui city tests check",
     ];
 
+    /// <summary>
+    /// Executes the run async operation.
+    /// </summary>
     public static async ValueTask<int> RunAsync(
         string[] args,
         TextWriter output,

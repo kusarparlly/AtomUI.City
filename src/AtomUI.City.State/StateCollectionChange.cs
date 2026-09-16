@@ -1,5 +1,8 @@
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents state collection change&lt;tkey, titem&gt;.
+/// </summary>
 public sealed record StateCollectionChange<TKey, TItem>
     where TKey : notnull
 {
@@ -8,6 +11,9 @@ public sealed record StateCollectionChange<TKey, TItem>
     private long _collectionVersion;
     private long _itemVersion;
 
+    /// <summary>
+    /// Executes the state collection change operation.
+    /// </summary>
     public StateCollectionChange(
         StateCollectionChangeKind Kind,
         TKey Key,
@@ -54,6 +60,9 @@ public sealed record StateCollectionChange<TKey, TItem>
         this.ItemVersion = ItemVersion;
     }
 
+    /// <summary>
+    /// Represents the kind value.
+    /// </summary>
     public StateCollectionChangeKind Kind
     {
         get => _kind;
@@ -71,6 +80,9 @@ public sealed record StateCollectionChange<TKey, TItem>
         }
     }
 
+    /// <summary>
+    /// Represents the key value.
+    /// </summary>
     public TKey Key
     {
         get => _key;
@@ -82,14 +94,29 @@ public sealed record StateCollectionChange<TKey, TItem>
         }
     }
 
+    /// <summary>
+    /// Gets or sets has old item.
+    /// </summary>
     public bool HasOldItem { get; init; }
 
+    /// <summary>
+    /// Gets or sets old item.
+    /// </summary>
     public TItem? OldItem { get; init; }
 
+    /// <summary>
+    /// Gets or sets has new item.
+    /// </summary>
     public bool HasNewItem { get; init; }
 
+    /// <summary>
+    /// Gets or sets new item.
+    /// </summary>
     public TItem? NewItem { get; init; }
 
+    /// <summary>
+    /// Represents the collection version value.
+    /// </summary>
     public long CollectionVersion
     {
         get => _collectionVersion;
@@ -107,6 +134,9 @@ public sealed record StateCollectionChange<TKey, TItem>
         }
     }
 
+    /// <summary>
+    /// Represents the item version value.
+    /// </summary>
     public long ItemVersion
     {
         get => _itemVersion;

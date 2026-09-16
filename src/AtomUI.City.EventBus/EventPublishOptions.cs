@@ -1,5 +1,8 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event publish options.
+/// </summary>
 public sealed class EventPublishOptions
 {
     private string? _correlationId;
@@ -7,20 +10,32 @@ public sealed class EventPublishOptions
     private int _publishDepth;
     private string? _partitionKey;
 
+    /// <summary>
+    /// Gets default.
+    /// </summary>
     public static EventPublishOptions Default { get; } = new();
 
+    /// <summary>
+    /// Represents the correlation id value.
+    /// </summary>
     public string? CorrelationId
     {
         get => _correlationId;
         init => _correlationId = EventCorrelationIds.ValidateOptional(value, nameof(CorrelationId));
     }
 
+    /// <summary>
+    /// Represents the causation id value.
+    /// </summary>
     public string? CausationId
     {
         get => _causationId;
         init => _causationId = EventCorrelationIds.ValidateOptional(value, nameof(CausationId));
     }
 
+    /// <summary>
+    /// Represents the publish depth value.
+    /// </summary>
     public int PublishDepth
     {
         get => _publishDepth;
@@ -38,6 +53,9 @@ public sealed class EventPublishOptions
         }
     }
 
+    /// <summary>
+    /// Represents the partition key value.
+    /// </summary>
     public string? PartitionKey
     {
         get => _partitionKey;

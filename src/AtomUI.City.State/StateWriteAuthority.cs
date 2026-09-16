@@ -2,6 +2,9 @@ using System.Collections.Frozen;
 
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents state write authority.
+/// </summary>
 public sealed class StateWriteAuthority
 {
     private readonly FrozenSet<string> _capabilities;
@@ -23,12 +26,24 @@ public sealed class StateWriteAuthority
         }
     }
 
+    /// <summary>
+    /// Gets kind.
+    /// </summary>
     public StateWriteAuthorityKind Kind { get; }
 
+    /// <summary>
+    /// Gets module name.
+    /// </summary>
     public string? ModuleName { get; }
 
+    /// <summary>
+    /// Gets plugin id.
+    /// </summary>
     public string? PluginId { get; }
 
+    /// <summary>
+    /// Gets capabilities.
+    /// </summary>
     public IReadOnlySet<string> Capabilities => _capabilities;
 
     internal static StateWriteAuthority Host(IEnumerable<string>? capabilities = null)
@@ -36,6 +51,9 @@ public sealed class StateWriteAuthority
         return new StateWriteAuthority(StateWriteAuthorityKind.Host, null, null, capabilities);
     }
 
+    /// <summary>
+    /// Executes the module operation.
+    /// </summary>
     public static StateWriteAuthority Module(
         string moduleName,
         IEnumerable<string>? capabilities = null)
@@ -45,6 +63,9 @@ public sealed class StateWriteAuthority
         return new StateWriteAuthority(StateWriteAuthorityKind.Module, moduleName, null, capabilities);
     }
 
+    /// <summary>
+    /// Executes the plugin operation.
+    /// </summary>
     public static StateWriteAuthority Plugin(
         string pluginId,
         IEnumerable<string>? capabilities = null)

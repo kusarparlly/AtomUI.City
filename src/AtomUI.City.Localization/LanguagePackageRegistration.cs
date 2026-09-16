@@ -1,7 +1,13 @@
 namespace AtomUI.City.Localization;
 
+/// <summary>
+/// Represents language package registration.
+/// </summary>
 public sealed class LanguagePackageRegistration
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>LanguagePackageRegistration</c> type.
+    /// </summary>
     public LanguagePackageRegistration(
         LanguagePackageDescriptor descriptor,
         string ownerId)
@@ -13,7 +19,13 @@ public sealed class LanguagePackageRegistration
         OwnerId = ownerId;
     }
 
+    /// <summary>
+    /// Gets descriptor.
+    /// </summary>
     public LanguagePackageDescriptor Descriptor { get; }
 
+    /// <summary>
+    /// Gets owner id.
+    /// </summary>
     public string OwnerId { get; }
 }

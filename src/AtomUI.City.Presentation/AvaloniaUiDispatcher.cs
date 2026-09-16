@@ -5,6 +5,9 @@ using Avalonia.Threading;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents avalonia ui dispatcher.
+/// </summary>
 public sealed class AvaloniaUiDispatcher : IUiDispatcher
 {
     private readonly Dispatcher _dispatcher;
@@ -12,26 +15,41 @@ public sealed class AvaloniaUiDispatcher : IUiDispatcher
     private readonly IHostDiagnostics? _diagnostics;
     private long _nextOperationId;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AvaloniaUiDispatcher</c> type.
+    /// </summary>
     public AvaloniaUiDispatcher()
         : this(Dispatcher.UIThread, runtime: null, diagnostics: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AvaloniaUiDispatcher</c> type.
+    /// </summary>
     public AvaloniaUiDispatcher(IPresentationRuntime runtime)
         : this(Dispatcher.UIThread, runtime, diagnostics: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AvaloniaUiDispatcher</c> type.
+    /// </summary>
     public AvaloniaUiDispatcher(Dispatcher dispatcher)
         : this(dispatcher, runtime: null, diagnostics: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AvaloniaUiDispatcher</c> type.
+    /// </summary>
     public AvaloniaUiDispatcher(Dispatcher dispatcher, IPresentationRuntime? runtime)
         : this(dispatcher, runtime, diagnostics: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AvaloniaUiDispatcher</c> type.
+    /// </summary>
     public AvaloniaUiDispatcher(
         Dispatcher dispatcher,
         IPresentationRuntime? runtime,
@@ -44,11 +62,17 @@ public sealed class AvaloniaUiDispatcher : IUiDispatcher
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the check access operation.
+    /// </summary>
     public bool CheckAccess()
     {
         return _dispatcher.CheckAccess();
     }
 
+    /// <summary>
+    /// Executes the invoke async operation.
+    /// </summary>
     public ValueTask InvokeAsync(Action callback, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(callback);
@@ -90,6 +114,9 @@ public sealed class AvaloniaUiDispatcher : IUiDispatcher
         }
     }
 
+    /// <summary>
+    /// Executes the invoke async&lt;t&gt; operation.
+    /// </summary>
     public ValueTask<T> InvokeAsync<T>(Func<T> callback, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(callback);
@@ -131,6 +158,9 @@ public sealed class AvaloniaUiDispatcher : IUiDispatcher
         }
     }
 
+    /// <summary>
+    /// Executes the post async operation.
+    /// </summary>
     public ValueTask PostAsync(
         Func<CancellationToken, ValueTask> callback,
         CancellationToken cancellationToken = default)

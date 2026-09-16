@@ -1,7 +1,13 @@
 namespace AtomUI.City.PluginSystem;
 
+/// <summary>
+/// Represents plugin manifest validator.
+/// </summary>
 public static class PluginManifestValidator
 {
+    /// <summary>
+    /// Executes the validate operation.
+    /// </summary>
     public static PluginValidationResult Validate(PluginManifest manifest)
     {
         ArgumentNullException.ThrowIfNull(manifest);

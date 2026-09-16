@@ -1,5 +1,8 @@
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents route outlet commit result.
+/// </summary>
 public sealed class RouteOutletCommitResult
 {
     private RouteOutletCommitResult(
@@ -14,14 +17,29 @@ public sealed class RouteOutletCommitResult
         OperationId = operationId;
     }
 
+    /// <summary>
+    /// Gets succeeded.
+    /// </summary>
     public bool Succeeded { get; }
 
+    /// <summary>
+    /// Gets error.
+    /// </summary>
     public PresentationError? Error { get; }
 
+    /// <summary>
+    /// Gets message.
+    /// </summary>
     public string? Message { get; }
 
+    /// <summary>
+    /// Gets operation id.
+    /// </summary>
     public long OperationId { get; }
 
+    /// <summary>
+    /// Executes the success operation.
+    /// </summary>
     public static RouteOutletCommitResult Success(long operationId = 0)
     {
         return new RouteOutletCommitResult(
@@ -31,6 +49,9 @@ public sealed class RouteOutletCommitResult
             operationId);
     }
 
+    /// <summary>
+    /// Executes the failed operation.
+    /// </summary>
     public static RouteOutletCommitResult Failed(
         PresentationError error,
         string message,

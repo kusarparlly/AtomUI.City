@@ -2,11 +2,17 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents delegate access token provider.
+/// </summary>
 public sealed class DelegateAccessTokenProvider : IAccessTokenProvider
 {
     private readonly Func<AccessTokenRequest, CancellationToken, ValueTask<AccessTokenResult>> _provider;
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>DelegateAccessTokenProvider</c> type.
+    /// </summary>
     public DelegateAccessTokenProvider(
         Func<AccessTokenRequest, CancellationToken, ValueTask<AccessTokenResult>> provider)
     {
@@ -15,6 +21,9 @@ public sealed class DelegateAccessTokenProvider : IAccessTokenProvider
         _provider = provider;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>DelegateAccessTokenProvider</c> type.
+    /// </summary>
     public DelegateAccessTokenProvider(
         Func<AccessTokenRequest, CancellationToken, ValueTask<AccessTokenResult>> provider,
         IHostDiagnostics diagnostics)
@@ -23,6 +32,9 @@ public sealed class DelegateAccessTokenProvider : IAccessTokenProvider
         _diagnostics = diagnostics ?? throw new ArgumentNullException(nameof(diagnostics));
     }
 
+    /// <summary>
+    /// Executes the get token async operation.
+    /// </summary>
     public async ValueTask<AccessTokenResult> GetTokenAsync(
         AccessTokenRequest request,
         CancellationToken cancellationToken = default)

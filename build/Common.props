@@ -13,11 +13,35 @@
     <IsTestProject Condition="$(MSBuildProjectFullPath.Contains('tests')) and $(MSBuildProjectName.EndsWith('.Tests'))">true</IsTestProject>
     <IsTestProject Condition="$(MSBuildProjectFullPath.Contains('tests')) and $(MSBuildProjectName.EndsWith('SmokeTests'))">true</IsTestProject>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
-    <NoWarn>$(NoWarn);CS1591;CS0436;CS7035;AVA3001;AVALONIA_X11_CSD;NU5104</NoWarn>
+    <!--
+      Public product assemblies publish XML documentation and therefore treat a
+      missing comment as a release error. Tests, fixtures and private build
+      helpers are intentionally excluded from that public documentation contract.
+    -->
+    <AtomUICityPublicApiDocumentationRequired Condition="
+        '$(MSBuildProjectName)' == 'AtomUI.City.Build' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.Cli' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.Core' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.Data' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.EventBus' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.Generators' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.Localization' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.Mvvm' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.PluginSystem' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.Presentation' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.Routing' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.Security' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.State' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.Templates' Or
+        '$(MSBuildProjectName)' == 'AtomUI.City.Testing'">true</AtomUICityPublicApiDocumentationRequired>
+    <AtomUICityPublicApiDocumentationRequired Condition="'$(AtomUICityPublicApiDocumentationRequired)' == ''">false</AtomUICityPublicApiDocumentationRequired>
+    <NoWarn>$(NoWarn);CS0436;CS7035;AVA3001;AVALONIA_X11_CSD;NU5104</NoWarn>
+    <NoWarn Condition="'$(AtomUICityPublicApiDocumentationRequired)' != 'true'">$(NoWarn);CS1591</NoWarn>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <GenerateAssemblyConfigurationAttribute>true</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>true</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>true</GenerateAssemblyProductAttribute>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <WarningsAsErrors Condition="'$(AtomUICityPublicApiDocumentationRequired)' == 'true'">$(WarningsAsErrors);CS1591</WarningsAsErrors>
   </PropertyGroup>
 </Project>

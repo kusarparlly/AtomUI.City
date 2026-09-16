@@ -1,9 +1,18 @@
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents signal rdata transport.
+/// </summary>
 public sealed class SignalRDataTransport : IRequestResponseTransport
 {
+    /// <summary>
+    /// Gets kind.
+    /// </summary>
     public DataTransportKind Kind => DataTransportKind.SignalR;
 
+    /// <summary>
+    /// Executes the send async&lt;tresponse&gt; operation.
+    /// </summary>
     public async ValueTask<DataResult<TResponse>> SendAsync<TResponse>(
         DataRequest<TResponse> request,
         DataRequestContext context,

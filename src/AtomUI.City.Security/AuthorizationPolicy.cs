@@ -1,7 +1,13 @@
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents authorization policy.
+/// </summary>
 public sealed class AuthorizationPolicy
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>AuthorizationPolicy</c> type.
+    /// </summary>
     public AuthorizationPolicy(
         string name,
         IReadOnlyCollection<AuthorizationRequirement> requirements,
@@ -31,12 +37,24 @@ public sealed class AuthorizationPolicy
         ContributionId = contributionId;
     }
 
+    /// <summary>
+    /// Gets name.
+    /// </summary>
     public string Name { get; }
 
+    /// <summary>
+    /// Gets requirements.
+    /// </summary>
     public IReadOnlyList<AuthorizationRequirement> Requirements { get; }
 
+    /// <summary>
+    /// Gets contribution id.
+    /// </summary>
     public string? ContributionId { get; }
 
+    /// <summary>
+    /// Executes the require authenticated operation.
+    /// </summary>
     public static AuthorizationPolicy RequireAuthenticated(string name)
     {
         return new AuthorizationPolicy(
@@ -44,6 +62,9 @@ public sealed class AuthorizationPolicy
             [AuthorizationRequirement.RequireAuthenticated()]);
     }
 
+    /// <summary>
+    /// Executes the require permission operation.
+    /// </summary>
     public static AuthorizationPolicy RequirePermission(
         string name,
         string permissionName,

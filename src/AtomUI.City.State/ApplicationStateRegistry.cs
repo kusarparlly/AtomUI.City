@@ -2,6 +2,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents application state registry.
+/// </summary>
 public sealed class ApplicationStateRegistry :
     IApplicationState,
     IApplicationStateWriter,
@@ -12,11 +15,17 @@ public sealed class ApplicationStateRegistry :
     private readonly object _syncRoot = new();
     private static readonly StateWriteAuthority HostAuthority = StateWriteAuthority.Host();
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ApplicationStateRegistry</c> type.
+    /// </summary>
     public ApplicationStateRegistry(IHostDiagnostics? diagnostics = null)
     {
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the add&lt;t&gt; operation.
+    /// </summary>
     public void Add<T>(StateDefinition<T> definition)
     {
         ArgumentNullException.ThrowIfNull(definition);
@@ -50,11 +59,17 @@ public sealed class ApplicationStateRegistry :
         }
     }
 
+    /// <summary>
+    /// Gets get&lt;t&gt;.
+    /// </summary>
     public IReadOnlyState<T> Get<T>(StateKey<T> key)
     {
         return GetRegistration<T>(key).State;
     }
 
+    /// <summary>
+    /// Executes the get writable&lt;t&gt; operation.
+    /// </summary>
     public IWritableState<T> GetWritable<T>(StateKey<T> key)
     {
         var registration = GetRegistration<T>(key);
@@ -63,6 +78,9 @@ public sealed class ApplicationStateRegistry :
         return registration.State;
     }
 
+    /// <summary>
+    /// Executes the create writer operation.
+    /// </summary>
     public IApplicationStateWriter CreateWriter(StateWriteAuthority authority)
     {
         ArgumentNullException.ThrowIfNull(authority);
@@ -70,6 +88,9 @@ public sealed class ApplicationStateRegistry :
         return new AuthorizedApplicationStateWriter(this, authority);
     }
 
+    /// <summary>
+    /// Executes the on change&lt;t&gt; operation.
+    /// </summary>
     public IStateSubscription OnChange<T>(
         StateKey<T> key,
         Action<StateChangedEventArgs<T>> handler)
@@ -79,11 +100,17 @@ public sealed class ApplicationStateRegistry :
         return Get(key).OnChange(handler);
     }
 
+    /// <summary>
+    /// Gets or sets set&lt;t&gt;.
+    /// </summary>
     public bool Set<T>(StateKey<T> key, T value)
     {
         return GetWritable(key).SetValue(value);
     }
 
+    /// <summary>
+    /// Executes the update&lt;t&gt; operation.
+    /// </summary>
     public bool Update<T>(StateKey<T> key, Func<T, T> updater)
     {
         ArgumentNullException.ThrowIfNull(updater);
@@ -91,6 +118,9 @@ public sealed class ApplicationStateRegistry :
         return GetWritable(key).Update(updater);
     }
 
+    /// <summary>
+    /// Executes the create snapshot operation.
+    /// </summary>
     public StateSnapshot CreateSnapshot()
     {
         StateRegistration[] registrations;
@@ -109,6 +139,9 @@ public sealed class ApplicationStateRegistry :
         return new StateSnapshot(entries);
     }
 
+    /// <summary>
+    /// Executes the restore operation.
+    /// </summary>
     public void Restore(StateSnapshot snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);

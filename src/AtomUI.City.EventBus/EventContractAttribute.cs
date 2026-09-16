@@ -2,21 +2,36 @@ using AtomUI.City.Core.Modularity;
 
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event contract.
+/// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false)]
 public sealed class EventContractAttribute : Attribute
 {
     private int _schemaVersion = 1;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EventContractAttribute"/> type.
+    /// </summary>
     public EventContractAttribute(string contractId, Type ownerModuleType)
     {
         ContractId = EventAttributeValidation.ValidateName(contractId, nameof(contractId));
         OwnerModuleType = EventAttributeValidation.ValidateOwner(ownerModuleType, nameof(ownerModuleType));
     }
 
+    /// <summary>
+    /// Gets contract id.
+    /// </summary>
     public string ContractId { get; }
 
+    /// <summary>
+    /// Gets owner module type.
+    /// </summary>
     public Type OwnerModuleType { get; }
 
+    /// <summary>
+    /// Represents the schema version value.
+    /// </summary>
     public int SchemaVersion
     {
         get => _schemaVersion;

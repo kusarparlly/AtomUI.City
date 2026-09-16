@@ -1,5 +1,8 @@
 namespace AtomUI.City.Cli;
 
+/// <summary>
+/// Represents dotnet invocation.
+/// </summary>
 public sealed class DotnetInvocation
 {
     private DotnetInvocation(IReadOnlyList<string> arguments)
@@ -17,12 +20,24 @@ public sealed class DotnetInvocation
         CiMode = ciMode;
     }
 
+    /// <summary>
+    /// Gets executable.
+    /// </summary>
     public string Executable { get; } = "dotnet";
 
+    /// <summary>
+    /// Gets arguments.
+    /// </summary>
     public IReadOnlyList<string> Arguments { get; }
 
+    /// <summary>
+    /// Gets working directory.
+    /// </summary>
     public string WorkingDirectory { get; }
 
+    /// <summary>
+    /// Gets ci mode.
+    /// </summary>
     public bool CiMode { get; }
 
     internal static DotnetInvocation Create(string command, CliCommandLine commandLine)

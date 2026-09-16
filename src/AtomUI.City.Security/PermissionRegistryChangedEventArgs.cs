@@ -1,7 +1,13 @@
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents permission registry changed event args.
+/// </summary>
 public sealed class PermissionRegistryChangedEventArgs : EventArgs
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>PermissionRegistryChangedEventArgs</c> type.
+    /// </summary>
     public PermissionRegistryChangedEventArgs(
         long revision,
         string? permissionName = null,
@@ -24,9 +30,18 @@ public sealed class PermissionRegistryChangedEventArgs : EventArgs
         ContributionId = contributionId;
     }
 
+    /// <summary>
+    /// Gets revision.
+    /// </summary>
     public long Revision { get; }
 
+    /// <summary>
+    /// Gets permission name.
+    /// </summary>
     public string? PermissionName { get; }
 
+    /// <summary>
+    /// Gets contribution id.
+    /// </summary>
     public string? ContributionId { get; }
 }

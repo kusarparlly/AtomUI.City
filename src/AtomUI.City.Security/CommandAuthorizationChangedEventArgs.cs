@@ -1,7 +1,13 @@
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents command authorization changed event args.
+/// </summary>
 public sealed class CommandAuthorizationChangedEventArgs : EventArgs
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>CommandAuthorizationChangedEventArgs</c> type.
+    /// </summary>
     public CommandAuthorizationChangedEventArgs(
         CommandAuthorizationChangeReason reason,
         long revision,
@@ -24,9 +30,18 @@ public sealed class CommandAuthorizationChangedEventArgs : EventArgs
         CommandId = commandId;
     }
 
+    /// <summary>
+    /// Gets reason.
+    /// </summary>
     public CommandAuthorizationChangeReason Reason { get; }
 
+    /// <summary>
+    /// Gets revision.
+    /// </summary>
     public long Revision { get; }
 
+    /// <summary>
+    /// Gets command id.
+    /// </summary>
     public string? CommandId { get; }
 }

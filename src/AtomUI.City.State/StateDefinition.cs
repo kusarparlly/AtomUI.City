@@ -1,7 +1,13 @@
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents state definition.
+/// </summary>
 public abstract class StateDefinition
 {
+    /// <summary>
+    /// Executes the state definition operation.
+    /// </summary>
     protected StateDefinition(
         string name,
         Type valueType,
@@ -65,24 +71,54 @@ public abstract class StateDefinition
         WriteCapability = writeCapability;
     }
 
+    /// <summary>
+    /// Gets name.
+    /// </summary>
     public string Name { get; }
 
+    /// <summary>
+    /// Gets value type.
+    /// </summary>
     public Type ValueType { get; }
 
+    /// <summary>
+    /// Gets lifetime.
+    /// </summary>
     public StateLifetime Lifetime { get; }
 
+    /// <summary>
+    /// Gets access.
+    /// </summary>
     public StateAccessPolicy Access { get; }
 
+    /// <summary>
+    /// Gets snapshot policy.
+    /// </summary>
     public StateSnapshotPolicy SnapshotPolicy { get; }
 
+    /// <summary>
+    /// Gets schema version.
+    /// </summary>
     public int SchemaVersion { get; }
 
+    /// <summary>
+    /// Gets owner module.
+    /// </summary>
     public string? OwnerModule { get; }
 
+    /// <summary>
+    /// Gets plugin id.
+    /// </summary>
     public string? PluginId { get; }
 
+    /// <summary>
+    /// Gets write capability.
+    /// </summary>
     public string? WriteCapability { get; }
 
+    /// <summary>
+    /// Executes the create&lt;t&gt; operation.
+    /// </summary>
     public static StateDefinition<T> Create<T>(
         StateKey<T> key,
         T defaultValue,
@@ -109,6 +145,9 @@ public abstract class StateDefinition
     }
 }
 
+/// <summary>
+/// Represents state definition&lt;t&gt;.
+/// </summary>
 public sealed class StateDefinition<T> : StateDefinition
 {
     private StateDefinition(
@@ -138,12 +177,24 @@ public sealed class StateDefinition<T> : StateDefinition
         Comparer = comparer;
     }
 
+    /// <summary>
+    /// Gets key.
+    /// </summary>
     public StateKey<T> Key { get; }
 
+    /// <summary>
+    /// Gets default value.
+    /// </summary>
     public T DefaultValue { get; }
 
+    /// <summary>
+    /// Gets comparer.
+    /// </summary>
     public IEqualityComparer<T>? Comparer { get; }
 
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static StateDefinition<T> Create(
         StateKey<T> key,
         T defaultValue,

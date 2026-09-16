@@ -2,17 +2,29 @@ using System.Net.Http.Headers;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents http data transport.
+/// </summary>
 public sealed class HttpDataTransport : IRequestResponseTransport
 {
     private readonly IHttpClientFactory _httpClientFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>HttpDataTransport</c> type.
+    /// </summary>
     public HttpDataTransport(IHttpClientFactory httpClientFactory)
     {
         _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
     }
 
+    /// <summary>
+    /// Gets kind.
+    /// </summary>
     public DataTransportKind Kind => DataTransportKind.Http;
 
+    /// <summary>
+    /// Executes the send async&lt;tresponse&gt; operation.
+    /// </summary>
     public async ValueTask<DataResult<TResponse>> SendAsync<TResponse>(
         DataRequest<TResponse> request,
         DataRequestContext context,

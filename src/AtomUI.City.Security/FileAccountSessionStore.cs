@@ -3,6 +3,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents file account session store.
+/// </summary>
 public sealed class FileAccountSessionStore : IAccountSessionStore
 {
     private const string AccountFileName = "account.json";
@@ -13,6 +16,9 @@ public sealed class FileAccountSessionStore : IAccountSessionStore
     private readonly string _accountsPath;
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>FileAccountSessionStore</c> type.
+    /// </summary>
     public FileAccountSessionStore(string rootPath, IHostDiagnostics? diagnostics = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(rootPath);
@@ -21,8 +27,14 @@ public sealed class FileAccountSessionStore : IAccountSessionStore
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Gets root path.
+    /// </summary>
     public string RootPath => _rootPath;
 
+    /// <summary>
+    /// Executes the list async operation.
+    /// </summary>
     public async ValueTask<SecurityStoreResult<IReadOnlyList<AccountRecordSnapshot>>> ListAsync(
         CancellationToken cancellationToken = default)
     {
@@ -96,6 +108,9 @@ public sealed class FileAccountSessionStore : IAccountSessionStore
         }
     }
 
+    /// <summary>
+    /// Executes the get async operation.
+    /// </summary>
     public async ValueTask<SecurityStoreResult<AccountRecordSnapshot>> GetAsync(
         SecurityAccountKey accountKey,
         CancellationToken cancellationToken = default)
@@ -119,6 +134,9 @@ public sealed class FileAccountSessionStore : IAccountSessionStore
         }
     }
 
+    /// <summary>
+    /// Executes the save async operation.
+    /// </summary>
     public async ValueTask<SecurityStoreResult<bool>> SaveAsync(
         AccountRecordSnapshot account,
         CancellationToken cancellationToken = default)
@@ -160,6 +178,9 @@ public sealed class FileAccountSessionStore : IAccountSessionStore
         }
     }
 
+    /// <summary>
+    /// Executes the remove async operation.
+    /// </summary>
     public async ValueTask<SecurityStoreResult<bool>> RemoveAsync(
         SecurityAccountKey accountKey,
         CancellationToken cancellationToken = default)
@@ -218,6 +239,9 @@ public sealed class FileAccountSessionStore : IAccountSessionStore
         }
     }
 
+    /// <summary>
+    /// Executes the get last active account async operation.
+    /// </summary>
     public async ValueTask<SecurityStoreResult<SecurityAccountKey?>> GetLastActiveAccountAsync(
         CancellationToken cancellationToken = default)
     {
@@ -244,6 +268,9 @@ public sealed class FileAccountSessionStore : IAccountSessionStore
         }
     }
 
+    /// <summary>
+    /// Executes the set last active account async operation.
+    /// </summary>
     public async ValueTask<SecurityStoreResult<bool>> SetLastActiveAccountAsync(
         SecurityAccountKey? accountKey,
         CancellationToken cancellationToken = default)

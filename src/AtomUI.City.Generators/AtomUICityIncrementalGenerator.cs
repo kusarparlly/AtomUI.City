@@ -15,6 +15,9 @@ using CityModuleMetadata = AtomUI.City.Generators.Modularity.ModuleMetadata;
 
 namespace AtomUI.City.Generators;
 
+/// <summary>
+/// Generates City module, service, EventBus, and presentation metadata at compile time.
+/// </summary>
 [Generator(LanguageNames.CSharp)]
 public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
 {
@@ -34,6 +37,9 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
     private const string ServiceRegistrarInterfaceName =
         "AtomUI.City.Core.DependencyInjection.IServiceRegistrar";
 
+    /// <summary>
+    /// Initializes the incremental source-generation pipeline.
+    /// </summary>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var generationEnabled = context.AnalyzerConfigOptionsProvider

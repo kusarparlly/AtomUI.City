@@ -2,8 +2,14 @@ using System.Text.Json;
 
 namespace AtomUI.City.PluginSystem;
 
+/// <summary>
+/// Represents plugin installation reader.
+/// </summary>
 public static class PluginInstallationReader
 {
+    /// <summary>
+    /// Executes the read operation.
+    /// </summary>
     public static PluginInstallation Read(string installRecordPath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(installRecordPath);

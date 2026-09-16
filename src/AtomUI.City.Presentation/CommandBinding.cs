@@ -6,16 +6,25 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents command binding.
+/// </summary>
 public sealed class CommandBinding
 {
     private readonly IUiDispatcher _dispatcher;
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>CommandBinding</c> type.
+    /// </summary>
     public CommandBinding(IUiDispatcher dispatcher)
         : this(dispatcher, diagnostics: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>CommandBinding</c> type.
+    /// </summary>
     public CommandBinding(
         IUiDispatcher dispatcher,
         IHostDiagnostics? diagnostics)
@@ -26,6 +35,9 @@ public sealed class CommandBinding
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the bind async operation.
+    /// </summary>
     public async ValueTask<ICommandBindingHandle> BindAsync(
         ICommand command,
         IUiCommandSource source,
@@ -49,6 +61,9 @@ public sealed class CommandBinding
         }
     }
 
+    /// <summary>
+    /// Executes the bind async operation.
+    /// </summary>
     public async ValueTask<ICommandBindingHandle> BindAsync(
         ICommand command,
         IUiCommandSource source,

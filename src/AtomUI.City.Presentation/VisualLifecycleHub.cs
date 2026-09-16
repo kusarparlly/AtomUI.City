@@ -2,16 +2,25 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents visual lifecycle hub.
+/// </summary>
 public sealed class VisualLifecycleHub
 {
     private readonly object _gate = new();
     private readonly List<Subscription> _subscribers = new();
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>VisualLifecycleHub</c> type.
+    /// </summary>
     public VisualLifecycleHub()
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>VisualLifecycleHub</c> type.
+    /// </summary>
     public VisualLifecycleHub(IHostDiagnostics diagnostics)
     {
         ArgumentNullException.ThrowIfNull(diagnostics);
@@ -19,11 +28,17 @@ public sealed class VisualLifecycleHub
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the subscribe operation.
+    /// </summary>
     public IDisposable Subscribe(Action<VisualLifecycleEvent> handler)
     {
         return Subscribe(handler, new VisualLifecycleSubscriptionOptions());
     }
 
+    /// <summary>
+    /// Executes the subscribe operation.
+    /// </summary>
     public IDisposable Subscribe(
         Action<VisualLifecycleEvent> handler,
         VisualLifecycleSubscriptionOptions options)
@@ -42,18 +57,27 @@ public sealed class VisualLifecycleHub
         return subscription;
     }
 
+    /// <summary>
+    /// Executes the notify operation.
+    /// </summary>
     public void Notify(object view, VisualLifecycleEventKind kind)
     {
         ArgumentNullException.ThrowIfNull(view);
         Notify(new VisualLifecycleEvent(view, kind));
     }
 
+    /// <summary>
+    /// Executes the notify operation.
+    /// </summary>
     public void Notify(VisualIdentity identity, VisualLifecycleEventKind kind)
     {
         ArgumentNullException.ThrowIfNull(identity);
         Notify(new VisualLifecycleEvent(identity, kind));
     }
 
+    /// <summary>
+    /// Executes the notify operation.
+    /// </summary>
     public void Notify(VisualLifecycleEvent lifecycleEvent)
     {
         ArgumentNullException.ThrowIfNull(lifecycleEvent);

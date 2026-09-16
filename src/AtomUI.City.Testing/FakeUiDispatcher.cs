@@ -2,6 +2,9 @@ using AtomUI.City.Core.Threading;
 
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents fake ui dispatcher.
+/// </summary>
 public sealed class FakeUiDispatcher : IUiDispatcher, IDisposable
 {
     private readonly object _gate = new();
@@ -11,16 +14,25 @@ public sealed class FakeUiDispatcher : IUiDispatcher, IDisposable
     private long _nextWorkItemId;
     private bool _disposed;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>FakeUiDispatcher</c> type.
+    /// </summary>
     public FakeUiDispatcher()
         : this(new TestDiagnostics())
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>FakeUiDispatcher</c> type.
+    /// </summary>
     public FakeUiDispatcher(TestDiagnostics diagnostics)
     {
         _diagnostics = diagnostics ?? throw new ArgumentNullException(nameof(diagnostics));
     }
 
+    /// <summary>
+    /// Represents the pending count value.
+    /// </summary>
     public int PendingCount
     {
         get
@@ -32,11 +44,17 @@ public sealed class FakeUiDispatcher : IUiDispatcher, IDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the check access operation.
+    /// </summary>
     public bool CheckAccess()
     {
         return _uiThreadDepth.Value > 0;
     }
 
+    /// <summary>
+    /// Executes the post operation.
+    /// </summary>
     public FakeUiWorkItem Post(Action callback)
     {
         ArgumentNullException.ThrowIfNull(callback);
@@ -49,6 +67,9 @@ public sealed class FakeUiDispatcher : IUiDispatcher, IDisposable
         });
     }
 
+    /// <summary>
+    /// Executes the drain operation.
+    /// </summary>
     public void Drain()
     {
         ThrowIfDisposed();
@@ -59,6 +80,9 @@ public sealed class FakeUiDispatcher : IUiDispatcher, IDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the invoke async operation.
+    /// </summary>
     public ValueTask InvokeAsync(Action callback, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(callback);
@@ -70,6 +94,9 @@ public sealed class FakeUiDispatcher : IUiDispatcher, IDisposable
         return ValueTask.CompletedTask;
     }
 
+    /// <summary>
+    /// Executes the invoke async&lt;t&gt; operation.
+    /// </summary>
     public ValueTask<T> InvokeAsync<T>(Func<T> callback, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(callback);
@@ -79,6 +106,9 @@ public sealed class FakeUiDispatcher : IUiDispatcher, IDisposable
         return ValueTask.FromResult(RunWithUiAccess(callback));
     }
 
+    /// <summary>
+    /// Executes the post async operation.
+    /// </summary>
     public ValueTask PostAsync(
         Func<CancellationToken, ValueTask> callback,
         CancellationToken cancellationToken = default)
@@ -91,6 +121,9 @@ public sealed class FakeUiDispatcher : IUiDispatcher, IDisposable
         return ValueTask.CompletedTask;
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         if (_disposed)

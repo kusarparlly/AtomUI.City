@@ -2,6 +2,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents in memory authorization policy provider.
+/// </summary>
 public sealed class InMemoryAuthorizationPolicyProvider : IAuthorizationPolicyProvider
 {
     private readonly Dictionary<string, AuthorizationPolicy> _policies = new(StringComparer.Ordinal);
@@ -9,6 +12,9 @@ public sealed class InMemoryAuthorizationPolicyProvider : IAuthorizationPolicyPr
     private readonly object _syncRoot = new();
     private long _revision;
 
+    /// <summary>
+    /// Represents the revision value.
+    /// </summary>
     public long Revision
     {
         get
@@ -20,6 +26,9 @@ public sealed class InMemoryAuthorizationPolicyProvider : IAuthorizationPolicyPr
         }
     }
 
+    /// <summary>
+    /// Represents the policies value.
+    /// </summary>
     public IReadOnlyCollection<AuthorizationPolicy> Policies
     {
         get
@@ -31,6 +40,9 @@ public sealed class InMemoryAuthorizationPolicyProvider : IAuthorizationPolicyPr
         }
     }
 
+    /// <summary>
+    /// Executes the add operation.
+    /// </summary>
     public bool Add(AuthorizationPolicy policy)
     {
         ArgumentNullException.ThrowIfNull(policy);
@@ -55,6 +67,9 @@ public sealed class InMemoryAuthorizationPolicyProvider : IAuthorizationPolicyPr
         }
     }
 
+    /// <summary>
+    /// Executes the remove operation.
+    /// </summary>
     public bool Remove(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -72,6 +87,9 @@ public sealed class InMemoryAuthorizationPolicyProvider : IAuthorizationPolicyPr
         }
     }
 
+    /// <summary>
+    /// Executes the remove by contribution operation.
+    /// </summary>
     public int RemoveByContribution(string contributionId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(contributionId);
@@ -98,6 +116,9 @@ public sealed class InMemoryAuthorizationPolicyProvider : IAuthorizationPolicyPr
         }
     }
 
+    /// <summary>
+    /// Executes the contains operation.
+    /// </summary>
     public bool Contains(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -108,6 +129,9 @@ public sealed class InMemoryAuthorizationPolicyProvider : IAuthorizationPolicyPr
         }
     }
 
+    /// <summary>
+    /// Executes the try get operation.
+    /// </summary>
     public bool TryGet(
         string name,
         [NotNullWhen(true)] out AuthorizationPolicy? policy)
@@ -120,6 +144,9 @@ public sealed class InMemoryAuthorizationPolicyProvider : IAuthorizationPolicyPr
         }
     }
 
+    /// <summary>
+    /// Executes the get policy async operation.
+    /// </summary>
     public ValueTask<AuthorizationPolicy?> GetPolicyAsync(
         string name,
         CancellationToken cancellationToken = default)

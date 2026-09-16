@@ -4,6 +4,9 @@ using AtomUI.City.State;
 
 namespace AtomUI.City.Localization;
 
+/// <summary>
+/// Represents localization service.
+/// </summary>
 public sealed class LocalizationService : ILocalizationService
 {
     private static readonly AsyncLocal<MutationExecution?> CurrentMutation = new();
@@ -29,6 +32,9 @@ public sealed class LocalizationService : ILocalizationService
     private long _packageCacheVersion;
     private int _disposed;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>LocalizationService</c> type.
+    /// </summary>
     public LocalizationService(
         IReadOnlyList<LanguagePackageDescriptor> descriptors,
         IEnumerable<ILanguagePackageProvider> providers,
@@ -46,6 +52,9 @@ public sealed class LocalizationService : ILocalizationService
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>LocalizationService</c> type.
+    /// </summary>
     public LocalizationService(
         LocalizationOptions options,
         IEnumerable<ILanguagePackageProvider> providers,
@@ -141,14 +150,29 @@ public sealed class LocalizationService : ILocalizationService
         _registry.DescriptorsRevoked += OnDescriptorsRevoked;
     }
 
+    /// <summary>
+    /// Gets state.
+    /// </summary>
     public CultureState State => _cultureState.Value;
 
+    /// <summary>
+    /// Gets culture state.
+    /// </summary>
     public IReadOnlyState<CultureState> CultureState => _cultureState;
 
+    /// <summary>
+    /// Gets current culture.
+    /// </summary>
     public CultureInfo CurrentCulture => State.CurrentCulture;
 
+    /// <summary>
+    /// Gets culture revision.
+    /// </summary>
     public long CultureRevision => State.Revision;
 
+    /// <summary>
+    /// Executes the activate scope operation.
+    /// </summary>
     public ILocalizationScopeLease ActivateScope(LocalizationLookupContext context)
     {
         ThrowIfDisposed();
@@ -174,6 +198,9 @@ public sealed class LocalizationService : ILocalizationService
         return new LocalizationScopeLease(this, context);
     }
 
+    /// <summary>
+    /// Executes the set culture async operation.
+    /// </summary>
     public ValueTask<LocalizationResult> SetCultureAsync(
         string cultureName,
         CancellationToken cancellationToken = default)
@@ -375,6 +402,9 @@ public sealed class LocalizationService : ILocalizationService
         }
     }
 
+    /// <summary>
+    /// Executes the get string async operation.
+    /// </summary>
     public async ValueTask<LocalizedString> GetStringAsync(
         string key,
         CancellationToken cancellationToken = default)
@@ -382,6 +412,9 @@ public sealed class LocalizationService : ILocalizationService
         return await GetStringAsync(key, LocalizationLookupContext.Global, cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the get string async operation.
+    /// </summary>
     public async ValueTask<LocalizedString> GetStringAsync(
         string key,
         LocalizationLookupContext context,
@@ -509,6 +542,9 @@ public sealed class LocalizationService : ILocalizationService
         return LocalizedString.Missing(key, stateSnapshot.CurrentCulture);
     }
 
+    /// <summary>
+    /// Executes the get message async operation.
+    /// </summary>
     public async ValueTask<LocalizedMessage> GetMessageAsync(
         string key,
         IReadOnlyList<object?> arguments,
@@ -522,6 +558,9 @@ public sealed class LocalizationService : ILocalizationService
             .ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the get message async operation.
+    /// </summary>
     public async ValueTask<LocalizedMessage> GetMessageAsync(
         string key,
         IReadOnlyList<object?> arguments,
@@ -562,6 +601,9 @@ public sealed class LocalizationService : ILocalizationService
         }
     }
 
+    /// <summary>
+    /// Executes the create text async operation.
+    /// </summary>
     public async ValueTask<ILocalizedText> CreateTextAsync(
         string key,
         CancellationToken cancellationToken = default)
@@ -569,6 +611,9 @@ public sealed class LocalizationService : ILocalizationService
         return await CreateTextAsync(key, LocalizationLookupContext.Global, cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the create text async operation.
+    /// </summary>
     public async ValueTask<ILocalizedText> CreateTextAsync(
         string key,
         LocalizationLookupContext context,
@@ -583,6 +628,9 @@ public sealed class LocalizationService : ILocalizationService
         return text;
     }
 
+    /// <summary>
+    /// Executes the create message text async operation.
+    /// </summary>
     public async ValueTask<ILocalizedText> CreateMessageTextAsync(
         string key,
         IReadOnlyList<object?> arguments,
@@ -596,6 +644,9 @@ public sealed class LocalizationService : ILocalizationService
             .ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the create message text async operation.
+    /// </summary>
     public async ValueTask<ILocalizedText> CreateMessageTextAsync(
         string key,
         IReadOnlyList<object?> arguments,
@@ -617,6 +668,9 @@ public sealed class LocalizationService : ILocalizationService
         return text;
     }
 
+    /// <summary>
+    /// Executes the revoke packages by contribution id async operation.
+    /// </summary>
     public ValueTask<int> RevokePackagesByContributionIdAsync(
         string contributionId,
         CancellationToken cancellationToken = default)
@@ -1344,6 +1398,9 @@ public sealed class LocalizationService : ILocalizationService
         }
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         ThrowIfReentrantDispose();
@@ -1351,6 +1408,9 @@ public sealed class LocalizationService : ILocalizationService
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public ValueTask DisposeAsync()
     {
         ThrowIfReentrantDispose();

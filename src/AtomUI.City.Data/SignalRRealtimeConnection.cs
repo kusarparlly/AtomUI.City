@@ -5,18 +5,36 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents signal rconnection options.
+/// </summary>
 public sealed class SignalRConnectionOptions
 {
     private IReadOnlyList<TimeSpan> _reconnectDelays = [];
 
+    /// <summary>
+    /// Gets or sets connection id.
+    /// </summary>
     public required string ConnectionId { get; init; }
 
+    /// <summary>
+    /// Gets or sets endpoint.
+    /// </summary>
     public required Uri Endpoint { get; init; }
 
+    /// <summary>
+    /// Gets or sets owner.
+    /// </summary>
     public required DataConnectionOwner Owner { get; init; }
 
+    /// <summary>
+    /// Gets or sets access token provider.
+    /// </summary>
     public Func<ValueTask<string?>>? AccessTokenProvider { get; init; }
 
+    /// <summary>
+    /// Represents the reconnect delays value.
+    /// </summary>
     public IReadOnlyList<TimeSpan> ReconnectDelays
     {
         get => _reconnectDelays;
@@ -33,8 +51,14 @@ public sealed class SignalRConnectionOptions
     }
 }
 
+/// <summary>
+/// Represents data connection state changed event args.
+/// </summary>
 public sealed class DataConnectionStateChangedEventArgs : EventArgs
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>DataConnectionStateChangedEventArgs</c> type.
+    /// </summary>
     public DataConnectionStateChangedEventArgs(
         DataConnectionState previousState,
         DataConnectionState currentState,
@@ -55,32 +79,59 @@ public sealed class DataConnectionStateChangedEventArgs : EventArgs
         Error = error;
     }
 
+    /// <summary>
+    /// Gets previous state.
+    /// </summary>
     public DataConnectionState PreviousState { get; }
 
+    /// <summary>
+    /// Gets current state.
+    /// </summary>
     public DataConnectionState CurrentState { get; }
 
+    /// <summary>
+    /// Gets error.
+    /// </summary>
     public Exception? Error { get; }
 }
 
+/// <summary>
+/// Defines the contract for irealtime connection transport.
+/// </summary>
 public interface IRealtimeConnectionTransport : IDataConnection, IAsyncDisposable
 {
+    /// <summary>
+    /// Occurs when state changed.
+    /// </summary>
     event EventHandler<DataConnectionStateChangedEventArgs>? StateChanged;
 
+    /// <summary>
+    /// Executes the invoke async&lt;tresponse&gt; operation.
+    /// </summary>
     ValueTask<DataResult<TResponse>> InvokeAsync<TResponse>(
         string methodName,
         IReadOnlyList<object?>? arguments = null,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Executes the subscribe&lt;tmessage&gt; operation.
+    /// </summary>
     IDataSubscription Subscribe<TMessage>(
         string methodName,
         Func<TMessage, CancellationToken, ValueTask> handler,
         DataSubscriptionOptions? options = null);
 
+    /// <summary>
+    /// Executes the switch principal async operation.
+    /// </summary>
     ValueTask SwitchPrincipalAsync(
         string principalRevision,
         CancellationToken cancellationToken = default);
 }
 
+/// <summary>
+/// Represents signal rrealtime connection.
+/// </summary>
 public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
 {
     private static readonly AsyncLocal<SignalRRealtimeConnection?> CurrentStateObserver = new();
@@ -98,6 +149,9 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
     private int _disposed;
     private string? _principalRevision;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>SignalRRealtimeConnection</c> type.
+    /// </summary>
     public SignalRRealtimeConnection(
         string connectionId,
         DataConnectionOwner owner,
@@ -127,16 +181,34 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
         _connection.Closed += OnClosedAsync;
     }
 
+    /// <summary>
+    /// Occurs when state changed.
+    /// </summary>
     public event EventHandler<DataConnectionStateChangedEventArgs>? StateChanged;
 
+    /// <summary>
+    /// Gets connection id.
+    /// </summary>
     public string ConnectionId { get; }
 
+    /// <summary>
+    /// Gets owner.
+    /// </summary>
     public DataConnectionOwner Owner { get; }
 
+    /// <summary>
+    /// Gets state.
+    /// </summary>
     public DataConnectionState State => (DataConnectionState)Volatile.Read(ref _state);
 
+    /// <summary>
+    /// Gets principal revision.
+    /// </summary>
     public string? PrincipalRevision => Volatile.Read(ref _principalRevision);
 
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static SignalRRealtimeConnection Create(
         SignalRConnectionOptions options,
         IDataDiagnostics? diagnostics = null)
@@ -170,6 +242,9 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
         return new SignalRRealtimeConnection(options.ConnectionId, options.Owner, builder.Build(), diagnostics);
     }
 
+    /// <summary>
+    /// Executes the start async operation.
+    /// </summary>
     public async ValueTask StartAsync(CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposed) != 0, this);
@@ -184,6 +259,9 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
         }
     }
 
+    /// <summary>
+    /// Executes the stop async operation.
+    /// </summary>
     public async ValueTask StopAsync(CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposed) != 0, this);
@@ -207,6 +285,9 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
         await CompleteLifecycleAsync(revocations, lifecycleFailure).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the invoke async&lt;tresponse&gt; operation.
+    /// </summary>
     public async ValueTask<DataResult<TResponse>> InvokeAsync<TResponse>(
         string methodName,
         IReadOnlyList<object?>? arguments = null,
@@ -255,6 +336,9 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
         }
     }
 
+    /// <summary>
+    /// Executes the subscribe&lt;tmessage&gt; operation.
+    /// </summary>
     public IDataSubscription Subscribe<TMessage>(
         string methodName,
         Func<TMessage, CancellationToken, ValueTask> handler,
@@ -293,6 +377,9 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
         return subscription;
     }
 
+    /// <summary>
+    /// Executes the switch principal async operation.
+    /// </summary>
     public async ValueTask SwitchPrincipalAsync(
         string principalRevision,
         CancellationToken cancellationToken = default)
@@ -334,6 +421,9 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
         await CompleteLifecycleAsync(revocations, lifecycleFailure).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public ValueTask DisposeAsync()
     {
         Task disposeTask;

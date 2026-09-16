@@ -1,7 +1,13 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event publish result.
+/// </summary>
 public sealed class EventPublishResult
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EventPublishResult"/> type.
+    /// </summary>
     public EventPublishResult(
         Guid eventId,
         EventContractId contractId,
@@ -10,6 +16,9 @@ public sealed class EventPublishResult
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EventPublishResult"/> type.
+    /// </summary>
     public EventPublishResult(
         Guid eventId,
         EventContractId contractId,
@@ -39,31 +48,67 @@ public sealed class EventPublishResult
         Duration = duration;
     }
 
+    /// <summary>
+    /// Gets event id.
+    /// </summary>
     public Guid EventId { get; }
 
+    /// <summary>
+    /// Gets contract id.
+    /// </summary>
     public EventContractId ContractId { get; }
 
+    /// <summary>
+    /// Gets deliveries.
+    /// </summary>
     public IReadOnlyList<EventDeliveryResult> Deliveries { get; }
 
+    /// <summary>
+    /// Gets duration.
+    /// </summary>
     public TimeSpan Duration { get; }
 
+    /// <summary>
+    /// Gets subscription count.
+    /// </summary>
     public int SubscriptionCount => Deliveries.Count;
 
+    /// <summary>
+    /// Gets delivered count.
+    /// </summary>
     public int DeliveredCount => Deliveries.Count(delivery => !delivery.Skipped);
 
+    /// <summary>
+    /// Gets failed count.
+    /// </summary>
     public int FailedCount => Deliveries.Count(delivery =>
         !delivery.Succeeded && !delivery.Canceled && !delivery.Skipped && !delivery.TimedOut);
 
+    /// <summary>
+    /// Gets a value indicating whether canceled count.
+    /// </summary>
     public int CanceledCount => Deliveries.Count(delivery =>
         delivery.Canceled && !delivery.Skipped && !delivery.TimedOut);
 
+    /// <summary>
+    /// Gets timed out count.
+    /// </summary>
     public int TimedOutCount => Deliveries.Count(delivery => delivery.TimedOut);
 
+    /// <summary>
+    /// Gets skipped count.
+    /// </summary>
     public int SkippedCount => Deliveries.Count(delivery => delivery.Skipped);
 
+    /// <summary>
+    /// Gets succeeded.
+    /// </summary>
     public bool Succeeded => FailedCount == 0 && CanceledCount == 0 && TimedOutCount == 0 && SkippedCount == 0;
 }
 
+/// <summary>
+/// Represents event delivery result.
+/// </summary>
 public sealed record EventDeliveryResult(
     EventSubscriptionId SubscriptionId,
     EventDispatchPolicy DispatchPolicy,
@@ -73,6 +118,9 @@ public sealed record EventDeliveryResult(
 {
     private TimeSpan _duration;
 
+    /// <summary>
+    /// Represents the duration value.
+    /// </summary>
     public TimeSpan Duration
     {
         get => _duration;
@@ -89,6 +137,9 @@ public sealed record EventDeliveryResult(
 
     private bool _timedOut;
 
+    /// <summary>
+    /// Represents the timed out value.
+    /// </summary>
     public bool TimedOut
     {
         get => _timedOut;
@@ -110,6 +161,9 @@ public sealed record EventDeliveryResult(
 
     private bool _skipped;
 
+    /// <summary>
+    /// Represents the skipped value.
+    /// </summary>
     public bool Skipped
     {
         get => _skipped;
@@ -129,6 +183,9 @@ public sealed record EventDeliveryResult(
         }
     }
 
+    /// <summary>
+    /// Gets status.
+    /// </summary>
     public EventDeliveryStatus Status => Skipped
         ? EventDeliveryStatus.Skipped
         : TimedOut
@@ -141,6 +198,9 @@ public sealed record EventDeliveryResult(
 
     private EventSubscriptionId _subscriptionId = ValidateSubscriptionId(SubscriptionId);
 
+    /// <summary>
+    /// Represents the subscription id value.
+    /// </summary>
     public EventSubscriptionId SubscriptionId
     {
         get => _subscriptionId;
@@ -149,6 +209,9 @@ public sealed record EventDeliveryResult(
 
     private EventDispatchPolicy _dispatchPolicy = ValidateDispatchPolicy(DispatchPolicy);
 
+    /// <summary>
+    /// Represents the dispatch policy value.
+    /// </summary>
     public EventDispatchPolicy DispatchPolicy
     {
         get => _dispatchPolicy;
@@ -157,6 +220,9 @@ public sealed record EventDeliveryResult(
 
     private bool _succeeded = ValidateSucceeded(Succeeded, Canceled, ErrorMessage, timedOut: false, skipped: false);
 
+    /// <summary>
+    /// Represents the succeeded value.
+    /// </summary>
     public bool Succeeded
     {
         get => _succeeded;
@@ -165,6 +231,9 @@ public sealed record EventDeliveryResult(
 
     private string? _errorMessage = ValidateErrorMessage(Succeeded, ErrorMessage);
 
+    /// <summary>
+    /// Represents the error message value.
+    /// </summary>
     public string? ErrorMessage
     {
         get => _errorMessage;
@@ -173,6 +242,9 @@ public sealed record EventDeliveryResult(
 
     private bool _canceled = ValidateCanceled(Succeeded, Canceled);
 
+    /// <summary>
+    /// Represents the canceled value.
+    /// </summary>
     public bool Canceled
     {
         get => _canceled;

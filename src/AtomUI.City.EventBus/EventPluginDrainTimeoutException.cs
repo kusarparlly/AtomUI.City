@@ -1,7 +1,13 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event plugin drain timeout exception.
+/// </summary>
 public sealed class EventPluginDrainTimeoutException : TimeoutException
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EventPluginDrainTimeoutException"/> type.
+    /// </summary>
     public EventPluginDrainTimeoutException(
         string pluginId,
         TimeSpan drainTimeout,
@@ -25,14 +31,29 @@ public sealed class EventPluginDrainTimeoutException : TimeoutException
         PendingRegistrations = pendingRegistrations;
     }
 
+    /// <summary>
+    /// Gets plugin id.
+    /// </summary>
     public string PluginId { get; }
 
+    /// <summary>
+    /// Gets drain timeout.
+    /// </summary>
     public TimeSpan DrainTimeout { get; }
 
+    /// <summary>
+    /// Gets active operations.
+    /// </summary>
     public int ActiveOperations { get; }
 
+    /// <summary>
+    /// Gets active subscriptions.
+    /// </summary>
     public int ActiveSubscriptions { get; }
 
+    /// <summary>
+    /// Gets pending registrations.
+    /// </summary>
     public int PendingRegistrations { get; }
 
     private static string CreateMessage(

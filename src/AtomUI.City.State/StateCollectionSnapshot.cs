@@ -1,8 +1,14 @@
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents state collection snapshot&lt;tkey, titem&gt;.
+/// </summary>
 public sealed class StateCollectionSnapshot<TKey, TItem>
     where TKey : notnull
 {
+    /// <summary>
+    /// Executes the state collection snapshot operation.
+    /// </summary>
     public StateCollectionSnapshot(
         long collectionVersion,
         IReadOnlyList<StateCollectionSnapshotEntry<TKey, TItem>> items)
@@ -28,9 +34,18 @@ public sealed class StateCollectionSnapshot<TKey, TItem>
         Items = Array.AsReadOnly(snapshotItems);
     }
 
+    /// <summary>
+    /// Gets collection version.
+    /// </summary>
     public long CollectionVersion { get; }
 
+    /// <summary>
+    /// Gets item count.
+    /// </summary>
     public int ItemCount => Items.Count;
 
+    /// <summary>
+    /// Gets items.
+    /// </summary>
     public IReadOnlyList<StateCollectionSnapshotEntry<TKey, TItem>> Items { get; }
 }

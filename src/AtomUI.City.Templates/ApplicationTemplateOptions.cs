@@ -1,5 +1,8 @@
 namespace AtomUI.City.Templates;
 
+/// <summary>
+/// Represents application template options.
+/// </summary>
 public sealed class ApplicationTemplateOptions
 {
     private static readonly HashSet<string> ReservedIdentifiers = new(StringComparer.Ordinal)
@@ -80,26 +83,56 @@ public sealed class ApplicationTemplateOptions
         "while",
     };
 
+    /// <summary>
+    /// Gets or sets app name.
+    /// </summary>
     public required string AppName { get; init; }
 
+    /// <summary>
+    /// Gets or sets root namespace.
+    /// </summary>
     public required string RootNamespace { get; init; }
 
+    /// <summary>
+    /// Gets or sets output path.
+    /// </summary>
     public required string OutputPath { get; init; }
 
+    /// <summary>
+    /// Gets or sets target framework.
+    /// </summary>
     public string TargetFramework { get; init; } = "net10.0";
 
+    /// <summary>
+    /// Gets or sets include tests.
+    /// </summary>
     public bool IncludeTests { get; init; } = true;
 
+    /// <summary>
+    /// Gets or sets use aot.
+    /// </summary>
     public bool UseAot { get; init; }
 
+    /// <summary>
+    /// Gets or sets use dynamic plugins.
+    /// </summary>
     public bool UseDynamicPlugins { get; init; }
 
+    /// <summary>
+    /// Gets or sets include sample.
+    /// </summary>
     public bool IncludeSample { get; init; }
 
+    /// <summary>
+    /// Gets effective root namespace.
+    /// </summary>
     public string EffectiveRootNamespace => string.IsNullOrWhiteSpace(RootNamespace)
         ? AppName
         : RootNamespace;
 
+    /// <summary>
+    /// Executes the validate operation.
+    /// </summary>
     public IReadOnlyList<TemplateDiagnostic> Validate()
     {
         var diagnostics = new List<TemplateDiagnostic>();

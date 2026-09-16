@@ -1,5 +1,8 @@
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents navigation snapshot.
+/// </summary>
 public sealed class NavigationSnapshot
 {
     private NavigationSnapshot(
@@ -17,18 +20,39 @@ public sealed class NavigationSnapshot
             new Dictionary<string, object?>(resolvedData ?? new Dictionary<string, object?>(), StringComparer.Ordinal));
     }
 
+    /// <summary>
+    /// Gets route.
+    /// </summary>
     public RouteDescriptor Route => ActiveRoute ?? throw new InvalidOperationException("Navigation snapshot does not have an active route.");
 
+    /// <summary>
+    /// Gets active route.
+    /// </summary>
     public RouteDescriptor? ActiveRoute { get; }
 
+    /// <summary>
+    /// Gets parameters.
+    /// </summary>
     public IReadOnlyDictionary<string, string> Parameters { get; }
 
+    /// <summary>
+    /// Gets route graph version.
+    /// </summary>
     public long RouteGraphVersion { get; }
 
+    /// <summary>
+    /// Gets reuse key.
+    /// </summary>
     public string? ReuseKey { get; }
 
+    /// <summary>
+    /// Gets resolved data.
+    /// </summary>
     public IReadOnlyDictionary<string, object?> ResolvedData { get; }
 
+    /// <summary>
+    /// Executes the empty operation.
+    /// </summary>
     public static NavigationSnapshot Empty(long routeGraphVersion)
     {
         return new NavigationSnapshot(
@@ -39,6 +63,9 @@ public sealed class NavigationSnapshot
             resolvedData: null);
     }
 
+    /// <summary>
+    /// Executes the from route operation.
+    /// </summary>
     public static NavigationSnapshot FromRoute(
         RouteDescriptor activeRoute,
         IReadOnlyDictionary<string, string> parameters,

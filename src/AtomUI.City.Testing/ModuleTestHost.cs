@@ -4,6 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents module test host.
+/// </summary>
 public sealed class ModuleTestHost : IDisposable, IAsyncDisposable
 {
     private readonly TestHost _host;
@@ -21,15 +24,27 @@ public sealed class ModuleTestHost : IDisposable, IAsyncDisposable
         Modules = Array.AsReadOnly(modules.ToArray());
     }
 
+    /// <summary>
+    /// Gets modules.
+    /// </summary>
     public IReadOnlyList<ModuleTestRecord> Modules { get; }
 
+    /// <summary>
+    /// Gets host.
+    /// </summary>
     public TestHost Host => _host;
 
+    /// <summary>
+    /// Executes the create builder operation.
+    /// </summary>
     public static ModuleTestHostBuilder CreateBuilder()
     {
         return new ModuleTestHostBuilder();
     }
 
+    /// <summary>
+    /// Executes the initialize async operation.
+    /// </summary>
     public async ValueTask InitializeAsync(CancellationToken cancellationToken = default)
     {
         if (_initialized)
@@ -122,6 +137,9 @@ public sealed class ModuleTestHost : IDisposable, IAsyncDisposable
         _initialized = true;
     }
 
+    /// <summary>
+    /// Executes the shutdown async operation.
+    /// </summary>
     public async ValueTask ShutdownAsync(CancellationToken cancellationToken = default)
     {
         if (_shutdown)
@@ -154,6 +172,9 @@ public sealed class ModuleTestHost : IDisposable, IAsyncDisposable
         await _applicationScope.DisposeAsync().ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         if (_disposed)
@@ -166,6 +187,9 @@ public sealed class ModuleTestHost : IDisposable, IAsyncDisposable
         _host.Dispose();
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         if (_disposed)

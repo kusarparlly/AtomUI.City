@@ -3,8 +3,14 @@ using System.Text.Json;
 
 namespace AtomUI.City.PluginSystem;
 
+/// <summary>
+/// Represents plugin package installer.
+/// </summary>
 public sealed class PluginPackageInstaller
 {
+    /// <summary>
+    /// Executes the install from directory async operation.
+    /// </summary>
     public async ValueTask<PluginInstallResult> InstallFromDirectoryAsync(
         string packageRoot,
         string pluginsRoot,
@@ -40,6 +46,9 @@ public sealed class PluginPackageInstaller
         }
     }
 
+    /// <summary>
+    /// Executes the install from package async operation.
+    /// </summary>
     public async ValueTask<PluginInstallResult> InstallFromPackageAsync(
         string packagePath,
         string pluginsRoot,

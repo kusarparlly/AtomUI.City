@@ -3,12 +3,18 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents file credential store.
+/// </summary>
 public sealed class FileCredentialStore : ICredentialStore
 {
     private readonly SemaphoreSlim _ioGate = new(1, 1);
     private readonly string _credentialsPath;
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>FileCredentialStore</c> type.
+    /// </summary>
     public FileCredentialStore(string rootPath, IHostDiagnostics? diagnostics = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(rootPath);
@@ -17,8 +23,14 @@ public sealed class FileCredentialStore : ICredentialStore
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Gets root path.
+    /// </summary>
     public string RootPath { get; }
 
+    /// <summary>
+    /// Executes the get async operation.
+    /// </summary>
     public async ValueTask<SecurityStoreResult<AccountCredentialSnapshot>> GetAsync(
         SecurityAccountKey accountKey,
         string resourceName,
@@ -101,6 +113,9 @@ public sealed class FileCredentialStore : ICredentialStore
         }
     }
 
+    /// <summary>
+    /// Executes the save async operation.
+    /// </summary>
     public async ValueTask<SecurityStoreResult<bool>> SaveAsync(
         AccountCredentialSnapshot credential,
         CancellationToken cancellationToken = default)
@@ -140,6 +155,9 @@ public sealed class FileCredentialStore : ICredentialStore
         }
     }
 
+    /// <summary>
+    /// Executes the remove async operation.
+    /// </summary>
     public async ValueTask<SecurityStoreResult<bool>> RemoveAsync(
         SecurityAccountKey accountKey,
         string resourceName,
@@ -154,6 +172,9 @@ public sealed class FileCredentialStore : ICredentialStore
             cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the remove all async operation.
+    /// </summary>
     public async ValueTask<SecurityStoreResult<bool>> RemoveAllAsync(
         SecurityAccountKey accountKey,
         CancellationToken cancellationToken = default)

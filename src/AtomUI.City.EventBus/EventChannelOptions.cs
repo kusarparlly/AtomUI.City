@@ -1,22 +1,46 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event channel options.
+/// </summary>
 public sealed class EventChannelOptions
 {
+    /// <summary>
+    /// Represents the default capacity value.
+    /// </summary>
     public const int DefaultCapacity = 256;
     private static readonly TimeSpan MaximumQueueWaitTimeout = TimeSpan.FromMilliseconds(int.MaxValue);
 
+    /// <summary>
+    /// Gets default.
+    /// </summary>
     public static EventChannelOptions Default { get; } = new();
 
+    /// <summary>
+    /// Gets or sets capacity.
+    /// </summary>
     public int Capacity { get; init; } = DefaultCapacity;
 
+    /// <summary>
+    /// Gets or sets backpressure policy.
+    /// </summary>
     public EventChannelBackpressurePolicy BackpressurePolicy { get; init; } =
         EventChannelBackpressurePolicy.Wait;
 
+    /// <summary>
+    /// Gets or sets execution mode.
+    /// </summary>
     public EventChannelExecutionMode ExecutionMode { get; init; } =
         EventChannelExecutionMode.Serialized;
 
+    /// <summary>
+    /// Gets or sets maximum concurrency.
+    /// </summary>
     public int MaximumConcurrency { get; init; } = 1;
 
+    /// <summary>
+    /// Gets or sets queue wait timeout.
+    /// </summary>
     public TimeSpan? QueueWaitTimeout { get; init; }
 
     internal void Validate()

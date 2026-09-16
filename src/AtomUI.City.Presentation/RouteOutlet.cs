@@ -5,6 +5,9 @@ using AtomUI.City.Mvvm;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents route outlet.
+/// </summary>
 public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
 {
     private readonly IUiDispatcher _dispatcher;
@@ -21,16 +24,25 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
     private bool _admissionFrozen;
     private long _operationSequence;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>RouteOutlet</c> type.
+    /// </summary>
     public RouteOutlet(string name, IUiDispatcher dispatcher)
         : this(name, dispatcher, target: null, diagnostics: null, failurePresenter: null, queueOptions: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>RouteOutlet</c> type.
+    /// </summary>
     public RouteOutlet(string name, IUiDispatcher dispatcher, IHostDiagnostics? diagnostics)
         : this(name, dispatcher, target: null, diagnostics, failurePresenter: null, queueOptions: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>RouteOutlet</c> type.
+    /// </summary>
     public RouteOutlet(
         string name,
         IUiDispatcher dispatcher,
@@ -57,10 +69,19 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
         _commitLane = new BoundedSerialExecutionLane(queueOptions.OutletPendingCapacity);
     }
 
+    /// <summary>
+    /// Gets name.
+    /// </summary>
     public string Name { get; }
 
+    /// <summary>
+    /// Gets current content.
+    /// </summary>
     public object? CurrentContent => CurrentEntry?.View;
 
+    /// <summary>
+    /// Represents the current entry value.
+    /// </summary>
     public PresentationEntry? CurrentEntry
     {
         get
@@ -72,6 +93,9 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Represents the state value.
+    /// </summary>
     public RouteOutletState State
     {
         get
@@ -83,8 +107,14 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Gets queue snapshot.
+    /// </summary>
     public PresentationQueueSnapshot QueueSnapshot => _commitLane.Snapshot;
 
+    /// <summary>
+    /// Executes the commit async operation.
+    /// </summary>
     public ValueTask<RouteOutletCommitResult> CommitAsync(
         RouteOutletCommitPlan plan,
         CancellationToken cancellationToken = default)
@@ -168,6 +198,9 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
             AwaitAcceptedCommitAsync(completion.Task, cancellationToken));
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public ValueTask DisposeAsync()
     {
         Task disposeTask;

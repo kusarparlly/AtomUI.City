@@ -6,6 +6,9 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace AtomUI.City.Generators.Analyzers;
 
+/// <summary>
+/// Represents build service provider usage analyzer.
+/// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class BuildServiceProviderUsageAnalyzer : DiagnosticAnalyzer
 {
@@ -32,8 +35,14 @@ public sealed class BuildServiceProviderUsageAnalyzer : DiagnosticAnalyzer
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
+    /// <summary>
+    /// Gets supported diagnostics.
+    /// </summary>
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <summary>
+    /// Initializes analyzer actions for the compilation.
+    /// </summary>
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

@@ -4,6 +4,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents navigation scope.
+/// </summary>
 public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
 {
     private const int MaxRedirectCount = 8;
@@ -26,6 +29,9 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
     private Task? _disposeTask;
     private bool _disposed;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>NavigationScope</c> type.
+    /// </summary>
     public NavigationScope(
         RouteGraphSnapshot routeGraph,
         Func<Type, object?>? serviceResolver = null,
@@ -34,6 +40,9 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>NavigationScope</c> type.
+    /// </summary>
     public NavigationScope(
         IRouteGraphProvider routeGraphProvider,
         Func<Type, object?>? serviceResolver = null,
@@ -48,10 +57,19 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
         _currentSnapshot = NavigationSnapshot.Empty(_currentRouteGraph.Version);
     }
 
+    /// <summary>
+    /// Gets router.
+    /// </summary>
     public IRouter Router => this;
 
+    /// <summary>
+    /// Gets current snapshot.
+    /// </summary>
     public NavigationSnapshot CurrentSnapshot => Volatile.Read(ref _currentSnapshot);
 
+    /// <summary>
+    /// Executes the navigate async operation.
+    /// </summary>
     public ValueTask<NavigationResult> NavigateAsync(
         RouteReference route,
         NavigationOptions? options = null,
@@ -65,6 +83,9 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
         return NavigateCoreAsync(target, cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the navigate async&lt;tparameters&gt; operation.
+    /// </summary>
     public ValueTask<NavigationResult> NavigateAsync<TParameters>(
         RouteReference<TParameters> route,
         TParameters parameters,
@@ -79,6 +100,9 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
         return NavigateCoreAsync(target, cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the navigate by path async operation.
+    /// </summary>
     public ValueTask<NavigationResult> NavigateByPathAsync(
         string path,
         NavigationOptions? options = null,
@@ -89,6 +113,9 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
         return NavigateCoreAsync(target, cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the navigate by uri async operation.
+    /// </summary>
     public ValueTask<NavigationResult> NavigateByUriAsync(
         Uri uri,
         NavigationOptions? options = null,
@@ -98,6 +125,9 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
         return NavigateCoreAsync(target, cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the back async operation.
+    /// </summary>
     public async ValueTask<NavigationResult> BackAsync(CancellationToken cancellationToken = default)
     {
         var journalTarget = NavigationTarget.FromJournal(
@@ -150,6 +180,9 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
             cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the forward async operation.
+    /// </summary>
     public async ValueTask<NavigationResult> ForwardAsync(CancellationToken cancellationToken = default)
     {
         var journalTarget = NavigationTarget.FromJournal(
@@ -1455,11 +1488,17 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
         };
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         _ = BeginDispose();
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         if (IsCurrentExecutionActive())

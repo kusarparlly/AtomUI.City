@@ -1,7 +1,13 @@
 namespace AtomUI.City.Build;
 
+/// <summary>
+/// Represents build ms build contract.
+/// </summary>
 public static class BuildMsBuildContract
 {
+    /// <summary>
+    /// Gets properties.
+    /// </summary>
     public static IReadOnlyList<string> Properties { get; } =
     [
         "AtomUICityOutputRoot",
@@ -17,6 +23,9 @@ public static class BuildMsBuildContract
         "AtomUICityBuildDiagnosticsLevel",
     ];
 
+    /// <summary>
+    /// Gets items.
+    /// </summary>
     public static IReadOnlyList<string> Items { get; } =
     [
         "AtomUICityPluginCapability",
@@ -30,6 +39,9 @@ public static class BuildMsBuildContract
         "AtomUICityResourcePack",
     ];
 
+    /// <summary>
+    /// Gets targets.
+    /// </summary>
     public static IReadOnlyList<string> Targets { get; } =
     [
         "GenerateAtomUICityManifests",
@@ -47,6 +59,9 @@ public static class BuildMsBuildContract
         "CleanAtomUICityOutput",
     ];
 
+    /// <summary>
+    /// Gets package assets.
+    /// </summary>
     public static IReadOnlyList<string> PackageAssets { get; } =
     [
         "buildTransitive/AtomUI.City.Build.props",
@@ -58,6 +73,9 @@ public static class BuildMsBuildContract
         "tools/net10.0/AtomUI.City.Build.Tasks.dll",
     ];
 
+    /// <summary>
+    /// Executes the get manifest output path operation.
+    /// </summary>
     public static string GetManifestOutputPath(string intermediateOutputPath, string manifestFileName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(intermediateOutputPath);

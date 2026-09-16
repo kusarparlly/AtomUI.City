@@ -2,10 +2,16 @@ using AtomUI.City.Security;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents access token credential provider.
+/// </summary>
 public sealed class AccessTokenCredentialProvider : IDataCredentialProvider
 {
     private readonly IAccessTokenProvider _accessTokenProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AccessTokenCredentialProvider</c> type.
+    /// </summary>
     public AccessTokenCredentialProvider(IAccessTokenProvider accessTokenProvider)
     {
         ArgumentNullException.ThrowIfNull(accessTokenProvider);
@@ -13,6 +19,9 @@ public sealed class AccessTokenCredentialProvider : IDataCredentialProvider
         _accessTokenProvider = accessTokenProvider;
     }
 
+    /// <summary>
+    /// Executes the get credential async operation.
+    /// </summary>
     public async ValueTask<DataCredentialResult> GetCredentialAsync(
         DataAuthenticationContext context,
         CancellationToken cancellationToken = default)

@@ -1,7 +1,13 @@
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents route descriptor.
+/// </summary>
 public sealed class RouteDescriptor
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>RouteDescriptor</c> type.
+    /// </summary>
     public RouteDescriptor(
         string routeId,
         RouteDefinitionKind kind,
@@ -39,34 +45,79 @@ public sealed class RouteDescriptor
         MiddlewareTypes = AsReadOnly(middlewareTypes);
     }
 
+    /// <summary>
+    /// Gets route id.
+    /// </summary>
     public string RouteId { get; }
 
+    /// <summary>
+    /// Gets kind.
+    /// </summary>
     public RouteDefinitionKind Kind { get; }
 
+    /// <summary>
+    /// Gets template.
+    /// </summary>
     public RouteTemplate? Template { get; }
 
+    /// <summary>
+    /// Gets view model target.
+    /// </summary>
     public ViewModelTargetDescriptor? ViewModelTarget { get; }
 
+    /// <summary>
+    /// Gets parent route id.
+    /// </summary>
     public string? ParentRouteId { get; }
 
+    /// <summary>
+    /// Gets outlet name.
+    /// </summary>
     public string OutletName { get; }
 
+    /// <summary>
+    /// Gets extension point.
+    /// </summary>
     public string? ExtensionPoint { get; }
 
+    /// <summary>
+    /// Gets redirect target route id.
+    /// </summary>
     public string? RedirectTargetRouteId { get; }
 
+    /// <summary>
+    /// Gets enter guard types.
+    /// </summary>
     public IReadOnlyList<Type> EnterGuardTypes { get; }
 
+    /// <summary>
+    /// Gets leave guard types.
+    /// </summary>
     public IReadOnlyList<Type> LeaveGuardTypes { get; }
 
+    /// <summary>
+    /// Gets match policy types.
+    /// </summary>
     public IReadOnlyList<Type> MatchPolicyTypes { get; }
 
+    /// <summary>
+    /// Gets metadata.
+    /// </summary>
     public RouteMetadataDescriptor Metadata { get; }
 
+    /// <summary>
+    /// Gets contribution id.
+    /// </summary>
     public string? ContributionId { get; }
 
+    /// <summary>
+    /// Gets resolver types.
+    /// </summary>
     public IReadOnlyList<Type> ResolverTypes { get; }
 
+    /// <summary>
+    /// Gets middleware types.
+    /// </summary>
     public IReadOnlyList<Type> MiddlewareTypes { get; }
 
     private static IReadOnlyList<Type> AsReadOnly(IReadOnlyList<Type>? values)

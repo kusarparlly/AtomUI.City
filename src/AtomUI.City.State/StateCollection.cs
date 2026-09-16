@@ -3,6 +3,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents state collection&lt;tkey, titem&gt;.
+/// </summary>
 public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>, IDisposable
     where TKey : notnull
 {
@@ -14,6 +17,9 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
     private bool _disposed;
     private long _version;
 
+    /// <summary>
+    /// Executes the state collection operation.
+    /// </summary>
     public StateCollection(
         IEqualityComparer<TKey>? keyComparer = null,
         IEqualityComparer<TItem>? itemComparer = null,
@@ -24,8 +30,14 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Occurs when changed.
+    /// </summary>
     public event EventHandler<StateCollectionChangedEventArgs<TKey, TItem>>? Changed;
 
+    /// <summary>
+    /// Represents the version value.
+    /// </summary>
     public long Version
     {
         get
@@ -37,6 +49,9 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         }
     }
 
+    /// <summary>
+    /// Represents the items value.
+    /// </summary>
     public IReadOnlyDictionary<TKey, TItem> Items
     {
         get
@@ -55,6 +70,9 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         }
     }
 
+    /// <summary>
+    /// Executes the try get item version operation.
+    /// </summary>
     public bool TryGetItemVersion(TKey key, out long version)
     {
         ArgumentNullException.ThrowIfNull(key);
@@ -72,6 +90,9 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         }
     }
 
+    /// <summary>
+    /// Executes the create snapshot operation.
+    /// </summary>
     public StateCollectionSnapshot<TKey, TItem> CreateSnapshot()
     {
         lock (_syncRoot)
@@ -87,6 +108,9 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         }
     }
 
+    /// <summary>
+    /// Executes the restore snapshot operation.
+    /// </summary>
     public bool RestoreSnapshot(StateCollectionSnapshot<TKey, TItem> snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
@@ -169,6 +193,9 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         return true;
     }
 
+    /// <summary>
+    /// Executes the add or update operation.
+    /// </summary>
     public bool AddOrUpdate(TKey key, TItem item)
     {
         ArgumentNullException.ThrowIfNull(key);
@@ -226,6 +253,9 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         return true;
     }
 
+    /// <summary>
+    /// Executes the add or update range operation.
+    /// </summary>
     public bool AddOrUpdateRange(IEnumerable<KeyValuePair<TKey, TItem>> items)
     {
         ArgumentNullException.ThrowIfNull(items);
@@ -316,6 +346,9 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         return true;
     }
 
+    /// <summary>
+    /// Executes the remove operation.
+    /// </summary>
     public bool Remove(TKey key)
     {
         ArgumentNullException.ThrowIfNull(key);
@@ -354,6 +387,9 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         return true;
     }
 
+    /// <summary>
+    /// Executes the clear operation.
+    /// </summary>
     public bool Clear()
     {
         StateCollectionChangedEventArgs<TKey, TItem> args;
@@ -390,6 +426,9 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         return true;
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         StateSubscription[] subscriptions;
@@ -412,11 +451,17 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         }
     }
 
+    /// <summary>
+    /// Executes the on change operation.
+    /// </summary>
     public IStateSubscription OnChange(Action<StateCollectionChangedEventArgs<TKey, TItem>> handler)
     {
         return OnChange(handler, StateSubscriptionOptions.Immediate);
     }
 
+    /// <summary>
+    /// Executes the on change operation.
+    /// </summary>
     public IStateSubscription OnChange(
         Action<StateCollectionChangedEventArgs<TKey, TItem>> handler,
         StateSubscriptionOptions options)

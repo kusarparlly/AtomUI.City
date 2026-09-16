@@ -1,7 +1,13 @@
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents route contribution.
+/// </summary>
 public sealed class RouteContribution
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>RouteContribution</c> type.
+    /// </summary>
     public RouteContribution(
         string contributionId,
         IReadOnlyList<RouteDescriptor> routes,
@@ -43,7 +49,16 @@ public sealed class RouteContribution
         ServiceResolver = serviceResolver;
     }
 
+    /// <summary>
+    /// Gets contribution id.
+    /// </summary>
     public string ContributionId { get; }
+    /// <summary>
+    /// Gets routes.
+    /// </summary>
     public IReadOnlyList<RouteDescriptor> Routes { get; }
+    /// <summary>
+    /// Gets service resolver.
+    /// </summary>
     public Func<Type, object?>? ServiceResolver { get; }
 }

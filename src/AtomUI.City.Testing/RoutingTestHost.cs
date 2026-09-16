@@ -2,6 +2,9 @@ namespace AtomUI.City.Testing;
 
 using AtomUI.City.Routing;
 
+/// <summary>
+/// Represents routing test host.
+/// </summary>
 public sealed class RoutingTestHost
 {
     private readonly RouteGraphSnapshot _graph;
@@ -17,15 +20,27 @@ public sealed class RoutingTestHost
         _navigationScope = new NavigationScope(_graph);
     }
 
+    /// <summary>
+    /// Gets routes.
+    /// </summary>
     public IReadOnlyList<RouteTestDefinition> Routes { get; }
 
+    /// <summary>
+    /// Gets diagnostics.
+    /// </summary>
     public TestDiagnostics Diagnostics { get; }
 
+    /// <summary>
+    /// Executes the create builder operation.
+    /// </summary>
     public static RoutingTestHostBuilder CreateBuilder()
     {
         return new RoutingTestHostBuilder();
     }
 
+    /// <summary>
+    /// Executes the match operation.
+    /// </summary>
     public RouteTestMatch Match(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
@@ -41,6 +56,9 @@ public sealed class RoutingTestHost
         return RouteTestMatch.NotFound();
     }
 
+    /// <summary>
+    /// Executes the navigate async operation.
+    /// </summary>
     public async ValueTask<RouteTestMatch> NavigateAsync(
         string path,
         CancellationToken cancellationToken = default)

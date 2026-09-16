@@ -2,8 +2,14 @@ using System.Text.Json;
 
 namespace AtomUI.City.PluginSystem;
 
+/// <summary>
+/// Represents plugin discovery scanner.
+/// </summary>
 public static class PluginDiscoveryScanner
 {
+    /// <summary>
+    /// Executes the discover installed operation.
+    /// </summary>
     public static PluginDiscoveryResult DiscoverInstalled(string pluginsRoot)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(pluginsRoot);
@@ -263,8 +269,14 @@ public static class PluginDiscoveryScanner
     }
 }
 
+/// <summary>
+/// Represents plugin discovery result.
+/// </summary>
 public sealed class PluginDiscoveryResult
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>PluginDiscoveryResult</c> type.
+    /// </summary>
     public PluginDiscoveryResult(
         IReadOnlyList<PluginDescriptor> plugins,
         IReadOnlyList<PluginDiagnostic> diagnostics)
@@ -273,9 +285,18 @@ public sealed class PluginDiscoveryResult
         Diagnostics = Array.AsReadOnly(diagnostics.ToArray());
     }
 
+    /// <summary>
+    /// Gets plugins.
+    /// </summary>
     public IReadOnlyList<PluginDescriptor> Plugins { get; }
 
+    /// <summary>
+    /// Gets diagnostics.
+    /// </summary>
     public IReadOnlyList<PluginDiagnostic> Diagnostics { get; }
 
+    /// <summary>
+    /// Gets succeeded.
+    /// </summary>
     public bool Succeeded => Diagnostics.Count == 0;
 }

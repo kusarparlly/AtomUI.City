@@ -1,11 +1,17 @@
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents state collection snapshot entry&lt;tkey, titem&gt;.
+/// </summary>
 public sealed record StateCollectionSnapshotEntry<TKey, TItem>
     where TKey : notnull
 {
     private TKey _key = default!;
     private long _itemVersion;
 
+    /// <summary>
+    /// Executes the state collection snapshot entry operation.
+    /// </summary>
     public StateCollectionSnapshotEntry(TKey Key, TItem Item, long ItemVersion)
     {
         ArgumentNullException.ThrowIfNull(Key);
@@ -23,6 +29,9 @@ public sealed record StateCollectionSnapshotEntry<TKey, TItem>
         this.ItemVersion = ItemVersion;
     }
 
+    /// <summary>
+    /// Represents the key value.
+    /// </summary>
     public TKey Key
     {
         get => _key;
@@ -34,8 +43,14 @@ public sealed record StateCollectionSnapshotEntry<TKey, TItem>
         }
     }
 
+    /// <summary>
+    /// Gets or sets item.
+    /// </summary>
     public TItem Item { get; init; }
 
+    /// <summary>
+    /// Represents the item version value.
+    /// </summary>
     public long ItemVersion
     {
         get => _itemVersion;

@@ -2,6 +2,9 @@ using AtomUI.City.Core.Hosting;
 
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents test host.
+/// </summary>
 public sealed class TestHost : IDisposable, IAsyncDisposable
 {
     private bool _disposed;
@@ -22,25 +25,52 @@ public sealed class TestHost : IDisposable, IAsyncDisposable
         Diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Gets application context.
+    /// </summary>
     public IApplicationContext ApplicationContext { get; }
 
+    /// <summary>
+    /// Gets properties.
+    /// </summary>
     public IReadOnlyDictionary<string, object?> Properties { get; }
 
+    /// <summary>
+    /// Gets directory.
+    /// </summary>
     public TestDirectory Directory { get; }
 
+    /// <summary>
+    /// Gets dispatcher.
+    /// </summary>
     public FakeUiDispatcher Dispatcher { get; }
 
+    /// <summary>
+    /// Gets scheduler.
+    /// </summary>
     public DeterministicScheduler Scheduler { get; }
 
+    /// <summary>
+    /// Gets diagnostics.
+    /// </summary>
     public TestDiagnostics Diagnostics { get; }
 
+    /// <summary>
+    /// Gets or sets is stopped.
+    /// </summary>
     public bool IsStopped { get; private set; }
 
+    /// <summary>
+    /// Executes the create builder operation.
+    /// </summary>
     public static TestHostBuilder CreateBuilder()
     {
         return new TestHostBuilder();
     }
 
+    /// <summary>
+    /// Executes the stop async operation.
+    /// </summary>
     public ValueTask StopAsync()
     {
         IsStopped = true;
@@ -48,6 +78,9 @@ public sealed class TestHost : IDisposable, IAsyncDisposable
         return ValueTask.CompletedTask;
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         if (_disposed)
@@ -64,6 +97,9 @@ public sealed class TestHost : IDisposable, IAsyncDisposable
         Diagnostics.Freeze();
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         if (_disposed)

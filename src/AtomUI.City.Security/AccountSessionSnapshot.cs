@@ -2,10 +2,16 @@ using System.Security.Claims;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents account session snapshot.
+/// </summary>
 public sealed class AccountSessionSnapshot
 {
     private readonly ClaimsPrincipal _principal;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AccountSessionSnapshot</c> type.
+    /// </summary>
     public AccountSessionSnapshot(
         AccountSessionMode mode,
         long revision,
@@ -56,24 +62,51 @@ public sealed class AccountSessionSnapshot
         Credential = credential;
     }
 
+    /// <summary>
+    /// Gets mode.
+    /// </summary>
     public AccountSessionMode Mode { get; }
 
+    /// <summary>
+    /// Gets revision.
+    /// </summary>
     public long Revision { get; }
 
+    /// <summary>
+    /// Gets profile.
+    /// </summary>
     public AccountProfileSnapshot? Profile { get; }
 
+    /// <summary>
+    /// Gets account key.
+    /// </summary>
     public SecurityAccountKey? AccountKey => Profile?.AccountKey;
 
+    /// <summary>
+    /// Gets permissions.
+    /// </summary>
     public PersistedPermissionSnapshot? Permissions { get; }
 
+    /// <summary>
+    /// Gets credential.
+    /// </summary>
     public AccountCredentialContext? Credential { get; }
 
+    /// <summary>
+    /// Gets principal.
+    /// </summary>
     public ClaimsPrincipal Principal => SecurityPrincipalSnapshot.Clone(_principal);
 
     internal ClaimsPrincipal PrincipalSnapshot => _principal;
 
+    /// <summary>
+    /// Gets a value indicating whether is active.
+    /// </summary>
     public bool IsActive => Mode != AccountSessionMode.Anonymous;
 
+    /// <summary>
+    /// Gets anonymous.
+    /// </summary>
     public static AccountSessionSnapshot Anonymous(long revision = 0) =>
         new(AccountSessionMode.Anonymous, revision);
 }

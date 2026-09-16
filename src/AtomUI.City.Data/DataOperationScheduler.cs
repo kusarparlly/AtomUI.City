@@ -2,12 +2,18 @@ using System.Diagnostics;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents data operation scheduler.
+/// </summary>
 public sealed class DataOperationScheduler : IDataOperationScheduler, IDisposable
 {
     private readonly object _syncRoot = new();
     private readonly Dictionary<OperationIdentity, OperationGate> _gates = [];
     private int _disposed;
 
+    /// <summary>
+    /// Executes the execute async&lt;tresponse&gt; operation.
+    /// </summary>
     public ValueTask<DataResult<TResponse>> ExecuteAsync<TResponse>(
         DataRequest<TResponse> request,
         DataOperationDelegate<TResponse> operation,
@@ -27,6 +33,9 @@ public sealed class DataOperationScheduler : IDataOperationScheduler, IDisposabl
         return ExecuteWithGateAsync(request, operation, cancellationToken, key, gate);
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         OperationGate[] gates;

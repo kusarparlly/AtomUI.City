@@ -5,27 +5,42 @@ using AtomUI.City.Core.Threading;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents view factory.
+/// </summary>
 public sealed class ViewFactory
 {
     private readonly IUiDispatcher _dispatcher;
     private readonly IServiceProvider _services;
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ViewFactory</c> type.
+    /// </summary>
     public ViewFactory(IUiDispatcher dispatcher)
         : this(dispatcher, EmptyServiceProvider.Instance, diagnostics: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ViewFactory</c> type.
+    /// </summary>
     public ViewFactory(IUiDispatcher dispatcher, IServiceProvider services)
         : this(dispatcher, services, diagnostics: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ViewFactory</c> type.
+    /// </summary>
     public ViewFactory(IUiDispatcher dispatcher, IHostDiagnostics? diagnostics)
         : this(dispatcher, EmptyServiceProvider.Instance, diagnostics)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ViewFactory</c> type.
+    /// </summary>
     public ViewFactory(
         IUiDispatcher dispatcher,
         IServiceProvider services,
@@ -39,6 +54,9 @@ public sealed class ViewFactory
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the create async operation.
+    /// </summary>
     public async ValueTask<object> CreateAsync(
         ViewDescriptor descriptor,
         CancellationToken cancellationToken = default)

@@ -3,12 +3,18 @@ using AtomUI.City.Core.Threading;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents presentation resource dictionary revoker.
+/// </summary>
 public sealed class PresentationResourceDictionaryRevoker : IPresentationResourceDictionaryRevoker
 {
     private readonly IUiDispatcher _dispatcher;
     private readonly IReadOnlyList<IPresentationResourceDictionaryTarget> _targets;
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>PresentationResourceDictionaryRevoker</c> type.
+    /// </summary>
     public PresentationResourceDictionaryRevoker(
         IUiDispatcher dispatcher,
         IEnumerable<IPresentationResourceDictionaryTarget> targets)
@@ -16,6 +22,9 @@ public sealed class PresentationResourceDictionaryRevoker : IPresentationResourc
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>PresentationResourceDictionaryRevoker</c> type.
+    /// </summary>
     public PresentationResourceDictionaryRevoker(
         IUiDispatcher dispatcher,
         IEnumerable<IPresentationResourceDictionaryTarget> targets,
@@ -29,6 +38,9 @@ public sealed class PresentationResourceDictionaryRevoker : IPresentationResourc
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the revoke async operation.
+    /// </summary>
     public async ValueTask<PresentationResourceDictionaryRevokeResult> RevokeAsync(
         PresentationResourceDictionaryRevocation revocation,
         CancellationToken cancellationToken = default)

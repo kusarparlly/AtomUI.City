@@ -2,8 +2,14 @@ using System.Net;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents data error mapper.
+/// </summary>
 public static class DataErrorMapper
 {
+    /// <summary>
+    /// Executes the from http status code operation.
+    /// </summary>
     public static DataError FromHttpStatusCode(HttpStatusCode statusCode)
     {
         var numericStatusCode = (int)statusCode;
@@ -43,6 +49,9 @@ public static class DataErrorMapper
             GetHttpMessageKey(kind));
     }
 
+    /// <summary>
+    /// Executes the from grpc status operation.
+    /// </summary>
     public static DataError FromGrpcStatus(GrpcStatusCode statusCode, string? detail = null)
     {
         if (!Enum.IsDefined(statusCode))

@@ -2,6 +2,9 @@ using System.Collections.Concurrent;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents in memory data request cache.
+/// </summary>
 public sealed class InMemoryDataRequestCache :
     IDataExpiringRequestCache,
     IDataCacheInvalidator,
@@ -13,6 +16,9 @@ public sealed class InMemoryDataRequestCache :
     private readonly TimeProvider _timeProvider;
     private long _mutationEpoch;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>InMemoryDataRequestCache</c> type.
+    /// </summary>
     public InMemoryDataRequestCache(
         IDataDiagnostics? diagnostics = null,
         TimeProvider? timeProvider = null)
@@ -21,6 +27,9 @@ public sealed class InMemoryDataRequestCache :
         _timeProvider = timeProvider ?? TimeProvider.System;
     }
 
+    /// <summary>
+    /// Executes the try get async&lt;tresponse&gt; operation.
+    /// </summary>
     public ValueTask<DataCacheLookup<TResponse>> TryGetAsync<TResponse>(
         DataCacheKey key,
         CancellationToken cancellationToken = default)
@@ -56,6 +65,9 @@ public sealed class InMemoryDataRequestCache :
         return ValueTask.FromResult(result);
     }
 
+    /// <summary>
+    /// Executes the set async&lt;tresponse&gt; operation.
+    /// </summary>
     public ValueTask SetAsync<TResponse>(
         DataCacheKey key,
         TResponse? value,
@@ -67,6 +79,9 @@ public sealed class InMemoryDataRequestCache :
         return SetAsync(key, value, DataCacheEntryOptions.NoExpiration, cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the set async&lt;tresponse&gt; operation.
+    /// </summary>
     public ValueTask SetAsync<TResponse>(
         DataCacheKey key,
         TResponse? value,
@@ -116,6 +131,9 @@ public sealed class InMemoryDataRequestCache :
         }
     }
 
+    /// <summary>
+    /// Executes the invalidate async operation.
+    /// </summary>
     public ValueTask InvalidateAsync(
         DataCacheKey key,
         CancellationToken cancellationToken = default)
@@ -135,6 +153,9 @@ public sealed class InMemoryDataRequestCache :
         return ValueTask.CompletedTask;
     }
 
+    /// <summary>
+    /// Executes the invalidate async operation.
+    /// </summary>
     public ValueTask<DataCacheInvalidationResult> InvalidateAsync(
         DataCacheInvalidation invalidation,
         CancellationToken cancellationToken = default)

@@ -2,8 +2,14 @@ using System.Collections.ObjectModel;
 
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event payload diagnostic snapshot.
+/// </summary>
 public sealed class EventPayloadDiagnosticSnapshot
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EventPayloadDiagnosticSnapshot"/> type.
+    /// </summary>
     public EventPayloadDiagnosticSnapshot(
         IReadOnlyDictionary<string, string?> fields,
         string? schemaVersion = null,
@@ -57,18 +63,36 @@ public sealed class EventPayloadDiagnosticSnapshot
         SizeEstimate = sizeEstimate;
     }
 
+    /// <summary>
+    /// Gets fields.
+    /// </summary>
     public IReadOnlyDictionary<string, string?> Fields { get; }
 
+    /// <summary>
+    /// Gets schema version.
+    /// </summary>
     public string? SchemaVersion { get; }
 
+    /// <summary>
+    /// Gets size estimate.
+    /// </summary>
     public long? SizeEstimate { get; }
 }
 
+/// <summary>
+/// Defines the contract for ievent payload diagnostic projector&lt;tevent&gt;.
+/// </summary>
 public interface IEventPayloadDiagnosticProjector<in TEvent>
 {
+    /// <summary>
+    /// Executes the project operation.
+    /// </summary>
     EventPayloadDiagnosticSnapshot Project(TEvent eventData);
 }
 
+/// <summary>
+/// Represents event payload diagnostic projector descriptor.
+/// </summary>
 public class EventPayloadDiagnosticProjectorDescriptor
 {
     private readonly Func<object, EventPayloadDiagnosticSnapshot> _project;
@@ -83,8 +107,14 @@ public class EventPayloadDiagnosticProjectorDescriptor
         _project = project;
     }
 
+    /// <summary>
+    /// Gets event type.
+    /// </summary>
     public Type EventType { get; }
 
+    /// <summary>
+    /// Executes the create&lt;tevent&gt; operation.
+    /// </summary>
     public static EventPayloadDiagnosticProjectorDescriptor Create<TEvent>(
         IEventPayloadDiagnosticProjector<TEvent> projector)
     {

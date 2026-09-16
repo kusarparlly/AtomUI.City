@@ -1,5 +1,8 @@
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents navigation result.
+/// </summary>
 public sealed class NavigationResult
 {
     private NavigationResult(
@@ -20,22 +23,49 @@ public sealed class NavigationResult
         RedirectTarget = redirectTarget;
     }
 
+    /// <summary>
+    /// Gets navigation id.
+    /// </summary>
     public Guid NavigationId { get; }
 
+    /// <summary>
+    /// Gets status.
+    /// </summary>
     public NavigationResultStatus Status { get; }
 
+    /// <summary>
+    /// Gets target.
+    /// </summary>
     public NavigationTarget Target { get; }
 
+    /// <summary>
+    /// Gets route.
+    /// </summary>
     public RouteDescriptor Route => ActiveRoute ?? throw new InvalidOperationException("Navigation did not produce an active route.");
 
+    /// <summary>
+    /// Gets active route.
+    /// </summary>
     public RouteDescriptor? ActiveRoute { get; }
 
+    /// <summary>
+    /// Gets parameters.
+    /// </summary>
     public IReadOnlyDictionary<string, string> Parameters { get; }
 
+    /// <summary>
+    /// Gets error.
+    /// </summary>
     public NavigationError? Error { get; }
 
+    /// <summary>
+    /// Gets redirect target.
+    /// </summary>
     public NavigationTarget? RedirectTarget { get; }
 
+    /// <summary>
+    /// Executes the success operation.
+    /// </summary>
     public static NavigationResult Success(
         Guid navigationId,
         NavigationTarget target,
@@ -56,6 +86,9 @@ public sealed class NavigationResult
             redirectTarget: null);
     }
 
+    /// <summary>
+    /// Executes the not found operation.
+    /// </summary>
     public static NavigationResult NotFound(
         Guid navigationId,
         NavigationTarget target,
@@ -69,6 +102,9 @@ public sealed class NavigationResult
             message);
     }
 
+    /// <summary>
+    /// Executes the rejected operation.
+    /// </summary>
     public static NavigationResult Rejected(
         Guid navigationId,
         NavigationTarget target,
@@ -83,6 +119,9 @@ public sealed class NavigationResult
             message ?? "Navigation was rejected.");
     }
 
+    /// <summary>
+    /// Executes the cancelled operation.
+    /// </summary>
     public static NavigationResult Cancelled(
         Guid navigationId,
         NavigationTarget target,
@@ -96,6 +135,9 @@ public sealed class NavigationResult
             message ?? "Navigation was cancelled.");
     }
 
+    /// <summary>
+    /// Executes the failed operation.
+    /// </summary>
     public static NavigationResult Failed(
         Guid navigationId,
         NavigationTarget target,
@@ -113,6 +155,9 @@ public sealed class NavigationResult
             redirectTarget: null);
     }
 
+    /// <summary>
+    /// Executes the redirected operation.
+    /// </summary>
     public static NavigationResult Redirected(
         Guid navigationId,
         NavigationTarget target,
@@ -130,6 +175,9 @@ public sealed class NavigationResult
             redirectTarget);
     }
 
+    /// <summary>
+    /// Executes the redirected operation.
+    /// </summary>
     public static NavigationResult Redirected(
         Guid navigationId,
         NavigationTarget target,

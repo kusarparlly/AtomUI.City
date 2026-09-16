@@ -1,5 +1,8 @@
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents data resilience options.
+/// </summary>
 public sealed class DataResilienceOptions
 {
     private TimeSpan? _timeout;
@@ -10,6 +13,9 @@ public sealed class DataResilienceOptions
     private DataRateLimitOptions _rateLimit = DataRateLimitOptions.Disabled;
     private DataResiliencePolicyScope _scope;
 
+    /// <summary>
+    /// Represents the timeout value.
+    /// </summary>
     public TimeSpan? Timeout
     {
         get => _timeout;
@@ -24,6 +30,9 @@ public sealed class DataResilienceOptions
         }
     }
 
+    /// <summary>
+    /// Represents the max retry attempts value.
+    /// </summary>
     public int MaxRetryAttempts
     {
         get => _maxRetryAttempts;
@@ -34,8 +43,14 @@ public sealed class DataResilienceOptions
         }
     }
 
+    /// <summary>
+    /// Gets or sets allow mutation retry.
+    /// </summary>
     public bool AllowMutationRetry { get; init; }
 
+    /// <summary>
+    /// Represents the retry delay value.
+    /// </summary>
     public TimeSpan RetryDelay
     {
         get => _retryDelay;
@@ -50,6 +65,9 @@ public sealed class DataResilienceOptions
         }
     }
 
+    /// <summary>
+    /// Represents the policy name value.
+    /// </summary>
     public string? PolicyName
     {
         get => _policyName;
@@ -64,6 +82,9 @@ public sealed class DataResilienceOptions
         }
     }
 
+    /// <summary>
+    /// Represents the scope value.
+    /// </summary>
     public DataResiliencePolicyScope Scope
     {
         get => _scope;
@@ -78,19 +99,31 @@ public sealed class DataResilienceOptions
         }
     }
 
+    /// <summary>
+    /// Represents the circuit breaker value.
+    /// </summary>
     public DataCircuitBreakerOptions CircuitBreaker
     {
         get => _circuitBreaker;
         init => _circuitBreaker = value ?? throw new ArgumentNullException(nameof(CircuitBreaker));
     }
 
+    /// <summary>
+    /// Represents the rate limit value.
+    /// </summary>
     public DataRateLimitOptions RateLimit
     {
         get => _rateLimit;
         init => _rateLimit = value ?? throw new ArgumentNullException(nameof(RateLimit));
     }
 
+    /// <summary>
+    /// Gets or sets enable fallback.
+    /// </summary>
     public bool EnableFallback { get; init; }
 
+    /// <summary>
+    /// Gets none.
+    /// </summary>
     public static DataResilienceOptions None { get; } = new();
 }

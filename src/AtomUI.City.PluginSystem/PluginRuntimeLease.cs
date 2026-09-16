@@ -1,5 +1,8 @@
 namespace AtomUI.City.PluginSystem;
 
+/// <summary>
+/// Represents plugin runtime lease.
+/// </summary>
 public sealed class PluginRuntimeLease
 {
     private readonly Func<CancellationToken, ValueTask> _revokeAsync;
@@ -22,12 +25,24 @@ public sealed class PluginRuntimeLease
         State = PluginRuntimeLeaseState.Active;
     }
 
+    /// <summary>
+    /// Gets lease id.
+    /// </summary>
     public string LeaseId { get; }
 
+    /// <summary>
+    /// Gets plugin id.
+    /// </summary>
     public string PluginId { get; }
 
+    /// <summary>
+    /// Gets kind.
+    /// </summary>
     public string Kind { get; }
 
+    /// <summary>
+    /// Gets or sets state.
+    /// </summary>
     public PluginRuntimeLeaseState State { get; private set; }
 
     internal async ValueTask<IReadOnlyList<PluginDiagnostic>> RevokeAsync(CancellationToken cancellationToken)

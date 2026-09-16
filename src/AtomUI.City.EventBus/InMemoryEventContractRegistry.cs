@@ -1,5 +1,8 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents in memory event contract registry.
+/// </summary>
 public sealed class InMemoryEventContractRegistry : IEventContractRegistry
 {
     private readonly Dictionary<EventContractId, EventContractDescriptor> _byContractId = [];
@@ -8,6 +11,9 @@ public sealed class InMemoryEventContractRegistry : IEventContractRegistry
     private IReadOnlyList<EventContractDescriptor> _descriptors = Array.Empty<EventContractDescriptor>();
     private bool _isFrozen;
 
+    /// <summary>
+    /// Represents the is frozen value.
+    /// </summary>
     public bool IsFrozen
     {
         get
@@ -19,6 +25,9 @@ public sealed class InMemoryEventContractRegistry : IEventContractRegistry
         }
     }
 
+    /// <summary>
+    /// Represents the descriptors value.
+    /// </summary>
     public IReadOnlyList<EventContractDescriptor> Descriptors
     {
         get
@@ -32,6 +41,9 @@ public sealed class InMemoryEventContractRegistry : IEventContractRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the register operation.
+    /// </summary>
     public void Register(EventContractDescriptor descriptor)
     {
         ArgumentNullException.ThrowIfNull(descriptor);
@@ -43,6 +55,9 @@ public sealed class InMemoryEventContractRegistry : IEventContractRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the freeze operation.
+    /// </summary>
     public void Freeze()
     {
         lock (_syncRoot)
@@ -57,6 +72,9 @@ public sealed class InMemoryEventContractRegistry : IEventContractRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the try get operation.
+    /// </summary>
     public bool TryGet(EventContractId contractId, out EventContractDescriptor? descriptor)
     {
         EventContractId.ThrowIfDefault(contractId, nameof(contractId));
@@ -67,6 +85,9 @@ public sealed class InMemoryEventContractRegistry : IEventContractRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the try get operation.
+    /// </summary>
     public bool TryGet(Type eventType, out EventContractDescriptor? descriptor)
     {
         ArgumentNullException.ThrowIfNull(eventType);
@@ -77,6 +98,9 @@ public sealed class InMemoryEventContractRegistry : IEventContractRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the get or create&lt;tevent&gt; operation.
+    /// </summary>
     public EventContractDescriptor GetOrCreate<TEvent>()
     {
         var eventType = typeof(TEvent);

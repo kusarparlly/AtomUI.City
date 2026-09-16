@@ -2,11 +2,17 @@ using System.Text;
 
 namespace AtomUI.City.Templates;
 
+/// <summary>
+/// Represents generation template renderer.
+/// </summary>
 public sealed class GenerationTemplateRenderer
 {
     private static readonly object RenderGatesSyncRoot = new();
     private static readonly Dictionary<string, RenderGate> RenderGates = new(GetPathComparer());
 
+    /// <summary>
+    /// Executes the create plan operation.
+    /// </summary>
     public TemplatePlan CreatePlan(GenerationTemplateOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -21,11 +27,17 @@ public sealed class GenerationTemplateRenderer
         return CreatePlan(options, CreateFiles(options));
     }
 
+    /// <summary>
+    /// Executes the render operation.
+    /// </summary>
     public TemplateRenderResult Render(GenerationTemplateOptions options)
     {
         return Render(options, CancellationToken.None);
     }
 
+    /// <summary>
+    /// Executes the render operation.
+    /// </summary>
     public TemplateRenderResult Render(
         GenerationTemplateOptions options,
         CancellationToken cancellationToken)

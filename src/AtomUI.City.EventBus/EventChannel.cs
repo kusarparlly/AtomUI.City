@@ -1,16 +1,31 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event channel&lt;tevent&gt;.
+/// </summary>
 public readonly record struct EventChannel<TEvent>
 {
+    /// <summary>
+    /// Represents the default name value.
+    /// </summary>
     public const string DefaultName = "default";
 
+    /// <summary>
+    /// Gets default.
+    /// </summary>
     public static EventChannel<TEvent> Default { get; } = new(DefaultName);
 
+    /// <summary>
+    /// Executes the event channel operation.
+    /// </summary>
     public EventChannel(string name)
     {
         Name = ValidateName(name);
     }
 
+    /// <summary>
+    /// Gets name.
+    /// </summary>
     public string Name { get; }
 
     internal static void ThrowIfDefault(EventChannel<TEvent> channel, string paramName)

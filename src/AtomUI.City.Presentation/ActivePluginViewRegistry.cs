@@ -2,21 +2,33 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents active plugin view registry.
+/// </summary>
 public sealed class ActivePluginViewRegistry : IActivePluginViewRegistry
 {
     private readonly object _gate = new();
     private readonly List<ActivePluginViewLease> _leases = [];
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ActivePluginViewRegistry</c> type.
+    /// </summary>
     public ActivePluginViewRegistry()
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ActivePluginViewRegistry</c> type.
+    /// </summary>
     public ActivePluginViewRegistry(IHostDiagnostics? diagnostics)
     {
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Represents the active views value.
+    /// </summary>
     public IReadOnlyList<ActivePluginView> ActiveViews
     {
         get
@@ -32,6 +44,9 @@ public sealed class ActivePluginViewRegistry : IActivePluginViewRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the track operation.
+    /// </summary>
     public IActivePluginViewLease Track(ActivePluginView view)
     {
         ArgumentNullException.ThrowIfNull(view);
@@ -48,6 +63,9 @@ public sealed class ActivePluginViewRegistry : IActivePluginViewRegistry
         return lease;
     }
 
+    /// <summary>
+    /// Executes the close plugin views async operation.
+    /// </summary>
     public ValueTask<int> ClosePluginViewsAsync(
         string pluginId,
         CancellationToken cancellationToken = default)
@@ -59,6 +77,9 @@ public sealed class ActivePluginViewRegistry : IActivePluginViewRegistry
             cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the close contribution views async operation.
+    /// </summary>
     public ValueTask<int> CloseContributionViewsAsync(
         string contributionId,
         CancellationToken cancellationToken = default)

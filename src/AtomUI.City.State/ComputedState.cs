@@ -3,6 +3,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents computed state&lt;t&gt;.
+/// </summary>
 public sealed class ComputedState<T> : IComputedState<T>, IDisposable
 {
     private readonly object _syncRoot = new();
@@ -21,11 +24,17 @@ public sealed class ComputedState<T> : IComputedState<T>, IDisposable
     private Exception? _lastError;
     private T? _value;
 
+    /// <summary>
+    /// Executes the computed state operation.
+    /// </summary>
     public ComputedState(Func<T> compute, params IReadOnlyState[] dependencies)
         : this(compute, diagnostics: null, dependencies)
     {
     }
 
+    /// <summary>
+    /// Executes the computed state operation.
+    /// </summary>
     public ComputedState(
         Func<T> compute,
         IHostDiagnostics? diagnostics,
@@ -64,10 +73,16 @@ public sealed class ComputedState<T> : IComputedState<T>, IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets value.
+    /// </summary>
     public T Value => EnsureValue().Value;
 
     object? IReadOnlyState.Value => Value;
 
+    /// <summary>
+    /// Represents the version value.
+    /// </summary>
     public long Version
     {
         get
@@ -79,8 +94,14 @@ public sealed class ComputedState<T> : IComputedState<T>, IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets value type.
+    /// </summary>
     public Type ValueType => typeof(T);
 
+    /// <summary>
+    /// Represents the last error value.
+    /// </summary>
     public Exception? LastError
     {
         get
@@ -92,11 +113,17 @@ public sealed class ComputedState<T> : IComputedState<T>, IDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the on change operation.
+    /// </summary>
     public IStateSubscription OnChange(Action<StateChangedEventArgs<T>> handler)
     {
         return OnChange(handler, StateSubscriptionOptions.Immediate);
     }
 
+    /// <summary>
+    /// Executes the on change operation.
+    /// </summary>
     public IStateSubscription OnChange(
         Action<StateChangedEventArgs<T>> handler,
         StateSubscriptionOptions options)
@@ -137,6 +164,9 @@ public sealed class ComputedState<T> : IComputedState<T>, IDisposable
         return OnChange(args => handler(args), options);
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         IStateSubscription[] dependencySubscriptions;

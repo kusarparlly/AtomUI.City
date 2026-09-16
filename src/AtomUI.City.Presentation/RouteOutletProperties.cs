@@ -4,8 +4,14 @@ using Avalonia.VisualTree;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents route outlet properties.
+/// </summary>
 public sealed class RouteOutletProperties : AvaloniaObject
 {
+    /// <summary>
+    /// Represents the name property value.
+    /// </summary>
     public static readonly AttachedProperty<string?> NameProperty =
         AvaloniaProperty.RegisterAttached<RouteOutletProperties, Control, string?>("Name");
 
@@ -24,12 +30,18 @@ public sealed class RouteOutletProperties : AvaloniaObject
     {
     }
 
+    /// <summary>
+    /// Executes the get name operation.
+    /// </summary>
     public static string? GetName(Control control)
     {
         ArgumentNullException.ThrowIfNull(control);
         return control.GetValue(NameProperty);
     }
 
+    /// <summary>
+    /// Executes the set name operation.
+    /// </summary>
     public static void SetName(Control control, string? value)
     {
         ArgumentNullException.ThrowIfNull(control);

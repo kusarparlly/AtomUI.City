@@ -3,6 +3,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents security route guard.
+/// </summary>
 public sealed class SecurityRouteGuard : IRouteEnterGuard
 {
     private readonly IAuthorizationEvaluator _authorizationEvaluator;
@@ -11,6 +14,9 @@ public sealed class SecurityRouteGuard : IRouteEnterGuard
     private readonly SecurityRouteGuardOptions _options;
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>SecurityRouteGuard</c> type.
+    /// </summary>
     public SecurityRouteGuard(
         IAuthorizationEvaluator authorizationEvaluator,
         ICurrentPrincipalAccessor principalAccessor,
@@ -24,6 +30,9 @@ public sealed class SecurityRouteGuard : IRouteEnterGuard
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>SecurityRouteGuard</c> type.
+    /// </summary>
     public SecurityRouteGuard(
         IAuthorizationEvaluator authorizationEvaluator,
         ICurrentPrincipalAccessor principalAccessor,
@@ -38,6 +47,9 @@ public sealed class SecurityRouteGuard : IRouteEnterGuard
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>SecurityRouteGuard</c> type.
+    /// </summary>
     public SecurityRouteGuard(
         IAuthorizationEvaluator authorizationEvaluator,
         ICurrentPrincipalAccessor principalAccessor,
@@ -64,6 +76,9 @@ public sealed class SecurityRouteGuard : IRouteEnterGuard
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the can enter async operation.
+    /// </summary>
     public async ValueTask<RouteGuardResult> CanEnterAsync(
         RouteGuardContext context,
         CancellationToken cancellationToken)

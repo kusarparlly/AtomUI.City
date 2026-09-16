@@ -1,12 +1,24 @@
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents the operation used to data request handler delegate&lt;tresponse&gt;.
+/// </summary>
 public delegate ValueTask<DataResult<TResponse>> DataRequestHandlerDelegate<TResponse>(
     CancellationToken cancellationToken);
 
+/// <summary>
+/// Defines the contract for idata request handler.
+/// </summary>
 public interface IDataRequestHandler
 {
+    /// <summary>
+    /// Gets order.
+    /// </summary>
     int Order { get; }
 
+    /// <summary>
+    /// Executes the invoke async&lt;tresponse&gt; operation.
+    /// </summary>
     ValueTask<DataResult<TResponse>> InvokeAsync<TResponse>(
         DataRequest<TResponse> request,
         DataRequestContext context,
@@ -14,8 +26,14 @@ public interface IDataRequestHandler
         CancellationToken cancellationToken = default);
 }
 
+/// <summary>
+/// Defines the contract for idata request handler source.
+/// </summary>
 public interface IDataRequestHandlerSource
 {
+    /// <summary>
+    /// Executes the get handlers&lt;tresponse&gt; operation.
+    /// </summary>
     IReadOnlyList<IDataRequestHandler> GetHandlers<TResponse>(DataRequest<TResponse> request);
 }
 

@@ -1,7 +1,13 @@
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents account record snapshot.
+/// </summary>
 public sealed class AccountRecordSnapshot
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>AccountRecordSnapshot</c> type.
+    /// </summary>
     public AccountRecordSnapshot(
         AccountProfileSnapshot profile,
         PersistedPermissionSnapshot permissions)
@@ -14,9 +20,18 @@ public sealed class AccountRecordSnapshot
         }
     }
 
+    /// <summary>
+    /// Gets account key.
+    /// </summary>
     public SecurityAccountKey AccountKey => Profile.AccountKey;
 
+    /// <summary>
+    /// Gets profile.
+    /// </summary>
     public AccountProfileSnapshot Profile { get; }
 
+    /// <summary>
+    /// Gets permissions.
+    /// </summary>
     public PersistedPermissionSnapshot Permissions { get; }
 }

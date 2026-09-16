@@ -2,10 +2,16 @@ using System.Security.Claims;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents authentication state snapshot.
+/// </summary>
 public sealed class AuthenticationStateSnapshot
 {
     private readonly ClaimsPrincipal _principal;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AuthenticationStateSnapshot</c> type.
+    /// </summary>
     public AuthenticationStateSnapshot(
         AuthenticationState state,
         ClaimsPrincipal principal,
@@ -78,18 +84,36 @@ public sealed class AuthenticationStateSnapshot
         FailureMessage = failureMessage;
     }
 
+    /// <summary>
+    /// Gets state.
+    /// </summary>
     public AuthenticationState State { get; }
 
+    /// <summary>
+    /// Gets principal.
+    /// </summary>
     public ClaimsPrincipal Principal => SecurityPrincipalSnapshot.Clone(_principal);
 
     internal ClaimsPrincipal PrincipalSnapshot => _principal;
 
+    /// <summary>
+    /// Gets revision.
+    /// </summary>
     public long Revision { get; }
 
+    /// <summary>
+    /// Gets scheme.
+    /// </summary>
     public string? Scheme { get; }
 
+    /// <summary>
+    /// Gets expires at.
+    /// </summary>
     public DateTimeOffset? ExpiresAt { get; }
 
+    /// <summary>
+    /// Gets failure message.
+    /// </summary>
     public string? FailureMessage { get; }
 
 }

@@ -2,6 +2,9 @@ namespace AtomUI.City.Routing;
 
 using AtomUI.City.Core.Diagnostics;
 
+/// <summary>
+/// Represents route registry.
+/// </summary>
 public sealed class RouteRegistry : IRouteRegistry, IRouteContributionServiceResolver
 {
     private readonly object _syncRoot = new();
@@ -9,11 +12,17 @@ public sealed class RouteRegistry : IRouteRegistry, IRouteContributionServiceRes
     private readonly Dictionary<string, Func<Type, object?>> _serviceResolvers = new(StringComparer.Ordinal);
     private RouteGraphSnapshot _currentSnapshot;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>RouteRegistry</c> type.
+    /// </summary>
     public RouteRegistry()
         : this(RouteGraphSnapshot.Create([]), diagnostics: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>RouteRegistry</c> type.
+    /// </summary>
     public RouteRegistry(
         RouteGraphSnapshot initialSnapshot,
         IHostDiagnostics? diagnostics = null)
@@ -22,13 +31,22 @@ public sealed class RouteRegistry : IRouteRegistry, IRouteContributionServiceRes
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Gets current snapshot.
+    /// </summary>
     public RouteGraphSnapshot CurrentSnapshot => Volatile.Read(ref _currentSnapshot);
 
+    /// <summary>
+    /// Executes the add contribution operation.
+    /// </summary>
     public RouteContributionLease AddContribution(
         string contributionId,
         IReadOnlyList<RouteDescriptor> routes) =>
         AddContribution(new RouteContribution(contributionId, routes));
 
+    /// <summary>
+    /// Executes the add contribution operation.
+    /// </summary>
     public RouteContributionLease AddContribution(RouteContribution contribution)
     {
         ArgumentNullException.ThrowIfNull(contribution);
@@ -68,6 +86,9 @@ public sealed class RouteRegistry : IRouteRegistry, IRouteContributionServiceRes
         return new RouteContributionLease(contributionId, ReleaseContribution);
     }
 
+    /// <summary>
+    /// Executes the remove contribution operation.
+    /// </summary>
     public bool RemoveContribution(string contributionId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(contributionId);

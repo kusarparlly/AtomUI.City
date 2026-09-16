@@ -2,8 +2,14 @@ using System.Collections.ObjectModel;
 
 namespace AtomUI.City.Templates;
 
+/// <summary>
+/// Represents template plan.
+/// </summary>
 public sealed class TemplatePlan
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TemplatePlan"/> type.
+    /// </summary>
     public TemplatePlan(
         string operationId,
         string command,
@@ -13,6 +19,9 @@ public sealed class TemplatePlan
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TemplatePlan"/> type.
+    /// </summary>
     public TemplatePlan(
         string operationId,
         string command,
@@ -50,26 +59,59 @@ public sealed class TemplatePlan
         Rollback = Array.AsReadOnly(rollback.ToArray());
     }
 
+    /// <summary>
+    /// Gets schema version.
+    /// </summary>
     public string SchemaVersion { get; } = "1.0";
 
+    /// <summary>
+    /// Gets operation id.
+    /// </summary>
     public string OperationId { get; }
 
+    /// <summary>
+    /// Gets command.
+    /// </summary>
     public string Command { get; }
 
+    /// <summary>
+    /// Gets inputs.
+    /// </summary>
     public IReadOnlyDictionary<string, object?> Inputs { get; }
 
+    /// <summary>
+    /// Gets changes.
+    /// </summary>
     public IReadOnlyList<TemplateChange> Changes { get; }
 
+    /// <summary>
+    /// Gets build targets.
+    /// </summary>
     public IReadOnlyList<string> BuildTargets { get; }
 
+    /// <summary>
+    /// Gets test targets.
+    /// </summary>
     public IReadOnlyList<string> TestTargets { get; }
 
+    /// <summary>
+    /// Gets docs required.
+    /// </summary>
     public IReadOnlyList<string> DocsRequired { get; }
 
+    /// <summary>
+    /// Gets risks.
+    /// </summary>
     public IReadOnlyList<string> Risks { get; }
 
+    /// <summary>
+    /// Gets rollback.
+    /// </summary>
     public IReadOnlyList<string> Rollback { get; }
 
+    /// <summary>
+    /// Executes the validate operation.
+    /// </summary>
     public IReadOnlyList<TemplateDiagnostic> Validate()
     {
         var diagnostics = new List<TemplateDiagnostic>();

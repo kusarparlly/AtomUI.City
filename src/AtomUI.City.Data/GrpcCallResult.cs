@@ -1,5 +1,8 @@
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents grpc call result&lt;t&gt;.
+/// </summary>
 public sealed class GrpcCallResult<T>
 {
     private GrpcCallResult(
@@ -14,19 +17,37 @@ public sealed class GrpcCallResult<T>
         Detail = detail;
     }
 
+    /// <summary>
+    /// Gets succeeded.
+    /// </summary>
     public bool Succeeded { get; }
 
+    /// <summary>
+    /// Gets value.
+    /// </summary>
     public T? Value { get; }
 
+    /// <summary>
+    /// Gets status code.
+    /// </summary>
     public GrpcStatusCode StatusCode { get; }
 
+    /// <summary>
+    /// Gets detail.
+    /// </summary>
     public string? Detail { get; }
 
+    /// <summary>
+    /// Executes the success operation.
+    /// </summary>
     public static GrpcCallResult<T> Success(T value)
     {
         return new GrpcCallResult<T>(succeeded: true, value, GrpcStatusCode.OK, detail: null);
     }
 
+    /// <summary>
+    /// Executes the failed operation.
+    /// </summary>
     public static GrpcCallResult<T> Failed(GrpcStatusCode statusCode, string? detail = null)
     {
         if (!Enum.IsDefined(statusCode))

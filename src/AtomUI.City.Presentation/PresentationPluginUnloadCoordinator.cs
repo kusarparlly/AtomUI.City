@@ -2,6 +2,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents presentation plugin unload coordinator.
+/// </summary>
 public sealed class PresentationPluginUnloadCoordinator : IPresentationPluginUnloadCoordinator
 {
     private readonly IActivePluginViewRegistry _activeViews;
@@ -11,6 +14,9 @@ public sealed class PresentationPluginUnloadCoordinator : IPresentationPluginUnl
     private readonly IPresentationResourceDictionaryRevoker _resourceDictionaries;
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>PresentationPluginUnloadCoordinator</c> type.
+    /// </summary>
     public PresentationPluginUnloadCoordinator(
         IActivePluginViewRegistry activeViews,
         IInteractionHandlerRegistry interactionHandlers,
@@ -33,6 +39,9 @@ public sealed class PresentationPluginUnloadCoordinator : IPresentationPluginUnl
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the cleanup async operation.
+    /// </summary>
     public async ValueTask<PresentationPluginUnloadResult> CleanupAsync(
         PresentationPluginUnloadRequest request,
         CancellationToken cancellationToken = default)

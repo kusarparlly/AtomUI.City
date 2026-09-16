@@ -4,6 +4,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AtomUI.City.Mvvm;
 
+/// <summary>
+/// Represents view model base.
+/// </summary>
 public abstract class ViewModelBase : ObservableValidator, IActivatable, IDisposable
 {
     private readonly IHostDiagnostics? _diagnostics;
@@ -11,11 +14,17 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
     private bool _disposed;
     private ActivationState _activationState = ActivationState.Constructed;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ViewModelBase"/> type.
+    /// </summary>
     protected ViewModelBase(IHostDiagnostics? diagnostics = null)
     {
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Represents the activation state value.
+    /// </summary>
     public ActivationState ActivationState
     {
         get
@@ -35,8 +44,14 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         }
     }
 
+    /// <summary>
+    /// Gets a value indicating whether is active.
+    /// </summary>
     public bool IsActive => ActivationState == ActivationState.Active;
 
+    /// <summary>
+    /// Represents the is disposed value.
+    /// </summary>
     public bool IsDisposed
     {
         get
@@ -48,15 +63,27 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         }
     }
 
+    /// <summary>
+    /// Gets current activation scope.
+    /// </summary>
     public IActivationScope? CurrentActivationScope => ActivationContext?.Scope;
 
+    /// <summary>
+    /// Gets or sets activation context.
+    /// </summary>
     public ActivationContext? ActivationContext { get; private set; }
 
+    /// <summary>
+    /// Executes the activate async operation.
+    /// </summary>
     public async ValueTask ActivateAsync(IActivationScope scope)
     {
         await ActivateAsync(scope, CancellationToken.None).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the activate async operation.
+    /// </summary>
     public async ValueTask ActivateAsync(IActivationScope scope, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(scope);
@@ -64,11 +91,17 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         await ActivateAsync(new ActivationContext(scope), cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the activate async operation.
+    /// </summary>
     public async ValueTask ActivateAsync(ActivationContext context)
     {
         await ActivateAsync(context, CancellationToken.None).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the activate async operation.
+    /// </summary>
     public async ValueTask ActivateAsync(ActivationContext context, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -127,11 +160,17 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         }
     }
 
+    /// <summary>
+    /// Executes the deactivate async operation.
+    /// </summary>
     public async ValueTask DeactivateAsync()
     {
         await DeactivateAsync(CancellationToken.None).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Executes the deactivate async operation.
+    /// </summary>
     public async ValueTask DeactivateAsync(CancellationToken cancellationToken)
     {
         lock (_stateSyncRoot)
@@ -176,6 +215,9 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         }
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         IActivationScope? scope;
@@ -204,6 +246,9 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         }
     }
 
+    /// <summary>
+    /// Executes the set property&lt;t&gt; operation.
+    /// </summary>
     protected new bool SetProperty<T>(
         ref T field,
         T newValue,
@@ -212,6 +257,9 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         return SetProperty(ref field, newValue, EqualityComparer<T>.Default, propertyName);
     }
 
+    /// <summary>
+    /// Executes the set property&lt;t&gt; operation.
+    /// </summary>
     protected new bool SetProperty<T>(
         ref T field,
         T newValue,
@@ -225,6 +273,9 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         return base.SetProperty(ref field, newValue, comparer, propertyName);
     }
 
+    /// <summary>
+    /// Executes the set property&lt;t&gt; operation.
+    /// </summary>
     protected new bool SetProperty<T>(
         ref T field,
         T newValue,
@@ -237,6 +288,9 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         return base.SetProperty(ref field, newValue, validate, propertyName);
     }
 
+    /// <summary>
+    /// Executes the set property&lt;t&gt; operation.
+    /// </summary>
     protected new bool SetProperty<T>(
         ref T field,
         T newValue,
@@ -251,8 +305,14 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         return base.SetProperty(ref field, newValue, comparer, validate, propertyName);
     }
 
+    /// <summary>
+    /// Gets on activated async.
+    /// </summary>
     protected virtual ValueTask OnActivatedAsync(ActivationContext context) => OnActivatedAsync(context.Scope);
 
+    /// <summary>
+    /// Executes the on activated async operation.
+    /// </summary>
     protected virtual ValueTask OnActivatedAsync(
         ActivationContext context,
         CancellationToken cancellationToken)
@@ -261,20 +321,35 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         return OnActivatedAsync(context);
     }
 
+    /// <summary>
+    /// Gets on activated async.
+    /// </summary>
     protected virtual ValueTask OnActivatedAsync(IActivationScope scope) => ValueTask.CompletedTask;
 
+    /// <summary>
+    /// Gets on deactivated async.
+    /// </summary>
     protected virtual ValueTask OnDeactivatedAsync() => ValueTask.CompletedTask;
 
+    /// <summary>
+    /// Executes the on deactivated async operation.
+    /// </summary>
     protected virtual ValueTask OnDeactivatedAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         return OnDeactivatedAsync();
     }
 
+    /// <summary>
+    /// Executes the on disposed operation.
+    /// </summary>
     protected virtual void OnDisposed()
     {
     }
 
+    /// <summary>
+    /// Executes the throw if disposed operation.
+    /// </summary>
     protected void ThrowIfDisposed()
     {
         if (IsDisposed)

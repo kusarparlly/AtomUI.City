@@ -1,7 +1,13 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event context&lt;tevent&gt;.
+/// </summary>
 public sealed class EventContext<TEvent>
 {
+    /// <summary>
+    /// Executes the event context operation.
+    /// </summary>
     public EventContext(
         TEvent eventData,
         EventContractId contractId,
@@ -50,23 +56,53 @@ public sealed class EventContext<TEvent>
         CancellationToken = cancellationToken;
     }
 
+    /// <summary>
+    /// Occurs when event.
+    /// </summary>
     public TEvent Event { get; }
 
+    /// <summary>
+    /// Gets contract id.
+    /// </summary>
     public EventContractId ContractId { get; }
 
+    /// <summary>
+    /// Gets event id.
+    /// </summary>
     public Guid EventId { get; }
 
+    /// <summary>
+    /// Gets correlation id.
+    /// </summary>
     public string CorrelationId { get; }
 
+    /// <summary>
+    /// Gets causation id.
+    /// </summary>
     public string? CausationId { get; }
 
+    /// <summary>
+    /// Gets published at.
+    /// </summary>
     public DateTimeOffset PublishedAt { get; }
 
+    /// <summary>
+    /// Gets publish depth.
+    /// </summary>
     public int PublishDepth { get; }
 
+    /// <summary>
+    /// Gets subscription id.
+    /// </summary>
     public EventSubscriptionId SubscriptionId { get; }
 
+    /// <summary>
+    /// Gets dispatch policy.
+    /// </summary>
     public EventDispatchPolicy DispatchPolicy { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether cancellation token.
+    /// </summary>
     public CancellationToken CancellationToken { get; }
 }

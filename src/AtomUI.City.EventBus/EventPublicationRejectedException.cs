@@ -1,7 +1,13 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event publication rejected exception.
+/// </summary>
 public sealed class EventPublicationRejectedException : InvalidOperationException
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EventPublicationRejectedException"/> type.
+    /// </summary>
     public EventPublicationRejectedException(
         Guid eventId,
         EventContractId contractId,
@@ -20,7 +26,13 @@ public sealed class EventPublicationRejectedException : InvalidOperationExceptio
         ContractId = contractId;
     }
 
+    /// <summary>
+    /// Gets event id.
+    /// </summary>
     public Guid EventId { get; }
 
+    /// <summary>
+    /// Gets contract id.
+    /// </summary>
     public EventContractId ContractId { get; }
 }

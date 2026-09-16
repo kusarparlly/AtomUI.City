@@ -1,11 +1,17 @@
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents plugin test host builder.
+/// </summary>
 public sealed class PluginTestHostBuilder
 {
     private readonly List<PluginTestPackage> _packages = [];
     private readonly TestHostBuilder _hostBuilder = TestHost.CreateBuilder();
     private bool _built;
 
+    /// <summary>
+    /// Executes the use plugin operation.
+    /// </summary>
     public PluginTestHostBuilder UsePlugin(string id, string version)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(id);
@@ -17,6 +23,9 @@ public sealed class PluginTestHostBuilder
         return this;
     }
 
+    /// <summary>
+    /// Executes the build operation.
+    /// </summary>
     public PluginTestHost Build()
     {
         ThrowIfBuilt();

@@ -257,6 +257,9 @@ internal sealed class StateSubscription : IStateSubscription
     }
 }
 
+/// <summary>
+/// Represents state subscription options.
+/// </summary>
 public sealed class StateSubscriptionOptions
 {
     private StateSubscriptionOptions(
@@ -277,22 +280,40 @@ public sealed class StateSubscriptionOptions
         MaxPendingNotifications = maxPendingNotifications;
     }
 
+    /// <summary>
+    /// Gets immediate.
+    /// </summary>
     public static StateSubscriptionOptions Immediate { get; } = new(
         StateDispatchPolicy.Immediate,
         dispatcher: null,
         maxPendingNotifications: 1);
 
+    /// <summary>
+    /// Gets dispatch policy.
+    /// </summary>
     public StateDispatchPolicy DispatchPolicy { get; }
 
+    /// <summary>
+    /// Gets ui dispatcher.
+    /// </summary>
     public IUiDispatcher? UiDispatcher { get; }
 
+    /// <summary>
+    /// Gets max pending notifications.
+    /// </summary>
     public int MaxPendingNotifications { get; }
 
+    /// <summary>
+    /// Executes the dispatcher operation.
+    /// </summary>
     public static StateSubscriptionOptions Dispatcher(IUiDispatcher dispatcher)
     {
         return Dispatcher(dispatcher, maxPendingNotifications: 1024);
     }
 
+    /// <summary>
+    /// Executes the dispatcher operation.
+    /// </summary>
     public static StateSubscriptionOptions Dispatcher(
         IUiDispatcher dispatcher,
         int maxPendingNotifications)
@@ -305,11 +326,17 @@ public sealed class StateSubscriptionOptions
             maxPendingNotifications);
     }
 
+    /// <summary>
+    /// Executes the background operation.
+    /// </summary>
     public static StateSubscriptionOptions Background()
     {
         return Background(maxPendingNotifications: 1024);
     }
 
+    /// <summary>
+    /// Executes the background operation.
+    /// </summary>
     public static StateSubscriptionOptions Background(int maxPendingNotifications)
     {
         return new StateSubscriptionOptions(
@@ -318,11 +345,17 @@ public sealed class StateSubscriptionOptions
             maxPendingNotifications);
     }
 
+    /// <summary>
+    /// Executes the queued operation.
+    /// </summary>
     public static StateSubscriptionOptions Queued()
     {
         return Queued(maxPendingNotifications: 1024);
     }
 
+    /// <summary>
+    /// Executes the queued operation.
+    /// </summary>
     public static StateSubscriptionOptions Queued(int maxPendingNotifications)
     {
         return new StateSubscriptionOptions(

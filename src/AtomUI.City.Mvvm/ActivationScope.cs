@@ -2,6 +2,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Mvvm;
 
+/// <summary>
+/// Represents activation scope.
+/// </summary>
 public sealed class ActivationScope : IActivationScope
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
@@ -11,16 +14,28 @@ public sealed class ActivationScope : IActivationScope
     private readonly object _syncRoot = new();
     private bool _isDisposed;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ActivationScope"/> type.
+    /// </summary>
     public ActivationScope(IHostDiagnostics? diagnostics = null)
     {
         CancellationToken = _cancellationTokenSource.Token;
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Gets id.
+    /// </summary>
     public Guid Id { get; } = Guid.NewGuid();
 
+    /// <summary>
+    /// Gets a value indicating whether cancellation token.
+    /// </summary>
     public CancellationToken CancellationToken { get; }
 
+    /// <summary>
+    /// Represents the is disposed value.
+    /// </summary>
     public bool IsDisposed
     {
         get
@@ -32,6 +47,9 @@ public sealed class ActivationScope : IActivationScope
         }
     }
 
+    /// <summary>
+    /// Executes the add operation.
+    /// </summary>
     public void Add(IDisposable disposable)
     {
         ArgumentNullException.ThrowIfNull(disposable);
@@ -48,6 +66,9 @@ public sealed class ActivationScope : IActivationScope
         DisposeSubscription(disposable);
     }
 
+    /// <summary>
+    /// Executes the add async operation.
+    /// </summary>
     public void AddAsync(IAsyncDisposable disposable)
     {
         ArgumentNullException.ThrowIfNull(disposable);
@@ -64,6 +85,9 @@ public sealed class ActivationScope : IActivationScope
         DisposeSubscriptionSync(disposable);
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         IAsyncDisposable[] asyncDisposables;
@@ -98,6 +122,9 @@ public sealed class ActivationScope : IActivationScope
         _cancellationTokenSource.Dispose();
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         IAsyncDisposable[] asyncDisposables;

@@ -2,20 +2,41 @@ using System.Collections.Concurrent;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Defines the supported data resilience policy scope values.
+/// </summary>
 public enum DataResiliencePolicyScope
 {
+    /// <summary>
+    /// Represents the operation value.
+    /// </summary>
     Operation,
+    /// <summary>
+    /// Represents the client value.
+    /// </summary>
     Client,
+    /// <summary>
+    /// Represents the global value.
+    /// </summary>
     Global,
 }
 
+/// <summary>
+/// Represents data circuit breaker options.
+/// </summary>
 public sealed class DataCircuitBreakerOptions
 {
     private int _failureThreshold = 5;
     private TimeSpan _breakDuration = TimeSpan.FromSeconds(30);
 
+    /// <summary>
+    /// Gets or sets is enabled.
+    /// </summary>
     public bool IsEnabled { get; init; }
 
+    /// <summary>
+    /// Represents the failure threshold value.
+    /// </summary>
     public int FailureThreshold
     {
         get => _failureThreshold;
@@ -26,6 +47,9 @@ public sealed class DataCircuitBreakerOptions
         }
     }
 
+    /// <summary>
+    /// Represents the break duration value.
+    /// </summary>
     public TimeSpan BreakDuration
     {
         get => _breakDuration;
@@ -40,16 +64,28 @@ public sealed class DataCircuitBreakerOptions
         }
     }
 
+    /// <summary>
+    /// Gets disabled.
+    /// </summary>
     public static DataCircuitBreakerOptions Disabled { get; } = new();
 }
 
+/// <summary>
+/// Represents data rate limit options.
+/// </summary>
 public sealed class DataRateLimitOptions
 {
     private int _permitLimit = 100;
     private TimeSpan _window = TimeSpan.FromSeconds(1);
 
+    /// <summary>
+    /// Gets or sets is enabled.
+    /// </summary>
     public bool IsEnabled { get; init; }
 
+    /// <summary>
+    /// Represents the permit limit value.
+    /// </summary>
     public int PermitLimit
     {
         get => _permitLimit;
@@ -60,6 +96,9 @@ public sealed class DataRateLimitOptions
         }
     }
 
+    /// <summary>
+    /// Represents the window value.
+    /// </summary>
     public TimeSpan Window
     {
         get => _window;
@@ -74,16 +113,31 @@ public sealed class DataRateLimitOptions
         }
     }
 
+    /// <summary>
+    /// Gets disabled.
+    /// </summary>
     public static DataRateLimitOptions Disabled { get; } = new();
 }
 
+/// <summary>
+/// Defines the contract for idata resilience policy provider.
+/// </summary>
 public interface IDataResiliencePolicyProvider
 {
+    /// <summary>
+    /// Executes the get policy operation.
+    /// </summary>
     DataResilienceOptions GetPolicy(string? policyName, DataResilienceOptions requestPolicy);
 }
 
+/// <summary>
+/// Represents default data resilience policy provider.
+/// </summary>
 public sealed class DefaultDataResiliencePolicyProvider : IDataResiliencePolicyProvider
 {
+    /// <summary>
+    /// Executes the get policy operation.
+    /// </summary>
     public DataResilienceOptions GetPolicy(string? policyName, DataResilienceOptions requestPolicy)
     {
         ArgumentNullException.ThrowIfNull(requestPolicy);
@@ -91,6 +145,9 @@ public sealed class DefaultDataResiliencePolicyProvider : IDataResiliencePolicyP
     }
 }
 
+/// <summary>
+/// Represents data fallback result&lt;tresponse&gt;.
+/// </summary>
 public sealed class DataFallbackResult<TResponse>
 {
     private DataFallbackResult(bool hasFallback, DataResult<TResponse>? result)
@@ -99,12 +156,24 @@ public sealed class DataFallbackResult<TResponse>
         Result = result;
     }
 
+    /// <summary>
+    /// Gets a value indicating whether has fallback.
+    /// </summary>
     public bool HasFallback { get; }
 
+    /// <summary>
+    /// Gets result.
+    /// </summary>
     public DataResult<TResponse>? Result { get; }
 
+    /// <summary>
+    /// Gets none.
+    /// </summary>
     public static DataFallbackResult<TResponse> None() => new(false, null);
 
+    /// <summary>
+    /// Executes the from result operation.
+    /// </summary>
     public static DataFallbackResult<TResponse> FromResult(DataResult<TResponse> result)
     {
         ArgumentNullException.ThrowIfNull(result);
@@ -112,8 +181,14 @@ public sealed class DataFallbackResult<TResponse>
     }
 }
 
+/// <summary>
+/// Defines the contract for idata fallback provider.
+/// </summary>
 public interface IDataFallbackProvider
 {
+    /// <summary>
+    /// Executes the try get fallback async&lt;tresponse&gt; operation.
+    /// </summary>
     ValueTask<DataFallbackResult<TResponse>> TryGetFallbackAsync<TResponse>(
         DataRequest<TResponse> request,
         DataRequestContext context,
@@ -121,8 +196,14 @@ public interface IDataFallbackProvider
         CancellationToken cancellationToken = default);
 }
 
+/// <summary>
+/// Represents no data fallback provider.
+/// </summary>
 public sealed class NoDataFallbackProvider : IDataFallbackProvider
 {
+    /// <summary>
+    /// Executes the try get fallback async&lt;tresponse&gt; operation.
+    /// </summary>
     public ValueTask<DataFallbackResult<TResponse>> TryGetFallbackAsync<TResponse>(
         DataRequest<TResponse> request,
         DataRequestContext context,

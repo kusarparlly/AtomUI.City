@@ -4,10 +4,19 @@ using System.Runtime.Loader;
 
 namespace AtomUI.City.Localization;
 
+/// <summary>
+/// Represents assembly language package provider.
+/// </summary>
 public sealed class AssemblyLanguagePackageProvider : ILanguagePackageProvider
 {
+    /// <summary>
+    /// Gets kind.
+    /// </summary>
     public LanguagePackageProviderKind Kind => LanguagePackageProviderKind.Assembly;
 
+    /// <summary>
+    /// Executes the discover operation.
+    /// </summary>
     public IReadOnlyList<LanguagePackageDescriptor> Discover(Assembly assembly)
     {
         ArgumentNullException.ThrowIfNull(assembly);
@@ -18,6 +27,9 @@ public sealed class AssemblyLanguagePackageProvider : ILanguagePackageProvider
             .ToArray());
     }
 
+    /// <summary>
+    /// Executes the load async operation.
+    /// </summary>
     public ValueTask<LanguagePackageLoadResult> LoadAsync(
         LanguagePackageDescriptor descriptor,
         CancellationToken cancellationToken = default)

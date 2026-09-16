@@ -2,16 +2,25 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents view registry.
+/// </summary>
 public sealed class ViewRegistry : IViewRegistry
 {
     private readonly Dictionary<ViewRegistrationKey, List<ViewDescriptor>> _descriptorLayers = new();
     private readonly ReaderWriterLockSlim _gate = new();
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ViewRegistry</c> type.
+    /// </summary>
     public ViewRegistry()
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>ViewRegistry</c> type.
+    /// </summary>
     public ViewRegistry(IHostDiagnostics diagnostics)
     {
         ArgumentNullException.ThrowIfNull(diagnostics);
@@ -19,11 +28,17 @@ public sealed class ViewRegistry : IViewRegistry
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the register operation.
+    /// </summary>
     public void Register(ViewDescriptor descriptor)
     {
         Register(descriptor, options: null);
     }
 
+    /// <summary>
+    /// Executes the register operation.
+    /// </summary>
     public void Register(
         ViewDescriptor descriptor,
         ViewRegistrationOptions? options)
@@ -43,11 +58,17 @@ public sealed class ViewRegistry : IViewRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the register manifest operation.
+    /// </summary>
     public void RegisterManifest(IEnumerable<ViewDescriptor> descriptors)
     {
         RegisterManifest(descriptors, options: null);
     }
 
+    /// <summary>
+    /// Executes the register manifest operation.
+    /// </summary>
     public void RegisterManifest(
         IEnumerable<ViewDescriptor> descriptors,
         ViewRegistrationOptions? options)
@@ -100,6 +121,9 @@ public sealed class ViewRegistry : IViewRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the revoke plugin operation.
+    /// </summary>
     public int RevokePlugin(string pluginId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(pluginId);
@@ -107,6 +131,9 @@ public sealed class ViewRegistry : IViewRegistry
         return Revoke(descriptor => string.Equals(descriptor.PluginId, pluginId, StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Executes the revoke contribution operation.
+    /// </summary>
     public int RevokeContribution(string contributionId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(contributionId);
@@ -137,11 +164,17 @@ public sealed class ViewRegistry : IViewRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the try locate operation.
+    /// </summary>
     public bool TryLocate(Type viewModelType, out ViewDescriptor? descriptor)
     {
         return TryLocate(viewModelType, viewKey: null, out descriptor);
     }
 
+    /// <summary>
+    /// Executes the try locate operation.
+    /// </summary>
     public bool TryLocate(
         Type viewModelType,
         string? viewKey,
@@ -154,6 +187,9 @@ public sealed class ViewRegistry : IViewRegistry
             out descriptor);
     }
 
+    /// <summary>
+    /// Executes the try locate operation.
+    /// </summary>
     public bool TryLocate(
         ViewLookupRequest request,
         out ViewDescriptor? descriptor)
@@ -186,11 +222,17 @@ public sealed class ViewRegistry : IViewRegistry
         return located;
     }
 
+    /// <summary>
+    /// Executes the locate operation.
+    /// </summary>
     public ViewDescriptor Locate(Type viewModelType, string? viewKey = null)
     {
         return Locate(new ViewLookupRequest(viewModelType, viewKey));
     }
 
+    /// <summary>
+    /// Executes the locate operation.
+    /// </summary>
     public ViewDescriptor Locate(ViewLookupRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);

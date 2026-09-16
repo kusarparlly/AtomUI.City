@@ -3,6 +3,9 @@ using System.Runtime.Loader;
 
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event contract descriptor.
+/// </summary>
 public sealed class EventContractDescriptor
 {
     private EventContractDescriptor(
@@ -28,20 +31,41 @@ public sealed class EventContractDescriptor
         IsGeneratedObjectGraphValidated = isGeneratedObjectGraphValidated;
     }
 
+    /// <summary>
+    /// Gets contract id.
+    /// </summary>
     public EventContractId ContractId { get; }
 
+    /// <summary>
+    /// Gets event type.
+    /// </summary>
     public Type EventType { get; }
 
+    /// <summary>
+    /// Gets plane.
+    /// </summary>
     public EventContractPlane Plane { get; }
 
+    /// <summary>
+    /// Gets assembly.
+    /// </summary>
     public Assembly Assembly { get; }
 
+    /// <summary>
+    /// Gets schema version.
+    /// </summary>
     public int SchemaVersion { get; }
 
+    /// <summary>
+    /// Gets schema fingerprint.
+    /// </summary>
     public string SchemaFingerprint { get; }
 
     internal bool IsGeneratedObjectGraphValidated { get; }
 
+    /// <summary>
+    /// Executes the shared&lt;tevent&gt; operation.
+    /// </summary>
     public static EventContractDescriptor Shared<TEvent>(
         EventContractId contractId,
         Assembly sharedAssembly)
@@ -55,6 +79,9 @@ public sealed class EventContractDescriptor
             isGeneratedObjectGraphValidated: false);
     }
 
+    /// <summary>
+    /// Executes the shared&lt;tevent&gt; operation.
+    /// </summary>
     public static EventContractDescriptor Shared<TEvent>(
         EventContractId contractId,
         Assembly sharedAssembly,
@@ -69,6 +96,9 @@ public sealed class EventContractDescriptor
             isGeneratedObjectGraphValidated: false);
     }
 
+    /// <summary>
+    /// Executes the generated shared&lt;tevent&gt; operation.
+    /// </summary>
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
     public static EventContractDescriptor GeneratedShared<TEvent>(
         EventContractId contractId,
@@ -118,6 +148,9 @@ public sealed class EventContractDescriptor
             isGeneratedObjectGraphValidated);
     }
 
+    /// <summary>
+    /// Executes the plugin private&lt;tevent&gt; operation.
+    /// </summary>
     public static EventContractDescriptor PluginPrivate<TEvent>(EventContractId contractId)
     {
         EventContractId.ThrowIfDefault(contractId, nameof(contractId));

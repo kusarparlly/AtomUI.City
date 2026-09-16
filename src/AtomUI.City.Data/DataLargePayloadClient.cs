@@ -4,20 +4,47 @@ using System.Net.Http.Headers;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Defines the supported data transfer stage values.
+/// </summary>
 public enum DataTransferStage
 {
+    /// <summary>
+    /// Represents the starting value.
+    /// </summary>
     Starting,
+    /// <summary>
+    /// Represents the transferring value.
+    /// </summary>
     Transferring,
+    /// <summary>
+    /// Represents the completing value.
+    /// </summary>
     Completing,
+    /// <summary>
+    /// Represents the completed value.
+    /// </summary>
     Completed,
 }
 
+/// <summary>
+/// Defines the supported data range unsupported policy values.
+/// </summary>
 public enum DataRangeUnsupportedPolicy
 {
+    /// <summary>
+    /// Represents the fail value.
+    /// </summary>
     Fail,
+    /// <summary>
+    /// Represents the restart value.
+    /// </summary>
     Restart,
 }
 
+/// <summary>
+/// Represents data transfer progress.
+/// </summary>
 public sealed record DataTransferProgress(
     Guid OperationId,
     long BytesTransferred,
@@ -26,32 +53,53 @@ public sealed record DataTransferProgress(
     double BytesPerSecond,
     DataTransferStage Stage)
 {
+    /// <summary>
+    /// Gets or sets operation id.
+    /// </summary>
     public Guid OperationId { get; init; } = OperationId != Guid.Empty
         ? OperationId
         : throw new ArgumentException("Transfer operation id cannot be empty.", nameof(OperationId));
 
+    /// <summary>
+    /// Gets or sets bytes transferred.
+    /// </summary>
     public long BytesTransferred { get; init; } = BytesTransferred >= 0
         ? BytesTransferred
         : throw new ArgumentOutOfRangeException(nameof(BytesTransferred));
 
+    /// <summary>
+    /// Gets or sets total bytes.
+    /// </summary>
     public long? TotalBytes { get; init; } = TotalBytes is null || TotalBytes >= BytesTransferred
         ? TotalBytes
         : throw new ArgumentOutOfRangeException(nameof(TotalBytes));
 
+    /// <summary>
+    /// Gets or sets percent.
+    /// </summary>
     public double? Percent { get; init; } = Percent is null
         || (double.IsFinite(Percent.Value) && Percent is >= 0 and <= 100)
             ? Percent
             : throw new ArgumentOutOfRangeException(nameof(Percent));
 
+    /// <summary>
+    /// Gets or sets bytes per second.
+    /// </summary>
     public double BytesPerSecond { get; init; } = double.IsFinite(BytesPerSecond) && BytesPerSecond >= 0
         ? BytesPerSecond
         : throw new ArgumentOutOfRangeException(nameof(BytesPerSecond));
 
+    /// <summary>
+    /// Gets or sets stage.
+    /// </summary>
     public DataTransferStage Stage { get; init; } = Enum.IsDefined(Stage)
         ? Stage
         : throw new ArgumentOutOfRangeException(nameof(Stage));
 }
 
+/// <summary>
+/// Represents data transfer options.
+/// </summary>
 public sealed class DataTransferOptions
 {
     private int _bufferSize = 64 * 1024;
@@ -60,6 +108,9 @@ public sealed class DataTransferOptions
     private DataRangeUnsupportedPolicy _rangeUnsupportedPolicy = DataRangeUnsupportedPolicy.Fail;
     private string? _temporaryDirectory;
 
+    /// <summary>
+    /// Represents the buffer size value.
+    /// </summary>
     public int BufferSize
     {
         get => _bufferSize;
@@ -70,6 +121,9 @@ public sealed class DataTransferOptions
         }
     }
 
+    /// <summary>
+    /// Represents the progress interval value.
+    /// </summary>
     public TimeSpan ProgressInterval
     {
         get => _progressInterval;
@@ -84,6 +138,9 @@ public sealed class DataTransferOptions
         }
     }
 
+    /// <summary>
+    /// Represents the resume offset value.
+    /// </summary>
     public long ResumeOffset
     {
         get => _resumeOffset;
@@ -94,6 +151,9 @@ public sealed class DataTransferOptions
         }
     }
 
+    /// <summary>
+    /// Represents the range unsupported policy value.
+    /// </summary>
     public DataRangeUnsupportedPolicy RangeUnsupportedPolicy
     {
         get => _rangeUnsupportedPolicy;
@@ -108,6 +168,9 @@ public sealed class DataTransferOptions
         }
     }
 
+    /// <summary>
+    /// Represents the temporary directory value.
+    /// </summary>
     public string? TemporaryDirectory
     {
         get => _temporaryDirectory;
@@ -122,27 +185,45 @@ public sealed class DataTransferOptions
         }
     }
 
+    /// <summary>
+    /// Gets default.
+    /// </summary>
     public static DataTransferOptions Default { get; } = new();
 }
 
+/// <summary>
+/// Represents data transfer receipt.
+/// </summary>
 public sealed record DataTransferReceipt(
     Guid OperationId,
     long BytesTransferred,
     HttpStatusCode StatusCode)
 {
+    /// <summary>
+    /// Gets or sets operation id.
+    /// </summary>
     public Guid OperationId { get; init; } = OperationId != Guid.Empty
         ? OperationId
         : throw new ArgumentException("Transfer operation id cannot be empty.", nameof(OperationId));
 
+    /// <summary>
+    /// Gets or sets bytes transferred.
+    /// </summary>
     public long BytesTransferred { get; init; } = BytesTransferred >= 0
         ? BytesTransferred
         : throw new ArgumentOutOfRangeException(nameof(BytesTransferred));
 
+    /// <summary>
+    /// Gets or sets status code.
+    /// </summary>
     public HttpStatusCode StatusCode { get; init; } = (int)StatusCode is >= 100 and <= 599
         ? StatusCode
         : throw new ArgumentOutOfRangeException(nameof(StatusCode));
 }
 
+/// <summary>
+/// Represents data temporary file.
+/// </summary>
 public sealed class DataTemporaryFile : IAsyncDisposable
 {
     private int _state;
@@ -153,10 +234,19 @@ public sealed class DataTemporaryFile : IAsyncDisposable
         Receipt = receipt;
     }
 
+    /// <summary>
+    /// Gets path.
+    /// </summary>
     public string Path { get; }
 
+    /// <summary>
+    /// Gets receipt.
+    /// </summary>
     public DataTransferReceipt Receipt { get; }
 
+    /// <summary>
+    /// Executes the commit operation.
+    /// </summary>
     public void Commit()
     {
         while (true)
@@ -174,6 +264,9 @@ public sealed class DataTemporaryFile : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public ValueTask DisposeAsync()
     {
         if (Interlocked.Exchange(ref _state, 2) == 0)
@@ -199,12 +292,18 @@ public sealed class DataTemporaryFile : IAsyncDisposable
     }
 }
 
+/// <summary>
+/// Represents data large payload client.
+/// </summary>
 public sealed class DataLargePayloadClient
 {
     private readonly HttpClient _httpClient;
     private readonly IDataDiagnostics? _diagnostics;
     private readonly TimeProvider _timeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>DataLargePayloadClient</c> type.
+    /// </summary>
     public DataLargePayloadClient(
         HttpClient httpClient,
         IDataDiagnostics? diagnostics = null,
@@ -215,6 +314,9 @@ public sealed class DataLargePayloadClient
         _timeProvider = timeProvider ?? TimeProvider.System;
     }
 
+    /// <summary>
+    /// Executes the upload async operation.
+    /// </summary>
     public async ValueTask<DataResult<DataTransferReceipt>> UploadAsync(
         HttpRequestMessage request,
         Stream source,
@@ -276,6 +378,9 @@ public sealed class DataLargePayloadClient
         }
     }
 
+    /// <summary>
+    /// Executes the download async operation.
+    /// </summary>
     public async ValueTask<DataResult<DataTransferReceipt>> DownloadAsync(
         HttpRequestMessage request,
         Stream destination,
@@ -410,6 +515,9 @@ public sealed class DataLargePayloadClient
         }
     }
 
+    /// <summary>
+    /// Executes the download to temporary file async operation.
+    /// </summary>
     public async ValueTask<DataResult<DataTemporaryFile>> DownloadToTemporaryFileAsync(
         HttpRequestMessage request,
         Func<DataTransferProgress, CancellationToken, ValueTask>? progress = null,

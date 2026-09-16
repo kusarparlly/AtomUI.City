@@ -2,6 +2,9 @@ using System.Text;
 
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents generated source snapshot.
+/// </summary>
 public sealed class GeneratedSourceSnapshot
 {
     private GeneratedSourceSnapshot(string text)
@@ -9,8 +12,14 @@ public sealed class GeneratedSourceSnapshot
         Text = text;
     }
 
+    /// <summary>
+    /// Gets text.
+    /// </summary>
     public string Text { get; }
 
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static GeneratedSourceSnapshot Create(IEnumerable<GeneratedSource> sources)
     {
         ArgumentNullException.ThrowIfNull(sources);

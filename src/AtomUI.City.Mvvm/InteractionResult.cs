@@ -1,5 +1,8 @@
 namespace AtomUI.City.Mvvm;
 
+/// <summary>
+/// Represents interaction result&lt;tresult&gt;.
+/// </summary>
 public sealed class InteractionResult<TResult>
 {
     private InteractionResult(
@@ -12,12 +15,24 @@ public sealed class InteractionResult<TResult>
         Exception = exception;
     }
 
+    /// <summary>
+    /// Gets status.
+    /// </summary>
     public InteractionResultStatus Status { get; }
 
+    /// <summary>
+    /// Gets value.
+    /// </summary>
     public TResult? Value { get; }
 
+    /// <summary>
+    /// Gets exception.
+    /// </summary>
     public Exception? Exception { get; }
 
+    /// <summary>
+    /// Executes the completed operation.
+    /// </summary>
     public static InteractionResult<TResult> Completed(TResult value)
     {
         return new InteractionResult<TResult>(
@@ -26,6 +41,9 @@ public sealed class InteractionResult<TResult>
             exception: null);
     }
 
+    /// <summary>
+    /// Executes the canceled operation.
+    /// </summary>
     public static InteractionResult<TResult> Canceled()
     {
         return new InteractionResult<TResult>(
@@ -34,6 +52,9 @@ public sealed class InteractionResult<TResult>
             exception: null);
     }
 
+    /// <summary>
+    /// Executes the failed operation.
+    /// </summary>
     public static InteractionResult<TResult> Failed(Exception exception)
     {
         ArgumentNullException.ThrowIfNull(exception);
@@ -44,6 +65,9 @@ public sealed class InteractionResult<TResult>
             exception);
     }
 
+    /// <summary>
+    /// Executes the not handled operation.
+    /// </summary>
     public static InteractionResult<TResult> NotHandled()
     {
         return new InteractionResult<TResult>(

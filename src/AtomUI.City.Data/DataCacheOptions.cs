@@ -1,5 +1,8 @@
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents data cache options.
+/// </summary>
 public sealed class DataCacheOptions
 {
     private const string DefaultRevision = "default";
@@ -24,6 +27,9 @@ public sealed class DataCacheOptions
         TimeToLive = timeToLive;
     }
 
+    /// <summary>
+    /// Gets disabled.
+    /// </summary>
     public static DataCacheOptions Disabled { get; } = new(
         isEnabled: false,
         requestFingerprint: string.Empty,
@@ -34,22 +40,49 @@ public sealed class DataCacheOptions
         policyVersion: DefaultRevision,
         timeToLive: null);
 
+    /// <summary>
+    /// Gets a value indicating whether is enabled.
+    /// </summary>
     public bool IsEnabled { get; }
 
+    /// <summary>
+    /// Gets request fingerprint.
+    /// </summary>
     public string RequestFingerprint { get; }
 
+    /// <summary>
+    /// Gets principal revision.
+    /// </summary>
     public string PrincipalRevision { get; }
 
+    /// <summary>
+    /// Gets permission revision.
+    /// </summary>
     public string PermissionRevision { get; }
 
+    /// <summary>
+    /// Gets plugin contribution id.
+    /// </summary>
     public string? PluginContributionId { get; }
 
+    /// <summary>
+    /// Gets client version.
+    /// </summary>
     public string ClientVersion { get; }
 
+    /// <summary>
+    /// Gets policy version.
+    /// </summary>
     public string PolicyVersion { get; }
 
+    /// <summary>
+    /// Gets time to live.
+    /// </summary>
     public TimeSpan? TimeToLive { get; }
 
+    /// <summary>
+    /// Executes the enabled operation.
+    /// </summary>
     public static DataCacheOptions Enabled(
         string requestFingerprint,
         string principalRevision = "anonymous",

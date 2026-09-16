@@ -4,8 +4,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents presentation runtime service collection extensions.
+/// </summary>
 public static class PresentationRuntimeServiceCollectionExtensions
 {
+    /// <summary>
+    /// Executes the add presentation runtime operation.
+    /// </summary>
     public static IServiceCollection AddPresentationRuntime(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);

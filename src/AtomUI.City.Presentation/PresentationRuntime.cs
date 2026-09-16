@@ -6,6 +6,9 @@ using AtomUI.City.Core.Threading;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents presentation runtime.
+/// </summary>
 public sealed class PresentationRuntime : IPresentationRuntime
 {
     private readonly object _syncRoot = new();
@@ -21,6 +24,9 @@ public sealed class PresentationRuntime : IPresentationRuntime
     private PresentationRuntimeState _state = PresentationRuntimeState.NotReady;
     private Task? _stopTask;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>PresentationRuntime</c> type.
+    /// </summary>
     public PresentationRuntime(IHostDiagnostics? diagnostics = null)
     {
         _diagnostics = diagnostics;
@@ -28,6 +34,9 @@ public sealed class PresentationRuntime : IPresentationRuntime
         _failurePresenter = new NullPresentationFailurePresenter();
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>PresentationRuntime</c> type.
+    /// </summary>
     public PresentationRuntime(IUiDispatcher dispatcher, IHostDiagnostics? diagnostics = null)
     {
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
@@ -51,6 +60,9 @@ public sealed class PresentationRuntime : IPresentationRuntime
         _lifecycleHub = lifecycleHub;
     }
 
+    /// <summary>
+    /// Represents the state value.
+    /// </summary>
     public PresentationRuntimeState State
     {
         get
@@ -62,8 +74,14 @@ public sealed class PresentationRuntime : IPresentationRuntime
         }
     }
 
+    /// <summary>
+    /// Gets a value indicating whether is ready.
+    /// </summary>
     public bool IsReady => State == PresentationRuntimeState.Ready;
 
+    /// <summary>
+    /// Represents the presentation scope value.
+    /// </summary>
     public LifecycleScope? PresentationScope
     {
         get
@@ -75,6 +93,9 @@ public sealed class PresentationRuntime : IPresentationRuntime
         }
     }
 
+    /// <summary>
+    /// Represents the application lifetime value.
+    /// </summary>
     public IApplicationLifetime? ApplicationLifetime
     {
         get
@@ -86,6 +107,9 @@ public sealed class PresentationRuntime : IPresentationRuntime
         }
     }
 
+    /// <summary>
+    /// Represents the windows value.
+    /// </summary>
     public IReadOnlyCollection<WindowSession> Windows
     {
         get
@@ -97,6 +121,9 @@ public sealed class PresentationRuntime : IPresentationRuntime
         }
     }
 
+    /// <summary>
+    /// Executes the attach operation.
+    /// </summary>
     public void Attach(
         IApplicationLifetime applicationLifetime,
         LifecycleScope hostScope,
@@ -129,6 +156,9 @@ public sealed class PresentationRuntime : IPresentationRuntime
         WriteDiagnostic(PresentationDiagnosticIds.RuntimeReady, "Presentation runtime is attached and ready.", scope.Id);
     }
 
+    /// <summary>
+    /// Executes the start async operation.
+    /// </summary>
     public ValueTask StartAsync(
         LifecycleScope applicationScope,
         string presentationScopeId = "presentation",
@@ -156,6 +186,9 @@ public sealed class PresentationRuntime : IPresentationRuntime
         return ValueTask.CompletedTask;
     }
 
+    /// <summary>
+    /// Executes the register window operation.
+    /// </summary>
     public WindowSession RegisterWindow(Window window, string windowId)
     {
         ArgumentNullException.ThrowIfNull(window);
@@ -202,6 +235,9 @@ public sealed class PresentationRuntime : IPresentationRuntime
         }
     }
 
+    /// <summary>
+    /// Executes the create window scope operation.
+    /// </summary>
     public LifecycleScope CreateWindowScope(string windowScopeId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(windowScopeId);
@@ -212,6 +248,9 @@ public sealed class PresentationRuntime : IPresentationRuntime
         }
     }
 
+    /// <summary>
+    /// Executes the stop async operation.
+    /// </summary>
     public ValueTask StopAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();

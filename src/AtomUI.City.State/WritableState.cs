@@ -2,6 +2,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents writable state&lt;t&gt;.
+/// </summary>
 public sealed class WritableState<T> : IWritableState<T>, IDisposable
 {
     private readonly IEqualityComparer<T> _comparer;
@@ -14,6 +17,9 @@ public sealed class WritableState<T> : IWritableState<T>, IDisposable
     private bool _disposed;
     private long _version;
 
+    /// <summary>
+    /// Executes the writable state operation.
+    /// </summary>
     public WritableState(
         T initialValue,
         IEqualityComparer<T>? comparer = null,
@@ -35,8 +41,14 @@ public sealed class WritableState<T> : IWritableState<T>, IDisposable
         _access = access;
     }
 
+    /// <summary>
+    /// Occurs when changed.
+    /// </summary>
     public event EventHandler<StateChangedEventArgs<T>>? Changed;
 
+    /// <summary>
+    /// Represents the value value.
+    /// </summary>
     public T Value
     {
         get
@@ -50,6 +62,9 @@ public sealed class WritableState<T> : IWritableState<T>, IDisposable
 
     object? IReadOnlyState.Value => Value;
 
+    /// <summary>
+    /// Represents the version value.
+    /// </summary>
     public long Version
     {
         get
@@ -61,13 +76,22 @@ public sealed class WritableState<T> : IWritableState<T>, IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets value type.
+    /// </summary>
     public Type ValueType => typeof(T);
 
+    /// <summary>
+    /// Gets or sets set.
+    /// </summary>
     public void Set(T value)
     {
         SetValue(value);
     }
 
+    /// <summary>
+    /// Executes the set value operation.
+    /// </summary>
     public bool SetValue(T value)
     {
         StateChangedEventArgs<T>? args;
@@ -95,6 +119,9 @@ public sealed class WritableState<T> : IWritableState<T>, IDisposable
         return true;
     }
 
+    /// <summary>
+    /// Executes the update operation.
+    /// </summary>
     public bool Update(Func<T, T> updater)
     {
         ArgumentNullException.ThrowIfNull(updater);
@@ -136,11 +163,17 @@ public sealed class WritableState<T> : IWritableState<T>, IDisposable
         return true;
     }
 
+    /// <summary>
+    /// Executes the on change operation.
+    /// </summary>
     public IStateSubscription OnChange(Action<StateChangedEventArgs<T>> handler)
     {
         return OnChange(handler, StateSubscriptionOptions.Immediate);
     }
 
+    /// <summary>
+    /// Executes the on change operation.
+    /// </summary>
     public IStateSubscription OnChange(
         Action<StateChangedEventArgs<T>> handler,
         StateSubscriptionOptions options)
@@ -179,6 +212,9 @@ public sealed class WritableState<T> : IWritableState<T>, IDisposable
         return OnChange(args => handler(args), options);
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         StateSubscription[] subscriptions;

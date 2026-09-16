@@ -2,6 +2,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents in memory command authorization descriptor provider.
+/// </summary>
 public sealed class InMemoryCommandAuthorizationDescriptorProvider : ICommandAuthorizationDescriptorProvider
 {
     private readonly Dictionary<string, CommandAuthorizationDescriptor> _descriptors = new(StringComparer.Ordinal);
@@ -10,6 +13,9 @@ public sealed class InMemoryCommandAuthorizationDescriptorProvider : ICommandAut
     private readonly OrderedEventPublisher<CommandAuthorizationChangedEventArgs> _eventPublisher;
     private long _revision;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>InMemoryCommandAuthorizationDescriptorProvider</c> type.
+    /// </summary>
     public InMemoryCommandAuthorizationDescriptorProvider()
     {
         _eventPublisher = new OrderedEventPublisher<CommandAuthorizationChangedEventArgs>(
@@ -17,6 +23,9 @@ public sealed class InMemoryCommandAuthorizationDescriptorProvider : ICommandAut
             SecurityDiagnosticIds.CommandAuthorizationObserverFailed);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>InMemoryCommandAuthorizationDescriptorProvider</c> type.
+    /// </summary>
     public InMemoryCommandAuthorizationDescriptorProvider(IHostDiagnostics diagnostics)
     {
         ArgumentNullException.ThrowIfNull(diagnostics);
@@ -25,8 +34,14 @@ public sealed class InMemoryCommandAuthorizationDescriptorProvider : ICommandAut
             SecurityDiagnosticIds.CommandAuthorizationObserverFailed);
     }
 
+    /// <summary>
+    /// Occurs when descriptor changed.
+    /// </summary>
     public event EventHandler<CommandAuthorizationChangedEventArgs>? DescriptorChanged;
 
+    /// <summary>
+    /// Represents the revision value.
+    /// </summary>
     public long Revision
     {
         get
@@ -38,6 +53,9 @@ public sealed class InMemoryCommandAuthorizationDescriptorProvider : ICommandAut
         }
     }
 
+    /// <summary>
+    /// Executes the add operation.
+    /// </summary>
     public bool Add(CommandAuthorizationDescriptor descriptor)
     {
         ArgumentNullException.ThrowIfNull(descriptor);
@@ -76,6 +94,9 @@ public sealed class InMemoryCommandAuthorizationDescriptorProvider : ICommandAut
         return true;
     }
 
+    /// <summary>
+    /// Executes the remove operation.
+    /// </summary>
     public bool Remove(string commandId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(commandId);
@@ -106,6 +127,9 @@ public sealed class InMemoryCommandAuthorizationDescriptorProvider : ICommandAut
         return true;
     }
 
+    /// <summary>
+    /// Executes the remove by contribution operation.
+    /// </summary>
     public int RemoveByContribution(string contributionId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(contributionId);
@@ -150,6 +174,9 @@ public sealed class InMemoryCommandAuthorizationDescriptorProvider : ICommandAut
         return commandIds.Length;
     }
 
+    /// <summary>
+    /// Executes the get descriptor async operation.
+    /// </summary>
     public ValueTask<CommandAuthorizationDescriptor?> GetDescriptorAsync(
         CommandAuthorizationContext context,
         CancellationToken cancellationToken = default)

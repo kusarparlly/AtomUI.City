@@ -5,13 +5,22 @@ using AtomUI.City.Core.Hosting;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents security service collection extensions.
+/// </summary>
 public static class SecurityServiceCollectionExtensions
 {
+    /// <summary>
+    /// Executes the add security operation.
+    /// </summary>
     public static IServiceCollection AddSecurity(this IServiceCollection services)
     {
         return AddSecurity(services, new SecurityPersistenceOptions());
     }
 
+    /// <summary>
+    /// Executes the add security operation.
+    /// </summary>
     public static IServiceCollection AddSecurity(
         this IServiceCollection services,
         SecurityPersistenceOptions persistenceOptions)

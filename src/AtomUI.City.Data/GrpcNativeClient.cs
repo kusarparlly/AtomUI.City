@@ -4,12 +4,18 @@ using System.Runtime.CompilerServices;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents grpc call options.
+/// </summary>
 public sealed class GrpcCallOptions
 {
     private IReadOnlyDictionary<string, string> _metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     private DateTime? _deadlineUtc;
     private DataStreamOptions _stream = DataStreamOptions.Default;
 
+    /// <summary>
+    /// Represents the metadata value.
+    /// </summary>
     public IReadOnlyDictionary<string, string> Metadata
     {
         get => _metadata;
@@ -30,6 +36,9 @@ public sealed class GrpcCallOptions
         }
     }
 
+    /// <summary>
+    /// Represents the deadline utc value.
+    /// </summary>
     public DateTime? DeadlineUtc
     {
         get => _deadlineUtc;
@@ -44,21 +53,33 @@ public sealed class GrpcCallOptions
         }
     }
 
+    /// <summary>
+    /// Represents the stream value.
+    /// </summary>
     public DataStreamOptions Stream
     {
         get => _stream;
         init => _stream = value ?? throw new ArgumentNullException(nameof(Stream));
     }
 
+    /// <summary>
+    /// Gets default.
+    /// </summary>
     public static GrpcCallOptions Default { get; } = new();
 }
 
+/// <summary>
+/// Represents grpc channel connection.
+/// </summary>
 public sealed class GrpcChannelConnection : IDataConnection, IDisposable
 {
     private readonly SemaphoreSlim _lifecycle = new(1, 1);
     private int _state = (int)DataConnectionState.Created;
     private int _disposed;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>GrpcChannelConnection</c> type.
+    /// </summary>
     public GrpcChannelConnection(
         string connectionId,
         DataConnectionOwner owner,
@@ -76,20 +97,38 @@ public sealed class GrpcChannelConnection : IDataConnection, IDisposable
         Channel = channel;
     }
 
+    /// <summary>
+    /// Gets connection id.
+    /// </summary>
     public string ConnectionId { get; }
 
+    /// <summary>
+    /// Gets owner.
+    /// </summary>
     public DataConnectionOwner Owner { get; }
 
+    /// <summary>
+    /// Gets channel.
+    /// </summary>
     public GrpcChannel Channel { get; }
 
+    /// <summary>
+    /// Gets call invoker.
+    /// </summary>
     public CallInvoker CallInvoker => Channel.CreateCallInvoker();
 
+    /// <summary>
+    /// Represents the state value.
+    /// </summary>
     public DataConnectionState State
     {
         get => (DataConnectionState)Volatile.Read(ref _state);
         private set => Volatile.Write(ref _state, (int)value);
     }
 
+    /// <summary>
+    /// Executes the start async operation.
+    /// </summary>
     public async ValueTask StartAsync(CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposed) != 0, this);
@@ -132,6 +171,9 @@ public sealed class GrpcChannelConnection : IDataConnection, IDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the stop async operation.
+    /// </summary>
     public async ValueTask StopAsync(CancellationToken cancellationToken = default)
     {
         await _lifecycle.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -153,6 +195,9 @@ public sealed class GrpcChannelConnection : IDataConnection, IDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         if (Interlocked.Exchange(ref _disposed, 1) == 0)
@@ -163,11 +208,17 @@ public sealed class GrpcChannelConnection : IDataConnection, IDisposable
     }
 }
 
+/// <summary>
+/// Represents native grpc client.
+/// </summary>
 public sealed class NativeGrpcClient
 {
     private readonly CallInvoker _invoker;
     private readonly IDataDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>NativeGrpcClient</c> type.
+    /// </summary>
     public NativeGrpcClient(GrpcChannelConnection connection, IDataDiagnostics? diagnostics = null)
     {
         Connection = connection ?? throw new ArgumentNullException(nameof(connection));
@@ -175,8 +226,14 @@ public sealed class NativeGrpcClient
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Gets connection.
+    /// </summary>
     public GrpcChannelConnection Connection { get; }
 
+    /// <summary>
+    /// Executes the unary async&lt;trequest, tresponse&gt; operation.
+    /// </summary>
     public async ValueTask<DataResult<TResponse>> UnaryAsync<TRequest, TResponse>(
         Method<TRequest, TResponse> method,
         TRequest request,
@@ -223,6 +280,9 @@ public sealed class NativeGrpcClient
         }
     }
 
+    /// <summary>
+    /// Executes the server streaming&lt;trequest, tresponse&gt; operation.
+    /// </summary>
     public IDataStream<TResponse> ServerStreaming<TRequest, TResponse>(
         Method<TRequest, TResponse> method,
         TRequest request,
@@ -255,6 +315,9 @@ public sealed class NativeGrpcClient
             });
     }
 
+    /// <summary>
+    /// Executes the client streaming&lt;trequest, tresponse&gt; operation.
+    /// </summary>
     public IGrpcClientStream<TRequest, TResponse> ClientStreaming<TRequest, TResponse>(
         Method<TRequest, TResponse> method,
         GrpcCallOptions? options = null,
@@ -273,6 +336,9 @@ public sealed class NativeGrpcClient
         return new GrpcClientStream<TRequest, TResponse>(call);
     }
 
+    /// <summary>
+    /// Executes the duplex streaming&lt;trequest, tresponse&gt; operation.
+    /// </summary>
     public IGrpcDuplexStream<TRequest, TResponse> DuplexStreaming<TRequest, TResponse>(
         Method<TRequest, TResponse> method,
         GrpcCallOptions? options = null,
@@ -362,19 +428,40 @@ public sealed class NativeGrpcClient
     }
 }
 
+/// <summary>
+/// Defines the contract for igrpc client stream&lt;trequest, tresponse&gt;.
+/// </summary>
 public interface IGrpcClientStream<in TRequest, TResponse> : IAsyncDisposable
 {
+    /// <summary>
+    /// Executes the write async operation.
+    /// </summary>
     ValueTask WriteAsync(TRequest message, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Executes the complete async operation.
+    /// </summary>
     ValueTask<DataResult<TResponse>> CompleteAsync(CancellationToken cancellationToken = default);
 }
 
+/// <summary>
+/// Defines the contract for igrpc duplex stream&lt;trequest, tresponse&gt;.
+/// </summary>
 public interface IGrpcDuplexStream<in TRequest, TResponse> : IAsyncDisposable
 {
+    /// <summary>
+    /// Gets responses.
+    /// </summary>
     IDataStream<TResponse> Responses { get; }
 
+    /// <summary>
+    /// Executes the write async operation.
+    /// </summary>
     ValueTask WriteAsync(TRequest message, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Executes the complete request async operation.
+    /// </summary>
     ValueTask CompleteRequestAsync(CancellationToken cancellationToken = default);
 }
 

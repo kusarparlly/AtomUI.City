@@ -1,9 +1,18 @@
 namespace AtomUI.City.Localization;
 
+/// <summary>
+/// Represents file language package provider.
+/// </summary>
 public sealed class FileLanguagePackageProvider : ILanguagePackageProvider
 {
+    /// <summary>
+    /// Gets kind.
+    /// </summary>
     public LanguagePackageProviderKind Kind => LanguagePackageProviderKind.File;
 
+    /// <summary>
+    /// Executes the load async operation.
+    /// </summary>
     public async ValueTask<LanguagePackageLoadResult> LoadAsync(
         LanguagePackageDescriptor descriptor,
         CancellationToken cancellationToken = default)

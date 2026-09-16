@@ -1,10 +1,16 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event channel metrics snapshot.
+/// </summary>
 public sealed record EventChannelMetricsSnapshot
 {
     private TimeSpan _totalQueueWaitDuration;
     private TimeSpan _maximumQueueWaitDuration;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EventChannelMetricsSnapshot"/> type.
+    /// </summary>
     public EventChannelMetricsSnapshot(
         EventContractId contractId,
         string channelName,
@@ -36,24 +42,63 @@ public sealed record EventChannelMetricsSnapshot
         FailedCount = NonNegative(failedCount, nameof(failedCount));
     }
 
+    /// <summary>
+    /// Gets contract id.
+    /// </summary>
     public EventContractId ContractId { get; }
+    /// <summary>
+    /// Gets channel name.
+    /// </summary>
     public string ChannelName { get; }
+    /// <summary>
+    /// Gets execution mode.
+    /// </summary>
     public EventChannelExecutionMode ExecutionMode { get; }
+    /// <summary>
+    /// Gets capacity.
+    /// </summary>
     public int Capacity { get; }
+    /// <summary>
+    /// Gets pending count.
+    /// </summary>
     public int PendingCount { get; }
+    /// <summary>
+    /// Gets in flight count.
+    /// </summary>
     public int InFlightCount { get; }
+    /// <summary>
+    /// Gets accepted count.
+    /// </summary>
     public long AcceptedCount { get; }
+    /// <summary>
+    /// Gets rejected count.
+    /// </summary>
     public long RejectedCount { get; }
+    /// <summary>
+    /// Gets dropped count.
+    /// </summary>
     public long DroppedCount { get; }
+    /// <summary>
+    /// Gets completed count.
+    /// </summary>
     public long CompletedCount { get; }
+    /// <summary>
+    /// Gets failed count.
+    /// </summary>
     public long FailedCount { get; }
 
+    /// <summary>
+    /// Represents the total queue wait duration value.
+    /// </summary>
     public TimeSpan TotalQueueWaitDuration
     {
         get => _totalQueueWaitDuration;
         init => _totalQueueWaitDuration = NonNegative(value, nameof(TotalQueueWaitDuration));
     }
 
+    /// <summary>
+    /// Represents the maximum queue wait duration value.
+    /// </summary>
     public TimeSpan MaximumQueueWaitDuration
     {
         get => _maximumQueueWaitDuration;
@@ -73,7 +118,13 @@ public sealed record EventChannelMetricsSnapshot
         : throw new ArgumentOutOfRangeException(parameterName, value, "Metric durations cannot be negative.");
 }
 
+/// <summary>
+/// Defines the contract for ievent channel monitor.
+/// </summary>
 public interface IEventChannelMonitor
 {
+    /// <summary>
+    /// Executes the get channel snapshots operation.
+    /// </summary>
     IReadOnlyList<EventChannelMetricsSnapshot> GetChannelSnapshots();
 }

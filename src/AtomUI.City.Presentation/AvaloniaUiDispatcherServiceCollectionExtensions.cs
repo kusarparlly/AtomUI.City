@@ -5,8 +5,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents avalonia ui dispatcher service collection extensions.
+/// </summary>
 public static class AvaloniaUiDispatcherServiceCollectionExtensions
 {
+    /// <summary>
+    /// Executes the add avalonia ui dispatcher operation.
+    /// </summary>
     public static IServiceCollection AddAvaloniaUiDispatcher(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);

@@ -1,7 +1,13 @@
 namespace AtomUI.City.PluginSystem;
 
+/// <summary>
+/// Represents plugin ms build contract.
+/// </summary>
 public static class PluginMsBuildContract
 {
+    /// <summary>
+    /// Gets properties.
+    /// </summary>
     public static IReadOnlyList<string> Properties { get; } =
     [
         "AtomUICityPlugin",
@@ -22,6 +28,9 @@ public static class PluginMsBuildContract
         "AtomUICityPluginDevelopmentMode",
     ];
 
+    /// <summary>
+    /// Gets items.
+    /// </summary>
     public static IReadOnlyList<string> Items { get; } =
     [
         "AtomUICityPluginCapability",
@@ -33,6 +42,9 @@ public static class PluginMsBuildContract
         "AtomUICityContributionManifest",
     ];
 
+    /// <summary>
+    /// Gets targets.
+    /// </summary>
     public static IReadOnlyList<string> Targets { get; } =
     [
         "GenerateAtomUICityPluginManifest",
@@ -44,6 +56,9 @@ public static class PluginMsBuildContract
         "CleanAtomUICityPluginArtifacts",
     ];
 
+    /// <summary>
+    /// Gets package content roots.
+    /// </summary>
     public static IReadOnlyList<string> PackageContentRoots { get; } =
     [
         "lib/",
@@ -54,6 +69,9 @@ public static class PluginMsBuildContract
         "runtimes/",
     ];
 
+    /// <summary>
+    /// Executes the get manifest output path operation.
+    /// </summary>
     public static string GetManifestOutputPath(string intermediateOutputPath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(intermediateOutputPath);

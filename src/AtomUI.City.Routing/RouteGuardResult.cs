@@ -1,5 +1,8 @@
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents route guard result.
+/// </summary>
 public sealed class RouteGuardResult
 {
     private RouteGuardResult(
@@ -16,16 +19,34 @@ public sealed class RouteGuardResult
         Exception = exception;
     }
 
+    /// <summary>
+    /// Gets status.
+    /// </summary>
     public RouteGuardResultStatus Status { get; }
 
+    /// <summary>
+    /// Gets code.
+    /// </summary>
     public string? Code { get; }
 
+    /// <summary>
+    /// Gets message.
+    /// </summary>
     public string? Message { get; }
 
+    /// <summary>
+    /// Gets redirect target.
+    /// </summary>
     public NavigationTarget? RedirectTarget { get; }
 
+    /// <summary>
+    /// Gets exception.
+    /// </summary>
     public Exception? Exception { get; }
 
+    /// <summary>
+    /// Executes the allow operation.
+    /// </summary>
     public static RouteGuardResult Allow()
     {
         return new RouteGuardResult(
@@ -36,6 +57,9 @@ public sealed class RouteGuardResult
             exception: null);
     }
 
+    /// <summary>
+    /// Executes the reject operation.
+    /// </summary>
     public static RouteGuardResult Reject(string code, string? message = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(code);
@@ -48,6 +72,9 @@ public sealed class RouteGuardResult
             exception: null);
     }
 
+    /// <summary>
+    /// Executes the cancel operation.
+    /// </summary>
     public static RouteGuardResult Cancel(string? message = null)
     {
         return new RouteGuardResult(
@@ -58,6 +85,9 @@ public sealed class RouteGuardResult
             exception: null);
     }
 
+    /// <summary>
+    /// Executes the redirect operation.
+    /// </summary>
     public static RouteGuardResult Redirect(NavigationTarget target)
     {
         ArgumentNullException.ThrowIfNull(target);
@@ -70,6 +100,9 @@ public sealed class RouteGuardResult
             exception: null);
     }
 
+    /// <summary>
+    /// Executes the failed operation.
+    /// </summary>
     public static RouteGuardResult Failed(
         string code,
         string message,

@@ -2,12 +2,21 @@ using System.Threading;
 
 namespace AtomUI.City.Mvvm;
 
+/// <summary>
+/// Represents activation scope accessor.
+/// </summary>
 public sealed class ActivationScopeAccessor
 {
     private readonly AsyncLocal<IActivationScope?> _current = new();
 
+    /// <summary>
+    /// Gets current.
+    /// </summary>
     public IActivationScope? Current => _current.Value;
 
+    /// <summary>
+    /// Executes the push operation.
+    /// </summary>
     public IDisposable Push(IActivationScope scope)
     {
         ArgumentNullException.ThrowIfNull(scope);

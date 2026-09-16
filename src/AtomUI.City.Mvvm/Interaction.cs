@@ -2,17 +2,26 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Mvvm;
 
+/// <summary>
+/// Represents interaction&lt;trequest, tresult&gt;.
+/// </summary>
 public sealed class Interaction<TRequest, TResult>
 {
     private readonly object _gate = new();
     private readonly List<HandlerRegistration> _handlers = [];
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Executes the interaction operation.
+    /// </summary>
     public Interaction(IHostDiagnostics? diagnostics = null)
     {
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the register handler operation.
+    /// </summary>
     public IDisposable RegisterHandler(
         Func<InteractionContext<TRequest>, CancellationToken, ValueTask<TResult>> handler,
         IActivationScope? activationScope = null)
@@ -31,6 +40,9 @@ public sealed class Interaction<TRequest, TResult>
         return registration;
     }
 
+    /// <summary>
+    /// Executes the request async operation.
+    /// </summary>
     public async ValueTask<InteractionResult<TResult>> RequestAsync(
         TRequest request,
         CancellationToken cancellationToken = default)

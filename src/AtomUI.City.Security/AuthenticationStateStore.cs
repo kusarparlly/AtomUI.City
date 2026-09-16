@@ -3,6 +3,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents authentication state store.
+/// </summary>
 public sealed class AuthenticationStateStore :
     IAuthenticationStateProvider,
     ICurrentPrincipalAccessor
@@ -15,6 +18,9 @@ public sealed class AuthenticationStateStore :
         SecurityPrincipals.Anonymous,
         revision: 0);
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AuthenticationStateStore</c> type.
+    /// </summary>
     public AuthenticationStateStore()
     {
         _eventPublisher = new OrderedEventPublisher<AuthenticationStateChangedEventArgs>(
@@ -22,6 +28,9 @@ public sealed class AuthenticationStateStore :
             SecurityDiagnosticIds.AuthenticationObserverFailed);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AuthenticationStateStore</c> type.
+    /// </summary>
     public AuthenticationStateStore(IHostDiagnostics diagnostics)
     {
         _diagnostics = diagnostics ?? throw new ArgumentNullException(nameof(diagnostics));
@@ -30,8 +39,14 @@ public sealed class AuthenticationStateStore :
             SecurityDiagnosticIds.AuthenticationObserverFailed);
     }
 
+    /// <summary>
+    /// Occurs when state changed.
+    /// </summary>
     public event EventHandler<AuthenticationStateChangedEventArgs>? StateChanged;
 
+    /// <summary>
+    /// Represents the current value.
+    /// </summary>
     public AuthenticationStateSnapshot Current
     {
         get
@@ -43,18 +58,30 @@ public sealed class AuthenticationStateStore :
         }
     }
 
+    /// <summary>
+    /// Gets principal.
+    /// </summary>
     public ClaimsPrincipal Principal => Current.Principal;
 
+    /// <summary>
+    /// Executes the set anonymous operation.
+    /// </summary>
     public AuthenticationStateSnapshot SetAnonymous()
     {
         return SetCore(AuthenticationState.Anonymous, SecurityPrincipals.Anonymous);
     }
 
+    /// <summary>
+    /// Executes the set authenticating operation.
+    /// </summary>
     public AuthenticationStateSnapshot SetAuthenticating(ClaimsPrincipal? principal = null, string? scheme = null)
     {
         return SetCore(AuthenticationState.Authenticating, principal ?? SecurityPrincipals.Anonymous, scheme);
     }
 
+    /// <summary>
+    /// Executes the set authenticated operation.
+    /// </summary>
     public AuthenticationStateSnapshot SetAuthenticated(
         ClaimsPrincipal principal,
         string? scheme = null,
@@ -66,6 +93,9 @@ public sealed class AuthenticationStateStore :
         return SetCore(AuthenticationState.Authenticated, principal, scheme, expiresAt);
     }
 
+    /// <summary>
+    /// Executes the set refreshing operation.
+    /// </summary>
     public AuthenticationStateSnapshot SetRefreshing(ClaimsPrincipal principal, string? scheme = null)
     {
         ArgumentNullException.ThrowIfNull(principal);
@@ -78,6 +108,9 @@ public sealed class AuthenticationStateStore :
             preserveCurrentTokenHints: true);
     }
 
+    /// <summary>
+    /// Executes the set expired operation.
+    /// </summary>
     public AuthenticationStateSnapshot SetExpired(ClaimsPrincipal principal, string? scheme = null)
     {
         ArgumentNullException.ThrowIfNull(principal);
@@ -127,11 +160,17 @@ public sealed class AuthenticationStateStore :
         }
     }
 
+    /// <summary>
+    /// Executes the set signed out operation.
+    /// </summary>
     public AuthenticationStateSnapshot SetSignedOut()
     {
         return SetCore(AuthenticationState.SignedOut, SecurityPrincipals.Anonymous);
     }
 
+    /// <summary>
+    /// Executes the set failed operation.
+    /// </summary>
     public AuthenticationStateSnapshot SetFailed(string failureMessage)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(failureMessage);

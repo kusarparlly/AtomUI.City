@@ -1,7 +1,13 @@
 namespace AtomUI.City.PluginSystem;
 
+/// <summary>
+/// Represents plugin package layout validator.
+/// </summary>
 public static class PluginPackageLayoutValidator
 {
+    /// <summary>
+    /// Executes the validate operation.
+    /// </summary>
     public static PluginValidationResult Validate(string packageRoot)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(packageRoot);

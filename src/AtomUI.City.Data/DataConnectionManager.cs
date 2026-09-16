@@ -2,6 +2,9 @@ using System.Runtime.ExceptionServices;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents data connection manager.
+/// </summary>
 public sealed class DataConnectionManager
 {
     private readonly Dictionary<string, ConnectionEntry> _connections = new(StringComparer.Ordinal);
@@ -11,11 +14,17 @@ public sealed class DataConnectionManager
     private bool _acceptingRegistrations = true;
     private long _nextRegistrationOrder;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>DataConnectionManager</c> type.
+    /// </summary>
     public DataConnectionManager(IDataDiagnostics? diagnostics = null)
     {
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the register operation.
+    /// </summary>
     public DataResult<DataConnectionRegistration> Register(IDataConnection connection)
     {
         ArgumentNullException.ThrowIfNull(connection);
@@ -78,6 +87,9 @@ public sealed class DataConnectionManager
             new DataConnectionRegistration(connection, () => RevokeAsync(entry)));
     }
 
+    /// <summary>
+    /// Executes the start owner async operation.
+    /// </summary>
     public async ValueTask StartOwnerAsync(
         DataConnectionOwner owner,
         CancellationToken cancellationToken = default)
@@ -116,6 +128,9 @@ public sealed class DataConnectionManager
         }
     }
 
+    /// <summary>
+    /// Executes the stop owner async operation.
+    /// </summary>
     public async ValueTask StopOwnerAsync(
         DataConnectionOwner owner,
         CancellationToken cancellationToken = default)
@@ -142,6 +157,9 @@ public sealed class DataConnectionManager
         }
     }
 
+    /// <summary>
+    /// Executes the stop all async operation.
+    /// </summary>
     public async ValueTask StopAllAsync(CancellationToken cancellationToken = default)
     {
         ConnectionEntry[] connections;
@@ -534,12 +552,18 @@ public sealed class DataConnectionManager
 
 }
 
+/// <summary>
+/// Represents data connection registration.
+/// </summary>
 public sealed class DataConnectionRegistration : IAsyncDisposable
 {
     private readonly Func<ValueTask>? _revoke;
     private readonly object _syncRoot = new();
     private Task? _revokeTask;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>DataConnectionRegistration</c> type.
+    /// </summary>
     [Obsolete(
         "Direct construction creates a detached compatibility handle. " +
         "Use DataConnectionManager.Register to obtain a revocable registration.")]
@@ -554,8 +578,14 @@ public sealed class DataConnectionRegistration : IAsyncDisposable
         _revoke = revoke;
     }
 
+    /// <summary>
+    /// Gets connection.
+    /// </summary>
     public IDataConnection Connection { get; }
 
+    /// <summary>
+    /// Executes the revoke async operation.
+    /// </summary>
     public ValueTask RevokeAsync()
     {
         Task revokeTask;
@@ -579,6 +609,9 @@ public sealed class DataConnectionRegistration : IAsyncDisposable
         return new ValueTask(revokeTask);
     }
 
+    /// <summary>
+    /// Gets dispose async.
+    /// </summary>
     public ValueTask DisposeAsync() => RevokeAsync();
 
     private async Task CompleteRevokeAsync(TaskCompletionSource completion)

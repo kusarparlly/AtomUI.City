@@ -2,11 +2,17 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents state factory.
+/// </summary>
 public sealed class StateFactory : IStateFactory
 {
     private readonly IStateScopeAccessor _scopeAccessor;
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>StateFactory</c> type.
+    /// </summary>
     public StateFactory(
         IStateScopeAccessor scopeAccessor,
         IHostDiagnostics? diagnostics = null)
@@ -15,6 +21,9 @@ public sealed class StateFactory : IStateFactory
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the create writable&lt;t&gt; operation.
+    /// </summary>
     public WritableState<T> CreateWritable<T>(
         T initialValue,
         IEqualityComparer<T>? comparer = null,
@@ -26,6 +35,9 @@ public sealed class StateFactory : IStateFactory
         return state;
     }
 
+    /// <summary>
+    /// Executes the create computed&lt;t&gt; operation.
+    /// </summary>
     public ComputedState<T> CreateComputed<T>(
         Func<T> compute,
         params IReadOnlyState[] dependencies)
@@ -35,6 +47,9 @@ public sealed class StateFactory : IStateFactory
         return state;
     }
 
+    /// <summary>
+    /// Executes the create scope operation.
+    /// </summary>
     public StateScope CreateScope(string id)
     {
         var scope = new StateScope(id, _diagnostics);

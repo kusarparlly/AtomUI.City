@@ -6,6 +6,9 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents source generation test case.
+/// </summary>
 public sealed class SourceGenerationTestCase
 {
     private readonly List<ExpectedDiagnostic> _expectedDiagnostics = [];
@@ -20,12 +23,24 @@ public sealed class SourceGenerationTestCase
         _readOnlySources = new ReadOnlyCollection<SourceFile>(_sources);
     }
 
+    /// <summary>
+    /// Gets name.
+    /// </summary>
     public string Name { get; }
 
+    /// <summary>
+    /// Gets sources.
+    /// </summary>
     public IReadOnlyList<SourceFile> Sources => _readOnlySources;
 
+    /// <summary>
+    /// Gets expected diagnostics.
+    /// </summary>
     public IReadOnlyList<ExpectedDiagnostic> ExpectedDiagnostics => _readOnlyExpectedDiagnostics;
 
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static SourceGenerationTestCase Create(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -33,6 +48,9 @@ public sealed class SourceGenerationTestCase
         return new SourceGenerationTestCase(name);
     }
 
+    /// <summary>
+    /// Executes the add source operation.
+    /// </summary>
     public SourceGenerationTestCase AddSource(string path, string text)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
@@ -43,6 +61,9 @@ public sealed class SourceGenerationTestCase
         return this;
     }
 
+    /// <summary>
+    /// Executes the expect diagnostic operation.
+    /// </summary>
     public SourceGenerationTestCase ExpectDiagnostic(string id)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(id);
@@ -52,6 +73,9 @@ public sealed class SourceGenerationTestCase
         return this;
     }
 
+    /// <summary>
+    /// Executes the run operation.
+    /// </summary>
     public SourceGenerationTestResult Run(
         ISourceGenerator generator,
         CancellationToken cancellationToken = default)

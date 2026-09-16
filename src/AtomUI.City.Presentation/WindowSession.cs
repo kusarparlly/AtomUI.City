@@ -6,6 +6,9 @@ using AtomUI.City.Mvvm;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents window session.
+/// </summary>
 public sealed class WindowSession : IAsyncDisposable
 {
     private readonly Dictionary<string, OutletRegistration> _outlets = new(StringComparer.Ordinal);
@@ -55,12 +58,24 @@ public sealed class WindowSession : IAsyncDisposable
         TransitionStateUnderLock(WindowSessionState.Ready);
     }
 
+    /// <summary>
+    /// Gets id.
+    /// </summary>
     public string Id { get; }
 
+    /// <summary>
+    /// Gets window.
+    /// </summary>
     public Window Window { get; }
 
+    /// <summary>
+    /// Gets scope.
+    /// </summary>
     public LifecycleScope Scope { get; }
 
+    /// <summary>
+    /// Represents the state value.
+    /// </summary>
     public WindowSessionState State
     {
         get
@@ -72,6 +87,9 @@ public sealed class WindowSession : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Represents the active close origin value.
+    /// </summary>
     public WindowCloseOrigin? ActiveCloseOrigin
     {
         get
@@ -85,6 +103,9 @@ public sealed class WindowSession : IAsyncDisposable
 
     internal event EventHandler? Closed;
 
+    /// <summary>
+    /// Represents the outlets value.
+    /// </summary>
     public IReadOnlyCollection<IRouteOutlet> Outlets
     {
         get
@@ -100,6 +121,9 @@ public sealed class WindowSession : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the register outlet operation.
+    /// </summary>
     public IDisposable RegisterOutlet(string name, IRouteOutletTarget target)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -139,6 +163,9 @@ public sealed class WindowSession : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the get outlet operation.
+    /// </summary>
     public IRouteOutlet GetOutlet(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -153,11 +180,17 @@ public sealed class WindowSession : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the close async operation.
+    /// </summary>
     public ValueTask<bool> CloseAsync(CancellationToken cancellationToken = default)
     {
         return CloseAsync(WindowCloseOrigin.Application, cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the close async operation.
+    /// </summary>
     public ValueTask<bool> CloseAsync(
         WindowCloseOrigin origin,
         CancellationToken cancellationToken = default)
@@ -165,6 +198,9 @@ public sealed class WindowSession : IAsyncDisposable
         return CloseCoreAsync(origin, canReject: origin != WindowCloseOrigin.OperatingSystem, cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         await CloseCoreAsync(

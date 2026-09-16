@@ -3,6 +3,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Mvvm;
 
+/// <summary>
+/// Represents validation scope.
+/// </summary>
 public sealed class ValidationScope : IDisposable
 {
     private readonly Dictionary<string, IReadOnlyList<string>> _errors = new(StringComparer.Ordinal);
@@ -14,13 +17,22 @@ public sealed class ValidationScope : IDisposable
     private ValidationStatus _status = ValidationStatus.Valid;
     private Exception? _exception;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidationScope"/> type.
+    /// </summary>
     public ValidationScope(IHostDiagnostics? diagnostics = null)
     {
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Occurs when validation changed.
+    /// </summary>
     public event EventHandler<ValidationChangedEventArgs>? ValidationChanged;
 
+    /// <summary>
+    /// Represents the status value.
+    /// </summary>
     public ValidationStatus Status
     {
         get
@@ -40,6 +52,9 @@ public sealed class ValidationScope : IDisposable
         }
     }
 
+    /// <summary>
+    /// Represents the is disposed value.
+    /// </summary>
     public bool IsDisposed
     {
         get
@@ -51,6 +66,9 @@ public sealed class ValidationScope : IDisposable
         }
     }
 
+    /// <summary>
+    /// Represents the errors value.
+    /// </summary>
     public IReadOnlyDictionary<string, IReadOnlyList<string>> Errors
     {
         get
@@ -63,6 +81,9 @@ public sealed class ValidationScope : IDisposable
         }
     }
 
+    /// <summary>
+    /// Represents the messages value.
+    /// </summary>
     public IReadOnlyDictionary<string, IReadOnlyList<ValidationMessage>> Messages
     {
         get
@@ -75,6 +96,9 @@ public sealed class ValidationScope : IDisposable
         }
     }
 
+    /// <summary>
+    /// Represents the exception value.
+    /// </summary>
     public Exception? Exception
     {
         get
@@ -94,6 +118,9 @@ public sealed class ValidationScope : IDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the bind to operation.
+    /// </summary>
     public void BindTo(IActivationScope activationScope)
     {
         ArgumentNullException.ThrowIfNull(activationScope);
@@ -107,6 +134,9 @@ public sealed class ValidationScope : IDisposable
         activationScope.Add(new DelegateDisposable(Cancel));
     }
 
+    /// <summary>
+    /// Executes the set invalid operation.
+    /// </summary>
     public void SetInvalid(
         string key,
         string message,
@@ -127,6 +157,9 @@ public sealed class ValidationScope : IDisposable
             ]);
     }
 
+    /// <summary>
+    /// Executes the set messages operation.
+    /// </summary>
     public void SetMessages(
         string? key,
         IEnumerable<ValidationMessage?> messages)
@@ -174,6 +207,9 @@ public sealed class ValidationScope : IDisposable
         RaiseChanged(args);
     }
 
+    /// <summary>
+    /// Executes the set pending operation.
+    /// </summary>
     public void SetPending()
     {
         ThrowIfDisposed();
@@ -190,6 +226,9 @@ public sealed class ValidationScope : IDisposable
         RaiseChanged(args);
     }
 
+    /// <summary>
+    /// Executes the set failed operation.
+    /// </summary>
     public void SetFailed(Exception exception)
     {
         ArgumentNullException.ThrowIfNull(exception);
@@ -221,6 +260,9 @@ public sealed class ValidationScope : IDisposable
         RaiseChanged(args);
     }
 
+    /// <summary>
+    /// Executes the cancel operation.
+    /// </summary>
     public void Cancel()
     {
         ThrowIfDisposed();
@@ -237,6 +279,9 @@ public sealed class ValidationScope : IDisposable
         RaiseChanged(args);
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         lock (_syncRoot)

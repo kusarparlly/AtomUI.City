@@ -3,8 +3,14 @@ using System.Runtime.Loader;
 
 namespace AtomUI.City.PluginSystem;
 
+/// <summary>
+/// Represents plugin loader.
+/// </summary>
 public sealed class PluginLoader
 {
+    /// <summary>
+    /// Executes the load async operation.
+    /// </summary>
     public ValueTask<PluginLoadResult> LoadAsync(
         PluginDescriptor descriptor,
         CancellationToken cancellationToken = default)

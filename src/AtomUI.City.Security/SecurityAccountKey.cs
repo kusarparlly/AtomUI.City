@@ -3,8 +3,14 @@ using System.Text;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents security account key.
+/// </summary>
 public sealed class SecurityAccountKey : IEquatable<SecurityAccountKey>
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>SecurityAccountKey</c> type.
+    /// </summary>
     public SecurityAccountKey(
         string authenticationScheme,
         string authority,
@@ -17,14 +23,29 @@ public sealed class SecurityAccountKey : IEquatable<SecurityAccountKey>
         SubjectId = Normalize(subjectId, nameof(subjectId), lowerInvariant: false);
     }
 
+    /// <summary>
+    /// Gets authentication scheme.
+    /// </summary>
     public string AuthenticationScheme { get; }
 
+    /// <summary>
+    /// Gets authority.
+    /// </summary>
     public string Authority { get; }
 
+    /// <summary>
+    /// Gets tenant id.
+    /// </summary>
     public string? TenantId { get; }
 
+    /// <summary>
+    /// Gets subject id.
+    /// </summary>
     public string SubjectId { get; }
 
+    /// <summary>
+    /// Executes the to storage key operation.
+    /// </summary>
     public string ToStorageKey()
     {
         var canonical = string.Join('\n', AuthenticationScheme, Authority, TenantId ?? string.Empty, SubjectId);
@@ -32,6 +53,9 @@ public sealed class SecurityAccountKey : IEquatable<SecurityAccountKey>
         return Convert.ToHexString(hash).ToLowerInvariant();
     }
 
+    /// <summary>
+    /// Executes the equals operation.
+    /// </summary>
     public bool Equals(SecurityAccountKey? other)
     {
         return other is not null
@@ -41,10 +65,19 @@ public sealed class SecurityAccountKey : IEquatable<SecurityAccountKey>
             && string.Equals(SubjectId, other.SubjectId, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Gets equals.
+    /// </summary>
     public override bool Equals(object? obj) => Equals(obj as SecurityAccountKey);
 
+    /// <summary>
+    /// Gets get hash code.
+    /// </summary>
     public override int GetHashCode() => HashCode.Combine(AuthenticationScheme, Authority, TenantId, SubjectId);
 
+    /// <summary>
+    /// Gets to string.
+    /// </summary>
     public override string ToString() => $"account:{ToStorageKey()[..16]}";
 
     private static string NormalizeAuthority(string authority)

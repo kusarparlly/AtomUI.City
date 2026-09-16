@@ -1,5 +1,8 @@
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents route match.
+/// </summary>
 public sealed class RouteMatch
 {
     private RouteMatch(
@@ -14,16 +17,34 @@ public sealed class RouteMatch
         UnmatchedPath = unmatchedPath;
     }
 
+    /// <summary>
+    /// Gets status.
+    /// </summary>
     public RouteMatchStatus Status { get; }
 
+    /// <summary>
+    /// Gets route.
+    /// </summary>
     public RouteDescriptor Route => MatchedRoute ?? throw new InvalidOperationException("No route was matched.");
 
+    /// <summary>
+    /// Gets matched route.
+    /// </summary>
     public RouteDescriptor? MatchedRoute { get; }
 
+    /// <summary>
+    /// Gets parameters.
+    /// </summary>
     public IReadOnlyDictionary<string, string> Parameters { get; }
 
+    /// <summary>
+    /// Gets unmatched path.
+    /// </summary>
     public string? UnmatchedPath { get; }
 
+    /// <summary>
+    /// Executes the success operation.
+    /// </summary>
     public static RouteMatch Success(
         RouteDescriptor route,
         IReadOnlyDictionary<string, string> parameters)
@@ -34,6 +55,9 @@ public sealed class RouteMatch
         return new RouteMatch(RouteMatchStatus.Success, route, parameters, unmatchedPath: null);
     }
 
+    /// <summary>
+    /// Executes the not found operation.
+    /// </summary>
     public static RouteMatch NotFound(string path)
     {
         return new RouteMatch(RouteMatchStatus.NotFound, null, RouteParameters.Empty(), path);

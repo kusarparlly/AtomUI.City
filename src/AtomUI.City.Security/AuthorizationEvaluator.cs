@@ -3,17 +3,26 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents authorization evaluator.
+/// </summary>
 public sealed class AuthorizationEvaluator : IAuthorizationEvaluator
 {
     private readonly IPermissionRegistry _permissions;
     private readonly IAuthorizationPolicyProvider? _policyProvider;
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AuthorizationEvaluator</c> type.
+    /// </summary>
     public AuthorizationEvaluator(IPermissionRegistry permissions)
         : this(permissions, policyProvider: null, diagnostics: null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AuthorizationEvaluator</c> type.
+    /// </summary>
     public AuthorizationEvaluator(
         IPermissionRegistry permissions,
         IAuthorizationPolicyProvider policyProvider)
@@ -21,6 +30,9 @@ public sealed class AuthorizationEvaluator : IAuthorizationEvaluator
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AuthorizationEvaluator</c> type.
+    /// </summary>
     public AuthorizationEvaluator(
         IPermissionRegistry permissions,
         IAuthorizationPolicyProvider? policyProvider,
@@ -33,6 +45,9 @@ public sealed class AuthorizationEvaluator : IAuthorizationEvaluator
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the evaluate async operation.
+    /// </summary>
     public ValueTask<AuthorizationResult> EvaluateAsync(
         AuthorizationRequest request,
         CancellationToken cancellationToken = default)
@@ -78,6 +93,9 @@ public sealed class AuthorizationEvaluator : IAuthorizationEvaluator
         }
     }
 
+    /// <summary>
+    /// Executes the evaluate policy async operation.
+    /// </summary>
     public async ValueTask<AuthorizationResult> EvaluatePolicyAsync(
         ClaimsPrincipal? principal,
         string policyName,

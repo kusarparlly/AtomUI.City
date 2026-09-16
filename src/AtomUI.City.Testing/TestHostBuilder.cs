@@ -3,6 +3,9 @@ using AtomUI.City.Core.Hosting;
 
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents test host builder.
+/// </summary>
 public sealed class TestHostBuilder
 {
     private readonly Dictionary<string, object?> _properties = new(StringComparer.Ordinal);
@@ -10,6 +13,9 @@ public sealed class TestHostBuilder
     private bool _keepDirectoryOnDispose;
     private bool _built;
 
+    /// <summary>
+    /// Executes the use property operation.
+    /// </summary>
     public TestHostBuilder UseProperty(string key, object? value)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
@@ -20,6 +26,9 @@ public sealed class TestHostBuilder
         return this;
     }
 
+    /// <summary>
+    /// Executes the use directory name operation.
+    /// </summary>
     public TestHostBuilder UseDirectoryName(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -30,6 +39,9 @@ public sealed class TestHostBuilder
         return this;
     }
 
+    /// <summary>
+    /// Executes the keep directory on dispose operation.
+    /// </summary>
     public TestHostBuilder KeepDirectoryOnDispose()
     {
         ThrowIfBuilt();
@@ -39,6 +51,9 @@ public sealed class TestHostBuilder
         return this;
     }
 
+    /// <summary>
+    /// Executes the build operation.
+    /// </summary>
     public TestHost Build()
     {
         ThrowIfBuilt();

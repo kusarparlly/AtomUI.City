@@ -1,7 +1,13 @@
 namespace AtomUI.City.PluginSystem;
 
+/// <summary>
+/// Represents plugin manifest builder.
+/// </summary>
 public static class PluginManifestBuilder
 {
+    /// <summary>
+    /// Executes the minimal operation.
+    /// </summary>
     public static PluginManifest Minimal(
         string pluginId,
         string packageId,

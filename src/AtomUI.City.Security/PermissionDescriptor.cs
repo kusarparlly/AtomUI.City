@@ -1,7 +1,13 @@
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents permission descriptor.
+/// </summary>
 public sealed class PermissionDescriptor
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>PermissionDescriptor</c> type.
+    /// </summary>
     public PermissionDescriptor(
         string name,
         string? displayNameKey = null,
@@ -28,18 +34,39 @@ public sealed class PermissionDescriptor
         IsHostOnly = isHostOnly;
     }
 
+    /// <summary>
+    /// Gets name.
+    /// </summary>
     public string Name { get; }
 
+    /// <summary>
+    /// Gets display name key.
+    /// </summary>
     public string? DisplayNameKey { get; }
 
+    /// <summary>
+    /// Gets description key.
+    /// </summary>
     public string? DescriptionKey { get; }
 
+    /// <summary>
+    /// Gets category.
+    /// </summary>
     public string? Category { get; }
 
+    /// <summary>
+    /// Gets contribution id.
+    /// </summary>
     public string? ContributionId { get; }
 
+    /// <summary>
+    /// Gets default policy.
+    /// </summary>
     public string? DefaultPolicy { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether is host only.
+    /// </summary>
     public bool IsHostOnly { get; }
 
     private static void ValidateOptionalIdentifier(string? value, string parameterName)

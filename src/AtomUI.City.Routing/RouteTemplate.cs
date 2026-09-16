@@ -3,6 +3,9 @@ using System.Text.RegularExpressions;
 
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents route template.
+/// </summary>
 public sealed class RouteTemplate
 {
     private RouteTemplate(string pattern, IReadOnlyList<RouteTemplateSegment> segments)
@@ -11,10 +14,19 @@ public sealed class RouteTemplate
         Segments = Array.AsReadOnly(segments.ToArray());
     }
 
+    /// <summary>
+    /// Gets pattern.
+    /// </summary>
     public string Pattern { get; }
 
+    /// <summary>
+    /// Gets segments.
+    /// </summary>
     public IReadOnlyList<RouteTemplateSegment> Segments { get; }
 
+    /// <summary>
+    /// Executes the parse operation.
+    /// </summary>
     public static RouteTemplate Parse(string pattern)
     {
         ArgumentNullException.ThrowIfNull(pattern);
@@ -32,6 +44,9 @@ public sealed class RouteTemplate
         return new RouteTemplate(normalizedPattern, segments);
     }
 
+    /// <summary>
+    /// Executes the try match operation.
+    /// </summary>
     public bool TryMatch(string path, out IReadOnlyDictionary<string, string> values)
     {
         ArgumentNullException.ThrowIfNull(path);
@@ -120,6 +135,9 @@ public sealed class RouteTemplate
         return true;
     }
 
+    /// <summary>
+    /// Executes the try bind parameters operation.
+    /// </summary>
     public bool TryBindParameters(
         IReadOnlyDictionary<string, string> parameters,
         out IReadOnlyDictionary<string, string> boundParameters)

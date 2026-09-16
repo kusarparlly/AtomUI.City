@@ -1,5 +1,8 @@
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents state snapshot entry.
+/// </summary>
 public sealed record StateSnapshotEntry
 {
     private string _stateName = null!;
@@ -8,6 +11,9 @@ public sealed record StateSnapshotEntry
     private int _schemaVersion;
     private StateLifetime _lifetime;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>StateSnapshotEntry</c> type.
+    /// </summary>
     public StateSnapshotEntry(
         string stateName,
         Type valueType,
@@ -28,6 +34,9 @@ public sealed record StateSnapshotEntry
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>StateSnapshotEntry</c> type.
+    /// </summary>
     public StateSnapshotEntry(
         string stateName,
         Type valueType,
@@ -72,6 +81,9 @@ public sealed record StateSnapshotEntry
         Lifetime = lifetime;
     }
 
+    /// <summary>
+    /// Represents the state name value.
+    /// </summary>
     public string StateName
     {
         get => _stateName;
@@ -83,6 +95,9 @@ public sealed record StateSnapshotEntry
         }
     }
 
+    /// <summary>
+    /// Represents the value type value.
+    /// </summary>
     public Type ValueType
     {
         get => _valueType;
@@ -94,8 +109,14 @@ public sealed record StateSnapshotEntry
         }
     }
 
+    /// <summary>
+    /// Gets or sets value.
+    /// </summary>
     public object? Value { get; init; }
 
+    /// <summary>
+    /// Represents the version value.
+    /// </summary>
     public long Version
     {
         get => _version;
@@ -113,6 +134,9 @@ public sealed record StateSnapshotEntry
         }
     }
 
+    /// <summary>
+    /// Represents the schema version value.
+    /// </summary>
     public int SchemaVersion
     {
         get => _schemaVersion;
@@ -130,10 +154,19 @@ public sealed record StateSnapshotEntry
         }
     }
 
+    /// <summary>
+    /// Gets or sets owner module.
+    /// </summary>
     public string? OwnerModule { get; init; }
 
+    /// <summary>
+    /// Gets or sets plugin id.
+    /// </summary>
     public string? PluginId { get; init; }
 
+    /// <summary>
+    /// Represents the lifetime value.
+    /// </summary>
     public StateLifetime Lifetime
     {
         get => _lifetime;
@@ -148,5 +181,8 @@ public sealed record StateSnapshotEntry
         }
     }
 
+    /// <summary>
+    /// Gets or sets timestamp.
+    /// </summary>
     public DateTimeOffset Timestamp { get; init; } = DateTimeOffset.UtcNow;
 }

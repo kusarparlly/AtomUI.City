@@ -1,5 +1,8 @@
 namespace AtomUI.City.Localization;
 
+/// <summary>
+/// Represents language package registry.
+/// </summary>
 public sealed class LanguagePackageRegistry
 {
     private readonly Dictionary<(string CultureName, string PackageId), LanguagePackageRegistration> _registrations = [];
@@ -9,6 +12,9 @@ public sealed class LanguagePackageRegistry
 
     internal event Action<IReadOnlyList<LanguagePackageDescriptor>>? DescriptorsRevoked;
 
+    /// <summary>
+    /// Represents the registrations value.
+    /// </summary>
     public IReadOnlyList<LanguagePackageRegistration> Registrations
     {
         get
@@ -20,6 +26,9 @@ public sealed class LanguagePackageRegistry
         }
     }
 
+    /// <summary>
+    /// Represents the descriptors value.
+    /// </summary>
     public IReadOnlyList<LanguagePackageDescriptor> Descriptors
     {
         get
@@ -33,6 +42,9 @@ public sealed class LanguagePackageRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the register operation.
+    /// </summary>
     public LocalizationResult Register(
         LanguagePackageDescriptor descriptor,
         string ownerId)
@@ -41,6 +53,9 @@ public sealed class LanguagePackageRegistry
         return RegisterRange([descriptor], ownerId);
     }
 
+    /// <summary>
+    /// Executes the register range operation.
+    /// </summary>
     public LocalizationResult RegisterRange(
         IEnumerable<LanguagePackageDescriptor> descriptors,
         string ownerId)
@@ -100,6 +115,9 @@ public sealed class LanguagePackageRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the revoke owner operation.
+    /// </summary>
     public int RevokeOwner(string ownerId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(ownerId);

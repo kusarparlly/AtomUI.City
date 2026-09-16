@@ -4,6 +4,9 @@ using System.Runtime.Loader;
 
 namespace AtomUI.City.PluginSystem;
 
+/// <summary>
+/// Represents plugin runtime.
+/// </summary>
 public sealed class PluginRuntime
 {
     private readonly List<PluginRuntimeLease> _leases = [];
@@ -21,15 +24,30 @@ public sealed class PluginRuntime
         State = PluginRuntimeState.Loaded;
     }
 
+    /// <summary>
+    /// Gets descriptor.
+    /// </summary>
     public PluginDescriptor Descriptor { get; }
 
+    /// <summary>
+    /// Gets or sets state.
+    /// </summary>
     public PluginRuntimeState State { get; private set; }
 
+    /// <summary>
+    /// Gets main assembly.
+    /// </summary>
     public Assembly MainAssembly => _mainAssembly ??
         throw new InvalidOperationException("Plugin main assembly is not available after unload.");
 
+    /// <summary>
+    /// Gets leases.
+    /// </summary>
     public IReadOnlyList<PluginRuntimeLease> Leases => Array.AsReadOnly(_leases.ToArray());
 
+    /// <summary>
+    /// Executes the register unload lease operation.
+    /// </summary>
     public PluginRuntimeLease RegisterUnloadLease(
         string leaseId,
         string kind,
@@ -46,6 +64,9 @@ public sealed class PluginRuntime
         return lease;
     }
 
+    /// <summary>
+    /// Executes the activate operation.
+    /// </summary>
     public void Activate()
     {
         if (State is not (PluginRuntimeState.Loaded or PluginRuntimeState.Inactive))
@@ -56,6 +77,9 @@ public sealed class PluginRuntime
         State = PluginRuntimeState.Active;
     }
 
+    /// <summary>
+    /// Executes the deactivate async operation.
+    /// </summary>
     public ValueTask DeactivateAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -69,6 +93,9 @@ public sealed class PluginRuntime
         return ValueTask.CompletedTask;
     }
 
+    /// <summary>
+    /// Executes the unload async operation.
+    /// </summary>
     public async ValueTask<PluginUnloadResult> UnloadAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();

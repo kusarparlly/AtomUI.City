@@ -2,6 +2,9 @@ using AtomUI.City.Core.Lifecycle;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents data request pipeline.
+/// </summary>
 public sealed class DataRequestPipeline : IDataRequestPipeline, IDisposable
 {
     private readonly IReadOnlyDictionary<DataTransportKind, IRequestResponseTransport> _transports;
@@ -21,6 +24,9 @@ public sealed class DataRequestPipeline : IDataRequestPipeline, IDisposable
     private readonly IDisposable? _resilienceTracking;
     private int _disposed;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>DataRequestPipeline</c> type.
+    /// </summary>
     public DataRequestPipeline(
         IRequestResponseTransport transport,
         IDataCredentialProvider? credentialProvider = null,
@@ -46,6 +52,9 @@ public sealed class DataRequestPipeline : IDataRequestPipeline, IDisposable
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>DataRequestPipeline</c> type.
+    /// </summary>
     public DataRequestPipeline(
         IEnumerable<IRequestResponseTransport> transports,
         IDataCredentialProvider? credentialProvider = null,
@@ -137,6 +146,9 @@ public sealed class DataRequestPipeline : IDataRequestPipeline, IDisposable
         return transportMap;
     }
 
+    /// <summary>
+    /// Executes the send async&lt;tresponse&gt; operation.
+    /// </summary>
     public ValueTask<DataResult<TResponse>> SendAsync<TResponse>(
         DataRequest<TResponse> request,
         CancellationToken cancellationToken = default)
@@ -175,6 +187,9 @@ public sealed class DataRequestPipeline : IDataRequestPipeline, IDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         if (Interlocked.Exchange(ref _disposed, 1) != 0)

@@ -1,11 +1,23 @@
 namespace AtomUI.City.Mvvm;
 
+/// <summary>
+/// Represents deactivation guard.
+/// </summary>
 public static class DeactivationGuard
 {
+    /// <summary>
+    /// Represents the canceled reason value.
+    /// </summary>
     public const string CanceledReason = "deactivation-cancelled";
 
+    /// <summary>
+    /// Represents the failed reason value.
+    /// </summary>
     public const string FailedReason = "deactivation-failed";
 
+    /// <summary>
+    /// Executes the can deactivate async operation.
+    /// </summary>
     public static async ValueTask<DeactivationResult> CanDeactivateAsync(
         object viewModel,
         CancellationToken cancellationToken)

@@ -1,11 +1,23 @@
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event bus dispatch options.
+/// </summary>
 public sealed class EventBusDispatchOptions
 {
+    /// <summary>
+    /// Represents the default maximum concurrent deliveries per publication value.
+    /// </summary>
     public const int DefaultMaximumConcurrentDeliveriesPerPublication = 16;
 
+    /// <summary>
+    /// Gets default.
+    /// </summary>
     public static EventBusDispatchOptions Default { get; } = new();
 
+    /// <summary>
+    /// Gets or sets maximum concurrent deliveries per publication.
+    /// </summary>
     public int MaximumConcurrentDeliveriesPerPublication { get; init; } =
         DefaultMaximumConcurrentDeliveriesPerPublication;
 

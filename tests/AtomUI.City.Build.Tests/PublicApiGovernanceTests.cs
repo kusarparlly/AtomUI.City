@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace AtomUI.City.Build.Tests;
 
@@ -39,6 +40,35 @@ public sealed class PublicApiGovernanceTests
                 CountSignatures(shipped) + CountSignatures(unshipped) > 0,
                 $"Public API baseline is empty for AtomUI.City.{productName}.");
         }
+    }
+
+    [Fact]
+    public void EveryProductProjectRequiresCompleteXmlDocumentation()
+    {
+        var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
+        var commonPropsPath = Path.Combine(repositoryRoot, "build", "Common.props");
+        var commonProps = XDocument.Load(commonPropsPath);
+        var commonPropsText = File.ReadAllText(commonPropsPath);
+        var gate = File.ReadAllText(Path.Combine(repositoryRoot, "engineering", "check-public-api.sh"));
+
+        var unconditionalNoWarn = commonProps
+            .Descendants("NoWarn")
+            .Where(static property => property.Attribute("Condition") is null)
+            .Select(static property => property.Value);
+        Assert.DoesNotContain(
+            unconditionalNoWarn,
+            value => value.Split(';', StringSplitOptions.RemoveEmptyEntries).Contains("CS1591", StringComparer.Ordinal));
+
+        Assert.Contains("<AtomUICityPublicApiDocumentationRequired Condition=", commonPropsText, StringComparison.Ordinal);
+        Assert.Contains("$(WarningsAsErrors);CS1591", commonPropsText, StringComparison.Ordinal);
+        foreach (var productName in ProductNames)
+        {
+            Assert.Contains($"'$(MSBuildProjectName)' == 'AtomUI.City.{productName}'", commonPropsText, StringComparison.Ordinal);
+        }
+
+        Assert.Contains("for product_name in \"${product_names[@]}\"", gate, StringComparison.Ordinal);
+        Assert.Contains("validate_build_artifacts", gate, StringComparison.Ordinal);
+        Assert.DoesNotContain("false\n", gate, StringComparison.Ordinal);
     }
 
     [Fact]

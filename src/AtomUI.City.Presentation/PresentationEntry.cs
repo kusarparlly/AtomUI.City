@@ -3,6 +3,9 @@ using AtomUI.City.Mvvm;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents presentation entry.
+/// </summary>
 public sealed class PresentationEntry : IAsyncDisposable
 {
     private readonly object _gate = new();
@@ -33,24 +36,54 @@ public sealed class PresentationEntry : IAsyncDisposable
         _visualLifecycleSubscription = visualLifecycleSubscription;
     }
 
+    /// <summary>
+    /// Gets operation id.
+    /// </summary>
     public long OperationId { get; }
 
+    /// <summary>
+    /// Gets handle.
+    /// </summary>
     public BoundViewHandle Handle { get; }
 
+    /// <summary>
+    /// Gets view.
+    /// </summary>
     public object View => Handle.View;
 
+    /// <summary>
+    /// Gets view model.
+    /// </summary>
     public object ViewModel => Handle.ViewModel;
 
+    /// <summary>
+    /// Gets activation scope.
+    /// </summary>
     public ActivationScope ActivationScope { get; }
 
+    /// <summary>
+    /// Gets view model lease.
+    /// </summary>
     public ViewModelLease? ViewModelLease { get; }
 
+    /// <summary>
+    /// Gets route id.
+    /// </summary>
     public string? RouteId { get; }
 
+    /// <summary>
+    /// Gets reuse key.
+    /// </summary>
     public string? ReuseKey { get; }
 
+    /// <summary>
+    /// Gets or sets is activated.
+    /// </summary>
     public bool IsActivated { get; internal set; }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public ValueTask DisposeAsync()
     {
         Task disposeTask;

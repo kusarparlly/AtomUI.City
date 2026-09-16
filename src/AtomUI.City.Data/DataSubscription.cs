@@ -2,18 +2,33 @@ using System.Threading.Channels;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Defines the supported data subscription error policy values.
+/// </summary>
 public enum DataSubscriptionErrorPolicy
 {
+    /// <summary>
+    /// Represents the continue value.
+    /// </summary>
     Continue,
+    /// <summary>
+    /// Represents the stop value.
+    /// </summary>
     Stop,
 }
 
+/// <summary>
+/// Represents data subscription options.
+/// </summary>
 public sealed class DataSubscriptionOptions
 {
     private int _capacity = 64;
     private DataBackpressurePolicy _backpressurePolicy = DataBackpressurePolicy.DropOldest;
     private DataSubscriptionErrorPolicy _errorPolicy = DataSubscriptionErrorPolicy.Continue;
 
+    /// <summary>
+    /// Represents the capacity value.
+    /// </summary>
     public int Capacity
     {
         get => _capacity;
@@ -24,6 +39,9 @@ public sealed class DataSubscriptionOptions
         }
     }
 
+    /// <summary>
+    /// Represents the backpressure policy value.
+    /// </summary>
     public DataBackpressurePolicy BackpressurePolicy
     {
         get => _backpressurePolicy;
@@ -38,6 +56,9 @@ public sealed class DataSubscriptionOptions
         }
     }
 
+    /// <summary>
+    /// Represents the error policy value.
+    /// </summary>
     public DataSubscriptionErrorPolicy ErrorPolicy
     {
         get => _errorPolicy;
@@ -52,17 +73,35 @@ public sealed class DataSubscriptionOptions
         }
     }
 
+    /// <summary>
+    /// Gets default.
+    /// </summary>
     public static DataSubscriptionOptions Default { get; } = new();
 }
 
+/// <summary>
+/// Defines the contract for idata subscription.
+/// </summary>
 public interface IDataSubscription : IAsyncDisposable
 {
+    /// <summary>
+    /// Gets subscription id.
+    /// </summary>
     Guid SubscriptionId { get; }
 
+    /// <summary>
+    /// Gets owner.
+    /// </summary>
     DataConnectionOwner Owner { get; }
 
+    /// <summary>
+    /// Gets completion.
+    /// </summary>
     Task Completion { get; }
 
+    /// <summary>
+    /// Executes the revoke async operation.
+    /// </summary>
     ValueTask RevokeAsync();
 }
 

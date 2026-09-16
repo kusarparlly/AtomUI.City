@@ -2,11 +2,17 @@ using System.Security.Claims;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents permission checker.
+/// </summary>
 public sealed class PermissionChecker : IPermissionChecker
 {
     private readonly IAuthorizationEvaluator _authorizationEvaluator;
     private readonly ICurrentPrincipalAccessor? _principalAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>PermissionChecker</c> type.
+    /// </summary>
     public PermissionChecker(
         IPermissionRegistry permissions,
         ICurrentPrincipalAccessor? principalAccessor = null)
@@ -14,6 +20,9 @@ public sealed class PermissionChecker : IPermissionChecker
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>PermissionChecker</c> type.
+    /// </summary>
     public PermissionChecker(
         IAuthorizationEvaluator authorizationEvaluator,
         ICurrentPrincipalAccessor? principalAccessor = null)
@@ -24,6 +33,9 @@ public sealed class PermissionChecker : IPermissionChecker
         _principalAccessor = principalAccessor;
     }
 
+    /// <summary>
+    /// Executes the check async operation.
+    /// </summary>
     public async ValueTask<AuthorizationResult> CheckAsync(
         ClaimsPrincipal? principal,
         string permissionName,
@@ -69,6 +81,9 @@ public sealed class PermissionChecker : IPermissionChecker
         }
     }
 
+    /// <summary>
+    /// Executes the check current async operation.
+    /// </summary>
     public async ValueTask<AuthorizationResult> CheckCurrentAsync(
         string permissionName,
         CancellationToken cancellationToken = default)

@@ -3,13 +3,22 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace AtomUI.City.Mvvm;
 
+/// <summary>
+/// Represents command group.
+/// </summary>
 public sealed class CommandGroup : IRelayCommand
 {
     private readonly object _gate = new();
     private readonly List<CommandRegistration> _registrations = [];
 
+    /// <summary>
+    /// Occurs when can execute changed.
+    /// </summary>
     public event EventHandler? CanExecuteChanged;
 
+    /// <summary>
+    /// Executes the register operation.
+    /// </summary>
     public IDisposable Register(
         ICommand command,
         Func<bool>? isActive = null,
@@ -30,6 +39,9 @@ public sealed class CommandGroup : IRelayCommand
         return registration;
     }
 
+    /// <summary>
+    /// Executes the can execute operation.
+    /// </summary>
     public bool CanExecute(object? parameter)
     {
         lock (_gate)
@@ -40,6 +52,9 @@ public sealed class CommandGroup : IRelayCommand
         }
     }
 
+    /// <summary>
+    /// Executes the execute operation.
+    /// </summary>
     public void Execute(object? parameter)
     {
         using var operation = OperationScope.Start(CancellationToken.None);
@@ -69,6 +84,9 @@ public sealed class CommandGroup : IRelayCommand
         }
     }
 
+    /// <summary>
+    /// Executes the notify can execute changed operation.
+    /// </summary>
     public void NotifyCanExecuteChanged()
     {
         CanExecuteChanged?.Invoke(this, EventArgs.Empty);

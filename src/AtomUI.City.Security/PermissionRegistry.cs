@@ -3,6 +3,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents permission registry.
+/// </summary>
 public sealed class PermissionRegistry : IPermissionRegistry
 {
     private readonly Dictionary<string, PermissionDescriptor> _permissions = new(StringComparer.Ordinal);
@@ -12,6 +15,9 @@ public sealed class PermissionRegistry : IPermissionRegistry
     private readonly IHostDiagnostics? _diagnostics;
     private long _revision;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>PermissionRegistry</c> type.
+    /// </summary>
     public PermissionRegistry()
     {
         _eventPublisher = new OrderedEventPublisher<PermissionRegistryChangedEventArgs>(
@@ -19,6 +25,9 @@ public sealed class PermissionRegistry : IPermissionRegistry
             SecurityDiagnosticIds.PermissionObserverFailed);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>PermissionRegistry</c> type.
+    /// </summary>
     public PermissionRegistry(IHostDiagnostics diagnostics)
     {
         _diagnostics = diagnostics ?? throw new ArgumentNullException(nameof(diagnostics));
@@ -27,8 +36,14 @@ public sealed class PermissionRegistry : IPermissionRegistry
             SecurityDiagnosticIds.PermissionObserverFailed);
     }
 
+    /// <summary>
+    /// Occurs when changed.
+    /// </summary>
     public event EventHandler<PermissionRegistryChangedEventArgs>? Changed;
 
+    /// <summary>
+    /// Represents the revision value.
+    /// </summary>
     public long Revision
     {
         get
@@ -40,6 +55,9 @@ public sealed class PermissionRegistry : IPermissionRegistry
         }
     }
 
+    /// <summary>
+    /// Represents the permissions value.
+    /// </summary>
     public IReadOnlyCollection<PermissionDescriptor> Permissions
     {
         get
@@ -51,6 +69,9 @@ public sealed class PermissionRegistry : IPermissionRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the add operation.
+    /// </summary>
     public bool Add(PermissionDescriptor descriptor)
     {
         ArgumentNullException.ThrowIfNull(descriptor);
@@ -89,6 +110,9 @@ public sealed class PermissionRegistry : IPermissionRegistry
         return true;
     }
 
+    /// <summary>
+    /// Executes the remove operation.
+    /// </summary>
     public bool Remove(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -122,6 +146,9 @@ public sealed class PermissionRegistry : IPermissionRegistry
         return true;
     }
 
+    /// <summary>
+    /// Executes the remove by contribution operation.
+    /// </summary>
     public int RemoveByContribution(string contributionId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(contributionId);
@@ -169,6 +196,9 @@ public sealed class PermissionRegistry : IPermissionRegistry
         return removedCount;
     }
 
+    /// <summary>
+    /// Executes the contains operation.
+    /// </summary>
     public bool Contains(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -179,6 +209,9 @@ public sealed class PermissionRegistry : IPermissionRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the try get operation.
+    /// </summary>
     public bool TryGet(
         string name,
         [NotNullWhen(true)] out PermissionDescriptor? descriptor)

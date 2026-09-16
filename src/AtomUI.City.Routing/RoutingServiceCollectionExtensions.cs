@@ -4,8 +4,14 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents routing service collection extensions.
+/// </summary>
 public static class RoutingServiceCollectionExtensions
 {
+    /// <summary>
+    /// Executes the add routing operation.
+    /// </summary>
     public static IServiceCollection AddRouting(
         this IServiceCollection services,
         IReadOnlyList<RouteDescriptor>? routes = null)

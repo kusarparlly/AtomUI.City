@@ -2,19 +2,31 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents unavailable access token provider.
+/// </summary>
 public sealed class UnavailableAccessTokenProvider : IAccessTokenProvider
 {
     private readonly IHostDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>UnavailableAccessTokenProvider</c> type.
+    /// </summary>
     public UnavailableAccessTokenProvider()
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <c>UnavailableAccessTokenProvider</c> type.
+    /// </summary>
     public UnavailableAccessTokenProvider(IHostDiagnostics diagnostics)
     {
         _diagnostics = diagnostics ?? throw new ArgumentNullException(nameof(diagnostics));
     }
 
+    /// <summary>
+    /// Executes the get token async operation.
+    /// </summary>
     public ValueTask<AccessTokenResult> GetTokenAsync(
         AccessTokenRequest request,
         CancellationToken cancellationToken = default)

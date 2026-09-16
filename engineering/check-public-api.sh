@@ -4,15 +4,6 @@ set -euo pipefail
 configuration="${CONFIGURATION:-Release}"
 version="$(sed -n 's:.*<AtomUICityVersion>\(.*\)</AtomUICityVersion>.*:\1:p' build/Version.props | head -n 1)"
 api_baseline_version="$(sed -n 's:.*<AtomUICityApiBaselineVersion>\(.*\)</AtomUICityApiBaselineVersion>.*:\1:p' build/Version.props | head -n 1)"
-core_project="src/AtomUI.City.Core/AtomUI.City.Core.csproj"
-shipped_api="src/AtomUI.City.Core/PublicAPI.Shipped.txt"
-unshipped_api="src/AtomUI.City.Core/PublicAPI.Unshipped.txt"
-eventbus_project="src/AtomUI.City.EventBus/AtomUI.City.EventBus.csproj"
-eventbus_shipped_api="src/AtomUI.City.EventBus/PublicAPI.Shipped.txt"
-eventbus_unshipped_api="src/AtomUI.City.EventBus/PublicAPI.Unshipped.txt"
-presentation_project="src/AtomUI.City.Presentation/AtomUI.City.Presentation.csproj"
-presentation_shipped_api="src/AtomUI.City.Presentation/PublicAPI.Shipped.txt"
-presentation_unshipped_api="src/AtomUI.City.Presentation/PublicAPI.Unshipped.txt"
 validation_output="output/public-api/package-validation"
 product_names=(
   Build
@@ -96,7 +87,7 @@ validate_build_artifacts() {
     --output "$validation_output" \
     -p:TreatWarningsAsErrors=true
 
-  package_path="$(find "$validation_output" -maxdepth 1 -name "$assembly_name.*.nupkg" ! -name '*.snupkg' -type f | sort | tail -n 1)"
+  package_path="$(find "$validation_output" -maxdepth 1 -name "$assembly_name.$version.nupkg" -type f | sort | tail -n 1)"
   if [[ -z "$package_path" ]]; then
     printf '%s validation package was not produced.\n' "$product_name" >&2
     exit 1
@@ -138,23 +129,9 @@ for product_name in "${product_names[@]}"; do
   fi
 done
 
-shipped_signature_count="$(grep -cEv '^[[:space:]]*(#|$)' "$shipped_api" || true)"
-if [[ "$shipped_signature_count" -eq 0 ]]; then
-  printf 'Core shipped public API baseline is empty: %s\n' "$shipped_api" >&2
-  exit 1
-fi
-
-eventbus_shipped_signature_count="$(grep -cEv '^[[:space:]]*(#|$)' "$eventbus_shipped_api" || true)"
-if [[ "$eventbus_shipped_signature_count" -eq 0 ]]; then
-  printf 'EventBus shipped public API baseline is empty: %s\n' "$eventbus_shipped_api" >&2
-  exit 1
-fi
-
-presentation_shipped_signature_count="$(grep -cEv '^[[:space:]]*(#|$)' "$presentation_shipped_api" || true)"
-if [[ "$presentation_shipped_signature_count" -eq 0 ]]; then
-  printf 'Presentation shipped public API baseline is empty: %s\n' "$presentation_shipped_api" >&2
-  exit 1
-fi
+core_project="src/AtomUI.City.Core/AtomUI.City.Core.csproj"
+eventbus_project="src/AtomUI.City.EventBus/AtomUI.City.EventBus.csproj"
+presentation_project="src/AtomUI.City.Presentation/AtomUI.City.Presentation.csproj"
 
 if ! grep -q 'Microsoft.CodeAnalysis.PublicApiAnalyzers' "$core_project"; then
   printf 'Core must reference Microsoft.CodeAnalysis.PublicApiAnalyzers.\n' >&2
@@ -198,21 +175,16 @@ done
 mkdir -p "$validation_output"
 head_revision="$(git rev-parse HEAD)"
 
-validate_build_artifacts \
-  "Core" \
-  "AtomUI.City.Core" \
-  "$core_project" \
-  "$shipped_signature_count"
+for product_name in "${product_names[@]}"; do
+  assembly_name="AtomUI.City.$product_name"
+  project="src/$assembly_name/$assembly_name.csproj"
+  product_shipped="src/$assembly_name/PublicAPI.Shipped.txt"
+  product_unshipped="src/$assembly_name/PublicAPI.Unshipped.txt"
+  product_signature_count="$(cat "$product_shipped" "$product_unshipped" | grep -cEv '^[[:space:]]*(#|$)' || true)"
 
-validate_build_artifacts \
-  "EventBus" \
-  "AtomUI.City.EventBus" \
-  "$eventbus_project" \
-  "$eventbus_shipped_signature_count"
-
-validate_build_artifacts \
-  "Presentation" \
-  "AtomUI.City.Presentation" \
-  "$presentation_project" \
-  "$presentation_shipped_signature_count" \
-  false
+  validate_build_artifacts \
+    "$product_name" \
+    "$assembly_name" \
+    "$project" \
+    "$product_signature_count"
+done

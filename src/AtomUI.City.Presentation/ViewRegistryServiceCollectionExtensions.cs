@@ -4,8 +4,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents view registry service collection extensions.
+/// </summary>
 public static class ViewRegistryServiceCollectionExtensions
 {
+    /// <summary>
+    /// Executes the add view registry operation.
+    /// </summary>
     public static IServiceCollection AddViewRegistry(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);

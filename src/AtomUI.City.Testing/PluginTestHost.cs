@@ -1,5 +1,8 @@
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents plugin test host.
+/// </summary>
 public sealed class PluginTestHost : IDisposable, IAsyncDisposable
 {
     private readonly Dictionary<string, PluginTestPackage> _packages;
@@ -12,15 +15,27 @@ public sealed class PluginTestHost : IDisposable, IAsyncDisposable
         _packages = packages.ToDictionary(package => package.Id, StringComparer.Ordinal);
     }
 
+    /// <summary>
+    /// Gets host.
+    /// </summary>
     public TestHost Host { get; }
 
+    /// <summary>
+    /// Gets records.
+    /// </summary>
     public IReadOnlyCollection<PluginTestRecord> Records => Array.AsReadOnly(_records.Values.ToArray());
 
+    /// <summary>
+    /// Executes the create builder operation.
+    /// </summary>
     public static PluginTestHostBuilder CreateBuilder()
     {
         return new PluginTestHostBuilder();
     }
 
+    /// <summary>
+    /// Executes the install async operation.
+    /// </summary>
     public ValueTask<PluginTestRecord> InstallAsync(
         string pluginId,
         CancellationToken cancellationToken = default)
@@ -48,6 +63,9 @@ public sealed class PluginTestHost : IDisposable, IAsyncDisposable
         return ValueTask.FromResult(record);
     }
 
+    /// <summary>
+    /// Executes the activate async operation.
+    /// </summary>
     public ValueTask<PluginTestRecord> ActivateAsync(
         string pluginId,
         CancellationToken cancellationToken = default)
@@ -62,6 +80,9 @@ public sealed class PluginTestHost : IDisposable, IAsyncDisposable
         return ValueTask.FromResult(record);
     }
 
+    /// <summary>
+    /// Executes the deactivate async operation.
+    /// </summary>
     public ValueTask<PluginTestRecord> DeactivateAsync(
         string pluginId,
         CancellationToken cancellationToken = default)
@@ -76,6 +97,9 @@ public sealed class PluginTestHost : IDisposable, IAsyncDisposable
         return ValueTask.FromResult(record);
     }
 
+    /// <summary>
+    /// Executes the register contribution operation.
+    /// </summary>
     public PluginTestRecord RegisterContribution(string pluginId, string contributionId)
     {
         ThrowIfDisposed();
@@ -88,6 +112,9 @@ public sealed class PluginTestHost : IDisposable, IAsyncDisposable
         return record;
     }
 
+    /// <summary>
+    /// Executes the unload async operation.
+    /// </summary>
     public ValueTask<PluginTestRecord> UnloadAsync(
         string pluginId,
         CancellationToken cancellationToken = default)
@@ -103,6 +130,9 @@ public sealed class PluginTestHost : IDisposable, IAsyncDisposable
         return ValueTask.FromResult(record);
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         if (_disposed)
@@ -115,6 +145,9 @@ public sealed class PluginTestHost : IDisposable, IAsyncDisposable
         Host.Dispose();
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         if (_disposed)

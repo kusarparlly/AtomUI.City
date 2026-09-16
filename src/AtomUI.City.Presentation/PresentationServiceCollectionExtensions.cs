@@ -5,8 +5,14 @@ using AtomUI.City.Core.Threading;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents presentation service collection extensions.
+/// </summary>
 public static class PresentationServiceCollectionExtensions
 {
+    /// <summary>
+    /// Executes the add presentation operation.
+    /// </summary>
     public static IServiceCollection AddPresentation(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
@@ -42,6 +48,9 @@ public static class PresentationServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Executes the add presentation operation.
+    /// </summary>
     public static IServiceCollection AddPresentation(
         this IServiceCollection services,
         PresentationQueueOptions queueOptions)

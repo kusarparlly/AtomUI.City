@@ -1,5 +1,8 @@
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents route matcher.
+/// </summary>
 public sealed class RouteMatcher
 {
     private readonly RouteGraphSnapshot _snapshot;
@@ -25,11 +28,17 @@ public sealed class RouteMatcher
             .ToArray();
     }
 
+    /// <summary>
+    /// Executes the match operation.
+    /// </summary>
     public RouteMatch Match(string path)
     {
         return Match(path, "primary");
     }
 
+    /// <summary>
+    /// Executes the match operation.
+    /// </summary>
     public RouteMatch Match(string path, string outletName)
     {
         ArgumentNullException.ThrowIfNull(path);
@@ -42,11 +51,17 @@ public sealed class RouteMatcher
         return RouteMatch.NotFound(path);
     }
 
+    /// <summary>
+    /// Executes the match all operation.
+    /// </summary>
     public IReadOnlyList<RouteMatch> MatchAll(string path)
     {
         return MatchAll(path, "primary");
     }
 
+    /// <summary>
+    /// Executes the match all operation.
+    /// </summary>
     public IReadOnlyList<RouteMatch> MatchAll(string path, string outletName)
     {
         ArgumentNullException.ThrowIfNull(path);

@@ -4,8 +4,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AtomUI.City.Localization;
 
+/// <summary>
+/// Represents localization service collection extensions.
+/// </summary>
 public static class LocalizationServiceCollectionExtensions
 {
+    /// <summary>
+    /// Executes the add localization operation.
+    /// </summary>
     public static IServiceCollection AddLocalization(
         this IServiceCollection services,
         Action<LocalizationOptions>? configure = null)

@@ -1,7 +1,13 @@
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents account credential context.
+/// </summary>
 public sealed class AccountCredentialContext
 {
+    /// <summary>
+    /// Initializes a new instance of the <c>AccountCredentialContext</c> type.
+    /// </summary>
     public AccountCredentialContext(
         string resourceName,
         string? scheme,
@@ -25,14 +31,29 @@ public sealed class AccountCredentialContext
         HasCredential = hasCredential;
     }
 
+    /// <summary>
+    /// Gets resource name.
+    /// </summary>
     public string ResourceName { get; }
 
+    /// <summary>
+    /// Gets scheme.
+    /// </summary>
     public string? Scheme { get; }
 
+    /// <summary>
+    /// Gets expires at.
+    /// </summary>
     public DateTimeOffset? ExpiresAt { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether has credential.
+    /// </summary>
     public bool HasCredential { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether is expired.
+    /// </summary>
     public bool IsExpired(DateTimeOffset now) =>
         HasCredential && ExpiresAt is not null && ExpiresAt <= now.ToUniversalTime();
 }

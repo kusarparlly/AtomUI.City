@@ -1,5 +1,8 @@
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents navigation target.
+/// </summary>
 public sealed class NavigationTarget
 {
     private NavigationTarget(
@@ -21,18 +24,36 @@ public sealed class NavigationTarget
                 new Dictionary<string, object?>(restoredData, StringComparer.Ordinal));
     }
 
+    /// <summary>
+    /// Gets kind.
+    /// </summary>
     public NavigationTargetKind Kind { get; }
 
+    /// <summary>
+    /// Gets route id.
+    /// </summary>
     public string? RouteId { get; }
 
+    /// <summary>
+    /// Gets path.
+    /// </summary>
     public string? Path { get; }
 
+    /// <summary>
+    /// Gets parameters.
+    /// </summary>
     public IReadOnlyDictionary<string, string> Parameters { get; }
 
+    /// <summary>
+    /// Gets options.
+    /// </summary>
     public NavigationOptions Options { get; }
 
     internal IReadOnlyDictionary<string, object?>? RestoredData { get; }
 
+    /// <summary>
+    /// Executes the from path operation.
+    /// </summary>
     public static NavigationTarget FromPath(
         string path,
         NavigationOptions options)
@@ -48,6 +69,9 @@ public sealed class NavigationTarget
             options);
     }
 
+    /// <summary>
+    /// Executes the from route reference operation.
+    /// </summary>
     public static NavigationTarget FromRouteReference(
         string routeId,
         IReadOnlyDictionary<string, string>? parameters,
@@ -64,6 +88,9 @@ public sealed class NavigationTarget
             options);
     }
 
+    /// <summary>
+    /// Executes the from deep link operation.
+    /// </summary>
     public static NavigationTarget FromDeepLink(Uri uri, NavigationOptions options)
     {
         ArgumentNullException.ThrowIfNull(uri);
@@ -145,6 +172,9 @@ public sealed class NavigationTarget
             source.Options);
     }
 
+    /// <summary>
+    /// Executes the to string operation.
+    /// </summary>
     public override string ToString()
     {
         return Kind switch

@@ -2,6 +2,9 @@ using System.Collections.Concurrent;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents data request context.
+/// </summary>
 public sealed class DataRequestContext
 {
     private readonly object _request;
@@ -25,27 +28,60 @@ public sealed class DataRequestContext
         CancellationToken = cancellationToken;
     }
 
+    /// <summary>
+    /// Gets operation id.
+    /// </summary>
     public Guid OperationId { get; }
 
+    /// <summary>
+    /// Gets correlation id.
+    /// </summary>
     public string CorrelationId { get; }
 
+    /// <summary>
+    /// Gets client id.
+    /// </summary>
     public string ClientId { get; }
 
+    /// <summary>
+    /// Gets operation name.
+    /// </summary>
     public string OperationName { get; }
 
+    /// <summary>
+    /// Gets transport kind.
+    /// </summary>
     public DataTransportKind TransportKind { get; }
 
+    /// <summary>
+    /// Gets access mode.
+    /// </summary>
     public DataAccessMode AccessMode { get; }
 
+    /// <summary>
+    /// Gets or sets attempt.
+    /// </summary>
     public int Attempt { get; internal set; }
 
+    /// <summary>
+    /// Gets a value indicating whether cancellation token.
+    /// </summary>
     public CancellationToken CancellationToken { get; }
 
+    /// <summary>
+    /// Gets or sets credential.
+    /// </summary>
     public DataCredential? Credential { get; private set; }
 
+    /// <summary>
+    /// Gets items.
+    /// </summary>
     public IDictionary<string, object?> Items { get; } =
         new ConcurrentDictionary<string, object?>(StringComparer.Ordinal);
 
+    /// <summary>
+    /// Executes the set credential operation.
+    /// </summary>
     public void SetCredential(DataCredential credential)
     {
         ArgumentNullException.ThrowIfNull(credential);
@@ -58,6 +94,9 @@ public sealed class DataRequestContext
         return ReferenceEquals(_request, request);
     }
 
+    /// <summary>
+    /// Executes the create&lt;tresponse&gt; operation.
+    /// </summary>
     public static DataRequestContext Create<TResponse>(
         DataRequest<TResponse> request,
         CancellationToken cancellationToken)

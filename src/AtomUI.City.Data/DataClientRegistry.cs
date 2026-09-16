@@ -1,22 +1,34 @@
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents data client registry.
+/// </summary>
 public sealed class DataClientRegistry : IDataClientFactory
 {
     private readonly Dictionary<Type, ClientRegistration> _clients = [];
     private readonly IDataDiagnostics? _diagnostics;
     private readonly object _syncRoot = new();
 
+    /// <summary>
+    /// Initializes a new instance of the <c>DataClientRegistry</c> type.
+    /// </summary>
     public DataClientRegistry(IDataDiagnostics? diagnostics = null)
     {
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the register&lt;tclient&gt; operation.
+    /// </summary>
     public void Register<TClient>(TClient client)
         where TClient : class, IDataClient
     {
         _ = RegisterCore(client);
     }
 
+    /// <summary>
+    /// Executes the register owned&lt;tclient&gt; operation.
+    /// </summary>
     public IDisposable RegisterOwned<TClient>(TClient client)
         where TClient : class, IDataClient
     {
@@ -45,6 +57,9 @@ public sealed class DataClientRegistry : IDataClientFactory
         return new ClientLease(this, typeof(TClient), token, clientId);
     }
 
+    /// <summary>
+    /// Executes the unregister&lt;tclient&gt; operation.
+    /// </summary>
     public bool Unregister<TClient>()
         where TClient : class, IDataClient
     {
@@ -76,6 +91,9 @@ public sealed class DataClientRegistry : IDataClientFactory
         return true;
     }
 
+    /// <summary>
+    /// Executes the get required client&lt;tclient&gt; operation.
+    /// </summary>
     public TClient GetRequiredClient<TClient>()
         where TClient : class, IDataClient
     {

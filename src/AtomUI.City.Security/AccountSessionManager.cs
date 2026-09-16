@@ -4,6 +4,9 @@ using AtomUI.City.Core.Diagnostics;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents account session manager.
+/// </summary>
 public sealed class AccountSessionManager : IAccountSessionManager
 {
     private const string StageGate = "gate";
@@ -26,6 +29,9 @@ public sealed class AccountSessionManager : IAccountSessionManager
     private readonly OrderedEventPublisher<AccountSessionChangedEventArgs> _eventPublisher;
     private AccountSessionSnapshot _current = AccountSessionSnapshot.Anonymous();
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AccountSessionManager</c> type.
+    /// </summary>
     public AccountSessionManager(
         IAccountSessionStore accountStore,
         ICredentialStore credentialStore,
@@ -45,8 +51,14 @@ public sealed class AccountSessionManager : IAccountSessionManager
             SecurityDiagnosticIds.AccountSessionObserverFailed);
     }
 
+    /// <summary>
+    /// Occurs when session changed.
+    /// </summary>
     public event EventHandler<AccountSessionChangedEventArgs>? SessionChanged;
 
+    /// <summary>
+    /// Represents the current value.
+    /// </summary>
     public AccountSessionSnapshot Current
     {
         get
@@ -58,10 +70,16 @@ public sealed class AccountSessionManager : IAccountSessionManager
         }
     }
 
+    /// <summary>
+    /// Executes the list accounts async operation.
+    /// </summary>
     public ValueTask<SecurityStoreResult<IReadOnlyList<AccountRecordSnapshot>>> ListAccountsAsync(
         CancellationToken cancellationToken = default) =>
         _accountStore.ListAsync(cancellationToken);
 
+    /// <summary>
+    /// Executes the restore async operation.
+    /// </summary>
     public ValueTask<AccountSwitchResult> RestoreAsync(
         AccountSwitchOptions? options = null,
         CancellationToken cancellationToken = default) =>
@@ -71,6 +89,9 @@ public sealed class AccountSessionManager : IAccountSessionManager
             (operationId, token) => RestoreCoreAsync(operationId, options ?? new AccountSwitchOptions(), token),
             cancellationToken);
 
+    /// <summary>
+    /// Executes the switch account async operation.
+    /// </summary>
     public ValueTask<AccountSwitchResult> SwitchAccountAsync(
         SecurityAccountKey accountKey,
         AccountSwitchOptions? options = null,
@@ -90,6 +111,9 @@ public sealed class AccountSessionManager : IAccountSessionManager
             cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the refresh account async operation.
+    /// </summary>
     public ValueTask<AccountSwitchResult> RefreshAccountAsync(
         SecurityAccountKey accountKey,
         AccountSwitchOptions? options = null,
@@ -107,6 +131,9 @@ public sealed class AccountSessionManager : IAccountSessionManager
             cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the remove account async operation.
+    /// </summary>
     public ValueTask<AccountSwitchResult> RemoveAccountAsync(
         SecurityAccountKey accountKey,
         CancellationToken cancellationToken = default)
@@ -119,6 +146,9 @@ public sealed class AccountSessionManager : IAccountSessionManager
             cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the get token async operation.
+    /// </summary>
     public async ValueTask<AccessTokenResult> GetTokenAsync(
         AccessTokenRequest request,
         CancellationToken cancellationToken = default)

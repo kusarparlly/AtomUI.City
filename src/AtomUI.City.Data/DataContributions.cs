@@ -2,6 +2,9 @@ using System.Collections.Concurrent;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents data contribution registry.
+/// </summary>
 public sealed class DataContributionRegistry : IDataRequestHandlerSource, IDataCapabilityAuthorizer
 {
     private readonly ConcurrentDictionary<string, DataContributionLease> _contributions = new(StringComparer.Ordinal);
@@ -12,6 +15,9 @@ public sealed class DataContributionRegistry : IDataRequestHandlerSource, IDataC
     private readonly IDataCacheInvalidator _cacheInvalidator;
     private readonly IDataDiagnostics? _diagnostics;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>DataContributionRegistry</c> type.
+    /// </summary>
     public DataContributionRegistry(
         DataClientDescriptorCatalog descriptors,
         DataClientRegistry clients,
@@ -26,6 +32,9 @@ public sealed class DataContributionRegistry : IDataRequestHandlerSource, IDataC
         _diagnostics = diagnostics;
     }
 
+    /// <summary>
+    /// Executes the begin contribution operation.
+    /// </summary>
     public DataResult<DataContributionLease> BeginContribution(
         string pluginId,
         string contributionId,
@@ -74,6 +83,9 @@ public sealed class DataContributionRegistry : IDataRequestHandlerSource, IDataC
         return DataResult<DataContributionLease>.Success(lease);
     }
 
+    /// <summary>
+    /// Executes the get handlers&lt;tresponse&gt; operation.
+    /// </summary>
     public IReadOnlyList<IDataRequestHandler> GetHandlers<TResponse>(DataRequest<TResponse> request)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -92,6 +104,9 @@ public sealed class DataContributionRegistry : IDataRequestHandlerSource, IDataC
         return contribution.GetHandlers();
     }
 
+    /// <summary>
+    /// Executes the is authorized operation.
+    /// </summary>
     public bool IsAuthorized(DataRequestOrigin origin, DataCapability capability)
     {
         ArgumentNullException.ThrowIfNull(origin);
@@ -162,6 +177,9 @@ public sealed class DataContributionRegistry : IDataRequestHandlerSource, IDataC
     }
 }
 
+/// <summary>
+/// Represents data contribution lease.
+/// </summary>
 public sealed class DataContributionLease : IAsyncDisposable
 {
     private static readonly AsyncLocal<object?> CurrentContribution = new();
@@ -208,14 +226,29 @@ public sealed class DataContributionLease : IAsyncDisposable
         Origin = DataRequestOrigin.Plugin(pluginId, contributionId, grantedCapabilities, token);
     }
 
+    /// <summary>
+    /// Gets plugin id.
+    /// </summary>
     public string PluginId { get; }
 
+    /// <summary>
+    /// Gets contribution id.
+    /// </summary>
     public string ContributionId { get; }
 
+    /// <summary>
+    /// Gets granted capabilities.
+    /// </summary>
     public DataCapability GrantedCapabilities { get; }
 
+    /// <summary>
+    /// Gets origin.
+    /// </summary>
     public DataRequestOrigin Origin { get; }
 
+    /// <summary>
+    /// Represents the is active value.
+    /// </summary>
     public bool IsActive
     {
         get
@@ -227,6 +260,9 @@ public sealed class DataContributionLease : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the register client descriptor operation.
+    /// </summary>
     public IDisposable RegisterClientDescriptor(DataClientDescriptor descriptor)
     {
         ArgumentNullException.ThrowIfNull(descriptor);
@@ -236,6 +272,9 @@ public sealed class DataContributionLease : IAsyncDisposable
         return TrackDisposable(lease, _descriptorLeases);
     }
 
+    /// <summary>
+    /// Executes the register client&lt;tclient&gt; operation.
+    /// </summary>
     public IDisposable RegisterClient<TClient>(TClient client)
         where TClient : class, IDataClient
     {
@@ -244,6 +283,9 @@ public sealed class DataContributionLease : IAsyncDisposable
         return TrackDisposable(lease, _clientLeases);
     }
 
+    /// <summary>
+    /// Executes the register handler operation.
+    /// </summary>
     public void RegisterHandler(IDataRequestHandler handler)
     {
         ArgumentNullException.ThrowIfNull(handler);
@@ -255,6 +297,9 @@ public sealed class DataContributionLease : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Executes the register connection async operation.
+    /// </summary>
     public async ValueTask<DataResult<DataConnectionRegistration>> RegisterConnectionAsync(
         IDataConnection connection)
     {
@@ -295,6 +340,9 @@ public sealed class DataContributionLease : IAsyncDisposable
             "Data contribution stopped while its connection was being registered."));
     }
 
+    /// <summary>
+    /// Executes the revoke async operation.
+    /// </summary>
     public ValueTask RevokeAsync()
     {
         TaskCompletionSource? completion = null;
@@ -321,6 +369,9 @@ public sealed class DataContributionLease : IAsyncDisposable
             : new ValueTask(revokeTask);
     }
 
+    /// <summary>
+    /// Gets dispose async.
+    /// </summary>
     public ValueTask DisposeAsync() => RevokeAsync();
 
     internal bool Owns(DataRequestOrigin origin)

@@ -1,7 +1,13 @@
 namespace AtomUI.City.PluginSystem;
 
+/// <summary>
+/// Represents plugin dependency validator.
+/// </summary>
 public static class PluginDependencyValidator
 {
+    /// <summary>
+    /// Executes the validate operation.
+    /// </summary>
     public static PluginValidationResult Validate(IReadOnlyList<PluginDescriptor> plugins)
     {
         ArgumentNullException.ThrowIfNull(plugins);

@@ -3,8 +3,14 @@ using System.Text;
 
 namespace AtomUI.City.Data;
 
+/// <summary>
+/// Represents data cache fingerprint.
+/// </summary>
 public static class DataCacheFingerprint
 {
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static string Create(string endpoint, string method, ReadOnlySpan<byte> canonicalPayload)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint);
@@ -17,6 +23,9 @@ public static class DataCacheFingerprint
         return Convert.ToHexString(hash.GetHashAndReset()).ToLowerInvariant();
     }
 
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static string Create(string endpoint, string method, string canonicalPayload)
     {
         ArgumentNullException.ThrowIfNull(canonicalPayload);

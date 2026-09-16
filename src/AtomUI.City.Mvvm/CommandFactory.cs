@@ -4,8 +4,14 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace AtomUI.City.Mvvm;
 
+/// <summary>
+/// Represents command factory.
+/// </summary>
 public static class CommandFactory
 {
+    /// <summary>
+    /// Executes the create operation.
+    /// </summary>
     public static IRelayCommand Create(
         Action execute,
         Func<bool>? canExecute = null,
@@ -21,6 +27,9 @@ public static class CommandFactory
             : new RelayCommand(() => Execute(execute, executionState, diagnostics), canExecute);
     }
 
+    /// <summary>
+    /// Executes the create async operation.
+    /// </summary>
     public static IAsyncRelayCommand CreateAsync(
         Func<CancellationToken, Task> execute,
         CommandExecutionState? state = null,

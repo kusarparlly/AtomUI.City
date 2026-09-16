@@ -4,8 +4,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents event bus service collection extensions.
+/// </summary>
 public static class EventBusServiceCollectionExtensions
 {
+    /// <summary>
+    /// Executes the add event bus operation.
+    /// </summary>
     public static IServiceCollection AddEventBus(
         this IServiceCollection services,
         EventChannelOptions defaultChannelOptions)
@@ -18,6 +24,9 @@ public static class EventBusServiceCollectionExtensions
         return services.AddEventBus();
     }
 
+    /// <summary>
+    /// Executes the add event bus operation.
+    /// </summary>
     public static IServiceCollection AddEventBus(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
@@ -85,6 +94,9 @@ public static class EventBusServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Executes the add event payload diagnostic projector&lt;tevent, tprojector&gt; operation.
+    /// </summary>
     public static IServiceCollection AddEventPayloadDiagnosticProjector<TEvent, TProjector>(
         this IServiceCollection services)
         where TProjector : class, IEventPayloadDiagnosticProjector<TEvent>
@@ -99,6 +111,9 @@ public static class EventBusServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Executes the configure event bus diagnostics operation.
+    /// </summary>
     public static IServiceCollection ConfigureEventBusDiagnostics(
         this IServiceCollection services,
         EventBusDiagnosticsOptions options)
@@ -110,6 +125,9 @@ public static class EventBusServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Executes the configure event bus runtime operation.
+    /// </summary>
     public static IServiceCollection ConfigureEventBusRuntime(
         this IServiceCollection services,
         EventBusRuntimeOptions options)
@@ -158,6 +176,9 @@ public static class EventBusServiceCollectionExtensions
         }
     }
 
+    /// <summary>
+    /// Executes the add event contract&lt;tevent&gt; operation.
+    /// </summary>
     public static IServiceCollection AddEventContract<TEvent>(
         this IServiceCollection services,
         EventContractId contractId)
@@ -170,6 +191,9 @@ public static class EventBusServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Executes the configure event channel&lt;tevent&gt; operation.
+    /// </summary>
     public static IServiceCollection ConfigureEventChannel<TEvent>(
         this IServiceCollection services,
         EventChannelOptions options)
@@ -177,6 +201,9 @@ public static class EventBusServiceCollectionExtensions
         return services.ConfigureEventChannel(EventChannel<TEvent>.Default, options);
     }
 
+    /// <summary>
+    /// Executes the configure event channel&lt;tevent&gt; operation.
+    /// </summary>
     public static IServiceCollection ConfigureEventChannel<TEvent>(
         this IServiceCollection services,
         EventChannel<TEvent> channel,

@@ -3,15 +3,24 @@ using Avalonia.Threading;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents avalonia route outlet target.
+/// </summary>
 public sealed class AvaloniaRouteOutletTarget : IRouteOutletTarget
 {
     private readonly ContentControl _control;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AvaloniaRouteOutletTarget</c> type.
+    /// </summary>
     public AvaloniaRouteOutletTarget(ContentControl control)
     {
         _control = control ?? throw new ArgumentNullException(nameof(control));
     }
 
+    /// <summary>
+    /// Represents the content value.
+    /// </summary>
     public object? Content
     {
         get
@@ -21,6 +30,9 @@ public sealed class AvaloniaRouteOutletTarget : IRouteOutletTarget
         }
     }
 
+    /// <summary>
+    /// Executes the set content operation.
+    /// </summary>
     public void SetContent(object? content)
     {
         EnsureAccess();

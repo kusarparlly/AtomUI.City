@@ -4,6 +4,9 @@ using AtomUI.City.Core.Lifecycle;
 
 namespace AtomUI.City.EventBus;
 
+/// <summary>
+/// Represents in memory event bus.
+/// </summary>
 public sealed class InMemoryEventBus :
     IEventBus,
     IEventChannelMonitor,
@@ -54,6 +57,9 @@ public sealed class InMemoryEventBus :
     private long _deliverySkippedCount;
     private long _totalHandlerDurationTicks;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InMemoryEventBus"/> type.
+    /// </summary>
     public InMemoryEventBus(
         IEventContractRegistry? contractRegistry = null,
         IHostDiagnostics? diagnostics = null,
@@ -114,6 +120,9 @@ public sealed class InMemoryEventBus :
         }
     }
 
+    /// <summary>
+    /// Executes the subscribe&lt;tevent&gt; operation.
+    /// </summary>
     public IEventSubscription Subscribe<TEvent>(
         LifecycleScope owner,
         Func<EventContext<TEvent>, ValueTask> handler,
@@ -122,6 +131,9 @@ public sealed class InMemoryEventBus :
         return Subscribe(owner, EventChannel<TEvent>.Default, handler, options);
     }
 
+    /// <summary>
+    /// Executes the subscribe&lt;tevent&gt; operation.
+    /// </summary>
     public IEventSubscription Subscribe<TEvent>(
         LifecycleScope owner,
         EventChannel<TEvent> channel,
@@ -134,6 +146,9 @@ public sealed class InMemoryEventBus :
         return SubscribeCore(owner, channel.Name, handler, options ?? EventSubscriptionOptions.Serialized);
     }
 
+    /// <summary>
+    /// Executes the subscribe&lt;tevent&gt; operation.
+    /// </summary>
     public IEventSubscription Subscribe<TEvent>(
         LifecycleScope owner,
         IEventHandler<TEvent> handler,
@@ -144,6 +159,9 @@ public sealed class InMemoryEventBus :
         return Subscribe(owner, EventChannel<TEvent>.Default, handler, options);
     }
 
+    /// <summary>
+    /// Executes the subscribe&lt;tevent&gt; operation.
+    /// </summary>
     public IEventSubscription Subscribe<TEvent>(
         LifecycleScope owner,
         EventChannel<TEvent> channel,
@@ -161,6 +179,9 @@ public sealed class InMemoryEventBus :
             handler.GetType().FullName);
     }
 
+    /// <summary>
+    /// Executes the publish async&lt;tevent&gt; operation.
+    /// </summary>
     public ValueTask<EventPublishResult> PublishAsync<TEvent>(
         TEvent eventData,
         EventPublishOptions? options = null,
@@ -169,6 +190,9 @@ public sealed class InMemoryEventBus :
         return PublishAsync(EventChannel<TEvent>.Default, eventData, options, cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the publish async&lt;tevent&gt; operation.
+    /// </summary>
     public async ValueTask<EventPublishResult> PublishAsync<TEvent>(
         EventChannel<TEvent> channel,
         TEvent eventData,
@@ -395,6 +419,9 @@ public sealed class InMemoryEventBus :
         };
     }
 
+    /// <summary>
+    /// Executes the post async&lt;tevent&gt; operation.
+    /// </summary>
     public ValueTask<EventPostResult> PostAsync<TEvent>(
         TEvent eventData,
         EventPublishOptions? options = null,
@@ -403,6 +430,9 @@ public sealed class InMemoryEventBus :
         return PostAsync(EventChannel<TEvent>.Default, eventData, options, cancellationToken);
     }
 
+    /// <summary>
+    /// Executes the post async&lt;tevent&gt; operation.
+    /// </summary>
     public async ValueTask<EventPostResult> PostAsync<TEvent>(
         EventChannel<TEvent> channel,
         TEvent eventData,
@@ -504,11 +534,17 @@ public sealed class InMemoryEventBus :
             Accepted: true);
     }
 
+    /// <summary>
+    /// Executes the dispose operation.
+    /// </summary>
     public void Dispose()
     {
         _ = RequestDisposal();
     }
 
+    /// <summary>
+    /// Executes the dispose async operation.
+    /// </summary>
     public ValueTask DisposeAsync()
     {
         return new ValueTask(RequestDisposal());
@@ -881,6 +917,9 @@ public sealed class InMemoryEventBus :
         }
     }
 
+    /// <summary>
+    /// Executes the get channel snapshots operation.
+    /// </summary>
     public IReadOnlyList<EventChannelMetricsSnapshot> GetChannelSnapshots()
     {
         lock (_syncRoot)
@@ -894,6 +933,9 @@ public sealed class InMemoryEventBus :
         }
     }
 
+    /// <summary>
+    /// Executes the get snapshot operation.
+    /// </summary>
     public EventBusMetricsSnapshot GetSnapshot()
     {
         int activeSubscriptionCount;

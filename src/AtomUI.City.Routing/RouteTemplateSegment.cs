@@ -1,5 +1,8 @@
 namespace AtomUI.City.Routing;
 
+/// <summary>
+/// Represents route template segment.
+/// </summary>
 public sealed class RouteTemplateSegment
 {
     private RouteTemplateSegment(
@@ -18,16 +21,34 @@ public sealed class RouteTemplateSegment
         Constraints = Array.AsReadOnly(constraints.ToArray());
     }
 
+    /// <summary>
+    /// Gets kind.
+    /// </summary>
     public RouteTemplateSegmentKind Kind { get; }
 
+    /// <summary>
+    /// Gets literal.
+    /// </summary>
     public string? Literal { get; }
 
+    /// <summary>
+    /// Gets name.
+    /// </summary>
     public string? Name { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether is optional.
+    /// </summary>
     public bool IsOptional { get; }
 
+    /// <summary>
+    /// Gets default value.
+    /// </summary>
     public string? DefaultValue { get; }
 
+    /// <summary>
+    /// Gets constraints.
+    /// </summary>
     public IReadOnlyList<string> Constraints { get; }
 
     internal static RouteTemplateSegment LiteralSegment(string literal)

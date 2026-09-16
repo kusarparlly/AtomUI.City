@@ -1,11 +1,20 @@
 namespace AtomUI.City.State;
 
+/// <summary>
+/// Represents state scope accessor.
+/// </summary>
 public sealed class StateScopeAccessor : IStateScopeAccessor
 {
     private readonly AsyncLocal<IStateScope?> _current = new();
 
+    /// <summary>
+    /// Gets current.
+    /// </summary>
     public IStateScope? Current => _current.Value;
 
+    /// <summary>
+    /// Executes the push operation.
+    /// </summary>
     public IDisposable Push(IStateScope scope)
     {
         ArgumentNullException.ThrowIfNull(scope);

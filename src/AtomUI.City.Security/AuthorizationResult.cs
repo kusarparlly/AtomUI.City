@@ -1,5 +1,8 @@
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents authorization result.
+/// </summary>
 public sealed class AuthorizationResult
 {
     private AuthorizationResult(
@@ -20,22 +23,49 @@ public sealed class AuthorizationResult
         Exception = exception;
     }
 
+    /// <summary>
+    /// Gets status.
+    /// </summary>
     public AuthorizationResultStatus Status { get; }
 
+    /// <summary>
+    /// Gets failure kind.
+    /// </summary>
     public SecurityFailureKind FailureKind { get; }
 
+    /// <summary>
+    /// Gets failed requirement.
+    /// </summary>
     public string? FailedRequirement { get; }
 
+    /// <summary>
+    /// Gets message.
+    /// </summary>
     public string? Message { get; }
 
+    /// <summary>
+    /// Gets message key.
+    /// </summary>
     public string? MessageKey { get; }
 
+    /// <summary>
+    /// Gets message arguments.
+    /// </summary>
     public IReadOnlyList<object?>? MessageArguments { get; }
 
+    /// <summary>
+    /// Gets exception.
+    /// </summary>
     public Exception? Exception { get; }
 
+    /// <summary>
+    /// Gets succeeded.
+    /// </summary>
     public bool Succeeded => Status == AuthorizationResultStatus.Allowed;
 
+    /// <summary>
+    /// Executes the allowed operation.
+    /// </summary>
     public static AuthorizationResult Allowed()
     {
         return new AuthorizationResult(
@@ -48,6 +78,9 @@ public sealed class AuthorizationResult
             exception: null);
     }
 
+    /// <summary>
+    /// Executes the challenge operation.
+    /// </summary>
     public static AuthorizationResult Challenge(
         string? message = null,
         string? messageKey = "Errors.AuthenticationRequired",
@@ -63,6 +96,9 @@ public sealed class AuthorizationResult
             exception: null);
     }
 
+    /// <summary>
+    /// Executes the forbidden operation.
+    /// </summary>
     public static AuthorizationResult Forbidden(
         string failedRequirement,
         string? message = null,
@@ -81,6 +117,9 @@ public sealed class AuthorizationResult
             exception: null);
     }
 
+    /// <summary>
+    /// Executes the denied operation.
+    /// </summary>
     public static AuthorizationResult Denied(
         string failedRequirement,
         string? message = null,
@@ -99,6 +138,9 @@ public sealed class AuthorizationResult
             exception: null);
     }
 
+    /// <summary>
+    /// Executes the failed operation.
+    /// </summary>
     public static AuthorizationResult Failed(
         SecurityFailureKind failureKind,
         string? failedRequirement = null,
@@ -130,6 +172,9 @@ public sealed class AuthorizationResult
             exception);
     }
 
+    /// <summary>
+    /// Executes the cancelled operation.
+    /// </summary>
     public static AuthorizationResult Cancelled(
         string? message = null,
         string? messageKey = "Errors.Cancelled",

@@ -4,8 +4,7 @@
     <TargetFrameworks>$(AtomUICityTargetFrameworks)</TargetFrameworks>
     <EnablePackageValidation>true</EnablePackageValidation>
     <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
-    <NoWarn>$([System.String]::Copy('$(NoWarn)').Replace('CS1591;', '').Replace(';CS1591', ''))</NoWarn>
-    <WarningsAsErrors>$(WarningsAsErrors);CS1591;RS0016;RS0017;RS0022;RS0024;RS0025;RS0026;RS0027;RS0036;RS0041;RS0048</WarningsAsErrors>
+    <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017;RS0022;RS0024;RS0025;RS0026;RS0027;RS0036;RS0041;RS0048</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

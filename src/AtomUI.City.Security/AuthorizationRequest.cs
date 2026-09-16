@@ -2,10 +2,16 @@ using System.Security.Claims;
 
 namespace AtomUI.City.Security;
 
+/// <summary>
+/// Represents authorization request.
+/// </summary>
 public sealed class AuthorizationRequest
 {
     private readonly ClaimsPrincipal _principal;
 
+    /// <summary>
+    /// Initializes a new instance of the <c>AuthorizationRequest</c> type.
+    /// </summary>
     public AuthorizationRequest(
         ClaimsPrincipal? principal,
         AuthorizationPolicy policy,
@@ -23,14 +29,26 @@ public sealed class AuthorizationRequest
         ContributionId = contributionId;
     }
 
+    /// <summary>
+    /// Gets principal.
+    /// </summary>
     public ClaimsPrincipal Principal => SecurityPrincipalSnapshot.Clone(_principal);
 
     internal ClaimsPrincipal PrincipalSnapshot => _principal;
 
+    /// <summary>
+    /// Gets policy.
+    /// </summary>
     public AuthorizationPolicy Policy { get; }
 
+    /// <summary>
+    /// Gets resource name.
+    /// </summary>
     public string? ResourceName { get; }
 
+    /// <summary>
+    /// Gets contribution id.
+    /// </summary>
     public string? ContributionId { get; }
 
     private static void ValidateOptional(string? value, string parameterName)

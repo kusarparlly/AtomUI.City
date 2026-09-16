@@ -2,12 +2,18 @@ using AtomUI.City.Core.Modularity;
 
 namespace AtomUI.City.Testing;
 
+/// <summary>
+/// Represents module test host builder.
+/// </summary>
 public sealed class ModuleTestHostBuilder
 {
     private readonly List<ModuleTestRecord> _modules = [];
     private readonly TestHostBuilder _hostBuilder = TestHost.CreateBuilder();
     private bool _built;
 
+    /// <summary>
+    /// Executes the use module operation.
+    /// </summary>
     public ModuleTestHostBuilder UseModule(string name, IModule module)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -19,6 +25,9 @@ public sealed class ModuleTestHostBuilder
         return this;
     }
 
+    /// <summary>
+    /// Executes the use host property operation.
+    /// </summary>
     public ModuleTestHostBuilder UseHostProperty(string key, object? value)
     {
         ThrowIfBuilt();
@@ -28,6 +37,9 @@ public sealed class ModuleTestHostBuilder
         return this;
     }
 
+    /// <summary>
+    /// Executes the build operation.
+    /// </summary>
     public ModuleTestHost Build()
     {
         ThrowIfBuilt();

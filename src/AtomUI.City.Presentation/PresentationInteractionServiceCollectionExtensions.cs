@@ -5,8 +5,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AtomUI.City.Presentation;
 
+/// <summary>
+/// Represents presentation interaction service collection extensions.
+/// </summary>
 public static class PresentationInteractionServiceCollectionExtensions
 {
+    /// <summary>
+    /// Executes the add presentation interaction handlers operation.
+    /// </summary>
     public static IServiceCollection AddPresentationInteractionHandlers(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
