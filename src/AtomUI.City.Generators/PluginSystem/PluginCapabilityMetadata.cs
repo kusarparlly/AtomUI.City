@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.PluginSystem;
 
-public sealed class PluginCapabilityMetadata
+internal sealed class PluginCapabilityMetadata
 {
     public PluginCapabilityMetadata(string name, IReadOnlyList<string> scope)
     {

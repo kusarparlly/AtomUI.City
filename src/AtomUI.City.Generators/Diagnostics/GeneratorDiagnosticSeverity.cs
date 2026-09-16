@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Diagnostics;
 
-public enum GeneratorDiagnosticSeverity
+internal enum GeneratorDiagnosticSeverity
 {
     Info,
     Warning,

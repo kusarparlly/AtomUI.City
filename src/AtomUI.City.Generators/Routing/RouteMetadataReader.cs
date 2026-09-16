@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AtomUI.City.Generators.Routing;
 
-public static class RouteMetadataReader
+internal static class RouteMetadataReader
 {
     private const string IndexRouteAttributeName = "AtomUI.City.Routing.IndexRouteAttribute";
     private const string LayoutRouteAttributeName = "AtomUI.City.Routing.LayoutRouteAttribute";

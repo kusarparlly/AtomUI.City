@@ -2,7 +2,7 @@ using AtomUI.City.Generators.Diagnostics;
 
 namespace AtomUI.City.Generators.PluginSystem;
 
-public sealed class PluginManifestResult
+internal sealed class PluginManifestResult
 {
     public PluginManifestResult(PluginManifest manifest, IReadOnlyList<GeneratorDiagnostic> diagnostics)
     {

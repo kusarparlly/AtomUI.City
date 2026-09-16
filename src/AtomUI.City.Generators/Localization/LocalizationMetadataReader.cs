@@ -3,7 +3,7 @@ using AtomUI.City.Generators.Diagnostics;
 
 namespace AtomUI.City.Generators.Localization;
 
-public static class LocalizationMetadataReader
+internal static class LocalizationMetadataReader
 {
     private const string LanguagePackageAttributeName = "AtomUI.City.Localization.LanguagePackageAttribute";
     private const string LocalizedResourceAttributeName = "AtomUI.City.Localization.LocalizedResourceAttribute";

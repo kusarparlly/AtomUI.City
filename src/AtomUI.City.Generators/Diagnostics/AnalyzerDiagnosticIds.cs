@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Diagnostics;
 
-public static class AnalyzerDiagnosticIds
+internal static class AnalyzerDiagnosticIds
 {
     public const string BuildServiceProviderNotAllowed = "AUCANL0001";
 }

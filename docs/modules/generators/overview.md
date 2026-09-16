@@ -29,6 +29,7 @@ AOT-first source generator 和 analyzer 包。
 ## 明确非目标
 
 - 不承载业务领域能力。
+- 不提供供应用或第三方 Generator 直接调用的 Reader、Metadata、Manifest、Builder 或 SourceBuilder SDK。
 
 ## 使用者画像
 
@@ -48,6 +49,8 @@ AOT-first source generator 和 analyzer 包。
 ## 与 Testing 的关系
 
 `tests/AtomUI.City.Generators.Tests` 必须覆盖 [features.md](features.md) 中每个 Feature ID。产品级完成不能只看现有测试文件存在，必须补齐 [testing.md](testing.md) 中列出的必断言行为。
+
+测试程序集通过 `InternalsVisibleTo` 白盒验证内部生成流水线；这不把 Internal Pipeline 提升为开发者 Public API。
 
 ## 文档索引
 

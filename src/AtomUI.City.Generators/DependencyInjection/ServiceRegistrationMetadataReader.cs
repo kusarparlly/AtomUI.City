@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace AtomUI.City.Generators.DependencyInjection;
 
-public static class ServiceRegistrationMetadataReader
+internal static class ServiceRegistrationMetadataReader
 {
     private const string ExposeServicesAttributeName = "AtomUI.City.Core.DependencyInjection.ExposeServicesAttribute";
     private const string ScopedDependencyInterfaceName = "AtomUI.City.Core.DependencyInjection.IScopedDependency";

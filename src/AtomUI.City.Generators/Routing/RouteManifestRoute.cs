@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Routing;
 
-public sealed class RouteManifestRoute
+internal sealed class RouteManifestRoute
 {
     public RouteManifestRoute(
         string id,

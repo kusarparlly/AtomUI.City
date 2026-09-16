@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace AtomUI.City.Generators.Routing;
 
-public static class RouteSourceBuilder
+internal static class RouteSourceBuilder
 {
     public static string Build(
         IReadOnlyList<RouteMapMetadata> routeMaps,

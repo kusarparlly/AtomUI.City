@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace AtomUI.City.Generators.Localization;
 
-public static class LocalizationRegistrarSourceBuilder
+internal static class LocalizationRegistrarSourceBuilder
 {
     public static string Build(LocalizationManifest manifest)
     {

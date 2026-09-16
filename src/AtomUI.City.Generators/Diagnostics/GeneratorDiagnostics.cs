@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace AtomUI.City.Generators.Diagnostics;
 
-public static class GeneratorDiagnostics
+internal static class GeneratorDiagnostics
 {
     public static readonly GeneratorDiagnosticDefinition DuplicateModuleName = new GeneratorDiagnosticDefinition(
         GeneratorDiagnosticIds.DuplicateModuleName,

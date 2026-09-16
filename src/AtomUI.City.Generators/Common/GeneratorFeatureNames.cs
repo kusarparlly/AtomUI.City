@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Common;
 
-public static class GeneratorFeatureNames
+internal static class GeneratorFeatureNames
 {
     public const string DependencyInjection = nameof(DependencyInjection);
     public const string Modularity = nameof(Modularity);

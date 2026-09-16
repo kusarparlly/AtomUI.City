@@ -3,7 +3,7 @@ using AtomUI.City.Generators.EventBus;
 
 namespace AtomUI.City.Generators.DependencyInjection;
 
-public static class ServiceRegistrarSourceBuilder
+internal static class ServiceRegistrarSourceBuilder
 {
     public static string GetRegistrarTypeName(string assemblyName)
     {

@@ -2,7 +2,7 @@ using AtomUI.City.Generators.Diagnostics;
 
 namespace AtomUI.City.Generators.Modularity;
 
-public sealed class ModuleDependencyGraphResult
+internal sealed class ModuleDependencyGraphResult
 {
     public ModuleDependencyGraphResult(
         IReadOnlyList<ModuleMetadata> orderedModules,

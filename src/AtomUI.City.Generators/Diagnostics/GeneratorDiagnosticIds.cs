@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Diagnostics;
 
-public static class GeneratorDiagnosticIds
+internal static class GeneratorDiagnosticIds
 {
     public const string DuplicateModuleName = "AUCGEN002";
     public const string CircularModuleDependency = "AUCGEN003";

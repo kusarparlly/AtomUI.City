@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace AtomUI.City.Generators.Data;
 
-public sealed class DataClientGenerationMetadata
+internal sealed class DataClientGenerationMetadata
 {
     public DataClientGenerationMetadata(
         string typeName,
@@ -31,7 +31,7 @@ public sealed class DataClientGenerationMetadata
     public Location? Location { get; }
 }
 
-public sealed class DataOperationGenerationMetadata
+internal sealed class DataOperationGenerationMetadata
 {
     public DataOperationGenerationMetadata(
         string operationName,

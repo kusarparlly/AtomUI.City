@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.PluginSystem;
 
-public sealed class PluginDependencyManifestEntry
+internal sealed class PluginDependencyManifestEntry
 {
     public PluginDependencyManifestEntry(string pluginId, string? versionRange)
     {

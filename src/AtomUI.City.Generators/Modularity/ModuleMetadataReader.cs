@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace AtomUI.City.Generators.Modularity;
 
-public static class ModuleMetadataReader
+internal static class ModuleMetadataReader
 {
     private const string DependsOnAttributeName = "AtomUI.City.Core.Modularity.DependsOnAttribute";
     private const string ApplicationModuleAttributeName = "AtomUI.City.Core.Modularity.ApplicationModuleAttribute";

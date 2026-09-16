@@ -2,7 +2,7 @@ using AtomUI.City.Generators.Diagnostics;
 
 namespace AtomUI.City.Generators.Modularity;
 
-public static class ModuleDependencyGraphBuilder
+internal static class ModuleDependencyGraphBuilder
 {
     public static ModuleDependencyGraphResult Build(
         IReadOnlyList<ModuleMetadata> modules,

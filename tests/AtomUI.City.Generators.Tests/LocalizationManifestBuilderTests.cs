@@ -241,12 +241,13 @@ public sealed class LocalizationManifestBuilderTests
     }
 
     [Theory]
-    [InlineData(LocalizedResourceMetadataKind.Pluralization)]
-    [InlineData(LocalizedResourceMetadataKind.ResourceObject)]
-    [InlineData(LocalizedResourceMetadataKind.FlowDirection)]
-    [InlineData(LocalizedResourceMetadataKind.CultureMetadata)]
-    public void BuildRejectsResourceKindsWithoutRuntimeContract(LocalizedResourceMetadataKind kind)
+    [InlineData(nameof(LocalizedResourceMetadataKind.Pluralization))]
+    [InlineData(nameof(LocalizedResourceMetadataKind.ResourceObject))]
+    [InlineData(nameof(LocalizedResourceMetadataKind.FlowDirection))]
+    [InlineData(nameof(LocalizedResourceMetadataKind.CultureMetadata))]
+    public void BuildRejectsResourceKindsWithoutRuntimeContract(string kindName)
     {
+        var kind = Enum.Parse<LocalizedResourceMetadataKind>(kindName);
         var result = LocalizationManifestBuilder.Build(
             [Package("Settings.zh-CN", "zh-CN")],
             [new LocalizedResourceMetadata(

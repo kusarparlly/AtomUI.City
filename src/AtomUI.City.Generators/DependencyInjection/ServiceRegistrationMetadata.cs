@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.DependencyInjection;
 
-public sealed class ServiceRegistrationMetadata
+internal sealed class ServiceRegistrationMetadata
 {
     public ServiceRegistrationMetadata(
         string implementationTypeName,

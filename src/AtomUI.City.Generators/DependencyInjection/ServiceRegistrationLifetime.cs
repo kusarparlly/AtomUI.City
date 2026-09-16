@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.DependencyInjection;
 
-public enum ServiceRegistrationLifetime
+internal enum ServiceRegistrationLifetime
 {
     Singleton,
     Scoped,

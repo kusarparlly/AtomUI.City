@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Diagnostics;
 
-public sealed class GeneratorDiagnosticDefinition
+internal sealed class GeneratorDiagnosticDefinition
 {
     public GeneratorDiagnosticDefinition(string id, string title, string message, GeneratorDiagnosticSeverity severity)
     {

@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Common;
 
-public enum GeneratorFeature
+internal enum GeneratorFeature
 {
     DependencyInjection,
     Modularity,

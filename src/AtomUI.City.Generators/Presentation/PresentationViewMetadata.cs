@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace AtomUI.City.Generators.Presentation;
 
-public sealed class PresentationViewMetadata
+internal sealed class PresentationViewMetadata
 {
     public PresentationViewMetadata(
         string viewTypeName,

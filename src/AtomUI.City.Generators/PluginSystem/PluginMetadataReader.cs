@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace AtomUI.City.Generators.PluginSystem;
 
-public static class PluginMetadataReader
+internal static class PluginMetadataReader
 {
     private const string ContributionManifestAttributeName = "AtomUI.City.PluginSystem.ContributionManifestAttribute";
     private const string PluginAttributeName = "AtomUI.City.PluginSystem.PluginAttribute";

@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.PluginSystem;
 
-public sealed class PluginContributionManifestEntry
+internal sealed class PluginContributionManifestEntry
 {
     public PluginContributionManifestEntry(string type, string path, bool required)
     {

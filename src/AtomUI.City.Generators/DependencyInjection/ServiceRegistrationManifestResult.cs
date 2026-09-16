@@ -2,7 +2,7 @@ using AtomUI.City.Generators.Diagnostics;
 
 namespace AtomUI.City.Generators.DependencyInjection;
 
-public sealed class ServiceRegistrationManifestResult
+internal sealed class ServiceRegistrationManifestResult
 {
     public ServiceRegistrationManifestResult(
         ServiceRegistrationManifest manifest,

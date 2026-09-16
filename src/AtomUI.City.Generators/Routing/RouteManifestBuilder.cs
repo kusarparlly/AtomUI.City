@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace AtomUI.City.Generators.Routing;
 
-public static class RouteManifestBuilder
+internal static class RouteManifestBuilder
 {
     public static RouteManifestResult Build(IReadOnlyList<RouteDefinitionMetadata> routes)
     {

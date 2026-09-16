@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Modularity;
 
-public sealed class ModuleMetadata
+internal sealed class ModuleMetadata
 {
     public ModuleMetadata(
         string name,

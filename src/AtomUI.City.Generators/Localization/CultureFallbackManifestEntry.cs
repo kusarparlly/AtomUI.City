@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Localization;
 
-public sealed class CultureFallbackManifestEntry
+internal sealed class CultureFallbackManifestEntry
 {
     public CultureFallbackManifestEntry(string culture, string fallbackCulture)
     {

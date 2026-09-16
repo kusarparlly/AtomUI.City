@@ -2,7 +2,7 @@ using AtomUI.City.Generators.Diagnostics;
 
 namespace AtomUI.City.Generators.DependencyInjection;
 
-public static class ServiceRegistrationManifestBuilder
+internal static class ServiceRegistrationManifestBuilder
 {
     public static ServiceRegistrationManifestResult Build(IReadOnlyList<ServiceRegistrationMetadata> registrations)
     {

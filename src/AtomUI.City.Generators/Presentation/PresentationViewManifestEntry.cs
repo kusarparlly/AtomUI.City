@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Presentation;
 
-public sealed class PresentationViewManifestEntry
+internal sealed class PresentationViewManifestEntry
 {
     public PresentationViewManifestEntry(
         string viewTypeName,

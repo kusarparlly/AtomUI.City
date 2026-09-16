@@ -2,7 +2,7 @@ using System.Text;
 
 namespace AtomUI.City.Generators.Data;
 
-public static class DataClientRegistrarSourceBuilder
+internal static class DataClientRegistrarSourceBuilder
 {
     public static string GetRegistrarTypeName(string assemblyName)
     {

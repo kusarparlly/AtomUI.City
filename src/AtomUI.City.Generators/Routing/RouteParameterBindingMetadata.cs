@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Routing;
 
-public sealed class RouteParameterBindingMetadata
+internal sealed class RouteParameterBindingMetadata
 {
     public RouteParameterBindingMetadata(string routeName, string memberName)
     {

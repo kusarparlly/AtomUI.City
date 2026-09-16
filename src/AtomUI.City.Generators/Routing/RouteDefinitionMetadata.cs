@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Routing;
 
-public sealed class RouteDefinitionMetadata
+internal sealed class RouteDefinitionMetadata
 {
     public RouteDefinitionMetadata(
         string routeMapTypeName,

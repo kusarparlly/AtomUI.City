@@ -2,7 +2,7 @@
 
 ## 兼容性范围
 
-本模块兼容面包括 public API、options、attribute、diagnostics code、manifest/schema、generated output、MSBuild property、CLI envelope、template layout、snapshot 或 plugin contract 中实际适用的部分。
+本模块兼容面包括 Roslyn Tooling Entry、diagnostics code、manifest/schema、generated output 以及构建集成中实际适用的部分。Reader、Metadata、Manifest、Builder、SourceBuilder 与诊断辅助模型是 `InternalContract`，不提供第三方 Generator SDK。
 
 ## 模块兼容性硬边界
 
@@ -13,7 +13,8 @@
 
 ## API 兼容规则
 
-- public 类型、成员、枚举值、attribute 参数和扩展方法默认视为兼容性承诺。
+- `AtomUICityIncrementalGenerator` 与 `BuildServiceProviderUsageAnalyzer` 是 Public Tooling Entry；其 Roslyn 发现、实例化和执行行为属于兼容性承诺。
+- Internal Pipeline 类型及其成员不形成二进制兼容承诺，可以在保持生成结果、诊断和 schema 合同的前提下演进。
 - 删除、重命名、改变默认行为、异常类型、Result status 或诊断码语义属于 breaking change。
 - 新增 API 可以 minor 版本发布，但必须有文档、测试和迁移说明。
 - `PresentationViewMetadata.HasAmbiguousConstructors` 是 1.0 前新增 metadata 成员；后续不能删除或改为允许 ambiguous registrar generation。

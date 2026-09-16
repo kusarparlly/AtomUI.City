@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Localization;
 
-public sealed class LanguagePackageMetadata
+internal sealed class LanguagePackageMetadata
 {
     public LanguagePackageMetadata(
         string packageId,

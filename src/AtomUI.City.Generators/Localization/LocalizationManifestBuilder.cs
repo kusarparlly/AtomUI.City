@@ -3,7 +3,7 @@ using AtomUI.City.Generators.Diagnostics;
 
 namespace AtomUI.City.Generators.Localization;
 
-public static class LocalizationManifestBuilder
+internal static class LocalizationManifestBuilder
 {
     public static LocalizationManifestResult Build(
         IReadOnlyList<LanguagePackageMetadata> packages,

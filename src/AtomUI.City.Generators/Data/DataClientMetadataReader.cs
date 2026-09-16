@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace AtomUI.City.Generators.Data;
 
-public static class DataClientMetadataReader
+internal static class DataClientMetadataReader
 {
     private const string ClientAttribute = "AtomUI.City.Data.DataClientAttribute";
     private const string OperationAttribute = "AtomUI.City.Data.DataOperationAttribute";

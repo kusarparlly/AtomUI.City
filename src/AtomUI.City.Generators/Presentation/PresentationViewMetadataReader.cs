@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace AtomUI.City.Generators.Presentation;
 
-public static class PresentationViewMetadataReader
+internal static class PresentationViewMetadataReader
 {
     private const string ViewForAttributeName = "AtomUI.City.Presentation.ViewForAttribute";
 

@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.PluginSystem;
 
-public sealed class PluginMetadata
+internal sealed class PluginMetadata
 {
     public PluginMetadata(
         string schemaVersion,

@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.PluginSystem;
 
-public sealed class PluginManifest
+internal sealed class PluginManifest
 {
     public PluginManifest(
         string schemaVersion,

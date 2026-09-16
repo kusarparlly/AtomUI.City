@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Localization;
 
-public enum ResourceScopeMetadata
+internal enum ResourceScopeMetadata
 {
     Host,
     Module,

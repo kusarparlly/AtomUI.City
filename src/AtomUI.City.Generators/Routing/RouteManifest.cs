@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Routing;
 
-public sealed class RouteManifest
+internal sealed class RouteManifest
 {
     public RouteManifest(IReadOnlyList<RouteManifestRoute> routes)
     {

@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.PluginSystem;
 
-public sealed class PluginDependencyMetadata
+internal sealed class PluginDependencyMetadata
 {
     public PluginDependencyMetadata(string pluginId, string? versionRange)
     {

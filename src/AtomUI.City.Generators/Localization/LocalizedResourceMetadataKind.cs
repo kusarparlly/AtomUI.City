@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Localization;
 
-public enum LocalizedResourceMetadataKind
+internal enum LocalizedResourceMetadataKind
 {
     String,
     FormattedString,

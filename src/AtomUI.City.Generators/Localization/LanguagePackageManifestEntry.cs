@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Localization;
 
-public sealed class LanguagePackageManifestEntry
+internal sealed class LanguagePackageManifestEntry
 {
     public LanguagePackageManifestEntry(
         string packageId,

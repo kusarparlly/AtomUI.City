@@ -2,7 +2,7 @@ using System.Text;
 
 namespace AtomUI.City.Generators.Modularity;
 
-public static class ModuleRegistrarSourceBuilder
+internal static class ModuleRegistrarSourceBuilder
 {
     public static string GetRegistrarTypeName(string assemblyName)
     {

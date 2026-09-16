@@ -2,7 +2,7 @@ using AtomUI.City.Generators.Diagnostics;
 
 namespace AtomUI.City.Generators.Routing;
 
-public sealed class RouteManifestResult
+internal sealed class RouteManifestResult
 {
     public RouteManifestResult(RouteManifest manifest, IReadOnlyList<GeneratorDiagnostic> diagnostics)
     {

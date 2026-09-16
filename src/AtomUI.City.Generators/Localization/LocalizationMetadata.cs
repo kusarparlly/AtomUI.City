@@ -2,7 +2,7 @@ using AtomUI.City.Generators.Diagnostics;
 
 namespace AtomUI.City.Generators.Localization;
 
-public sealed class LocalizationMetadata
+internal sealed class LocalizationMetadata
 {
     public LocalizationMetadata(
         IReadOnlyList<LanguagePackageMetadata> packages,

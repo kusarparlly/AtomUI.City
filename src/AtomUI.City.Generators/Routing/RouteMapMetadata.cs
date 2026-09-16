@@ -2,7 +2,7 @@ namespace AtomUI.City.Generators.Routing;
 
 using Microsoft.CodeAnalysis;
 
-public sealed class RouteMapMetadata
+internal sealed class RouteMapMetadata
 {
     public RouteMapMetadata(
         string typeName,

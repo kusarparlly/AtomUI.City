@@ -2,7 +2,7 @@ using AtomUI.City.Generators.Diagnostics;
 
 namespace AtomUI.City.Generators.Presentation;
 
-public static class PresentationViewManifestBuilder
+internal static class PresentationViewManifestBuilder
 {
     public static PresentationViewManifestResult Build(IReadOnlyList<PresentationViewMetadata> views)
     {

@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Common;
 
-public static class GeneratedCodeNames
+internal static class GeneratedCodeNames
 {
     public const string RootHintFolder = "AtomUI.City";
     public const string GeneratedNamespace = "AtomUI.City.Generated";

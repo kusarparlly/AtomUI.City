@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Routing;
 
-public enum RouteDefinitionMetadataKind
+internal enum RouteDefinitionMetadataKind
 {
     Route,
     Layout,

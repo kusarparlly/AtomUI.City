@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Localization;
 
-public sealed class LocalizedResourceManifestEntry
+internal sealed class LocalizedResourceManifestEntry
 {
     public LocalizedResourceManifestEntry(
         string key,

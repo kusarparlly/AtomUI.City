@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Presentation;
 
-public sealed class PresentationViewManifest
+internal sealed class PresentationViewManifest
 {
     public PresentationViewManifest(IReadOnlyList<PresentationViewManifestEntry> views)
     {

@@ -4,13 +4,13 @@
 
 ## Stability 基线
 
-本模块当前全部 public 类型、diagnostic、generated name 和 manifest shape 均为 `Preview`。`PublicAPI.Unshipped.txt` 仅用于在 API 边界审计期间阻止静默变化；它不决定某个 Roslyn reader/builder 是开发者 API 还是 `InternalContract`，该归类必须经过单独审查后写入本文。
+本模块不提供第三方 Generator SDK。Public surface 只包含 Roslyn 从 analyzer 程序集外部发现并激活的 `AtomUICityIncrementalGenerator` 与 `BuildServiceProviderUsageAnalyzer`；它们属于 `Preview` Tooling Entry，不是应用开发者扩展点。diagnostic id、generated name、manifest shape 和生成行为是外部可观察合同，Reader、Metadata、Manifest、Builder、SourceBuilder 与诊断辅助模型均为 `InternalContract`。
 
 ## API Family 合同
 
 | API Family | 关键类型 | 职责 | 硬性行为 |
 | --- | --- | --- | --- |
-| Incremental Entry | AtomUICityIncrementalGenerator, GeneratorFeature, GeneratorFeatureNames | Roslyn incremental generator 入口和 feature 选择。 | 不引用运行时包；输出稳定；无关输入不触发无关输出变化。 |
+| Tooling Entry | AtomUICityIncrementalGenerator, BuildServiceProviderUsageAnalyzer | Roslyn incremental generator 与 analyzer 激活入口。 | 必须能从 analyzer 包发现并实例化；不引用运行时包；不构成第三方扩展 SDK。 |
 | Metadata Readers | ModuleMetadataReader, ServiceRegistrationMetadataReader, RouteMetadataReader, PluginMetadataReader, LocalizationMetadataReader, PresentationViewMetadataReader | 从 syntax/semantic model 读取声明。 | reader 不做业务生成；非法声明输出 diagnostic metadata；`LocalizationMetadata.Diagnostics` 保存 attribute 读取阶段错误。 |
 | Manifest Builders | ModuleDependencyGraphBuilder, ServiceRegistrationManifestBuilder, RouteManifestBuilder, PluginManifestBuilder, LocalizationManifestBuilder, PresentationViewManifestBuilder | 校验 metadata 并生成 manifest result。 | result 不可变；排序确定；失败不生成不完整 success manifest。 |
 | Source Builders | LocalizationRegistrarSourceBuilder, PresentationViewRegistrarSourceBuilder | 生成 C# 注册代码。 | hint name 稳定；生成代码不依赖 runtime reflection；Localization registrar 通过单次 `RegisterRange` 原子注册 manifest。 |
@@ -35,71 +35,79 @@
 | PresentationViewRegistrarSourceBuilder.Build | 生成 view registrar source。 | PresentationViewManifest。 | Generated source text 和 hint name。 | manifest failed 时不得生成 registrar source。 | 纯 CPU。 | hint name 和 source ordering 稳定。 |
 | GeneratorDiagnostics.CreateRoslynDiagnostic | 创建 Roslyn diagnostic。 | feature、generator diagnostic、location、message args。 | Diagnostic。 | 参数数量不匹配按 Roslyn Diagnostic 格式化规则稳定失败。 | 同步 API 无 token。 | diagnostic definition 不可变，可并发读取。 |
 
-## Public 类型覆盖
+## Tooling Entry 与 Internal Pipeline 类型覆盖
 
 | Type | 分类 | Review 规则 |
 | --- | --- | --- |
-| `AtomUICityIncrementalGenerator` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `GeneratedCodeNames` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `GeneratedTypeName` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `GeneratorFeature` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `GeneratorFeatureNames` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ServiceRegistrationLifetime` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ServiceRegistrationManifest` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ServiceRegistrationManifestBuilder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ServiceRegistrationManifestResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ServiceRegistrationMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ServiceRegistrationMetadataReader` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `GeneratorDiagnostic` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `GeneratorDiagnosticDefinition` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `GeneratorDiagnosticIds` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `GeneratorDiagnosticSeverity` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `GeneratorDiagnostics` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `CultureFallbackManifestEntry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LanguagePackageManifestEntry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LanguagePackageMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizationManifest` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizationManifestBuilder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizationManifestResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizationMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizationMetadataReader` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizationRegistrarSourceBuilder` | 支持类型 | 生成类型名、成员、排序或原子注册行为变化必须更新本文档和 compatibility。 |
-| `LocalizedResourceManifestEntry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizedResourceMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `LocalizedResourceMetadataKind` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ResourceScopeMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ModuleDependencyGraphBuilder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ModuleDependencyGraphResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ModuleDependencyMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ModuleMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `ModuleMetadataReader` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PluginCapabilityManifestEntry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PluginCapabilityMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PluginContributionManifestEntry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PluginContributionManifestMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PluginDependencyManifestEntry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PluginDependencyMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PluginManifest` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PluginManifestBuilder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PluginManifestResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PluginMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PluginMetadataReader` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationViewConstructorParameter` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationViewManifest` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationViewManifestBuilder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationViewManifestEntry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationViewManifestResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationViewMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationViewMetadataReader` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PresentationViewRegistrarSourceBuilder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `RouteDefinitionMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `RouteDefinitionMetadataKind` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `RouteManifest` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `RouteManifestBuilder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `RouteManifestResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `RouteManifestRoute` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `RouteMapMetadata` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `RouteMetadataReader` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `AtomUICityIncrementalGenerator` | Public Tooling Entry | Roslyn 激活入口；新增、删除、重命名或激活行为变化必须更新本文档和 compatibility。 |
+| `BuildServiceProviderUsageAnalyzer` | Public Tooling Entry | Roslyn 激活入口；新增、删除、重命名或激活行为变化必须更新本文档和 compatibility。 |
+
+以下类型是可白盒测试的生成器内部流水线，不属于开发者 Public API；其对外可观察输出仍受上文合同约束。
+
+### Internal Pipeline 类型
+
+| Type | 分类 | Review 规则 |
+| --- | --- | --- |
+| `GeneratedCodeNames` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `GeneratedTypeName` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `GeneratorFeature` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `GeneratorFeatureNames` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `ServiceRegistrationLifetime` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `ServiceRegistrationManifest` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `ServiceRegistrationManifestBuilder` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `ServiceRegistrationManifestResult` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `ServiceRegistrationMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `ServiceRegistrationMetadataReader` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `GeneratorDiagnostic` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `GeneratorDiagnosticDefinition` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `GeneratorDiagnosticIds` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `GeneratorDiagnosticSeverity` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `GeneratorDiagnostics` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `CultureFallbackManifestEntry` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `LanguagePackageManifestEntry` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `LanguagePackageMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `LocalizationManifest` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `LocalizationManifestBuilder` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `LocalizationManifestResult` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `LocalizationMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `LocalizationMetadataReader` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `LocalizationRegistrarSourceBuilder` | InternalContract | 生成类型名、成员、排序或原子注册行为变化必须更新本文档和 compatibility。 |
+| `LocalizedResourceManifestEntry` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `LocalizedResourceMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `LocalizedResourceMetadataKind` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `ResourceScopeMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `ModuleDependencyGraphBuilder` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `ModuleDependencyGraphResult` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `ModuleDependencyMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `ModuleMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `ModuleMetadataReader` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PluginCapabilityManifestEntry` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PluginCapabilityMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PluginContributionManifestEntry` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PluginContributionManifestMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PluginDependencyManifestEntry` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PluginDependencyMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PluginManifest` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PluginManifestBuilder` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PluginManifestResult` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PluginMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PluginMetadataReader` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PresentationViewConstructorParameter` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PresentationViewManifest` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PresentationViewManifestBuilder` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PresentationViewManifestEntry` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PresentationViewManifestResult` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PresentationViewMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PresentationViewMetadataReader` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `PresentationViewRegistrarSourceBuilder` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `RouteDefinitionMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `RouteDefinitionMetadataKind` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `RouteManifest` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `RouteManifestBuilder` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `RouteManifestResult` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `RouteManifestRoute` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `RouteMapMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `RouteMetadataReader` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
 
 ## Nullability 和参数规则
 

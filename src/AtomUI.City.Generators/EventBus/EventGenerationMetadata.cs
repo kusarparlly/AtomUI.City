@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace AtomUI.City.Generators.EventBus;
 
-public sealed class EventGenerationManifest
+internal sealed class EventGenerationManifest
 {
     public EventGenerationManifest(
         IReadOnlyList<GeneratedEventContractMetadata> contracts,
@@ -19,7 +19,7 @@ public sealed class EventGenerationManifest
     public bool IsEmpty => Contracts.Count == 0 && Handlers.Count == 0;
 }
 
-public sealed class GeneratedEventContractMetadata
+internal sealed class GeneratedEventContractMetadata
 {
     public GeneratedEventContractMetadata(
         ITypeSymbol eventTypeSymbol,
@@ -48,7 +48,7 @@ public sealed class GeneratedEventContractMetadata
     public IReadOnlyList<GeneratedEventChannelMetadata> Channels { get; }
 }
 
-public sealed class GeneratedEventChannelMetadata
+internal sealed class GeneratedEventChannelMetadata
 {
     public GeneratedEventChannelMetadata(string name, int capacity, int backpressurePolicy,
         int executionMode, int maximumConcurrency, int queueWaitTimeoutMilliseconds)
@@ -69,7 +69,7 @@ public sealed class GeneratedEventChannelMetadata
     public int QueueWaitTimeoutMilliseconds { get; }
 }
 
-public sealed class GeneratedEventHandlerMetadata
+internal sealed class GeneratedEventHandlerMetadata
 {
     public GeneratedEventHandlerMetadata(ITypeSymbol eventTypeSymbol, string ownerTypeName, string eventTypeName, string handlerTypeName,
         string channelName, int dispatchPolicy, int dispatchMode, int errorPolicy,

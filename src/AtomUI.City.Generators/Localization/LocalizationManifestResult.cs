@@ -2,7 +2,7 @@ using AtomUI.City.Generators.Diagnostics;
 
 namespace AtomUI.City.Generators.Localization;
 
-public sealed class LocalizationManifestResult
+internal sealed class LocalizationManifestResult
 {
     public LocalizationManifestResult(
         LocalizationManifest manifest,

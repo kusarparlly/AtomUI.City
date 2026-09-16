@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Common;
 
-public sealed class GeneratedTypeName
+internal sealed class GeneratedTypeName
 {
     public GeneratedTypeName(string @namespace, string name)
     {

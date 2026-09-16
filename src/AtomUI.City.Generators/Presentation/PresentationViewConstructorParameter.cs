@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Presentation;
 
-public sealed class PresentationViewConstructorParameter
+internal sealed class PresentationViewConstructorParameter
 {
     public PresentationViewConstructorParameter(string typeName)
     {

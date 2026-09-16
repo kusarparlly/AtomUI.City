@@ -1,4 +1,5 @@
 using AtomUI.City.Generators;
+using AtomUI.City.Generators.Analyzers;
 using AtomUI.City.Generators.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -7,6 +8,25 @@ namespace AtomUI.City.Generators.Tests;
 
 public sealed class IncrementalGeneratorInfrastructureTests
 {
+    [Fact]
+    public void AssemblyExportsOnlyRoslynToolingEntries()
+    {
+        var assembly = typeof(AtomUICityIncrementalGenerator).Assembly;
+        var exportedTypes = assembly.GetExportedTypes()
+            .Select(static type => type.FullName!)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Equal(
+            [
+                typeof(BuildServiceProviderUsageAnalyzer).FullName!,
+                typeof(AtomUICityIncrementalGenerator).FullName!,
+            ],
+            exportedTypes);
+        Assert.NotNull(Activator.CreateInstance(typeof(AtomUICityIncrementalGenerator)));
+        Assert.NotNull(Activator.CreateInstance(typeof(BuildServiceProviderUsageAnalyzer)));
+    }
+
     [Fact]
     public void BootstrapperUsesIncrementalGeneratorContract()
     {

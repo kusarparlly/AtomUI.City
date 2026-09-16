@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Localization;
 
-public sealed class LocalizedResourceMetadata
+internal sealed class LocalizedResourceMetadata
 {
     public LocalizedResourceMetadata(
         string key,

@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.Localization;
 
-public sealed class LocalizationManifest
+internal sealed class LocalizationManifest
 {
     public LocalizationManifest(
         IReadOnlyList<LanguagePackageManifestEntry> packages,

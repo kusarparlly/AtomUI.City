@@ -1,6 +1,6 @@
 namespace AtomUI.City.Generators.DependencyInjection;
 
-public sealed class ServiceRegistrationManifest
+internal sealed class ServiceRegistrationManifest
 {
     public ServiceRegistrationManifest(IReadOnlyList<ServiceRegistrationMetadata> registrations)
     {

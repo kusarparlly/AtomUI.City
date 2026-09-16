@@ -3,7 +3,7 @@ using AtomUI.City.Generators.Common;
 
 namespace AtomUI.City.Generators.Presentation;
 
-public static class PresentationViewRegistrarSourceBuilder
+internal static class PresentationViewRegistrarSourceBuilder
 {
     public static string Build(PresentationViewManifest manifest)
     {
