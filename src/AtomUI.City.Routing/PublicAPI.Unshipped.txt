@@ -1,0 +1,420 @@
+#nullable enable
+AtomUI.City.Routing.FragmentAttribute
+AtomUI.City.Routing.FragmentAttribute.FragmentAttribute(string? name = null) -> void
+AtomUI.City.Routing.FragmentAttribute.Name.get -> string?
+AtomUI.City.Routing.IndexRouteAttribute
+AtomUI.City.Routing.IndexRouteAttribute.IndexRouteAttribute(System.Type! viewModelType) -> void
+AtomUI.City.Routing.IRouteEnterGuard
+AtomUI.City.Routing.IRouteEnterGuard.CanEnterAsync(AtomUI.City.Routing.RouteGuardContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.RouteGuardResult!>
+AtomUI.City.Routing.IRouteGraphProvider
+AtomUI.City.Routing.IRouteGraphProvider.CurrentSnapshot.get -> AtomUI.City.Routing.RouteGraphSnapshot!
+AtomUI.City.Routing.IRouteLeaveGuard
+AtomUI.City.Routing.IRouteLeaveGuard.CanLeaveAsync(AtomUI.City.Routing.RouteGuardContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.RouteGuardResult!>
+AtomUI.City.Routing.IRouteMatchPolicy
+AtomUI.City.Routing.IRouteMatchPolicy.CanMatchAsync(AtomUI.City.Routing.RouteMatchPolicyContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<bool>
+AtomUI.City.Routing.IRouteNavigationMiddleware
+AtomUI.City.Routing.IRouteNavigationMiddleware.InvokeAsync(AtomUI.City.Routing.RouteNavigationMiddlewareContext! context, AtomUI.City.Routing.RouteNavigationDelegate! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.IRouter
+AtomUI.City.Routing.IRouter.BackAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.IRouter.ForwardAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.IRouter.NavigateAsync(AtomUI.City.Routing.RouteReference route, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.IRouter.NavigateAsync<TParameters>(AtomUI.City.Routing.RouteReference<TParameters> route, TParameters parameters, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.IRouter.NavigateByPathAsync(string! path, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.IRouter.NavigateByUriAsync(System.Uri! uri, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.IRouteRegistry
+AtomUI.City.Routing.IRouteRegistry.AddContribution(AtomUI.City.Routing.RouteContribution! contribution) -> AtomUI.City.Routing.RouteContributionLease!
+AtomUI.City.Routing.IRouteRegistry.AddContribution(string! contributionId, System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteDescriptor!>! routes) -> AtomUI.City.Routing.RouteContributionLease!
+AtomUI.City.Routing.IRouteRegistry.RemoveContribution(string! contributionId) -> bool
+AtomUI.City.Routing.IRouteResolver
+AtomUI.City.Routing.IRouteResolver.ResolveAsync(AtomUI.City.Routing.RouteResolveContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.RouteResolveResult!>
+AtomUI.City.Routing.LayoutRouteAttribute
+AtomUI.City.Routing.LayoutRouteAttribute.LayoutRouteAttribute(System.Type! viewModelType) -> void
+AtomUI.City.Routing.NavigationConcurrencyPolicy
+AtomUI.City.Routing.NavigationConcurrencyPolicy.CancelPrevious = 0 -> AtomUI.City.Routing.NavigationConcurrencyPolicy
+AtomUI.City.Routing.NavigationConcurrencyPolicy.Queue = 1 -> AtomUI.City.Routing.NavigationConcurrencyPolicy
+AtomUI.City.Routing.NavigationConcurrencyPolicy.RejectIfBusy = 2 -> AtomUI.City.Routing.NavigationConcurrencyPolicy
+AtomUI.City.Routing.NavigationError
+AtomUI.City.Routing.NavigationError.<Clone>$() -> AtomUI.City.Routing.NavigationError!
+AtomUI.City.Routing.NavigationError.Code.get -> string!
+AtomUI.City.Routing.NavigationError.Code.init -> void
+AtomUI.City.Routing.NavigationError.Deconstruct(out string! Code, out string! Message, out System.Exception? Exception) -> void
+AtomUI.City.Routing.NavigationError.Equals(AtomUI.City.Routing.NavigationError? other) -> bool
+AtomUI.City.Routing.NavigationError.Exception.get -> System.Exception?
+AtomUI.City.Routing.NavigationError.Exception.init -> void
+AtomUI.City.Routing.NavigationError.Message.get -> string!
+AtomUI.City.Routing.NavigationError.Message.init -> void
+AtomUI.City.Routing.NavigationError.NavigationError(string! Code, string! Message, System.Exception? Exception = null) -> void
+AtomUI.City.Routing.NavigationHistoryBehavior
+AtomUI.City.Routing.NavigationHistoryBehavior.Record = 0 -> AtomUI.City.Routing.NavigationHistoryBehavior
+AtomUI.City.Routing.NavigationHistoryBehavior.ReplaceCurrent = 2 -> AtomUI.City.Routing.NavigationHistoryBehavior
+AtomUI.City.Routing.NavigationHistoryBehavior.Skip = 1 -> AtomUI.City.Routing.NavigationHistoryBehavior
+AtomUI.City.Routing.NavigationMode
+AtomUI.City.Routing.NavigationMode.Push = 0 -> AtomUI.City.Routing.NavigationMode
+AtomUI.City.Routing.NavigationMode.Replace = 1 -> AtomUI.City.Routing.NavigationMode
+AtomUI.City.Routing.NavigationMode.Reset = 2 -> AtomUI.City.Routing.NavigationMode
+AtomUI.City.Routing.NavigationOptions
+AtomUI.City.Routing.NavigationOptions.AllowRedirect.get -> bool
+AtomUI.City.Routing.NavigationOptions.AllowRedirect.init -> void
+AtomUI.City.Routing.NavigationOptions.ConcurrencyPolicy.get -> AtomUI.City.Routing.NavigationConcurrencyPolicy
+AtomUI.City.Routing.NavigationOptions.ConcurrencyPolicy.init -> void
+AtomUI.City.Routing.NavigationOptions.ForceReload.get -> bool
+AtomUI.City.Routing.NavigationOptions.ForceReload.init -> void
+AtomUI.City.Routing.NavigationOptions.HistoryBehavior.get -> AtomUI.City.Routing.NavigationHistoryBehavior
+AtomUI.City.Routing.NavigationOptions.HistoryBehavior.init -> void
+AtomUI.City.Routing.NavigationOptions.JournalCapacity.get -> int
+AtomUI.City.Routing.NavigationOptions.JournalCapacity.init -> void
+AtomUI.City.Routing.NavigationOptions.Mode.get -> AtomUI.City.Routing.NavigationMode
+AtomUI.City.Routing.NavigationOptions.Mode.init -> void
+AtomUI.City.Routing.NavigationOptions.NavigationOptions() -> void
+AtomUI.City.Routing.NavigationOptions.OutletName.get -> string!
+AtomUI.City.Routing.NavigationOptions.OutletName.init -> void
+AtomUI.City.Routing.NavigationOptions.Timeout.get -> System.TimeSpan?
+AtomUI.City.Routing.NavigationOptions.Timeout.init -> void
+AtomUI.City.Routing.NavigationResult
+AtomUI.City.Routing.NavigationResult.ActiveRoute.get -> AtomUI.City.Routing.RouteDescriptor?
+AtomUI.City.Routing.NavigationResult.Error.get -> AtomUI.City.Routing.NavigationError?
+AtomUI.City.Routing.NavigationResult.NavigationId.get -> System.Guid
+AtomUI.City.Routing.NavigationResult.Parameters.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+AtomUI.City.Routing.NavigationResult.RedirectTarget.get -> AtomUI.City.Routing.NavigationTarget?
+AtomUI.City.Routing.NavigationResult.Route.get -> AtomUI.City.Routing.RouteDescriptor!
+AtomUI.City.Routing.NavigationResult.Status.get -> AtomUI.City.Routing.NavigationResultStatus
+AtomUI.City.Routing.NavigationResult.Target.get -> AtomUI.City.Routing.NavigationTarget!
+AtomUI.City.Routing.NavigationResultStatus
+AtomUI.City.Routing.NavigationResultStatus.Cancelled = 3 -> AtomUI.City.Routing.NavigationResultStatus
+AtomUI.City.Routing.NavigationResultStatus.Failed = 4 -> AtomUI.City.Routing.NavigationResultStatus
+AtomUI.City.Routing.NavigationResultStatus.NotFound = 5 -> AtomUI.City.Routing.NavigationResultStatus
+AtomUI.City.Routing.NavigationResultStatus.Redirected = 2 -> AtomUI.City.Routing.NavigationResultStatus
+AtomUI.City.Routing.NavigationResultStatus.Rejected = 1 -> AtomUI.City.Routing.NavigationResultStatus
+AtomUI.City.Routing.NavigationResultStatus.Success = 0 -> AtomUI.City.Routing.NavigationResultStatus
+AtomUI.City.Routing.NavigationScope
+AtomUI.City.Routing.NavigationScope.BackAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.NavigationScope.CurrentSnapshot.get -> AtomUI.City.Routing.NavigationSnapshot!
+AtomUI.City.Routing.NavigationScope.Dispose() -> void
+AtomUI.City.Routing.NavigationScope.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Routing.NavigationScope.ForwardAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.NavigationScope.NavigateAsync(AtomUI.City.Routing.RouteReference route, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.NavigationScope.NavigateAsync<TParameters>(AtomUI.City.Routing.RouteReference<TParameters> route, TParameters parameters, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.NavigationScope.NavigateByPathAsync(string! path, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.NavigationScope.NavigateByUriAsync(System.Uri! uri, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.NavigationScope.NavigationScope(AtomUI.City.Routing.IRouteGraphProvider! routeGraphProvider, System.Func<System.Type!, object?>? serviceResolver = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Routing.NavigationScope.NavigationScope(AtomUI.City.Routing.RouteGraphSnapshot! routeGraph, System.Func<System.Type!, object?>? serviceResolver = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Routing.NavigationScope.Router.get -> AtomUI.City.Routing.IRouter!
+AtomUI.City.Routing.NavigationSnapshot
+AtomUI.City.Routing.NavigationSnapshot.ActiveRoute.get -> AtomUI.City.Routing.RouteDescriptor?
+AtomUI.City.Routing.NavigationSnapshot.Parameters.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+AtomUI.City.Routing.NavigationSnapshot.ResolvedData.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>!
+AtomUI.City.Routing.NavigationSnapshot.ReuseKey.get -> string?
+AtomUI.City.Routing.NavigationSnapshot.Route.get -> AtomUI.City.Routing.RouteDescriptor!
+AtomUI.City.Routing.NavigationSnapshot.RouteGraphVersion.get -> long
+AtomUI.City.Routing.NavigationTarget
+AtomUI.City.Routing.NavigationTarget.Kind.get -> AtomUI.City.Routing.NavigationTargetKind
+AtomUI.City.Routing.NavigationTarget.Options.get -> AtomUI.City.Routing.NavigationOptions!
+AtomUI.City.Routing.NavigationTarget.Parameters.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+AtomUI.City.Routing.NavigationTarget.Path.get -> string?
+AtomUI.City.Routing.NavigationTarget.RouteId.get -> string?
+AtomUI.City.Routing.NavigationTargetKind
+AtomUI.City.Routing.NavigationTargetKind.DeepLink = 2 -> AtomUI.City.Routing.NavigationTargetKind
+AtomUI.City.Routing.NavigationTargetKind.Journal = 3 -> AtomUI.City.Routing.NavigationTargetKind
+AtomUI.City.Routing.NavigationTargetKind.Path = 1 -> AtomUI.City.Routing.NavigationTargetKind
+AtomUI.City.Routing.NavigationTargetKind.RouteReference = 0 -> AtomUI.City.Routing.NavigationTargetKind
+AtomUI.City.Routing.QueryAttribute
+AtomUI.City.Routing.QueryAttribute.Name.get -> string?
+AtomUI.City.Routing.QueryAttribute.QueryAttribute(string? name = null) -> void
+AtomUI.City.Routing.RedirectRouteAttribute
+AtomUI.City.Routing.RedirectRouteAttribute.RedirectRouteAttribute(string! template) -> void
+AtomUI.City.Routing.RouteAttribute
+AtomUI.City.Routing.RouteAttribute.RouteAttribute(string! template, System.Type! viewModelType) -> void
+AtomUI.City.Routing.RouteContribution
+AtomUI.City.Routing.RouteContribution.ContributionId.get -> string!
+AtomUI.City.Routing.RouteContribution.RouteContribution(string! contributionId, System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteDescriptor!>! routes, System.Func<System.Type!, object?>? serviceResolver = null) -> void
+AtomUI.City.Routing.RouteContribution.Routes.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteDescriptor!>!
+AtomUI.City.Routing.RouteContribution.ServiceResolver.get -> System.Func<System.Type!, object?>?
+AtomUI.City.Routing.RouteContributionLease
+AtomUI.City.Routing.RouteContributionLease.ContributionId.get -> string!
+AtomUI.City.Routing.RouteContributionLease.Dispose() -> void
+AtomUI.City.Routing.RouteContributionLease.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Routing.RouteDefinitionAttribute
+AtomUI.City.Routing.RouteDefinitionAttribute.ActivationHint.get -> string?
+AtomUI.City.Routing.RouteDefinitionAttribute.ActivationHint.set -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.BreadcrumbKey.get -> string?
+AtomUI.City.Routing.RouteDefinitionAttribute.BreadcrumbKey.set -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.DescriptionKey.get -> string?
+AtomUI.City.Routing.RouteDefinitionAttribute.DescriptionKey.set -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.ErrorTitleKey.get -> string?
+AtomUI.City.Routing.RouteDefinitionAttribute.ErrorTitleKey.set -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.ExtensionPoint.get -> string?
+AtomUI.City.Routing.RouteDefinitionAttribute.ExtensionPoint.set -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.GroupKey.get -> string?
+AtomUI.City.Routing.RouteDefinitionAttribute.GroupKey.set -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.Id.get -> string?
+AtomUI.City.Routing.RouteDefinitionAttribute.Id.set -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.Kind.get -> AtomUI.City.Routing.RouteDefinitionKind
+AtomUI.City.Routing.RouteDefinitionAttribute.Outlet.get -> string!
+AtomUI.City.Routing.RouteDefinitionAttribute.Outlet.set -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.Parent.get -> string?
+AtomUI.City.Routing.RouteDefinitionAttribute.Parent.set -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.ReuseKey.get -> string?
+AtomUI.City.Routing.RouteDefinitionAttribute.ReuseKey.set -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.RouteDefinitionAttribute(AtomUI.City.Routing.RouteDefinitionKind kind, string? template, System.Type? viewModelType) -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.Target.get -> string?
+AtomUI.City.Routing.RouteDefinitionAttribute.Target.set -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.Template.get -> string?
+AtomUI.City.Routing.RouteDefinitionAttribute.TitleKey.get -> string?
+AtomUI.City.Routing.RouteDefinitionAttribute.TitleKey.set -> void
+AtomUI.City.Routing.RouteDefinitionAttribute.ViewModelType.get -> System.Type?
+AtomUI.City.Routing.RouteDefinitionKind
+AtomUI.City.Routing.RouteDefinitionKind.ExtensionPoint = 5 -> AtomUI.City.Routing.RouteDefinitionKind
+AtomUI.City.Routing.RouteDefinitionKind.Group = 3 -> AtomUI.City.Routing.RouteDefinitionKind
+AtomUI.City.Routing.RouteDefinitionKind.Index = 2 -> AtomUI.City.Routing.RouteDefinitionKind
+AtomUI.City.Routing.RouteDefinitionKind.Layout = 1 -> AtomUI.City.Routing.RouteDefinitionKind
+AtomUI.City.Routing.RouteDefinitionKind.Redirect = 4 -> AtomUI.City.Routing.RouteDefinitionKind
+AtomUI.City.Routing.RouteDefinitionKind.Route = 0 -> AtomUI.City.Routing.RouteDefinitionKind
+AtomUI.City.Routing.RouteDescriptor
+AtomUI.City.Routing.RouteDescriptor.ContributionId.get -> string?
+AtomUI.City.Routing.RouteDescriptor.EnterGuardTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+AtomUI.City.Routing.RouteDescriptor.ExtensionPoint.get -> string?
+AtomUI.City.Routing.RouteDescriptor.Kind.get -> AtomUI.City.Routing.RouteDefinitionKind
+AtomUI.City.Routing.RouteDescriptor.LeaveGuardTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+AtomUI.City.Routing.RouteDescriptor.MatchPolicyTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+AtomUI.City.Routing.RouteDescriptor.Metadata.get -> AtomUI.City.Routing.RouteMetadataDescriptor!
+AtomUI.City.Routing.RouteDescriptor.MiddlewareTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+AtomUI.City.Routing.RouteDescriptor.OutletName.get -> string!
+AtomUI.City.Routing.RouteDescriptor.ParentRouteId.get -> string?
+AtomUI.City.Routing.RouteDescriptor.RedirectTargetRouteId.get -> string?
+AtomUI.City.Routing.RouteDescriptor.ResolverTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+AtomUI.City.Routing.RouteDescriptor.RouteDescriptor(string! routeId, AtomUI.City.Routing.RouteDefinitionKind kind, string? template, AtomUI.City.Routing.ViewModelTargetDescriptor? viewModelTarget, string? parentRouteId = null, string! outletName = "primary", string? extensionPoint = null, string? redirectTargetRouteId = null, System.Collections.Generic.IReadOnlyList<System.Type!>? enterGuardTypes = null, System.Collections.Generic.IReadOnlyList<System.Type!>? leaveGuardTypes = null, System.Collections.Generic.IReadOnlyList<System.Type!>? matchPolicyTypes = null, AtomUI.City.Routing.RouteMetadataDescriptor? metadata = null, string? contributionId = null, System.Collections.Generic.IReadOnlyList<System.Type!>? resolverTypes = null, System.Collections.Generic.IReadOnlyList<System.Type!>? middlewareTypes = null) -> void
+AtomUI.City.Routing.RouteDescriptor.RouteId.get -> string!
+AtomUI.City.Routing.RouteDescriptor.Template.get -> AtomUI.City.Routing.RouteTemplate?
+AtomUI.City.Routing.RouteDescriptor.ViewModelTarget.get -> AtomUI.City.Routing.ViewModelTargetDescriptor?
+AtomUI.City.Routing.RouteExtensionPoint
+AtomUI.City.Routing.RouteExtensionPoint.Equals(AtomUI.City.Routing.RouteExtensionPoint other) -> bool
+AtomUI.City.Routing.RouteExtensionPoint.Id.get -> string!
+AtomUI.City.Routing.RouteExtensionPoint.RouteExtensionPoint() -> void
+AtomUI.City.Routing.RouteExtensionPoint.RouteExtensionPoint(string! id) -> void
+AtomUI.City.Routing.RouteExtensionPointAttribute
+AtomUI.City.Routing.RouteExtensionPointAttribute.RouteExtensionPointAttribute(string! extensionPoint) -> void
+AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.CircularParentRoute = 5 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.CircularRedirect = 11 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.DuplicateExtensionPoint = 8 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.DuplicateIndexRoute = 7 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.DuplicateRouteId = 0 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.DuplicateRouteTemplate = 1 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.InvalidContribution = 4 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.InvalidRouteDefinition = 6 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.InvalidRouteTemplate = 3 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.InvalidVersion = 12 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.MissingExtensionPoint = 9 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.MissingParentRoute = 2 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphError.MissingRedirectTarget = 10 -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphException
+AtomUI.City.Routing.RouteGraphException.Error.get -> AtomUI.City.Routing.RouteGraphError
+AtomUI.City.Routing.RouteGraphException.RouteGraphException(AtomUI.City.Routing.RouteGraphError error, string! message) -> void
+AtomUI.City.Routing.RouteGraphSnapshot
+AtomUI.City.Routing.RouteGraphSnapshot.GetChildren(string! parentRouteId) -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteDescriptor!>!
+AtomUI.City.Routing.RouteGraphSnapshot.GetContributionRoutes(string! contributionId) -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteDescriptor!>!
+AtomUI.City.Routing.RouteGraphSnapshot.GetRequiredRoute(string! routeId) -> AtomUI.City.Routing.RouteDescriptor!
+AtomUI.City.Routing.RouteGraphSnapshot.Matcher.get -> AtomUI.City.Routing.RouteMatcher!
+AtomUI.City.Routing.RouteGraphSnapshot.Routes.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteDescriptor!>!
+AtomUI.City.Routing.RouteGraphSnapshot.TryGetRoute(string! routeId, out AtomUI.City.Routing.RouteDescriptor? route) -> bool
+AtomUI.City.Routing.RouteGraphSnapshot.Version.get -> long
+AtomUI.City.Routing.RouteGraphSnapshot.WithContribution(string! contributionId, System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteDescriptor!>! routes, long? version = null) -> AtomUI.City.Routing.RouteGraphSnapshot!
+AtomUI.City.Routing.RouteGraphSnapshot.WithoutContribution(string! contributionId, long? version = null) -> AtomUI.City.Routing.RouteGraphSnapshot!
+AtomUI.City.Routing.RouteGroupAttribute
+AtomUI.City.Routing.RouteGroupAttribute.RouteGroupAttribute(string! template) -> void
+AtomUI.City.Routing.RouteGuardContext
+AtomUI.City.Routing.RouteGuardContext.CurrentSnapshot.get -> AtomUI.City.Routing.NavigationSnapshot!
+AtomUI.City.Routing.RouteGuardContext.NavigationId.get -> System.Guid
+AtomUI.City.Routing.RouteGuardContext.Parameters.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+AtomUI.City.Routing.RouteGuardContext.Route.get -> AtomUI.City.Routing.RouteDescriptor!
+AtomUI.City.Routing.RouteGuardContext.RouteGuardContext(System.Guid navigationId, AtomUI.City.Routing.NavigationTarget! target, AtomUI.City.Routing.RouteDescriptor! route, AtomUI.City.Routing.NavigationSnapshot! currentSnapshot, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! parameters) -> void
+AtomUI.City.Routing.RouteGuardContext.Target.get -> AtomUI.City.Routing.NavigationTarget!
+AtomUI.City.Routing.RouteGuardResult
+AtomUI.City.Routing.RouteGuardResult.Code.get -> string?
+AtomUI.City.Routing.RouteGuardResult.Exception.get -> System.Exception?
+AtomUI.City.Routing.RouteGuardResult.Message.get -> string?
+AtomUI.City.Routing.RouteGuardResult.RedirectTarget.get -> AtomUI.City.Routing.NavigationTarget?
+AtomUI.City.Routing.RouteGuardResult.Status.get -> AtomUI.City.Routing.RouteGuardResultStatus
+AtomUI.City.Routing.RouteGuardResultStatus
+AtomUI.City.Routing.RouteGuardResultStatus.Allow = 0 -> AtomUI.City.Routing.RouteGuardResultStatus
+AtomUI.City.Routing.RouteGuardResultStatus.Cancel = 3 -> AtomUI.City.Routing.RouteGuardResultStatus
+AtomUI.City.Routing.RouteGuardResultStatus.Failed = 4 -> AtomUI.City.Routing.RouteGuardResultStatus
+AtomUI.City.Routing.RouteGuardResultStatus.Redirect = 2 -> AtomUI.City.Routing.RouteGuardResultStatus
+AtomUI.City.Routing.RouteGuardResultStatus.Reject = 1 -> AtomUI.City.Routing.RouteGuardResultStatus
+AtomUI.City.Routing.RouteGuardsAttribute
+AtomUI.City.Routing.RouteGuardsAttribute.GuardTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+AtomUI.City.Routing.RouteGuardsAttribute.RouteGuardsAttribute(params System.Type![]! guardTypes) -> void
+AtomUI.City.Routing.RouteMapAttribute
+AtomUI.City.Routing.RouteMapAttribute.RouteMapAttribute() -> void
+AtomUI.City.Routing.RouteMatch
+AtomUI.City.Routing.RouteMatch.MatchedRoute.get -> AtomUI.City.Routing.RouteDescriptor?
+AtomUI.City.Routing.RouteMatch.Parameters.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+AtomUI.City.Routing.RouteMatch.Route.get -> AtomUI.City.Routing.RouteDescriptor!
+AtomUI.City.Routing.RouteMatch.Status.get -> AtomUI.City.Routing.RouteMatchStatus
+AtomUI.City.Routing.RouteMatch.UnmatchedPath.get -> string?
+AtomUI.City.Routing.RouteMatcher
+AtomUI.City.Routing.RouteMatcher.Match(string! path) -> AtomUI.City.Routing.RouteMatch!
+AtomUI.City.Routing.RouteMatcher.Match(string! path, string! outletName) -> AtomUI.City.Routing.RouteMatch!
+AtomUI.City.Routing.RouteMatcher.MatchAll(string! path) -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteMatch!>!
+AtomUI.City.Routing.RouteMatcher.MatchAll(string! path, string! outletName) -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteMatch!>!
+AtomUI.City.Routing.RouteMatchPoliciesAttribute
+AtomUI.City.Routing.RouteMatchPoliciesAttribute.PolicyTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+AtomUI.City.Routing.RouteMatchPoliciesAttribute.RouteMatchPoliciesAttribute(params System.Type![]! policyTypes) -> void
+AtomUI.City.Routing.RouteMatchPolicyContext
+AtomUI.City.Routing.RouteMatchPolicyContext.CurrentSnapshot.get -> AtomUI.City.Routing.NavigationSnapshot!
+AtomUI.City.Routing.RouteMatchPolicyContext.NavigationId.get -> System.Guid
+AtomUI.City.Routing.RouteMatchPolicyContext.Route.get -> AtomUI.City.Routing.RouteDescriptor!
+AtomUI.City.Routing.RouteMatchPolicyContext.RouteMatchPolicyContext(System.Guid navigationId, AtomUI.City.Routing.NavigationTarget! target, AtomUI.City.Routing.RouteDescriptor! route, AtomUI.City.Routing.NavigationSnapshot! currentSnapshot) -> void
+AtomUI.City.Routing.RouteMatchPolicyContext.Target.get -> AtomUI.City.Routing.NavigationTarget!
+AtomUI.City.Routing.RouteMatchStatus
+AtomUI.City.Routing.RouteMatchStatus.NotFound = 1 -> AtomUI.City.Routing.RouteMatchStatus
+AtomUI.City.Routing.RouteMatchStatus.Success = 0 -> AtomUI.City.Routing.RouteMatchStatus
+AtomUI.City.Routing.RouteMetadataDescriptor
+AtomUI.City.Routing.RouteMetadataDescriptor.BreadcrumbKey.get -> string?
+AtomUI.City.Routing.RouteMetadataDescriptor.DescriptionKey.get -> string?
+AtomUI.City.Routing.RouteMetadataDescriptor.ErrorTitleKey.get -> string?
+AtomUI.City.Routing.RouteMetadataDescriptor.GroupKey.get -> string?
+AtomUI.City.Routing.RouteMetadataDescriptor.RouteMetadataDescriptor(string? titleKey = null, string? descriptionKey = null, string? breadcrumbKey = null, string? groupKey = null, string? errorTitleKey = null) -> void
+AtomUI.City.Routing.RouteMetadataDescriptor.TitleKey.get -> string?
+AtomUI.City.Routing.RouteMiddlewareAttribute
+AtomUI.City.Routing.RouteMiddlewareAttribute.MiddlewareTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+AtomUI.City.Routing.RouteMiddlewareAttribute.RouteMiddlewareAttribute(params System.Type![]! middlewareTypes) -> void
+AtomUI.City.Routing.RouteNavigationDelegate
+AtomUI.City.Routing.RouteNavigationMiddlewareContext
+AtomUI.City.Routing.RouteNavigationMiddlewareContext.CurrentSnapshot.get -> AtomUI.City.Routing.NavigationSnapshot!
+AtomUI.City.Routing.RouteNavigationMiddlewareContext.NavigationId.get -> System.Guid
+AtomUI.City.Routing.RouteNavigationMiddlewareContext.Parameters.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+AtomUI.City.Routing.RouteNavigationMiddlewareContext.Route.get -> AtomUI.City.Routing.RouteDescriptor!
+AtomUI.City.Routing.RouteNavigationMiddlewareContext.RouteNavigationMiddlewareContext(System.Guid navigationId, AtomUI.City.Routing.NavigationTarget! target, AtomUI.City.Routing.RouteDescriptor! route, AtomUI.City.Routing.NavigationSnapshot! currentSnapshot, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! parameters) -> void
+AtomUI.City.Routing.RouteNavigationMiddlewareContext.Target.get -> AtomUI.City.Routing.NavigationTarget!
+AtomUI.City.Routing.RouteReference
+AtomUI.City.Routing.RouteReference.Equals(AtomUI.City.Routing.RouteReference other) -> bool
+AtomUI.City.Routing.RouteReference.Id.get -> string!
+AtomUI.City.Routing.RouteReference.RouteReference() -> void
+AtomUI.City.Routing.RouteReference.RouteReference(string! id) -> void
+AtomUI.City.Routing.RouteReference<TParameters>
+AtomUI.City.Routing.RouteReference<TParameters>.BindParameters(TParameters parameters) -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+AtomUI.City.Routing.RouteReference<TParameters>.Equals(AtomUI.City.Routing.RouteReference<TParameters> other) -> bool
+AtomUI.City.Routing.RouteReference<TParameters>.Id.get -> string!
+AtomUI.City.Routing.RouteReference<TParameters>.ParameterBinder.get -> System.Func<TParameters, System.Collections.Generic.IReadOnlyDictionary<string!, string!>!>?
+AtomUI.City.Routing.RouteReference<TParameters>.RouteReference() -> void
+AtomUI.City.Routing.RouteReference<TParameters>.RouteReference(string! id) -> void
+AtomUI.City.Routing.RouteReference<TParameters>.RouteReference(string! id, System.Func<TParameters, System.Collections.Generic.IReadOnlyDictionary<string!, string!>!>? parameterBinder) -> void
+AtomUI.City.Routing.RouteRegistry
+AtomUI.City.Routing.RouteRegistry.AddContribution(AtomUI.City.Routing.RouteContribution! contribution) -> AtomUI.City.Routing.RouteContributionLease!
+AtomUI.City.Routing.RouteRegistry.AddContribution(string! contributionId, System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteDescriptor!>! routes) -> AtomUI.City.Routing.RouteContributionLease!
+AtomUI.City.Routing.RouteRegistry.CurrentSnapshot.get -> AtomUI.City.Routing.RouteGraphSnapshot!
+AtomUI.City.Routing.RouteRegistry.RemoveContribution(string! contributionId) -> bool
+AtomUI.City.Routing.RouteRegistry.RouteRegistry() -> void
+AtomUI.City.Routing.RouteRegistry.RouteRegistry(AtomUI.City.Routing.RouteGraphSnapshot! initialSnapshot, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Routing.RouteResolveContext
+AtomUI.City.Routing.RouteResolveContext.CurrentSnapshot.get -> AtomUI.City.Routing.NavigationSnapshot!
+AtomUI.City.Routing.RouteResolveContext.NavigationId.get -> System.Guid
+AtomUI.City.Routing.RouteResolveContext.Parameters.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+AtomUI.City.Routing.RouteResolveContext.Route.get -> AtomUI.City.Routing.RouteDescriptor!
+AtomUI.City.Routing.RouteResolveContext.RouteResolveContext(System.Guid navigationId, AtomUI.City.Routing.NavigationTarget! target, AtomUI.City.Routing.RouteDescriptor! route, AtomUI.City.Routing.NavigationSnapshot! currentSnapshot, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! parameters) -> void
+AtomUI.City.Routing.RouteResolveContext.Target.get -> AtomUI.City.Routing.NavigationTarget!
+AtomUI.City.Routing.RouteResolveResult
+AtomUI.City.Routing.RouteResolveResult.Code.get -> string?
+AtomUI.City.Routing.RouteResolveResult.Data.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>!
+AtomUI.City.Routing.RouteResolveResult.Exception.get -> System.Exception?
+AtomUI.City.Routing.RouteResolveResult.Message.get -> string?
+AtomUI.City.Routing.RouteResolveResult.RedirectTarget.get -> AtomUI.City.Routing.NavigationTarget?
+AtomUI.City.Routing.RouteResolveResult.Status.get -> AtomUI.City.Routing.RouteResolveResultStatus
+AtomUI.City.Routing.RouteResolveResultStatus
+AtomUI.City.Routing.RouteResolveResultStatus.Cancelled = 3 -> AtomUI.City.Routing.RouteResolveResultStatus
+AtomUI.City.Routing.RouteResolveResultStatus.Failed = 4 -> AtomUI.City.Routing.RouteResolveResultStatus
+AtomUI.City.Routing.RouteResolveResultStatus.NotFound = 1 -> AtomUI.City.Routing.RouteResolveResultStatus
+AtomUI.City.Routing.RouteResolveResultStatus.Redirect = 2 -> AtomUI.City.Routing.RouteResolveResultStatus
+AtomUI.City.Routing.RouteResolveResultStatus.Success = 0 -> AtomUI.City.Routing.RouteResolveResultStatus
+AtomUI.City.Routing.RouteResolversAttribute
+AtomUI.City.Routing.RouteResolversAttribute.ResolverTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+AtomUI.City.Routing.RouteResolversAttribute.RouteResolversAttribute(params System.Type![]! resolverTypes) -> void
+AtomUI.City.Routing.RouteTemplate
+AtomUI.City.Routing.RouteTemplate.Pattern.get -> string!
+AtomUI.City.Routing.RouteTemplate.Segments.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteTemplateSegment!>!
+AtomUI.City.Routing.RouteTemplate.TryBindParameters(System.Collections.Generic.IReadOnlyDictionary<string!, string!>! parameters, out System.Collections.Generic.IReadOnlyDictionary<string!, string!>! boundParameters) -> bool
+AtomUI.City.Routing.RouteTemplate.TryMatch(string! path, out System.Collections.Generic.IReadOnlyDictionary<string!, string!>! values) -> bool
+AtomUI.City.Routing.RouteTemplateSegment
+AtomUI.City.Routing.RouteTemplateSegment.Constraints.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Routing.RouteTemplateSegment.DefaultValue.get -> string?
+AtomUI.City.Routing.RouteTemplateSegment.IsOptional.get -> bool
+AtomUI.City.Routing.RouteTemplateSegment.Kind.get -> AtomUI.City.Routing.RouteTemplateSegmentKind
+AtomUI.City.Routing.RouteTemplateSegment.Literal.get -> string?
+AtomUI.City.Routing.RouteTemplateSegment.Name.get -> string?
+AtomUI.City.Routing.RouteTemplateSegmentKind
+AtomUI.City.Routing.RouteTemplateSegmentKind.CatchAll = 2 -> AtomUI.City.Routing.RouteTemplateSegmentKind
+AtomUI.City.Routing.RouteTemplateSegmentKind.Literal = 0 -> AtomUI.City.Routing.RouteTemplateSegmentKind
+AtomUI.City.Routing.RouteTemplateSegmentKind.Parameter = 1 -> AtomUI.City.Routing.RouteTemplateSegmentKind
+AtomUI.City.Routing.RoutingDiagnosticIds
+AtomUI.City.Routing.RoutingModule
+AtomUI.City.Routing.RoutingModule.RoutingModule() -> void
+AtomUI.City.Routing.RoutingServiceCollectionExtensions
+AtomUI.City.Routing.ViewModelTargetDescriptor
+AtomUI.City.Routing.ViewModelTargetDescriptor.ActivationHint.get -> string?
+AtomUI.City.Routing.ViewModelTargetDescriptor.ParameterBindings.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Routing.ViewModelTargetDescriptor.ReuseKey.get -> string?
+AtomUI.City.Routing.ViewModelTargetDescriptor.ViewModelTargetDescriptor(System.Type! viewModelType) -> void
+AtomUI.City.Routing.ViewModelTargetDescriptor.ViewModelTargetDescriptor(System.Type! viewModelType, System.Collections.Generic.IReadOnlyList<string!>? parameterBindings, string? reuseKey = null, string? activationHint = null) -> void
+AtomUI.City.Routing.ViewModelTargetDescriptor.ViewModelType.get -> System.Type!
+const AtomUI.City.Routing.RoutingDiagnosticIds.NavigationCompleted = "AUCRT002" -> string!
+const AtomUI.City.Routing.RoutingDiagnosticIds.NavigationFailed = "AUCRT003" -> string!
+const AtomUI.City.Routing.RoutingDiagnosticIds.NavigationStarted = "AUCRT001" -> string!
+const AtomUI.City.Routing.RoutingDiagnosticIds.PipelineComponentFailed = "AUCRT006" -> string!
+const AtomUI.City.Routing.RoutingDiagnosticIds.PipelineComponentRejected = "AUCRT007" -> string!
+const AtomUI.City.Routing.RoutingDiagnosticIds.ResolverFailed = "AUCRT005" -> string!
+const AtomUI.City.Routing.RoutingDiagnosticIds.RouteGraphChanged = "AUCRT004" -> string!
+const AtomUI.City.Routing.RoutingDiagnosticIds.RouteGraphRejected = "AUCRT008" -> string!
+override AtomUI.City.Routing.NavigationError.Equals(object? obj) -> bool
+override AtomUI.City.Routing.NavigationError.GetHashCode() -> int
+override AtomUI.City.Routing.NavigationError.ToString() -> string!
+override AtomUI.City.Routing.NavigationTarget.ToString() -> string!
+override AtomUI.City.Routing.RouteExtensionPoint.GetHashCode() -> int
+override AtomUI.City.Routing.RouteExtensionPoint.ToString() -> string!
+override AtomUI.City.Routing.RouteReference.GetHashCode() -> int
+override AtomUI.City.Routing.RouteReference.ToString() -> string!
+override AtomUI.City.Routing.RouteReference<TParameters>.GetHashCode() -> int
+override AtomUI.City.Routing.RouteReference<TParameters>.ToString() -> string!
+override AtomUI.City.Routing.RoutingModule.ConfigureServices(AtomUI.City.Core.Modularity.ServiceConfigurationContext! context) -> void
+static AtomUI.City.Routing.NavigationError.operator !=(AtomUI.City.Routing.NavigationError? left, AtomUI.City.Routing.NavigationError? right) -> bool
+static AtomUI.City.Routing.NavigationError.operator ==(AtomUI.City.Routing.NavigationError? left, AtomUI.City.Routing.NavigationError? right) -> bool
+static AtomUI.City.Routing.NavigationOptions.Default.get -> AtomUI.City.Routing.NavigationOptions!
+static AtomUI.City.Routing.NavigationResult.Cancelled(System.Guid navigationId, AtomUI.City.Routing.NavigationTarget! target, string? message = null) -> AtomUI.City.Routing.NavigationResult!
+static AtomUI.City.Routing.NavigationResult.Failed(System.Guid navigationId, AtomUI.City.Routing.NavigationTarget! target, string! code, string! message, System.Exception? exception = null) -> AtomUI.City.Routing.NavigationResult!
+static AtomUI.City.Routing.NavigationResult.NotFound(System.Guid navigationId, AtomUI.City.Routing.NavigationTarget! target, string! message) -> AtomUI.City.Routing.NavigationResult!
+static AtomUI.City.Routing.NavigationResult.Redirected(System.Guid navigationId, AtomUI.City.Routing.NavigationTarget! target, AtomUI.City.Routing.NavigationTarget! redirectTarget) -> AtomUI.City.Routing.NavigationResult!
+static AtomUI.City.Routing.NavigationResult.Redirected(System.Guid navigationId, AtomUI.City.Routing.NavigationTarget! target, AtomUI.City.Routing.NavigationTarget! redirectTarget, AtomUI.City.Routing.RouteDescriptor! route, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! parameters) -> AtomUI.City.Routing.NavigationResult!
+static AtomUI.City.Routing.NavigationResult.Rejected(System.Guid navigationId, AtomUI.City.Routing.NavigationTarget! target, string! code, string? message = null) -> AtomUI.City.Routing.NavigationResult!
+static AtomUI.City.Routing.NavigationResult.Success(System.Guid navigationId, AtomUI.City.Routing.NavigationTarget! target, AtomUI.City.Routing.RouteDescriptor! route, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! parameters) -> AtomUI.City.Routing.NavigationResult!
+static AtomUI.City.Routing.NavigationSnapshot.Empty(long routeGraphVersion) -> AtomUI.City.Routing.NavigationSnapshot!
+static AtomUI.City.Routing.NavigationSnapshot.FromRoute(AtomUI.City.Routing.RouteDescriptor! activeRoute, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! parameters, long routeGraphVersion, string? reuseKey = null, System.Collections.Generic.IReadOnlyDictionary<string!, object?>? resolvedData = null) -> AtomUI.City.Routing.NavigationSnapshot!
+static AtomUI.City.Routing.NavigationTarget.FromDeepLink(System.Uri! uri, AtomUI.City.Routing.NavigationOptions! options) -> AtomUI.City.Routing.NavigationTarget!
+static AtomUI.City.Routing.NavigationTarget.FromPath(string! path, AtomUI.City.Routing.NavigationOptions! options) -> AtomUI.City.Routing.NavigationTarget!
+static AtomUI.City.Routing.NavigationTarget.FromRouteReference(string! routeId, System.Collections.Generic.IReadOnlyDictionary<string!, string!>? parameters, AtomUI.City.Routing.NavigationOptions! options) -> AtomUI.City.Routing.NavigationTarget!
+static AtomUI.City.Routing.RouteExtensionPoint.operator !=(AtomUI.City.Routing.RouteExtensionPoint left, AtomUI.City.Routing.RouteExtensionPoint right) -> bool
+static AtomUI.City.Routing.RouteExtensionPoint.operator ==(AtomUI.City.Routing.RouteExtensionPoint left, AtomUI.City.Routing.RouteExtensionPoint right) -> bool
+static AtomUI.City.Routing.RouteGraphSnapshot.Create(System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteDescriptor!>! routes) -> AtomUI.City.Routing.RouteGraphSnapshot!
+static AtomUI.City.Routing.RouteGraphSnapshot.Create(System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteDescriptor!>! routes, long version) -> AtomUI.City.Routing.RouteGraphSnapshot!
+static AtomUI.City.Routing.RouteGuardResult.Allow() -> AtomUI.City.Routing.RouteGuardResult!
+static AtomUI.City.Routing.RouteGuardResult.Cancel(string? message = null) -> AtomUI.City.Routing.RouteGuardResult!
+static AtomUI.City.Routing.RouteGuardResult.Failed(string! code, string! message, System.Exception? exception = null) -> AtomUI.City.Routing.RouteGuardResult!
+static AtomUI.City.Routing.RouteGuardResult.Redirect(AtomUI.City.Routing.NavigationTarget! target) -> AtomUI.City.Routing.RouteGuardResult!
+static AtomUI.City.Routing.RouteGuardResult.Reject(string! code, string? message = null) -> AtomUI.City.Routing.RouteGuardResult!
+static AtomUI.City.Routing.RouteMatch.NotFound(string! path) -> AtomUI.City.Routing.RouteMatch!
+static AtomUI.City.Routing.RouteMatch.Success(AtomUI.City.Routing.RouteDescriptor! route, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! parameters) -> AtomUI.City.Routing.RouteMatch!
+static AtomUI.City.Routing.RouteMetadataDescriptor.Empty.get -> AtomUI.City.Routing.RouteMetadataDescriptor!
+static AtomUI.City.Routing.RouteReference.operator !=(AtomUI.City.Routing.RouteReference left, AtomUI.City.Routing.RouteReference right) -> bool
+static AtomUI.City.Routing.RouteReference.operator ==(AtomUI.City.Routing.RouteReference left, AtomUI.City.Routing.RouteReference right) -> bool
+static AtomUI.City.Routing.RouteReference<TParameters>.operator !=(AtomUI.City.Routing.RouteReference<TParameters> left, AtomUI.City.Routing.RouteReference<TParameters> right) -> bool
+static AtomUI.City.Routing.RouteReference<TParameters>.operator ==(AtomUI.City.Routing.RouteReference<TParameters> left, AtomUI.City.Routing.RouteReference<TParameters> right) -> bool
+static AtomUI.City.Routing.RouteResolveResult.Cancelled(string? message = null) -> AtomUI.City.Routing.RouteResolveResult!
+static AtomUI.City.Routing.RouteResolveResult.Failed(string! code, string! message, System.Exception? exception = null) -> AtomUI.City.Routing.RouteResolveResult!
+static AtomUI.City.Routing.RouteResolveResult.NotFound(string? message = null) -> AtomUI.City.Routing.RouteResolveResult!
+static AtomUI.City.Routing.RouteResolveResult.Redirect(AtomUI.City.Routing.NavigationTarget! target) -> AtomUI.City.Routing.RouteResolveResult!
+static AtomUI.City.Routing.RouteResolveResult.Success(System.Collections.Generic.IReadOnlyDictionary<string!, object?>? data = null) -> AtomUI.City.Routing.RouteResolveResult!
+static AtomUI.City.Routing.RouteTemplate.Parse(string! pattern) -> AtomUI.City.Routing.RouteTemplate!
+static AtomUI.City.Routing.RoutingServiceCollectionExtensions.AddRouting(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteDescriptor!>? routes = null) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+virtual AtomUI.City.Routing.RouteNavigationDelegate.Invoke() -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+~override AtomUI.City.Routing.RouteExtensionPoint.Equals(object obj) -> bool
+~override AtomUI.City.Routing.RouteReference.Equals(object obj) -> bool
+~override AtomUI.City.Routing.RouteReference<TParameters>.Equals(object obj) -> bool

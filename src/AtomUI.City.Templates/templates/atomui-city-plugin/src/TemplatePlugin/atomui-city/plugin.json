@@ -9,7 +9,7 @@
   "mainAssembly": "TemplatePlugin.dll",
   "targetFramework": "__TARGET_FRAMEWORK__",
   "pluginApiVersion": "1.0",
-  "minHostVersion": "1.0.0",
+  "minHostVersion": "1.0.0-preview.1",
   "unloadable": true,
   "aotCompatible": false,
   "capabilities": [],

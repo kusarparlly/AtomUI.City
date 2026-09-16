@@ -1,0 +1,110 @@
+#nullable enable
+AtomUI.City.Templates.ApplicationTemplateOptions
+AtomUI.City.Templates.ApplicationTemplateOptions.ApplicationTemplateOptions() -> void
+AtomUI.City.Templates.ApplicationTemplateOptions.AppName.get -> string!
+AtomUI.City.Templates.ApplicationTemplateOptions.AppName.init -> void
+AtomUI.City.Templates.ApplicationTemplateOptions.EffectiveRootNamespace.get -> string!
+AtomUI.City.Templates.ApplicationTemplateOptions.IncludeSample.get -> bool
+AtomUI.City.Templates.ApplicationTemplateOptions.IncludeSample.init -> void
+AtomUI.City.Templates.ApplicationTemplateOptions.IncludeTests.get -> bool
+AtomUI.City.Templates.ApplicationTemplateOptions.IncludeTests.init -> void
+AtomUI.City.Templates.ApplicationTemplateOptions.OutputPath.get -> string!
+AtomUI.City.Templates.ApplicationTemplateOptions.OutputPath.init -> void
+AtomUI.City.Templates.ApplicationTemplateOptions.RootNamespace.get -> string!
+AtomUI.City.Templates.ApplicationTemplateOptions.RootNamespace.init -> void
+AtomUI.City.Templates.ApplicationTemplateOptions.TargetFramework.get -> string!
+AtomUI.City.Templates.ApplicationTemplateOptions.TargetFramework.init -> void
+AtomUI.City.Templates.ApplicationTemplateOptions.UseAot.get -> bool
+AtomUI.City.Templates.ApplicationTemplateOptions.UseAot.init -> void
+AtomUI.City.Templates.ApplicationTemplateOptions.UseDynamicPlugins.get -> bool
+AtomUI.City.Templates.ApplicationTemplateOptions.UseDynamicPlugins.init -> void
+AtomUI.City.Templates.ApplicationTemplateOptions.Validate() -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Templates.TemplateDiagnostic!>!
+AtomUI.City.Templates.ApplicationTemplateRenderer
+AtomUI.City.Templates.ApplicationTemplateRenderer.ApplicationTemplateRenderer() -> void
+AtomUI.City.Templates.ApplicationTemplateRenderer.CreatePlan(AtomUI.City.Templates.ApplicationTemplateOptions! options) -> AtomUI.City.Templates.TemplatePlan!
+AtomUI.City.Templates.ApplicationTemplateRenderer.Render(AtomUI.City.Templates.ApplicationTemplateOptions! options) -> AtomUI.City.Templates.TemplateRenderResult!
+AtomUI.City.Templates.ApplicationTemplateRenderer.Render(AtomUI.City.Templates.ApplicationTemplateOptions! options, System.Threading.CancellationToken cancellationToken) -> AtomUI.City.Templates.TemplateRenderResult!
+AtomUI.City.Templates.GenerationTemplateKind
+AtomUI.City.Templates.GenerationTemplateKind.Configuration = 3 -> AtomUI.City.Templates.GenerationTemplateKind
+AtomUI.City.Templates.GenerationTemplateKind.Localization = 4 -> AtomUI.City.Templates.GenerationTemplateKind
+AtomUI.City.Templates.GenerationTemplateKind.Module = 0 -> AtomUI.City.Templates.GenerationTemplateKind
+AtomUI.City.Templates.GenerationTemplateKind.Page = 1 -> AtomUI.City.Templates.GenerationTemplateKind
+AtomUI.City.Templates.GenerationTemplateKind.Test = 2 -> AtomUI.City.Templates.GenerationTemplateKind
+AtomUI.City.Templates.GenerationTemplateOptions
+AtomUI.City.Templates.GenerationTemplateOptions.Cultures.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Templates.GenerationTemplateOptions.Cultures.init -> void
+AtomUI.City.Templates.GenerationTemplateOptions.GenerationTemplateOptions() -> void
+AtomUI.City.Templates.GenerationTemplateOptions.IncludeTests.get -> bool
+AtomUI.City.Templates.GenerationTemplateOptions.IncludeTests.init -> void
+AtomUI.City.Templates.GenerationTemplateOptions.Kind.get -> AtomUI.City.Templates.GenerationTemplateKind
+AtomUI.City.Templates.GenerationTemplateOptions.Kind.init -> void
+AtomUI.City.Templates.GenerationTemplateOptions.ModuleDependencies.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Templates.GenerationTemplateOptions.ModuleDependencies.init -> void
+AtomUI.City.Templates.GenerationTemplateOptions.Name.get -> string!
+AtomUI.City.Templates.GenerationTemplateOptions.Name.init -> void
+AtomUI.City.Templates.GenerationTemplateOptions.OutputPath.get -> string!
+AtomUI.City.Templates.GenerationTemplateOptions.OutputPath.init -> void
+AtomUI.City.Templates.GenerationTemplateOptions.ProjectName.get -> string!
+AtomUI.City.Templates.GenerationTemplateOptions.ProjectName.init -> void
+AtomUI.City.Templates.GenerationTemplateOptions.ReloadableConfiguration.get -> bool
+AtomUI.City.Templates.GenerationTemplateOptions.ReloadableConfiguration.init -> void
+AtomUI.City.Templates.GenerationTemplateOptions.RootNamespace.get -> string!
+AtomUI.City.Templates.GenerationTemplateOptions.RootNamespace.init -> void
+AtomUI.City.Templates.GenerationTemplateOptions.RoutePath.get -> string?
+AtomUI.City.Templates.GenerationTemplateOptions.RoutePath.init -> void
+AtomUI.City.Templates.GenerationTemplateOptions.Validate() -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Templates.TemplateDiagnostic!>!
+AtomUI.City.Templates.GenerationTemplateRenderer
+AtomUI.City.Templates.GenerationTemplateRenderer.CreatePlan(AtomUI.City.Templates.GenerationTemplateOptions! options) -> AtomUI.City.Templates.TemplatePlan!
+AtomUI.City.Templates.GenerationTemplateRenderer.GenerationTemplateRenderer() -> void
+AtomUI.City.Templates.GenerationTemplateRenderer.Render(AtomUI.City.Templates.GenerationTemplateOptions! options) -> AtomUI.City.Templates.TemplateRenderResult!
+AtomUI.City.Templates.GenerationTemplateRenderer.Render(AtomUI.City.Templates.GenerationTemplateOptions! options, System.Threading.CancellationToken cancellationToken) -> AtomUI.City.Templates.TemplateRenderResult!
+AtomUI.City.Templates.TemplateChange
+AtomUI.City.Templates.TemplateChange.<Clone>$() -> AtomUI.City.Templates.TemplateChange!
+AtomUI.City.Templates.TemplateChange.Deconstruct(out string! Type, out string! Path) -> void
+AtomUI.City.Templates.TemplateChange.Equals(AtomUI.City.Templates.TemplateChange? other) -> bool
+AtomUI.City.Templates.TemplateChange.Path.get -> string!
+AtomUI.City.Templates.TemplateChange.Path.init -> void
+AtomUI.City.Templates.TemplateChange.TemplateChange(string! Type, string! Path) -> void
+AtomUI.City.Templates.TemplateChange.Type.get -> string!
+AtomUI.City.Templates.TemplateChange.Type.init -> void
+AtomUI.City.Templates.TemplateDiagnostic
+AtomUI.City.Templates.TemplateDiagnostic.<Clone>$() -> AtomUI.City.Templates.TemplateDiagnostic!
+AtomUI.City.Templates.TemplateDiagnostic.Code.get -> string!
+AtomUI.City.Templates.TemplateDiagnostic.Context.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>!
+AtomUI.City.Templates.TemplateDiagnostic.Equals(AtomUI.City.Templates.TemplateDiagnostic? other) -> bool
+AtomUI.City.Templates.TemplateDiagnostic.Message.get -> string!
+AtomUI.City.Templates.TemplateDiagnostic.TemplateDiagnostic(string! code, string! message) -> void
+AtomUI.City.Templates.TemplateDiagnostic.TemplateDiagnostic(string! code, string! message, System.Collections.Generic.IReadOnlyDictionary<string!, object?>! context) -> void
+AtomUI.City.Templates.TemplatePlan
+AtomUI.City.Templates.TemplatePlan.BuildTargets.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Templates.TemplatePlan.Changes.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Templates.TemplateChange!>!
+AtomUI.City.Templates.TemplatePlan.Command.get -> string!
+AtomUI.City.Templates.TemplatePlan.DocsRequired.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Templates.TemplatePlan.Inputs.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>!
+AtomUI.City.Templates.TemplatePlan.OperationId.get -> string!
+AtomUI.City.Templates.TemplatePlan.Risks.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Templates.TemplatePlan.Rollback.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Templates.TemplatePlan.SchemaVersion.get -> string!
+AtomUI.City.Templates.TemplatePlan.TemplatePlan(string! operationId, string! command, System.Collections.Generic.IReadOnlyDictionary<string!, object?>! inputs, System.Collections.Generic.IReadOnlyList<AtomUI.City.Templates.TemplateChange!>! changes) -> void
+AtomUI.City.Templates.TemplatePlan.TemplatePlan(string! operationId, string! command, System.Collections.Generic.IReadOnlyDictionary<string!, object?>! inputs, System.Collections.Generic.IReadOnlyList<AtomUI.City.Templates.TemplateChange!>! changes, System.Collections.Generic.IReadOnlyList<string!>! buildTargets, System.Collections.Generic.IReadOnlyList<string!>! testTargets, System.Collections.Generic.IReadOnlyList<string!>! docsRequired, System.Collections.Generic.IReadOnlyList<string!>! risks, System.Collections.Generic.IReadOnlyList<string!>! rollback) -> void
+AtomUI.City.Templates.TemplatePlan.TestTargets.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Templates.TemplatePlan.Validate() -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Templates.TemplateDiagnostic!>!
+AtomUI.City.Templates.TemplateRenderResult
+AtomUI.City.Templates.TemplateRenderResult.AppliedPaths.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Templates.TemplateRenderResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Templates.TemplateDiagnostic!>!
+AtomUI.City.Templates.TemplateRenderResult.Plan.get -> AtomUI.City.Templates.TemplatePlan?
+AtomUI.City.Templates.TemplateRenderResult.Succeeded.get -> bool
+override AtomUI.City.Templates.TemplateChange.Equals(object? obj) -> bool
+override AtomUI.City.Templates.TemplateChange.GetHashCode() -> int
+override AtomUI.City.Templates.TemplateChange.ToString() -> string!
+override AtomUI.City.Templates.TemplateDiagnostic.Equals(object? obj) -> bool
+override AtomUI.City.Templates.TemplateDiagnostic.GetHashCode() -> int
+override AtomUI.City.Templates.TemplateDiagnostic.ToString() -> string!
+static AtomUI.City.Templates.TemplateChange.Create(string! path) -> AtomUI.City.Templates.TemplateChange!
+static AtomUI.City.Templates.TemplateChange.operator !=(AtomUI.City.Templates.TemplateChange? left, AtomUI.City.Templates.TemplateChange? right) -> bool
+static AtomUI.City.Templates.TemplateChange.operator ==(AtomUI.City.Templates.TemplateChange? left, AtomUI.City.Templates.TemplateChange? right) -> bool
+static AtomUI.City.Templates.TemplateDiagnostic.operator !=(AtomUI.City.Templates.TemplateDiagnostic? left, AtomUI.City.Templates.TemplateDiagnostic? right) -> bool
+static AtomUI.City.Templates.TemplateDiagnostic.operator ==(AtomUI.City.Templates.TemplateDiagnostic? left, AtomUI.City.Templates.TemplateDiagnostic? right) -> bool
+static AtomUI.City.Templates.TemplateRenderResult.Failed(AtomUI.City.Templates.TemplatePlan? plan, params AtomUI.City.Templates.TemplateDiagnostic![]! diagnostics) -> AtomUI.City.Templates.TemplateRenderResult!
+static AtomUI.City.Templates.TemplateRenderResult.Failed(params AtomUI.City.Templates.TemplateDiagnostic![]! diagnostics) -> AtomUI.City.Templates.TemplateRenderResult!
+static AtomUI.City.Templates.TemplateRenderResult.Success(AtomUI.City.Templates.TemplatePlan! plan, System.Collections.Generic.IReadOnlyList<string!>? appliedPaths = null) -> AtomUI.City.Templates.TemplateRenderResult!

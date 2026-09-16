@@ -2,7 +2,9 @@
   <PropertyGroup>
     <NoWarn>$(NoWarn);CS7035</NoWarn>
     <AvaloniaVersion>12.0.4</AvaloniaVersion>
-    <AtomUICityVersion>1.0.0</AtomUICityVersion>
+    <AtomUICityVersion>1.0.0-preview.1</AtomUICityVersion>
     <AtomUICityTemplatesVersion>$(AtomUICityVersion)</AtomUICityTemplatesVersion>
+    <!-- Set to the immediately preceding published package when promoting a stable release. -->
+    <AtomUICityApiBaselineVersion></AtomUICityApiBaselineVersion>
   </PropertyGroup>
 </Project>

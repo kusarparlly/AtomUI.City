@@ -11,4 +11,46 @@
   <Import Project="$(MSBuildThisFileDirectory)/build/PackageMetaInfo.props" />
   <Import Project="$(MSBuildThisFileDirectory)/build/Output.props" />
 
+  <!--
+    Public API governance is enabled for every product project. Core, EventBus and
+    Presentation keep their project-local analyzer configuration because they
+    already have module-specific release gates. The remaining product projects
+    share this configuration so a newly added public member can never bypass the
+    repository API review merely because it belongs to a later module.
+  -->
+  <PropertyGroup Condition="
+      '$(MSBuildProjectName)' == 'AtomUI.City.Build' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Cli' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Data' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Generators' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Localization' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Mvvm' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.PluginSystem' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Routing' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Security' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.State' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Templates' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Testing'">
+    <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017</WarningsAsErrors>
+    <NoWarn>$(NoWarn);RS0026;RS0027</NoWarn>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
+  </PropertyGroup>
+
+  <ItemGroup Condition="
+      '$(MSBuildProjectName)' == 'AtomUI.City.Build' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Cli' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Data' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Generators' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Localization' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Mvvm' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.PluginSystem' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Routing' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Security' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.State' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Templates' Or
+      '$(MSBuildProjectName)' == 'AtomUI.City.Testing'">
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
+  </ItemGroup>
+
 </Project>

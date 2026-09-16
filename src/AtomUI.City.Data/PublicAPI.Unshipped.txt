@@ -1,0 +1,879 @@
+#nullable enable
+AtomUI.City.Data.AccessTokenCredentialProvider
+AtomUI.City.Data.AccessTokenCredentialProvider.AccessTokenCredentialProvider(AtomUI.City.Security.IAccessTokenProvider! accessTokenProvider) -> void
+AtomUI.City.Data.AccessTokenCredentialProvider.GetCredentialAsync(AtomUI.City.Data.DataAuthenticationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataCredentialResult!>
+AtomUI.City.Data.DataAccessMode
+AtomUI.City.Data.DataAccessMode.Download = 4 -> AtomUI.City.Data.DataAccessMode
+AtomUI.City.Data.DataAccessMode.Mutation = 1 -> AtomUI.City.Data.DataAccessMode
+AtomUI.City.Data.DataAccessMode.Query = 0 -> AtomUI.City.Data.DataAccessMode
+AtomUI.City.Data.DataAccessMode.Subscription = 2 -> AtomUI.City.Data.DataAccessMode
+AtomUI.City.Data.DataAccessMode.Upload = 3 -> AtomUI.City.Data.DataAccessMode
+AtomUI.City.Data.DataAuthenticationContext
+AtomUI.City.Data.DataAuthenticationContext.Authentication.get -> AtomUI.City.Data.DataAuthenticationOptions!
+AtomUI.City.Data.DataAuthenticationContext.ClientId.get -> string!
+AtomUI.City.Data.DataAuthenticationContext.DataAuthenticationContext(string! clientId, string! operationName, AtomUI.City.Data.DataAuthenticationOptions! authentication) -> void
+AtomUI.City.Data.DataAuthenticationContext.OperationName.get -> string!
+AtomUI.City.Data.DataAuthenticationMode
+AtomUI.City.Data.DataAuthenticationMode.Anonymous = 0 -> AtomUI.City.Data.DataAuthenticationMode
+AtomUI.City.Data.DataAuthenticationMode.Bearer = 1 -> AtomUI.City.Data.DataAuthenticationMode
+AtomUI.City.Data.DataAuthenticationOptions
+AtomUI.City.Data.DataAuthenticationOptions.Mode.get -> AtomUI.City.Data.DataAuthenticationMode
+AtomUI.City.Data.DataAuthenticationOptions.Scheme.get -> string?
+AtomUI.City.Data.DataBackpressurePolicy
+AtomUI.City.Data.DataBackpressurePolicy.BlockProducer = 4 -> AtomUI.City.Data.DataBackpressurePolicy
+AtomUI.City.Data.DataBackpressurePolicy.Buffer = 0 -> AtomUI.City.Data.DataBackpressurePolicy
+AtomUI.City.Data.DataBackpressurePolicy.DropNewest = 2 -> AtomUI.City.Data.DataBackpressurePolicy
+AtomUI.City.Data.DataBackpressurePolicy.DropOldest = 1 -> AtomUI.City.Data.DataBackpressurePolicy
+AtomUI.City.Data.DataBackpressurePolicy.LatestOnly = 3 -> AtomUI.City.Data.DataBackpressurePolicy
+AtomUI.City.Data.DataCacheEntryOptions
+AtomUI.City.Data.DataCacheEntryOptions.DataCacheEntryOptions() -> void
+AtomUI.City.Data.DataCacheEntryOptions.TimeToLive.get -> System.TimeSpan?
+AtomUI.City.Data.DataCacheEntryOptions.TimeToLive.init -> void
+AtomUI.City.Data.DataCacheFingerprint
+AtomUI.City.Data.DataCacheInvalidation
+AtomUI.City.Data.DataCacheInvalidation.ClientId.get -> string?
+AtomUI.City.Data.DataCacheInvalidation.ClientVersion.get -> string?
+AtomUI.City.Data.DataCacheInvalidation.ExactKeys.get -> System.Collections.Generic.IReadOnlySet<AtomUI.City.Data.DataCacheKey!>?
+AtomUI.City.Data.DataCacheInvalidation.Matches(AtomUI.City.Data.DataCacheKey! key) -> bool
+AtomUI.City.Data.DataCacheInvalidation.OperationName.get -> string?
+AtomUI.City.Data.DataCacheInvalidation.PermissionRevision.get -> string?
+AtomUI.City.Data.DataCacheInvalidation.PluginContributionId.get -> string?
+AtomUI.City.Data.DataCacheInvalidation.PolicyVersion.get -> string?
+AtomUI.City.Data.DataCacheInvalidation.PrincipalRevision.get -> string?
+AtomUI.City.Data.DataCacheInvalidation.Reason.get -> AtomUI.City.Data.DataCacheInvalidationReason
+AtomUI.City.Data.DataCacheInvalidationReason
+AtomUI.City.Data.DataCacheInvalidationReason.ClientVersionChanged = 6 -> AtomUI.City.Data.DataCacheInvalidationReason
+AtomUI.City.Data.DataCacheInvalidationReason.Expired = 8 -> AtomUI.City.Data.DataCacheInvalidationReason
+AtomUI.City.Data.DataCacheInvalidationReason.Manual = 0 -> AtomUI.City.Data.DataCacheInvalidationReason
+AtomUI.City.Data.DataCacheInvalidationReason.Mutation = 1 -> AtomUI.City.Data.DataCacheInvalidationReason
+AtomUI.City.Data.DataCacheInvalidationReason.PermissionChanged = 4 -> AtomUI.City.Data.DataCacheInvalidationReason
+AtomUI.City.Data.DataCacheInvalidationReason.PluginRevoked = 5 -> AtomUI.City.Data.DataCacheInvalidationReason
+AtomUI.City.Data.DataCacheInvalidationReason.PrincipalChanged = 3 -> AtomUI.City.Data.DataCacheInvalidationReason
+AtomUI.City.Data.DataCacheInvalidationReason.RouteLeft = 7 -> AtomUI.City.Data.DataCacheInvalidationReason
+AtomUI.City.Data.DataCacheInvalidationReason.Subscription = 2 -> AtomUI.City.Data.DataCacheInvalidationReason
+AtomUI.City.Data.DataCacheInvalidationResult
+AtomUI.City.Data.DataCacheInvalidationResult.<Clone>$() -> AtomUI.City.Data.DataCacheInvalidationResult!
+AtomUI.City.Data.DataCacheInvalidationResult.DataCacheInvalidationResult(int RemovedEntryCount) -> void
+AtomUI.City.Data.DataCacheInvalidationResult.Deconstruct(out int RemovedEntryCount) -> void
+AtomUI.City.Data.DataCacheInvalidationResult.Equals(AtomUI.City.Data.DataCacheInvalidationResult? other) -> bool
+AtomUI.City.Data.DataCacheInvalidationResult.RemovedEntryCount.get -> int
+AtomUI.City.Data.DataCacheInvalidationResult.RemovedEntryCount.init -> void
+AtomUI.City.Data.DataCacheKey
+AtomUI.City.Data.DataCacheKey.<Clone>$() -> AtomUI.City.Data.DataCacheKey!
+AtomUI.City.Data.DataCacheKey.AccessMode.get -> AtomUI.City.Data.DataAccessMode
+AtomUI.City.Data.DataCacheKey.AccessMode.init -> void
+AtomUI.City.Data.DataCacheKey.AuthenticationScheme.get -> string!
+AtomUI.City.Data.DataCacheKey.AuthenticationScheme.init -> void
+AtomUI.City.Data.DataCacheKey.ClientId.get -> string!
+AtomUI.City.Data.DataCacheKey.ClientId.init -> void
+AtomUI.City.Data.DataCacheKey.ClientVersion.get -> string!
+AtomUI.City.Data.DataCacheKey.ClientVersion.init -> void
+AtomUI.City.Data.DataCacheKey.DataCacheKey(string! ClientId, string! OperationName, AtomUI.City.Data.DataTransportKind TransportKind, AtomUI.City.Data.DataAccessMode AccessMode, string! RequestFingerprint, string! AuthenticationScheme, string! PrincipalRevision, string! PermissionRevision, string? PluginContributionId, string! ClientVersion, string! PolicyVersion) -> void
+AtomUI.City.Data.DataCacheKey.Deconstruct(out string! ClientId, out string! OperationName, out AtomUI.City.Data.DataTransportKind TransportKind, out AtomUI.City.Data.DataAccessMode AccessMode, out string! RequestFingerprint, out string! AuthenticationScheme, out string! PrincipalRevision, out string! PermissionRevision, out string? PluginContributionId, out string! ClientVersion, out string! PolicyVersion) -> void
+AtomUI.City.Data.DataCacheKey.Equals(AtomUI.City.Data.DataCacheKey? other) -> bool
+AtomUI.City.Data.DataCacheKey.OperationName.get -> string!
+AtomUI.City.Data.DataCacheKey.OperationName.init -> void
+AtomUI.City.Data.DataCacheKey.PermissionRevision.get -> string!
+AtomUI.City.Data.DataCacheKey.PermissionRevision.init -> void
+AtomUI.City.Data.DataCacheKey.PluginContributionId.get -> string?
+AtomUI.City.Data.DataCacheKey.PluginContributionId.init -> void
+AtomUI.City.Data.DataCacheKey.PolicyVersion.get -> string!
+AtomUI.City.Data.DataCacheKey.PolicyVersion.init -> void
+AtomUI.City.Data.DataCacheKey.PrincipalRevision.get -> string!
+AtomUI.City.Data.DataCacheKey.PrincipalRevision.init -> void
+AtomUI.City.Data.DataCacheKey.RequestFingerprint.get -> string!
+AtomUI.City.Data.DataCacheKey.RequestFingerprint.init -> void
+AtomUI.City.Data.DataCacheKey.TransportKind.get -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.DataCacheKey.TransportKind.init -> void
+AtomUI.City.Data.DataCacheLookup<TResponse>
+AtomUI.City.Data.DataCacheLookup<TResponse>.IsHit.get -> bool
+AtomUI.City.Data.DataCacheLookup<TResponse>.Value.get -> TResponse?
+AtomUI.City.Data.DataCacheOptions
+AtomUI.City.Data.DataCacheOptions.ClientVersion.get -> string!
+AtomUI.City.Data.DataCacheOptions.IsEnabled.get -> bool
+AtomUI.City.Data.DataCacheOptions.PermissionRevision.get -> string!
+AtomUI.City.Data.DataCacheOptions.PluginContributionId.get -> string?
+AtomUI.City.Data.DataCacheOptions.PolicyVersion.get -> string!
+AtomUI.City.Data.DataCacheOptions.PrincipalRevision.get -> string!
+AtomUI.City.Data.DataCacheOptions.RequestFingerprint.get -> string!
+AtomUI.City.Data.DataCacheOptions.TimeToLive.get -> System.TimeSpan?
+AtomUI.City.Data.DataCapability
+AtomUI.City.Data.DataCapability.None = 0 -> AtomUI.City.Data.DataCapability
+AtomUI.City.Data.DataCapability.UseDataClient = 1 -> AtomUI.City.Data.DataCapability
+AtomUI.City.Data.DataCapability.UseGrpcClient = 4 -> AtomUI.City.Data.DataCapability
+AtomUI.City.Data.DataCapability.UseHttpClient = 2 -> AtomUI.City.Data.DataCapability
+AtomUI.City.Data.DataCapability.UseRealtimeConnection = 16 -> AtomUI.City.Data.DataCapability
+AtomUI.City.Data.DataCapability.UseSignalRHub = 8 -> AtomUI.City.Data.DataCapability
+AtomUI.City.Data.DataCapability.UseStreaming = 32 -> AtomUI.City.Data.DataCapability
+AtomUI.City.Data.DataCircuitBreakerOptions
+AtomUI.City.Data.DataCircuitBreakerOptions.BreakDuration.get -> System.TimeSpan
+AtomUI.City.Data.DataCircuitBreakerOptions.BreakDuration.init -> void
+AtomUI.City.Data.DataCircuitBreakerOptions.DataCircuitBreakerOptions() -> void
+AtomUI.City.Data.DataCircuitBreakerOptions.FailureThreshold.get -> int
+AtomUI.City.Data.DataCircuitBreakerOptions.FailureThreshold.init -> void
+AtomUI.City.Data.DataCircuitBreakerOptions.IsEnabled.get -> bool
+AtomUI.City.Data.DataCircuitBreakerOptions.IsEnabled.init -> void
+AtomUI.City.Data.DataClientAttribute
+AtomUI.City.Data.DataClientAttribute.ClientId.get -> string!
+AtomUI.City.Data.DataClientAttribute.DataClientAttribute(string! clientId, AtomUI.City.Data.DataTransportKind transportKind) -> void
+AtomUI.City.Data.DataClientAttribute.TransportKind.get -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.DataClientAttribute.Version.get -> string!
+AtomUI.City.Data.DataClientAttribute.Version.init -> void
+AtomUI.City.Data.DataClientDescriptor
+AtomUI.City.Data.DataClientDescriptor.ClientId.get -> string!
+AtomUI.City.Data.DataClientDescriptor.ClientType.get -> System.Type!
+AtomUI.City.Data.DataClientDescriptor.DataClientDescriptor(string! clientId, System.Type! clientType, AtomUI.City.Data.DataTransportKind transportKind, string! version, System.Collections.Generic.IReadOnlyList<AtomUI.City.Data.DataOperationDescriptor!>! operations, string? pluginContributionId = null) -> void
+AtomUI.City.Data.DataClientDescriptor.Operations.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Data.DataOperationDescriptor!>!
+AtomUI.City.Data.DataClientDescriptor.PluginContributionId.get -> string?
+AtomUI.City.Data.DataClientDescriptor.TransportKind.get -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.DataClientDescriptor.Version.get -> string!
+AtomUI.City.Data.DataClientDescriptor.WithPluginContribution(string! contributionId) -> AtomUI.City.Data.DataClientDescriptor!
+AtomUI.City.Data.DataClientDescriptorCatalog
+AtomUI.City.Data.DataClientDescriptorCatalog.DataClientDescriptorCatalog() -> void
+AtomUI.City.Data.DataClientDescriptorCatalog.Register(AtomUI.City.Data.DataClientDescriptor! descriptor) -> System.IDisposable!
+AtomUI.City.Data.DataClientDescriptorCatalog.RegisterGenerated<TRegistrar>() -> void
+AtomUI.City.Data.DataClientDescriptorCatalog.Snapshot.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Data.DataClientDescriptor!>!
+AtomUI.City.Data.DataClientDescriptorCatalog.TryGet(string! clientId, out AtomUI.City.Data.DataClientDescriptor? descriptor) -> bool
+AtomUI.City.Data.DataClientRegistry
+AtomUI.City.Data.DataClientRegistry.DataClientRegistry(AtomUI.City.Data.IDataDiagnostics? diagnostics = null) -> void
+AtomUI.City.Data.DataClientRegistry.GetRequiredClient<TClient>() -> TClient!
+AtomUI.City.Data.DataClientRegistry.Register<TClient>(TClient! client) -> void
+AtomUI.City.Data.DataClientRegistry.RegisterOwned<TClient>(TClient! client) -> System.IDisposable!
+AtomUI.City.Data.DataClientRegistry.Unregister<TClient>() -> bool
+AtomUI.City.Data.DataConcurrencyOptions
+AtomUI.City.Data.DataConcurrencyOptions.DataConcurrencyOptions() -> void
+AtomUI.City.Data.DataConcurrencyOptions.MaximumQueueLength.get -> int
+AtomUI.City.Data.DataConcurrencyOptions.MaximumQueueLength.init -> void
+AtomUI.City.Data.DataConcurrencyOptions.OperationKey.get -> string?
+AtomUI.City.Data.DataConcurrencyOptions.OperationKey.init -> void
+AtomUI.City.Data.DataConcurrencyOptions.Policy.get -> AtomUI.City.Data.DataConcurrencyPolicy
+AtomUI.City.Data.DataConcurrencyOptions.Policy.init -> void
+AtomUI.City.Data.DataConcurrencyOptions.ResourceKey.get -> string?
+AtomUI.City.Data.DataConcurrencyOptions.ResourceKey.init -> void
+AtomUI.City.Data.DataConcurrencyPolicy
+AtomUI.City.Data.DataConcurrencyPolicy.AllowConcurrent = 0 -> AtomUI.City.Data.DataConcurrencyPolicy
+AtomUI.City.Data.DataConcurrencyPolicy.CancelPrevious = 3 -> AtomUI.City.Data.DataConcurrencyPolicy
+AtomUI.City.Data.DataConcurrencyPolicy.DisallowConcurrent = 1 -> AtomUI.City.Data.DataConcurrencyPolicy
+AtomUI.City.Data.DataConcurrencyPolicy.KeyedSerial = 5 -> AtomUI.City.Data.DataConcurrencyPolicy
+AtomUI.City.Data.DataConcurrencyPolicy.LatestWins = 4 -> AtomUI.City.Data.DataConcurrencyPolicy
+AtomUI.City.Data.DataConcurrencyPolicy.Queue = 2 -> AtomUI.City.Data.DataConcurrencyPolicy
+AtomUI.City.Data.DataConnectionManager
+AtomUI.City.Data.DataConnectionManager.DataConnectionManager(AtomUI.City.Data.IDataDiagnostics? diagnostics = null) -> void
+AtomUI.City.Data.DataConnectionManager.Register(AtomUI.City.Data.IDataConnection! connection) -> AtomUI.City.Data.DataResult<AtomUI.City.Data.DataConnectionRegistration!>!
+AtomUI.City.Data.DataConnectionManager.StartOwnerAsync(AtomUI.City.Data.DataConnectionOwner owner, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.DataConnectionManager.StopAllAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.DataConnectionManager.StopOwnerAsync(AtomUI.City.Data.DataConnectionOwner owner, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.DataConnectionOwner
+AtomUI.City.Data.DataConnectionOwner.DataConnectionOwner() -> void
+AtomUI.City.Data.DataConnectionOwner.DataConnectionOwner(AtomUI.City.Data.DataConnectionOwnerKind kind, string! id) -> void
+AtomUI.City.Data.DataConnectionOwner.Equals(AtomUI.City.Data.DataConnectionOwner other) -> bool
+AtomUI.City.Data.DataConnectionOwner.Id.get -> string?
+AtomUI.City.Data.DataConnectionOwner.Kind.get -> AtomUI.City.Data.DataConnectionOwnerKind
+AtomUI.City.Data.DataConnectionOwnerKind
+AtomUI.City.Data.DataConnectionOwnerKind.Activation = 4 -> AtomUI.City.Data.DataConnectionOwnerKind
+AtomUI.City.Data.DataConnectionOwnerKind.Application = 0 -> AtomUI.City.Data.DataConnectionOwnerKind
+AtomUI.City.Data.DataConnectionOwnerKind.Manual = 6 -> AtomUI.City.Data.DataConnectionOwnerKind
+AtomUI.City.Data.DataConnectionOwnerKind.Navigation = 2 -> AtomUI.City.Data.DataConnectionOwnerKind
+AtomUI.City.Data.DataConnectionOwnerKind.Plugin = 5 -> AtomUI.City.Data.DataConnectionOwnerKind
+AtomUI.City.Data.DataConnectionOwnerKind.Route = 3 -> AtomUI.City.Data.DataConnectionOwnerKind
+AtomUI.City.Data.DataConnectionOwnerKind.Window = 1 -> AtomUI.City.Data.DataConnectionOwnerKind
+AtomUI.City.Data.DataConnectionRegistration
+AtomUI.City.Data.DataConnectionRegistration.Connection.get -> AtomUI.City.Data.IDataConnection!
+AtomUI.City.Data.DataConnectionRegistration.DataConnectionRegistration(AtomUI.City.Data.IDataConnection! connection) -> void
+AtomUI.City.Data.DataConnectionRegistration.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.DataConnectionRegistration.RevokeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.DataConnectionState.Connected = 2 -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.DataConnectionState.Connecting = 1 -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.DataConnectionState.Created = 0 -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.DataConnectionState.Disconnecting = 4 -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.DataConnectionState.Faulted = 6 -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.DataConnectionState.Reconnecting = 3 -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.DataConnectionState.Stopped = 5 -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.DataConnectionStateChangedEventArgs
+AtomUI.City.Data.DataConnectionStateChangedEventArgs.CurrentState.get -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.DataConnectionStateChangedEventArgs.DataConnectionStateChangedEventArgs(AtomUI.City.Data.DataConnectionState previousState, AtomUI.City.Data.DataConnectionState currentState, System.Exception? error = null) -> void
+AtomUI.City.Data.DataConnectionStateChangedEventArgs.Error.get -> System.Exception?
+AtomUI.City.Data.DataConnectionStateChangedEventArgs.PreviousState.get -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.DataConsistencyOptions
+AtomUI.City.Data.DataConsistencyOptions.DataConsistencyOptions() -> void
+AtomUI.City.Data.DataConsistencyOptions.InvalidationsOnSuccess.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Data.DataCacheInvalidation!>!
+AtomUI.City.Data.DataConsistencyOptions.InvalidationsOnSuccess.init -> void
+AtomUI.City.Data.DataConsistencyOptions.OptimisticUpdate.get -> AtomUI.City.Data.IDataOptimisticUpdate?
+AtomUI.City.Data.DataConsistencyOptions.OptimisticUpdate.init -> void
+AtomUI.City.Data.DataConsistencyOptions.RollBackOnCancellation.get -> bool
+AtomUI.City.Data.DataConsistencyOptions.RollBackOnCancellation.init -> void
+AtomUI.City.Data.DataContributionLease
+AtomUI.City.Data.DataContributionLease.ContributionId.get -> string!
+AtomUI.City.Data.DataContributionLease.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.DataContributionLease.GrantedCapabilities.get -> AtomUI.City.Data.DataCapability
+AtomUI.City.Data.DataContributionLease.IsActive.get -> bool
+AtomUI.City.Data.DataContributionLease.Origin.get -> AtomUI.City.Data.DataRequestOrigin!
+AtomUI.City.Data.DataContributionLease.PluginId.get -> string!
+AtomUI.City.Data.DataContributionLease.RegisterClient<TClient>(TClient! client) -> System.IDisposable!
+AtomUI.City.Data.DataContributionLease.RegisterClientDescriptor(AtomUI.City.Data.DataClientDescriptor! descriptor) -> System.IDisposable!
+AtomUI.City.Data.DataContributionLease.RegisterConnectionAsync(AtomUI.City.Data.IDataConnection! connection) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<AtomUI.City.Data.DataConnectionRegistration!>!>
+AtomUI.City.Data.DataContributionLease.RegisterHandler(AtomUI.City.Data.IDataRequestHandler! handler) -> void
+AtomUI.City.Data.DataContributionLease.RevokeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.DataContributionRegistry
+AtomUI.City.Data.DataContributionRegistry.BeginContribution(string! pluginId, string! contributionId, AtomUI.City.Data.DataCapability grantedCapabilities) -> AtomUI.City.Data.DataResult<AtomUI.City.Data.DataContributionLease!>!
+AtomUI.City.Data.DataContributionRegistry.DataContributionRegistry(AtomUI.City.Data.DataClientDescriptorCatalog! descriptors, AtomUI.City.Data.DataClientRegistry! clients, AtomUI.City.Data.DataConnectionManager! connections, AtomUI.City.Data.IDataCacheInvalidator! cacheInvalidator, AtomUI.City.Data.IDataDiagnostics? diagnostics = null) -> void
+AtomUI.City.Data.DataContributionRegistry.GetHandlers<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request) -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Data.IDataRequestHandler!>!
+AtomUI.City.Data.DataContributionRegistry.IsAuthorized(AtomUI.City.Data.DataRequestOrigin! origin, AtomUI.City.Data.DataCapability capability) -> bool
+AtomUI.City.Data.DataCredential
+AtomUI.City.Data.DataCredential.<Clone>$() -> AtomUI.City.Data.DataCredential!
+AtomUI.City.Data.DataCredential.DataCredential(string! scheme, string! parameter) -> void
+AtomUI.City.Data.DataCredential.Equals(AtomUI.City.Data.DataCredential? other) -> bool
+AtomUI.City.Data.DataCredential.Parameter.get -> string!
+AtomUI.City.Data.DataCredential.Scheme.get -> string!
+AtomUI.City.Data.DataCredentialResult
+AtomUI.City.Data.DataCredentialResult.Credential.get -> AtomUI.City.Data.DataCredential?
+AtomUI.City.Data.DataCredentialResult.Message.get -> string?
+AtomUI.City.Data.DataCredentialResult.Status.get -> AtomUI.City.Data.DataCredentialResultStatus
+AtomUI.City.Data.DataCredentialResult.Succeeded.get -> bool
+AtomUI.City.Data.DataCredentialResultStatus
+AtomUI.City.Data.DataCredentialResultStatus.Cancelled = 5 -> AtomUI.City.Data.DataCredentialResultStatus
+AtomUI.City.Data.DataCredentialResultStatus.Expired = 3 -> AtomUI.City.Data.DataCredentialResultStatus
+AtomUI.City.Data.DataCredentialResultStatus.None = 0 -> AtomUI.City.Data.DataCredentialResultStatus
+AtomUI.City.Data.DataCredentialResultStatus.Required = 2 -> AtomUI.City.Data.DataCredentialResultStatus
+AtomUI.City.Data.DataCredentialResultStatus.Success = 1 -> AtomUI.City.Data.DataCredentialResultStatus
+AtomUI.City.Data.DataCredentialResultStatus.Unavailable = 4 -> AtomUI.City.Data.DataCredentialResultStatus
+AtomUI.City.Data.DataDiagnosticIds
+AtomUI.City.Data.DataDiagnosticRecord
+AtomUI.City.Data.DataDiagnosticRecord.<Clone>$() -> AtomUI.City.Data.DataDiagnosticRecord!
+AtomUI.City.Data.DataDiagnosticRecord.Attempt.get -> int?
+AtomUI.City.Data.DataDiagnosticRecord.Attempt.init -> void
+AtomUI.City.Data.DataDiagnosticRecord.ClientId.get -> string?
+AtomUI.City.Data.DataDiagnosticRecord.ClientId.init -> void
+AtomUI.City.Data.DataDiagnosticRecord.Code.get -> string!
+AtomUI.City.Data.DataDiagnosticRecord.Code.init -> void
+AtomUI.City.Data.DataDiagnosticRecord.DataDiagnosticRecord(string! Code, string! Message, AtomUI.City.Data.DataDiagnosticSeverity Severity, System.Guid? OperationId = null, string? ClientId = null, string? OperationName = null, AtomUI.City.Data.DataTransportKind? TransportKind = null, int? Attempt = null, AtomUI.City.Data.DataErrorKind? ErrorKind = null) -> void
+AtomUI.City.Data.DataDiagnosticRecord.Deconstruct(out string! Code, out string! Message, out AtomUI.City.Data.DataDiagnosticSeverity Severity, out System.Guid? OperationId, out string? ClientId, out string? OperationName, out AtomUI.City.Data.DataTransportKind? TransportKind, out int? Attempt, out AtomUI.City.Data.DataErrorKind? ErrorKind) -> void
+AtomUI.City.Data.DataDiagnosticRecord.Equals(AtomUI.City.Data.DataDiagnosticRecord? other) -> bool
+AtomUI.City.Data.DataDiagnosticRecord.ErrorKind.get -> AtomUI.City.Data.DataErrorKind?
+AtomUI.City.Data.DataDiagnosticRecord.ErrorKind.init -> void
+AtomUI.City.Data.DataDiagnosticRecord.Message.get -> string!
+AtomUI.City.Data.DataDiagnosticRecord.Message.init -> void
+AtomUI.City.Data.DataDiagnosticRecord.OperationId.get -> System.Guid?
+AtomUI.City.Data.DataDiagnosticRecord.OperationId.init -> void
+AtomUI.City.Data.DataDiagnosticRecord.OperationName.get -> string?
+AtomUI.City.Data.DataDiagnosticRecord.OperationName.init -> void
+AtomUI.City.Data.DataDiagnosticRecord.Severity.get -> AtomUI.City.Data.DataDiagnosticSeverity
+AtomUI.City.Data.DataDiagnosticRecord.Severity.init -> void
+AtomUI.City.Data.DataDiagnosticRecord.TransportKind.get -> AtomUI.City.Data.DataTransportKind?
+AtomUI.City.Data.DataDiagnosticRecord.TransportKind.init -> void
+AtomUI.City.Data.DataDiagnosticSeverity
+AtomUI.City.Data.DataDiagnosticSeverity.Error = 3 -> AtomUI.City.Data.DataDiagnosticSeverity
+AtomUI.City.Data.DataDiagnosticSeverity.Info = 1 -> AtomUI.City.Data.DataDiagnosticSeverity
+AtomUI.City.Data.DataDiagnosticSeverity.Trace = 0 -> AtomUI.City.Data.DataDiagnosticSeverity
+AtomUI.City.Data.DataDiagnosticSeverity.Warning = 2 -> AtomUI.City.Data.DataDiagnosticSeverity
+AtomUI.City.Data.DataError
+AtomUI.City.Data.DataError.<Clone>$() -> AtomUI.City.Data.DataError!
+AtomUI.City.Data.DataError.DataError(AtomUI.City.Data.DataErrorKind Kind, string! Message, string? TransportStatus = null, string? MessageKey = null, System.Collections.Generic.IReadOnlyList<object?>? MessageArguments = null, System.Exception? Exception = null) -> void
+AtomUI.City.Data.DataError.Deconstruct(out AtomUI.City.Data.DataErrorKind Kind, out string! Message, out string? TransportStatus, out string? MessageKey, out System.Collections.Generic.IReadOnlyList<object?>? MessageArguments, out System.Exception? Exception) -> void
+AtomUI.City.Data.DataError.Equals(AtomUI.City.Data.DataError? other) -> bool
+AtomUI.City.Data.DataError.Exception.get -> System.Exception?
+AtomUI.City.Data.DataError.Exception.init -> void
+AtomUI.City.Data.DataError.Kind.get -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataError.Kind.init -> void
+AtomUI.City.Data.DataError.Message.get -> string!
+AtomUI.City.Data.DataError.Message.init -> void
+AtomUI.City.Data.DataError.MessageArguments.get -> System.Collections.Generic.IReadOnlyList<object?>?
+AtomUI.City.Data.DataError.MessageArguments.init -> void
+AtomUI.City.Data.DataError.MessageKey.get -> string?
+AtomUI.City.Data.DataError.MessageKey.init -> void
+AtomUI.City.Data.DataError.TransportStatus.get -> string?
+AtomUI.City.Data.DataError.TransportStatus.init -> void
+AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.AuthenticationExpired = 5 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.AuthenticationRequired = 4 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.AuthorizationForbidden = 6 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.BadRequest = 7 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.Cancelled = 0 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.Conflict = 9 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.ConnectionClosed = 17 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.ConnectionFailed = 16 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.CredentialUnavailable = 3 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.DeadlineExceeded = 22 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.LocalStorageError = 25 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.NetworkUnavailable = 2 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.NotFound = 8 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.PluginUnavailable = 24 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.PolicyRejected = 15 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.ReconnectFailed = 18 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.SerializationError = 14 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.ServerError = 11 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.ServiceUnavailable = 12 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.StreamCancelled = 19 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.StreamCompleted = 20 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.StreamProtocolError = 21 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.Timeout = 1 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.TransportError = 13 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.Unavailable = 23 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.Unknown = 26 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorKind.ValidationFailed = 10 -> AtomUI.City.Data.DataErrorKind
+AtomUI.City.Data.DataErrorMapper
+AtomUI.City.Data.DataFallbackResult<TResponse>
+AtomUI.City.Data.DataFallbackResult<TResponse>.HasFallback.get -> bool
+AtomUI.City.Data.DataFallbackResult<TResponse>.Result.get -> AtomUI.City.Data.DataResult<TResponse>?
+AtomUI.City.Data.DataLargePayloadClient
+AtomUI.City.Data.DataLargePayloadClient.DataLargePayloadClient(System.Net.Http.HttpClient! httpClient, AtomUI.City.Data.IDataDiagnostics? diagnostics = null, System.TimeProvider? timeProvider = null) -> void
+AtomUI.City.Data.DataLargePayloadClient.DownloadAsync(System.Net.Http.HttpRequestMessage! request, System.IO.Stream! destination, System.Func<AtomUI.City.Data.DataTransferProgress!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>? progress = null, AtomUI.City.Data.DataTransferOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<AtomUI.City.Data.DataTransferReceipt!>!>
+AtomUI.City.Data.DataLargePayloadClient.DownloadToTemporaryFileAsync(System.Net.Http.HttpRequestMessage! request, System.Func<AtomUI.City.Data.DataTransferProgress!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>? progress = null, AtomUI.City.Data.DataTransferOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<AtomUI.City.Data.DataTemporaryFile!>!>
+AtomUI.City.Data.DataLargePayloadClient.UploadAsync(System.Net.Http.HttpRequestMessage! request, System.IO.Stream! source, long? totalBytes = null, System.Func<AtomUI.City.Data.DataTransferProgress!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>? progress = null, AtomUI.City.Data.DataTransferOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<AtomUI.City.Data.DataTransferReceipt!>!>
+AtomUI.City.Data.DataModule
+AtomUI.City.Data.DataModule.DataModule() -> void
+AtomUI.City.Data.DataOperationAttribute
+AtomUI.City.Data.DataOperationAttribute.AccessMode.get -> AtomUI.City.Data.DataAccessMode
+AtomUI.City.Data.DataOperationAttribute.AuthenticationPolicy.get -> string!
+AtomUI.City.Data.DataOperationAttribute.AuthenticationPolicy.init -> void
+AtomUI.City.Data.DataOperationAttribute.CacheEnabled.get -> bool
+AtomUI.City.Data.DataOperationAttribute.CacheEnabled.init -> void
+AtomUI.City.Data.DataOperationAttribute.ConcurrencyPolicy.get -> AtomUI.City.Data.DataConcurrencyPolicy
+AtomUI.City.Data.DataOperationAttribute.ConcurrencyPolicy.init -> void
+AtomUI.City.Data.DataOperationAttribute.DataOperationAttribute(string! operationName, AtomUI.City.Data.DataAccessMode accessMode = AtomUI.City.Data.DataAccessMode.Query) -> void
+AtomUI.City.Data.DataOperationAttribute.MaxRetryAttempts.get -> int
+AtomUI.City.Data.DataOperationAttribute.MaxRetryAttempts.init -> void
+AtomUI.City.Data.DataOperationAttribute.OperationName.get -> string!
+AtomUI.City.Data.DataOperationAttribute.TimeoutMilliseconds.get -> int
+AtomUI.City.Data.DataOperationAttribute.TimeoutMilliseconds.init -> void
+AtomUI.City.Data.DataOperationDelegate<TResponse>
+AtomUI.City.Data.DataOperationDescriptor
+AtomUI.City.Data.DataOperationDescriptor.AccessMode.get -> AtomUI.City.Data.DataAccessMode
+AtomUI.City.Data.DataOperationDescriptor.AuthenticationPolicy.get -> string!
+AtomUI.City.Data.DataOperationDescriptor.CacheEnabled.get -> bool
+AtomUI.City.Data.DataOperationDescriptor.ConcurrencyPolicy.get -> AtomUI.City.Data.DataConcurrencyPolicy
+AtomUI.City.Data.DataOperationDescriptor.DataOperationDescriptor(string! operationName, System.Type! requestType, System.Type! responseType, AtomUI.City.Data.DataAccessMode accessMode, AtomUI.City.Data.DataConcurrencyPolicy concurrencyPolicy = AtomUI.City.Data.DataConcurrencyPolicy.AllowConcurrent, System.TimeSpan? timeout = null, int maxRetryAttempts = 0, bool cacheEnabled = false, string! authenticationPolicy = "Anonymous") -> void
+AtomUI.City.Data.DataOperationDescriptor.MaxRetryAttempts.get -> int
+AtomUI.City.Data.DataOperationDescriptor.OperationName.get -> string!
+AtomUI.City.Data.DataOperationDescriptor.RequestType.get -> System.Type!
+AtomUI.City.Data.DataOperationDescriptor.ResponseType.get -> System.Type!
+AtomUI.City.Data.DataOperationDescriptor.Timeout.get -> System.TimeSpan?
+AtomUI.City.Data.DataOperationScheduler
+AtomUI.City.Data.DataOperationScheduler.DataOperationScheduler() -> void
+AtomUI.City.Data.DataOperationScheduler.Dispose() -> void
+AtomUI.City.Data.DataOperationScheduler.ExecuteAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataOperationDelegate<TResponse>! operation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.DataRangeUnsupportedPolicy
+AtomUI.City.Data.DataRangeUnsupportedPolicy.Fail = 0 -> AtomUI.City.Data.DataRangeUnsupportedPolicy
+AtomUI.City.Data.DataRangeUnsupportedPolicy.Restart = 1 -> AtomUI.City.Data.DataRangeUnsupportedPolicy
+AtomUI.City.Data.DataRateLimitOptions
+AtomUI.City.Data.DataRateLimitOptions.DataRateLimitOptions() -> void
+AtomUI.City.Data.DataRateLimitOptions.IsEnabled.get -> bool
+AtomUI.City.Data.DataRateLimitOptions.IsEnabled.init -> void
+AtomUI.City.Data.DataRateLimitOptions.PermitLimit.get -> int
+AtomUI.City.Data.DataRateLimitOptions.PermitLimit.init -> void
+AtomUI.City.Data.DataRateLimitOptions.Window.get -> System.TimeSpan
+AtomUI.City.Data.DataRateLimitOptions.Window.init -> void
+AtomUI.City.Data.DataRequest<TResponse>
+AtomUI.City.Data.DataRequest<TResponse>.AccessMode.get -> AtomUI.City.Data.DataAccessMode
+AtomUI.City.Data.DataRequest<TResponse>.Authentication.get -> AtomUI.City.Data.DataAuthenticationOptions!
+AtomUI.City.Data.DataRequest<TResponse>.Authentication.init -> void
+AtomUI.City.Data.DataRequest<TResponse>.Cache.get -> AtomUI.City.Data.DataCacheOptions!
+AtomUI.City.Data.DataRequest<TResponse>.Cache.init -> void
+AtomUI.City.Data.DataRequest<TResponse>.ClientId.get -> string!
+AtomUI.City.Data.DataRequest<TResponse>.Concurrency.get -> AtomUI.City.Data.DataConcurrencyOptions!
+AtomUI.City.Data.DataRequest<TResponse>.Concurrency.init -> void
+AtomUI.City.Data.DataRequest<TResponse>.Consistency.get -> AtomUI.City.Data.DataConsistencyOptions!
+AtomUI.City.Data.DataRequest<TResponse>.Consistency.init -> void
+AtomUI.City.Data.DataRequest<TResponse>.DataRequest(string! clientId, string! operationName, AtomUI.City.Data.DataTransportKind transportKind, AtomUI.City.Data.DataAccessMode accessMode = AtomUI.City.Data.DataAccessMode.Query) -> void
+AtomUI.City.Data.DataRequest<TResponse>.IdempotencyKey.get -> string?
+AtomUI.City.Data.DataRequest<TResponse>.IdempotencyKey.init -> void
+AtomUI.City.Data.DataRequest<TResponse>.Items.get -> System.Collections.Generic.IDictionary<string!, object?>!
+AtomUI.City.Data.DataRequest<TResponse>.OperationName.get -> string!
+AtomUI.City.Data.DataRequest<TResponse>.Origin.get -> AtomUI.City.Data.DataRequestOrigin!
+AtomUI.City.Data.DataRequest<TResponse>.Origin.init -> void
+AtomUI.City.Data.DataRequest<TResponse>.ParentScope.get -> AtomUI.City.Core.Lifecycle.LifecycleScope?
+AtomUI.City.Data.DataRequest<TResponse>.ParentScope.init -> void
+AtomUI.City.Data.DataRequest<TResponse>.Resilience.get -> AtomUI.City.Data.DataResilienceOptions!
+AtomUI.City.Data.DataRequest<TResponse>.Resilience.init -> void
+AtomUI.City.Data.DataRequest<TResponse>.TransportKind.get -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.DataRequestContext
+AtomUI.City.Data.DataRequestContext.AccessMode.get -> AtomUI.City.Data.DataAccessMode
+AtomUI.City.Data.DataRequestContext.Attempt.get -> int
+AtomUI.City.Data.DataRequestContext.CancellationToken.get -> System.Threading.CancellationToken
+AtomUI.City.Data.DataRequestContext.ClientId.get -> string!
+AtomUI.City.Data.DataRequestContext.CorrelationId.get -> string!
+AtomUI.City.Data.DataRequestContext.Credential.get -> AtomUI.City.Data.DataCredential?
+AtomUI.City.Data.DataRequestContext.Items.get -> System.Collections.Generic.IDictionary<string!, object?>!
+AtomUI.City.Data.DataRequestContext.OperationId.get -> System.Guid
+AtomUI.City.Data.DataRequestContext.OperationName.get -> string!
+AtomUI.City.Data.DataRequestContext.SetCredential(AtomUI.City.Data.DataCredential! credential) -> void
+AtomUI.City.Data.DataRequestContext.TransportKind.get -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.DataRequestHandlerDelegate<TResponse>
+AtomUI.City.Data.DataRequestOrigin
+AtomUI.City.Data.DataRequestOrigin.Capabilities.get -> AtomUI.City.Data.DataCapability
+AtomUI.City.Data.DataRequestOrigin.ContributionId.get -> string?
+AtomUI.City.Data.DataRequestOrigin.Kind.get -> AtomUI.City.Data.DataRequestOriginKind
+AtomUI.City.Data.DataRequestOrigin.PluginId.get -> string?
+AtomUI.City.Data.DataRequestOriginKind
+AtomUI.City.Data.DataRequestOriginKind.Host = 0 -> AtomUI.City.Data.DataRequestOriginKind
+AtomUI.City.Data.DataRequestOriginKind.Plugin = 1 -> AtomUI.City.Data.DataRequestOriginKind
+AtomUI.City.Data.DataRequestPipeline
+AtomUI.City.Data.DataRequestPipeline.DataRequestPipeline(AtomUI.City.Data.IRequestResponseTransport! transport, AtomUI.City.Data.IDataCredentialProvider? credentialProvider = null, AtomUI.City.Data.IDataDiagnostics? diagnostics = null, AtomUI.City.Data.IDataRequestCache? cache = null, AtomUI.City.Data.IDataOperationScheduler? operationScheduler = null, AtomUI.City.Data.IDataResiliencePolicyProvider? resiliencePolicyProvider = null, AtomUI.City.Data.IDataFallbackProvider? fallbackProvider = null, System.Collections.Generic.IEnumerable<AtomUI.City.Data.IDataRequestHandler!>? handlers = null, AtomUI.City.Data.IDataRequestHandlerSource? handlerSource = null, AtomUI.City.Data.IDataCapabilityAuthorizer? capabilityAuthorizer = null) -> void
+AtomUI.City.Data.DataRequestPipeline.DataRequestPipeline(System.Collections.Generic.IEnumerable<AtomUI.City.Data.IRequestResponseTransport!>! transports, AtomUI.City.Data.IDataCredentialProvider? credentialProvider = null, AtomUI.City.Data.IDataDiagnostics? diagnostics = null, AtomUI.City.Data.IDataRequestCache? cache = null, AtomUI.City.Data.IDataOperationScheduler? operationScheduler = null, AtomUI.City.Data.IDataResiliencePolicyProvider? resiliencePolicyProvider = null, AtomUI.City.Data.IDataFallbackProvider? fallbackProvider = null, System.Collections.Generic.IEnumerable<AtomUI.City.Data.IDataRequestHandler!>? handlers = null, AtomUI.City.Data.IDataRequestHandlerSource? handlerSource = null, AtomUI.City.Data.IDataCapabilityAuthorizer? capabilityAuthorizer = null) -> void
+AtomUI.City.Data.DataRequestPipeline.Dispose() -> void
+AtomUI.City.Data.DataRequestPipeline.SendAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.DataResilienceOptions
+AtomUI.City.Data.DataResilienceOptions.AllowMutationRetry.get -> bool
+AtomUI.City.Data.DataResilienceOptions.AllowMutationRetry.init -> void
+AtomUI.City.Data.DataResilienceOptions.CircuitBreaker.get -> AtomUI.City.Data.DataCircuitBreakerOptions!
+AtomUI.City.Data.DataResilienceOptions.CircuitBreaker.init -> void
+AtomUI.City.Data.DataResilienceOptions.DataResilienceOptions() -> void
+AtomUI.City.Data.DataResilienceOptions.EnableFallback.get -> bool
+AtomUI.City.Data.DataResilienceOptions.EnableFallback.init -> void
+AtomUI.City.Data.DataResilienceOptions.MaxRetryAttempts.get -> int
+AtomUI.City.Data.DataResilienceOptions.MaxRetryAttempts.init -> void
+AtomUI.City.Data.DataResilienceOptions.PolicyName.get -> string?
+AtomUI.City.Data.DataResilienceOptions.PolicyName.init -> void
+AtomUI.City.Data.DataResilienceOptions.RateLimit.get -> AtomUI.City.Data.DataRateLimitOptions!
+AtomUI.City.Data.DataResilienceOptions.RateLimit.init -> void
+AtomUI.City.Data.DataResilienceOptions.RetryDelay.get -> System.TimeSpan
+AtomUI.City.Data.DataResilienceOptions.RetryDelay.init -> void
+AtomUI.City.Data.DataResilienceOptions.Scope.get -> AtomUI.City.Data.DataResiliencePolicyScope
+AtomUI.City.Data.DataResilienceOptions.Scope.init -> void
+AtomUI.City.Data.DataResilienceOptions.Timeout.get -> System.TimeSpan?
+AtomUI.City.Data.DataResilienceOptions.Timeout.init -> void
+AtomUI.City.Data.DataResiliencePolicyScope
+AtomUI.City.Data.DataResiliencePolicyScope.Client = 1 -> AtomUI.City.Data.DataResiliencePolicyScope
+AtomUI.City.Data.DataResiliencePolicyScope.Global = 2 -> AtomUI.City.Data.DataResiliencePolicyScope
+AtomUI.City.Data.DataResiliencePolicyScope.Operation = 0 -> AtomUI.City.Data.DataResiliencePolicyScope
+AtomUI.City.Data.DataResult<T>
+AtomUI.City.Data.DataResult<T>.Cast<TResponse>() -> AtomUI.City.Data.DataResult<TResponse>!
+AtomUI.City.Data.DataResult<T>.Error.get -> AtomUI.City.Data.DataError?
+AtomUI.City.Data.DataResult<T>.Status.get -> AtomUI.City.Data.DataResultStatus
+AtomUI.City.Data.DataResult<T>.Succeeded.get -> bool
+AtomUI.City.Data.DataResult<T>.Value.get -> T?
+AtomUI.City.Data.DataResultStatus
+AtomUI.City.Data.DataResultStatus.Cancelled = 2 -> AtomUI.City.Data.DataResultStatus
+AtomUI.City.Data.DataResultStatus.Failed = 1 -> AtomUI.City.Data.DataResultStatus
+AtomUI.City.Data.DataResultStatus.Partial = 3 -> AtomUI.City.Data.DataResultStatus
+AtomUI.City.Data.DataResultStatus.StaleSuppressed = 4 -> AtomUI.City.Data.DataResultStatus
+AtomUI.City.Data.DataResultStatus.Success = 0 -> AtomUI.City.Data.DataResultStatus
+AtomUI.City.Data.DataServiceCollectionExtensions
+AtomUI.City.Data.DataStream<T>
+AtomUI.City.Data.DataStream<T>.Completion.get -> System.Threading.Tasks.Task!
+AtomUI.City.Data.DataStream<T>.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.DataStream<T>.GetAsyncEnumerator(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Collections.Generic.IAsyncEnumerator<AtomUI.City.Data.DataResult<T>!>!
+AtomUI.City.Data.DataStream<T>.StreamId.get -> System.Guid
+AtomUI.City.Data.DataStreamOptions
+AtomUI.City.Data.DataStreamOptions.BackpressurePolicy.get -> AtomUI.City.Data.DataBackpressurePolicy
+AtomUI.City.Data.DataStreamOptions.BackpressurePolicy.init -> void
+AtomUI.City.Data.DataStreamOptions.Capacity.get -> int
+AtomUI.City.Data.DataStreamOptions.Capacity.init -> void
+AtomUI.City.Data.DataStreamOptions.DataStreamOptions() -> void
+AtomUI.City.Data.DataStreamOptions.ParentScope.get -> AtomUI.City.Core.Lifecycle.LifecycleScope?
+AtomUI.City.Data.DataStreamOptions.ParentScope.init -> void
+AtomUI.City.Data.DataSubscriptionErrorPolicy
+AtomUI.City.Data.DataSubscriptionErrorPolicy.Continue = 0 -> AtomUI.City.Data.DataSubscriptionErrorPolicy
+AtomUI.City.Data.DataSubscriptionErrorPolicy.Stop = 1 -> AtomUI.City.Data.DataSubscriptionErrorPolicy
+AtomUI.City.Data.DataSubscriptionOptions
+AtomUI.City.Data.DataSubscriptionOptions.BackpressurePolicy.get -> AtomUI.City.Data.DataBackpressurePolicy
+AtomUI.City.Data.DataSubscriptionOptions.BackpressurePolicy.init -> void
+AtomUI.City.Data.DataSubscriptionOptions.Capacity.get -> int
+AtomUI.City.Data.DataSubscriptionOptions.Capacity.init -> void
+AtomUI.City.Data.DataSubscriptionOptions.DataSubscriptionOptions() -> void
+AtomUI.City.Data.DataSubscriptionOptions.ErrorPolicy.get -> AtomUI.City.Data.DataSubscriptionErrorPolicy
+AtomUI.City.Data.DataSubscriptionOptions.ErrorPolicy.init -> void
+AtomUI.City.Data.DataTemporaryFile
+AtomUI.City.Data.DataTemporaryFile.Commit() -> void
+AtomUI.City.Data.DataTemporaryFile.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.DataTemporaryFile.Path.get -> string!
+AtomUI.City.Data.DataTemporaryFile.Receipt.get -> AtomUI.City.Data.DataTransferReceipt!
+AtomUI.City.Data.DataTransferOptions
+AtomUI.City.Data.DataTransferOptions.BufferSize.get -> int
+AtomUI.City.Data.DataTransferOptions.BufferSize.init -> void
+AtomUI.City.Data.DataTransferOptions.DataTransferOptions() -> void
+AtomUI.City.Data.DataTransferOptions.ProgressInterval.get -> System.TimeSpan
+AtomUI.City.Data.DataTransferOptions.ProgressInterval.init -> void
+AtomUI.City.Data.DataTransferOptions.RangeUnsupportedPolicy.get -> AtomUI.City.Data.DataRangeUnsupportedPolicy
+AtomUI.City.Data.DataTransferOptions.RangeUnsupportedPolicy.init -> void
+AtomUI.City.Data.DataTransferOptions.ResumeOffset.get -> long
+AtomUI.City.Data.DataTransferOptions.ResumeOffset.init -> void
+AtomUI.City.Data.DataTransferOptions.TemporaryDirectory.get -> string?
+AtomUI.City.Data.DataTransferOptions.TemporaryDirectory.init -> void
+AtomUI.City.Data.DataTransferProgress
+AtomUI.City.Data.DataTransferProgress.<Clone>$() -> AtomUI.City.Data.DataTransferProgress!
+AtomUI.City.Data.DataTransferProgress.BytesPerSecond.get -> double
+AtomUI.City.Data.DataTransferProgress.BytesPerSecond.init -> void
+AtomUI.City.Data.DataTransferProgress.BytesTransferred.get -> long
+AtomUI.City.Data.DataTransferProgress.BytesTransferred.init -> void
+AtomUI.City.Data.DataTransferProgress.DataTransferProgress(System.Guid OperationId, long BytesTransferred, long? TotalBytes, double? Percent, double BytesPerSecond, AtomUI.City.Data.DataTransferStage Stage) -> void
+AtomUI.City.Data.DataTransferProgress.Deconstruct(out System.Guid OperationId, out long BytesTransferred, out long? TotalBytes, out double? Percent, out double BytesPerSecond, out AtomUI.City.Data.DataTransferStage Stage) -> void
+AtomUI.City.Data.DataTransferProgress.Equals(AtomUI.City.Data.DataTransferProgress? other) -> bool
+AtomUI.City.Data.DataTransferProgress.OperationId.get -> System.Guid
+AtomUI.City.Data.DataTransferProgress.OperationId.init -> void
+AtomUI.City.Data.DataTransferProgress.Percent.get -> double?
+AtomUI.City.Data.DataTransferProgress.Percent.init -> void
+AtomUI.City.Data.DataTransferProgress.Stage.get -> AtomUI.City.Data.DataTransferStage
+AtomUI.City.Data.DataTransferProgress.Stage.init -> void
+AtomUI.City.Data.DataTransferProgress.TotalBytes.get -> long?
+AtomUI.City.Data.DataTransferProgress.TotalBytes.init -> void
+AtomUI.City.Data.DataTransferReceipt
+AtomUI.City.Data.DataTransferReceipt.<Clone>$() -> AtomUI.City.Data.DataTransferReceipt!
+AtomUI.City.Data.DataTransferReceipt.BytesTransferred.get -> long
+AtomUI.City.Data.DataTransferReceipt.BytesTransferred.init -> void
+AtomUI.City.Data.DataTransferReceipt.DataTransferReceipt(System.Guid OperationId, long BytesTransferred, System.Net.HttpStatusCode StatusCode) -> void
+AtomUI.City.Data.DataTransferReceipt.Deconstruct(out System.Guid OperationId, out long BytesTransferred, out System.Net.HttpStatusCode StatusCode) -> void
+AtomUI.City.Data.DataTransferReceipt.Equals(AtomUI.City.Data.DataTransferReceipt? other) -> bool
+AtomUI.City.Data.DataTransferReceipt.OperationId.get -> System.Guid
+AtomUI.City.Data.DataTransferReceipt.OperationId.init -> void
+AtomUI.City.Data.DataTransferReceipt.StatusCode.get -> System.Net.HttpStatusCode
+AtomUI.City.Data.DataTransferReceipt.StatusCode.init -> void
+AtomUI.City.Data.DataTransferStage
+AtomUI.City.Data.DataTransferStage.Completed = 3 -> AtomUI.City.Data.DataTransferStage
+AtomUI.City.Data.DataTransferStage.Completing = 2 -> AtomUI.City.Data.DataTransferStage
+AtomUI.City.Data.DataTransferStage.Starting = 0 -> AtomUI.City.Data.DataTransferStage
+AtomUI.City.Data.DataTransferStage.Transferring = 1 -> AtomUI.City.Data.DataTransferStage
+AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.DataTransportKind.Grpc = 1 -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.DataTransportKind.Http = 0 -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.DataTransportKind.SignalR = 2 -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.DefaultDataCapabilityAuthorizer
+AtomUI.City.Data.DefaultDataCapabilityAuthorizer.DefaultDataCapabilityAuthorizer() -> void
+AtomUI.City.Data.DefaultDataCapabilityAuthorizer.IsAuthorized(AtomUI.City.Data.DataRequestOrigin! origin, AtomUI.City.Data.DataCapability capability) -> bool
+AtomUI.City.Data.DefaultDataResiliencePolicyProvider
+AtomUI.City.Data.DefaultDataResiliencePolicyProvider.DefaultDataResiliencePolicyProvider() -> void
+AtomUI.City.Data.DefaultDataResiliencePolicyProvider.GetPolicy(string? policyName, AtomUI.City.Data.DataResilienceOptions! requestPolicy) -> AtomUI.City.Data.DataResilienceOptions!
+AtomUI.City.Data.GeneratedDataClientManifestAttribute
+AtomUI.City.Data.GeneratedDataClientManifestAttribute.GeneratedDataClientManifestAttribute(System.Type! registrarType, int version = 1) -> void
+AtomUI.City.Data.GeneratedDataClientManifestAttribute.RegistrarType.get -> System.Type!
+AtomUI.City.Data.GeneratedDataClientManifestAttribute.Version.get -> int
+AtomUI.City.Data.GrpcCallOptions
+AtomUI.City.Data.GrpcCallOptions.DeadlineUtc.get -> System.DateTime?
+AtomUI.City.Data.GrpcCallOptions.DeadlineUtc.init -> void
+AtomUI.City.Data.GrpcCallOptions.GrpcCallOptions() -> void
+AtomUI.City.Data.GrpcCallOptions.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+AtomUI.City.Data.GrpcCallOptions.Metadata.init -> void
+AtomUI.City.Data.GrpcCallOptions.Stream.get -> AtomUI.City.Data.DataStreamOptions!
+AtomUI.City.Data.GrpcCallOptions.Stream.init -> void
+AtomUI.City.Data.GrpcCallResult<T>
+AtomUI.City.Data.GrpcCallResult<T>.Detail.get -> string?
+AtomUI.City.Data.GrpcCallResult<T>.StatusCode.get -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcCallResult<T>.Succeeded.get -> bool
+AtomUI.City.Data.GrpcCallResult<T>.Value.get -> T?
+AtomUI.City.Data.GrpcChannelConnection
+AtomUI.City.Data.GrpcChannelConnection.CallInvoker.get -> Grpc.Core.CallInvoker!
+AtomUI.City.Data.GrpcChannelConnection.Channel.get -> Grpc.Net.Client.GrpcChannel!
+AtomUI.City.Data.GrpcChannelConnection.ConnectionId.get -> string!
+AtomUI.City.Data.GrpcChannelConnection.Dispose() -> void
+AtomUI.City.Data.GrpcChannelConnection.GrpcChannelConnection(string! connectionId, AtomUI.City.Data.DataConnectionOwner owner, Grpc.Net.Client.GrpcChannel! channel) -> void
+AtomUI.City.Data.GrpcChannelConnection.Owner.get -> AtomUI.City.Data.DataConnectionOwner
+AtomUI.City.Data.GrpcChannelConnection.StartAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.GrpcChannelConnection.State.get -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.GrpcChannelConnection.StopAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.GrpcDataRequest<TResponse>
+AtomUI.City.Data.GrpcDataRequest<TResponse>.GrpcDataRequest(string! clientId, string! operationName, System.Func<AtomUI.City.Data.GrpcRequestContext!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<AtomUI.City.Data.GrpcCallResult<TResponse>!>>! invoker, AtomUI.City.Data.DataAccessMode accessMode = AtomUI.City.Data.DataAccessMode.Query) -> void
+AtomUI.City.Data.GrpcDataRequest<TResponse>.Invoker.get -> System.Func<AtomUI.City.Data.GrpcRequestContext!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<AtomUI.City.Data.GrpcCallResult<TResponse>!>>!
+AtomUI.City.Data.GrpcDataTransport
+AtomUI.City.Data.GrpcDataTransport.GrpcDataTransport() -> void
+AtomUI.City.Data.GrpcDataTransport.Kind.get -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.GrpcDataTransport.SendAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataRequestContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.GrpcRequestContext
+AtomUI.City.Data.GrpcRequestContext.Credential.get -> AtomUI.City.Data.DataCredential?
+AtomUI.City.Data.GrpcRequestContext.GrpcRequestContext(AtomUI.City.Data.DataRequestContext! request) -> void
+AtomUI.City.Data.GrpcRequestContext.Request.get -> AtomUI.City.Data.DataRequestContext!
+AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.Aborted = 10 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.AlreadyExists = 6 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.Cancelled = 1 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.DataLoss = 15 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.DeadlineExceeded = 4 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.FailedPrecondition = 9 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.Internal = 13 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.InvalidArgument = 3 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.NotFound = 5 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.OK = 0 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.OutOfRange = 11 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.PermissionDenied = 7 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.ResourceExhausted = 8 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.Unauthenticated = 16 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.Unavailable = 14 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.Unimplemented = 12 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.GrpcStatusCode.Unknown = 2 -> AtomUI.City.Data.GrpcStatusCode
+AtomUI.City.Data.HttpDataRequest<TResponse>
+AtomUI.City.Data.HttpDataRequest<TResponse>.ClientName.get -> string!
+AtomUI.City.Data.HttpDataRequest<TResponse>.HttpDataRequest(string! clientId, string! operationName, string! clientName, System.Func<AtomUI.City.Data.DataRequestContext!, System.Net.Http.HttpRequestMessage!>! requestFactory, System.Func<System.Net.Http.HttpResponseMessage!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<TResponse>>! responseMapper, AtomUI.City.Data.DataAccessMode accessMode = AtomUI.City.Data.DataAccessMode.Query) -> void
+AtomUI.City.Data.HttpDataRequest<TResponse>.HttpDataRequest(string! clientId, string! operationName, string! clientName, System.Func<AtomUI.City.Data.DataRequestContext!, System.Net.Http.HttpRequestMessage!>! requestFactory, System.Func<System.Net.Http.HttpResponseMessage!, System.Threading.Tasks.ValueTask<TResponse>>! responseMapper, AtomUI.City.Data.DataAccessMode accessMode = AtomUI.City.Data.DataAccessMode.Query) -> void
+AtomUI.City.Data.HttpDataRequest<TResponse>.RequestFactory.get -> System.Func<AtomUI.City.Data.DataRequestContext!, System.Net.Http.HttpRequestMessage!>!
+AtomUI.City.Data.HttpDataRequest<TResponse>.ResponseMapper.get -> System.Func<System.Net.Http.HttpResponseMessage!, System.Threading.Tasks.ValueTask<TResponse>>!
+AtomUI.City.Data.HttpDataRequest<TResponse>.ResponseMapperWithCancellation.get -> System.Func<System.Net.Http.HttpResponseMessage!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<TResponse>>!
+AtomUI.City.Data.HttpDataTransport
+AtomUI.City.Data.HttpDataTransport.HttpDataTransport(System.Net.Http.IHttpClientFactory! httpClientFactory) -> void
+AtomUI.City.Data.HttpDataTransport.Kind.get -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.HttpDataTransport.SendAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataRequestContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.IDataCacheInvalidator
+AtomUI.City.Data.IDataCacheInvalidator.InvalidateAsync(AtomUI.City.Data.DataCacheInvalidation! invalidation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataCacheInvalidationResult!>
+AtomUI.City.Data.IDataCapabilityAuthorizer
+AtomUI.City.Data.IDataCapabilityAuthorizer.IsAuthorized(AtomUI.City.Data.DataRequestOrigin! origin, AtomUI.City.Data.DataCapability capability) -> bool
+AtomUI.City.Data.IDataClient
+AtomUI.City.Data.IDataClient.ClientId.get -> string!
+AtomUI.City.Data.IDataClientDescriptorRegistrar
+AtomUI.City.Data.IDataClientDescriptorRegistrar.Register(AtomUI.City.Data.DataClientDescriptorCatalog! catalog) -> void
+AtomUI.City.Data.IDataClientFactory
+AtomUI.City.Data.IDataClientFactory.GetRequiredClient<TClient>() -> TClient!
+AtomUI.City.Data.IDataConnection
+AtomUI.City.Data.IDataConnection.ConnectionId.get -> string!
+AtomUI.City.Data.IDataConnection.Owner.get -> AtomUI.City.Data.DataConnectionOwner
+AtomUI.City.Data.IDataConnection.StartAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.IDataConnection.State.get -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.IDataConnection.StopAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.IDataCredentialProvider
+AtomUI.City.Data.IDataCredentialProvider.GetCredentialAsync(AtomUI.City.Data.DataAuthenticationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataCredentialResult!>
+AtomUI.City.Data.IDataDiagnostics
+AtomUI.City.Data.IDataDiagnostics.Records.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Data.DataDiagnosticRecord!>!
+AtomUI.City.Data.IDataDiagnostics.Write(AtomUI.City.Data.DataDiagnosticRecord! record) -> void
+AtomUI.City.Data.IDataExpiringRequestCache
+AtomUI.City.Data.IDataExpiringRequestCache.SetAsync<TResponse>(AtomUI.City.Data.DataCacheKey! key, TResponse? value, AtomUI.City.Data.DataCacheEntryOptions! options, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.IDataFallbackProvider
+AtomUI.City.Data.IDataFallbackProvider.TryGetFallbackAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataRequestContext! context, AtomUI.City.Data.DataError! error, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataFallbackResult<TResponse>!>
+AtomUI.City.Data.IDataOperationScheduler
+AtomUI.City.Data.IDataOperationScheduler.ExecuteAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataOperationDelegate<TResponse>! operation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.IDataOptimisticUpdate
+AtomUI.City.Data.IDataOptimisticUpdate.ApplyAsync(AtomUI.City.Data.DataRequestContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.IDataOptimisticUpdate.ConfirmAsync(AtomUI.City.Data.DataRequestContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.IDataOptimisticUpdate.RollBackAsync(AtomUI.City.Data.DataRequestContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.IDataRequestCache
+AtomUI.City.Data.IDataRequestCache.InvalidateAsync(AtomUI.City.Data.DataCacheKey! key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.IDataRequestCache.SetAsync<TResponse>(AtomUI.City.Data.DataCacheKey! key, TResponse? value, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.IDataRequestCache.TryGetAsync<TResponse>(AtomUI.City.Data.DataCacheKey! key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataCacheLookup<TResponse>!>
+AtomUI.City.Data.IDataRequestHandler
+AtomUI.City.Data.IDataRequestHandler.InvokeAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataRequestContext! context, AtomUI.City.Data.DataRequestHandlerDelegate<TResponse>! next, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.IDataRequestHandler.Order.get -> int
+AtomUI.City.Data.IDataRequestHandlerSource
+AtomUI.City.Data.IDataRequestHandlerSource.GetHandlers<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request) -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Data.IDataRequestHandler!>!
+AtomUI.City.Data.IDataRequestPipeline
+AtomUI.City.Data.IDataRequestPipeline.SendAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.IDataResiliencePolicyProvider
+AtomUI.City.Data.IDataResiliencePolicyProvider.GetPolicy(string? policyName, AtomUI.City.Data.DataResilienceOptions! requestPolicy) -> AtomUI.City.Data.DataResilienceOptions!
+AtomUI.City.Data.IDataStream<T>
+AtomUI.City.Data.IDataStream<T>.Completion.get -> System.Threading.Tasks.Task!
+AtomUI.City.Data.IDataStream<T>.StreamId.get -> System.Guid
+AtomUI.City.Data.IDataSubscription
+AtomUI.City.Data.IDataSubscription.Completion.get -> System.Threading.Tasks.Task!
+AtomUI.City.Data.IDataSubscription.Owner.get -> AtomUI.City.Data.DataConnectionOwner
+AtomUI.City.Data.IDataSubscription.RevokeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.IDataSubscription.SubscriptionId.get -> System.Guid
+AtomUI.City.Data.IGrpcClientStream<TRequest, TResponse>
+AtomUI.City.Data.IGrpcClientStream<TRequest, TResponse>.CompleteAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.IGrpcClientStream<TRequest, TResponse>.WriteAsync(TRequest message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.IGrpcDuplexStream<TRequest, TResponse>
+AtomUI.City.Data.IGrpcDuplexStream<TRequest, TResponse>.CompleteRequestAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.IGrpcDuplexStream<TRequest, TResponse>.Responses.get -> AtomUI.City.Data.IDataStream<TResponse>!
+AtomUI.City.Data.IGrpcDuplexStream<TRequest, TResponse>.WriteAsync(TRequest message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.InMemoryDataDiagnostics
+AtomUI.City.Data.InMemoryDataDiagnostics.Capacity.get -> int
+AtomUI.City.Data.InMemoryDataDiagnostics.DroppedCount.get -> long
+AtomUI.City.Data.InMemoryDataDiagnostics.InMemoryDataDiagnostics() -> void
+AtomUI.City.Data.InMemoryDataDiagnostics.InMemoryDataDiagnostics(int capacity) -> void
+AtomUI.City.Data.InMemoryDataDiagnostics.Records.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Data.DataDiagnosticRecord!>!
+AtomUI.City.Data.InMemoryDataDiagnostics.Write(AtomUI.City.Data.DataDiagnosticRecord! record) -> void
+AtomUI.City.Data.InMemoryDataRequestCache
+AtomUI.City.Data.InMemoryDataRequestCache.InMemoryDataRequestCache(AtomUI.City.Data.IDataDiagnostics? diagnostics = null, System.TimeProvider? timeProvider = null) -> void
+AtomUI.City.Data.InMemoryDataRequestCache.InvalidateAsync(AtomUI.City.Data.DataCacheInvalidation! invalidation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataCacheInvalidationResult!>
+AtomUI.City.Data.InMemoryDataRequestCache.InvalidateAsync(AtomUI.City.Data.DataCacheKey! key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.InMemoryDataRequestCache.SetAsync<TResponse>(AtomUI.City.Data.DataCacheKey! key, TResponse? value, AtomUI.City.Data.DataCacheEntryOptions! options, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.InMemoryDataRequestCache.SetAsync<TResponse>(AtomUI.City.Data.DataCacheKey! key, TResponse? value, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.InMemoryDataRequestCache.TryGetAsync<TResponse>(AtomUI.City.Data.DataCacheKey! key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataCacheLookup<TResponse>!>
+AtomUI.City.Data.IRealtimeConnectionTransport
+AtomUI.City.Data.IRealtimeConnectionTransport.InvokeAsync<TResponse>(string! methodName, System.Collections.Generic.IReadOnlyList<object?>? arguments = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.IRealtimeConnectionTransport.StateChanged -> System.EventHandler<AtomUI.City.Data.DataConnectionStateChangedEventArgs!>?
+AtomUI.City.Data.IRealtimeConnectionTransport.Subscribe<TMessage>(string! methodName, System.Func<TMessage, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>! handler, AtomUI.City.Data.DataSubscriptionOptions? options = null) -> AtomUI.City.Data.IDataSubscription!
+AtomUI.City.Data.IRealtimeConnectionTransport.SwitchPrincipalAsync(string! principalRevision, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.IRequestResponseTransport
+AtomUI.City.Data.IRequestResponseTransport.Kind.get -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.IRequestResponseTransport.SendAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataRequestContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.NativeGrpcClient
+AtomUI.City.Data.NativeGrpcClient.ClientStreaming<TRequest, TResponse>(Grpc.Core.Method<TRequest!, TResponse!>! method, AtomUI.City.Data.GrpcCallOptions? options = null, AtomUI.City.Data.DataCredential? credential = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> AtomUI.City.Data.IGrpcClientStream<TRequest!, TResponse!>!
+AtomUI.City.Data.NativeGrpcClient.Connection.get -> AtomUI.City.Data.GrpcChannelConnection!
+AtomUI.City.Data.NativeGrpcClient.DuplexStreaming<TRequest, TResponse>(Grpc.Core.Method<TRequest!, TResponse!>! method, AtomUI.City.Data.GrpcCallOptions? options = null, AtomUI.City.Data.DataCredential? credential = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> AtomUI.City.Data.IGrpcDuplexStream<TRequest!, TResponse!>!
+AtomUI.City.Data.NativeGrpcClient.NativeGrpcClient(AtomUI.City.Data.GrpcChannelConnection! connection, AtomUI.City.Data.IDataDiagnostics? diagnostics = null) -> void
+AtomUI.City.Data.NativeGrpcClient.ServerStreaming<TRequest, TResponse>(Grpc.Core.Method<TRequest!, TResponse!>! method, TRequest! request, AtomUI.City.Data.GrpcCallOptions? options = null, AtomUI.City.Data.DataCredential? credential = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> AtomUI.City.Data.IDataStream<TResponse!>!
+AtomUI.City.Data.NativeGrpcClient.UnaryAsync<TRequest, TResponse>(Grpc.Core.Method<TRequest!, TResponse!>! method, TRequest! request, AtomUI.City.Data.GrpcCallOptions? options = null, AtomUI.City.Data.DataCredential? credential = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse!>!>
+AtomUI.City.Data.NativeGrpcDataRequest<TRequest, TResponse>
+AtomUI.City.Data.NativeGrpcDataRequest<TRequest, TResponse>.Client.get -> AtomUI.City.Data.NativeGrpcClient!
+AtomUI.City.Data.NativeGrpcDataRequest<TRequest, TResponse>.Method.get -> Grpc.Core.Method<TRequest!, TResponse!>!
+AtomUI.City.Data.NativeGrpcDataRequest<TRequest, TResponse>.NativeGrpcDataRequest(string! clientId, string! operationName, AtomUI.City.Data.NativeGrpcClient! client, Grpc.Core.Method<TRequest!, TResponse!>! method, TRequest! payload, AtomUI.City.Data.GrpcCallOptions? options = null, AtomUI.City.Data.DataAccessMode accessMode = AtomUI.City.Data.DataAccessMode.Query) -> void
+AtomUI.City.Data.NativeGrpcDataRequest<TRequest, TResponse>.Options.get -> AtomUI.City.Data.GrpcCallOptions!
+AtomUI.City.Data.NativeGrpcDataRequest<TRequest, TResponse>.Payload.get -> TRequest!
+AtomUI.City.Data.NoDataFallbackProvider
+AtomUI.City.Data.NoDataFallbackProvider.NoDataFallbackProvider() -> void
+AtomUI.City.Data.NoDataFallbackProvider.TryGetFallbackAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataRequestContext! context, AtomUI.City.Data.DataError! error, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataFallbackResult<TResponse>!>
+AtomUI.City.Data.SignalRConnectionClosedException
+AtomUI.City.Data.SignalRConnectionClosedException.SignalRConnectionClosedException(string? message = null) -> void
+AtomUI.City.Data.SignalRConnectionClosedException.SignalRConnectionClosedException(string? message, System.Exception? innerException) -> void
+AtomUI.City.Data.SignalRConnectionOptions
+AtomUI.City.Data.SignalRConnectionOptions.AccessTokenProvider.get -> System.Func<System.Threading.Tasks.ValueTask<string?>>?
+AtomUI.City.Data.SignalRConnectionOptions.AccessTokenProvider.init -> void
+AtomUI.City.Data.SignalRConnectionOptions.ConnectionId.get -> string!
+AtomUI.City.Data.SignalRConnectionOptions.ConnectionId.init -> void
+AtomUI.City.Data.SignalRConnectionOptions.Endpoint.get -> System.Uri!
+AtomUI.City.Data.SignalRConnectionOptions.Endpoint.init -> void
+AtomUI.City.Data.SignalRConnectionOptions.Owner.get -> AtomUI.City.Data.DataConnectionOwner
+AtomUI.City.Data.SignalRConnectionOptions.Owner.init -> void
+AtomUI.City.Data.SignalRConnectionOptions.ReconnectDelays.get -> System.Collections.Generic.IReadOnlyList<System.TimeSpan>!
+AtomUI.City.Data.SignalRConnectionOptions.ReconnectDelays.init -> void
+AtomUI.City.Data.SignalRConnectionOptions.SignalRConnectionOptions() -> void
+AtomUI.City.Data.SignalRDataRequest<TResponse>
+AtomUI.City.Data.SignalRDataRequest<TResponse>.HubName.get -> string!
+AtomUI.City.Data.SignalRDataRequest<TResponse>.Invoker.get -> System.Func<AtomUI.City.Data.SignalRInvocationContext!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<TResponse>>!
+AtomUI.City.Data.SignalRDataRequest<TResponse>.MethodName.get -> string!
+AtomUI.City.Data.SignalRDataRequest<TResponse>.SignalRDataRequest(string! clientId, string! operationName, string! hubName, string! methodName, System.Func<AtomUI.City.Data.SignalRInvocationContext!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<TResponse>>! invoker, AtomUI.City.Data.DataAccessMode accessMode = AtomUI.City.Data.DataAccessMode.Query) -> void
+AtomUI.City.Data.SignalRDataTransport
+AtomUI.City.Data.SignalRDataTransport.Kind.get -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Data.SignalRDataTransport.SendAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataRequestContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.SignalRDataTransport.SignalRDataTransport() -> void
+AtomUI.City.Data.SignalRInvocationContext
+AtomUI.City.Data.SignalRInvocationContext.Credential.get -> AtomUI.City.Data.DataCredential?
+AtomUI.City.Data.SignalRInvocationContext.HubName.get -> string!
+AtomUI.City.Data.SignalRInvocationContext.MethodName.get -> string!
+AtomUI.City.Data.SignalRInvocationContext.Request.get -> AtomUI.City.Data.DataRequestContext!
+AtomUI.City.Data.SignalRInvocationContext.SignalRInvocationContext(string! hubName, string! methodName, AtomUI.City.Data.DataRequestContext! request) -> void
+AtomUI.City.Data.SignalRRealtimeConnection
+AtomUI.City.Data.SignalRRealtimeConnection.ConnectionId.get -> string!
+AtomUI.City.Data.SignalRRealtimeConnection.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.SignalRRealtimeConnection.InvokeAsync<TResponse>(string! methodName, System.Collections.Generic.IReadOnlyList<object?>? arguments = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.SignalRRealtimeConnection.Owner.get -> AtomUI.City.Data.DataConnectionOwner
+AtomUI.City.Data.SignalRRealtimeConnection.PrincipalRevision.get -> string?
+AtomUI.City.Data.SignalRRealtimeConnection.SignalRRealtimeConnection(string! connectionId, AtomUI.City.Data.DataConnectionOwner owner, Microsoft.AspNetCore.SignalR.Client.HubConnection! connection, AtomUI.City.Data.IDataDiagnostics? diagnostics = null) -> void
+AtomUI.City.Data.SignalRRealtimeConnection.StartAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.SignalRRealtimeConnection.State.get -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Data.SignalRRealtimeConnection.StateChanged -> System.EventHandler<AtomUI.City.Data.DataConnectionStateChangedEventArgs!>?
+AtomUI.City.Data.SignalRRealtimeConnection.StopAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.SignalRRealtimeConnection.Subscribe<TMessage>(string! methodName, System.Func<TMessage, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>! handler, AtomUI.City.Data.DataSubscriptionOptions? options = null) -> AtomUI.City.Data.IDataSubscription!
+AtomUI.City.Data.SignalRRealtimeConnection.SwitchPrincipalAsync(string! principalRevision, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Data.SignalRReconnectFailedException
+AtomUI.City.Data.SignalRReconnectFailedException.SignalRReconnectFailedException(string? message = null) -> void
+AtomUI.City.Data.SignalRReconnectFailedException.SignalRReconnectFailedException(string? message, System.Exception? innerException) -> void
+const AtomUI.City.Data.DataDiagnosticIds.BackpressureDropped = "AUCDATA026" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.CacheHit = "AUCDATA008" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.CacheInvalidated = "AUCDATA010" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.CacheInvalidationUnsupported = "AUCDATA035" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.CacheMiss = "AUCDATA009" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.CacheReadFailed = "AUCDATA006" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.CacheWriteFailed = "AUCDATA007" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.CircuitOpened = "AUCDATA021" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.CircuitRejected = "AUCDATA022" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ClientMissing = "AUCDATA011" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ClientRegistered = "AUCDATA016" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ClientUnregistered = "AUCDATA017" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ClientUnregistrationMissing = "AUCDATA018" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ConnectionRegistered = "AUCDATA002" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ConnectionRegistrationRejected = "AUCDATA015" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ConnectionStarted = "AUCDATA014" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ConnectionStartFailed = "AUCDATA013" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ConnectionStopFailed = "AUCDATA012" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ConnectionStopped = "AUCDATA003" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ContributionRegistered = "AUCDATA029" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ContributionRejected = "AUCDATA031" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.ContributionRevoked = "AUCDATA030" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.FallbackApplied = "AUCDATA024" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.FallbackFailed = "AUCDATA025" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.HandlerFailed = "AUCDATA032" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.RateLimitRejected = "AUCDATA023" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.RequestCancelled = "AUCDATA020" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.RequestCompleted = "AUCDATA004" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.RequestFailed = "AUCDATA005" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.RequestRetry = "AUCDATA001" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.RequestStaleSuppressed = "AUCDATA019" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.StreamCompleted = "AUCDATA027" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.StreamFailed = "AUCDATA028" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.TransferCompleted = "AUCDATA034" -> string!
+const AtomUI.City.Data.DataDiagnosticIds.TransferProgressFailed = "AUCDATA033" -> string!
+const AtomUI.City.Data.GeneratedDataClientManifestAttribute.CurrentVersion = 1 -> int
+const AtomUI.City.Data.InMemoryDataDiagnostics.DefaultCapacity = 4096 -> int
+override AtomUI.City.Data.DataCacheInvalidationResult.Equals(object? obj) -> bool
+override AtomUI.City.Data.DataCacheInvalidationResult.GetHashCode() -> int
+override AtomUI.City.Data.DataCacheInvalidationResult.ToString() -> string!
+override AtomUI.City.Data.DataCacheKey.Equals(object? obj) -> bool
+override AtomUI.City.Data.DataCacheKey.GetHashCode() -> int
+override AtomUI.City.Data.DataCacheKey.ToString() -> string!
+override AtomUI.City.Data.DataConnectionOwner.GetHashCode() -> int
+override AtomUI.City.Data.DataCredential.Equals(object? obj) -> bool
+override AtomUI.City.Data.DataCredential.GetHashCode() -> int
+override AtomUI.City.Data.DataCredential.ToString() -> string!
+override AtomUI.City.Data.DataDiagnosticRecord.Equals(object? obj) -> bool
+override AtomUI.City.Data.DataDiagnosticRecord.GetHashCode() -> int
+override AtomUI.City.Data.DataDiagnosticRecord.ToString() -> string!
+override AtomUI.City.Data.DataError.Equals(object? obj) -> bool
+override AtomUI.City.Data.DataError.GetHashCode() -> int
+override AtomUI.City.Data.DataError.ToString() -> string!
+override AtomUI.City.Data.DataModule.ConfigureServices(AtomUI.City.Core.Modularity.ServiceConfigurationContext! context) -> void
+override AtomUI.City.Data.DataModule.OnApplicationShutdownAsync(AtomUI.City.Core.Modularity.ApplicationShutdownContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+override AtomUI.City.Data.DataTransferProgress.Equals(object? obj) -> bool
+override AtomUI.City.Data.DataTransferProgress.GetHashCode() -> int
+override AtomUI.City.Data.DataTransferProgress.ToString() -> string!
+override AtomUI.City.Data.DataTransferReceipt.Equals(object? obj) -> bool
+override AtomUI.City.Data.DataTransferReceipt.GetHashCode() -> int
+override AtomUI.City.Data.DataTransferReceipt.ToString() -> string!
+static AtomUI.City.Data.DataAuthenticationOptions.Anonymous.get -> AtomUI.City.Data.DataAuthenticationOptions!
+static AtomUI.City.Data.DataAuthenticationOptions.Bearer(string! scheme = "Bearer") -> AtomUI.City.Data.DataAuthenticationOptions!
+static AtomUI.City.Data.DataCacheEntryOptions.NoExpiration.get -> AtomUI.City.Data.DataCacheEntryOptions!
+static AtomUI.City.Data.DataCacheFingerprint.Create(string! endpoint, string! method, string! canonicalPayload) -> string!
+static AtomUI.City.Data.DataCacheFingerprint.Create(string! endpoint, string! method, System.ReadOnlySpan<byte> canonicalPayload) -> string!
+static AtomUI.City.Data.DataCacheInvalidation.All(AtomUI.City.Data.DataCacheInvalidationReason reason = AtomUI.City.Data.DataCacheInvalidationReason.Manual) -> AtomUI.City.Data.DataCacheInvalidation!
+static AtomUI.City.Data.DataCacheInvalidation.ForClient(string! clientId, AtomUI.City.Data.DataCacheInvalidationReason reason = AtomUI.City.Data.DataCacheInvalidationReason.Manual) -> AtomUI.City.Data.DataCacheInvalidation!
+static AtomUI.City.Data.DataCacheInvalidation.ForClientVersion(string! clientId, string! clientVersion, AtomUI.City.Data.DataCacheInvalidationReason reason = AtomUI.City.Data.DataCacheInvalidationReason.ClientVersionChanged) -> AtomUI.City.Data.DataCacheInvalidation!
+static AtomUI.City.Data.DataCacheInvalidation.ForOperation(string! clientId, string! operationName, AtomUI.City.Data.DataCacheInvalidationReason reason = AtomUI.City.Data.DataCacheInvalidationReason.Manual) -> AtomUI.City.Data.DataCacheInvalidation!
+static AtomUI.City.Data.DataCacheInvalidation.ForPermissionRevision(string! permissionRevision, AtomUI.City.Data.DataCacheInvalidationReason reason = AtomUI.City.Data.DataCacheInvalidationReason.PermissionChanged) -> AtomUI.City.Data.DataCacheInvalidation!
+static AtomUI.City.Data.DataCacheInvalidation.ForPlugin(string! pluginContributionId, AtomUI.City.Data.DataCacheInvalidationReason reason = AtomUI.City.Data.DataCacheInvalidationReason.PluginRevoked) -> AtomUI.City.Data.DataCacheInvalidation!
+static AtomUI.City.Data.DataCacheInvalidation.ForPolicyVersion(string! policyVersion, AtomUI.City.Data.DataCacheInvalidationReason reason = AtomUI.City.Data.DataCacheInvalidationReason.Manual) -> AtomUI.City.Data.DataCacheInvalidation!
+static AtomUI.City.Data.DataCacheInvalidation.ForPrincipal(string! principalRevision, AtomUI.City.Data.DataCacheInvalidationReason reason = AtomUI.City.Data.DataCacheInvalidationReason.PrincipalChanged) -> AtomUI.City.Data.DataCacheInvalidation!
+static AtomUI.City.Data.DataCacheInvalidation.Keys(System.Collections.Generic.IEnumerable<AtomUI.City.Data.DataCacheKey!>! keys, AtomUI.City.Data.DataCacheInvalidationReason reason = AtomUI.City.Data.DataCacheInvalidationReason.Manual) -> AtomUI.City.Data.DataCacheInvalidation!
+static AtomUI.City.Data.DataCacheInvalidationResult.operator !=(AtomUI.City.Data.DataCacheInvalidationResult? left, AtomUI.City.Data.DataCacheInvalidationResult? right) -> bool
+static AtomUI.City.Data.DataCacheInvalidationResult.operator ==(AtomUI.City.Data.DataCacheInvalidationResult? left, AtomUI.City.Data.DataCacheInvalidationResult? right) -> bool
+static AtomUI.City.Data.DataCacheKey.Create<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, string! authenticationScheme) -> AtomUI.City.Data.DataCacheKey!
+static AtomUI.City.Data.DataCacheKey.operator !=(AtomUI.City.Data.DataCacheKey? left, AtomUI.City.Data.DataCacheKey? right) -> bool
+static AtomUI.City.Data.DataCacheKey.operator ==(AtomUI.City.Data.DataCacheKey? left, AtomUI.City.Data.DataCacheKey? right) -> bool
+static AtomUI.City.Data.DataCacheLookup<TResponse>.Hit(TResponse? value) -> AtomUI.City.Data.DataCacheLookup<TResponse>!
+static AtomUI.City.Data.DataCacheLookup<TResponse>.Miss() -> AtomUI.City.Data.DataCacheLookup<TResponse>!
+static AtomUI.City.Data.DataCacheOptions.Disabled.get -> AtomUI.City.Data.DataCacheOptions!
+static AtomUI.City.Data.DataCacheOptions.Enabled(string! requestFingerprint, string! principalRevision = "anonymous", string! permissionRevision = "default", string? pluginContributionId = null, string! clientVersion = "default", string! policyVersion = "default", System.TimeSpan? timeToLive = null) -> AtomUI.City.Data.DataCacheOptions!
+static AtomUI.City.Data.DataCircuitBreakerOptions.Disabled.get -> AtomUI.City.Data.DataCircuitBreakerOptions!
+static AtomUI.City.Data.DataConcurrencyOptions.AllowConcurrent.get -> AtomUI.City.Data.DataConcurrencyOptions!
+static AtomUI.City.Data.DataConnectionOwner.None.get -> AtomUI.City.Data.DataConnectionOwner
+static AtomUI.City.Data.DataConnectionOwner.operator !=(AtomUI.City.Data.DataConnectionOwner left, AtomUI.City.Data.DataConnectionOwner right) -> bool
+static AtomUI.City.Data.DataConnectionOwner.operator ==(AtomUI.City.Data.DataConnectionOwner left, AtomUI.City.Data.DataConnectionOwner right) -> bool
+static AtomUI.City.Data.DataConsistencyOptions.None.get -> AtomUI.City.Data.DataConsistencyOptions!
+static AtomUI.City.Data.DataCredential.Bearer(string! token) -> AtomUI.City.Data.DataCredential!
+static AtomUI.City.Data.DataCredential.operator !=(AtomUI.City.Data.DataCredential? left, AtomUI.City.Data.DataCredential? right) -> bool
+static AtomUI.City.Data.DataCredential.operator ==(AtomUI.City.Data.DataCredential? left, AtomUI.City.Data.DataCredential? right) -> bool
+static AtomUI.City.Data.DataCredentialResult.Cancelled(string? message = null) -> AtomUI.City.Data.DataCredentialResult!
+static AtomUI.City.Data.DataCredentialResult.Expired(string? message = null) -> AtomUI.City.Data.DataCredentialResult!
+static AtomUI.City.Data.DataCredentialResult.None() -> AtomUI.City.Data.DataCredentialResult!
+static AtomUI.City.Data.DataCredentialResult.Required(string? message = null) -> AtomUI.City.Data.DataCredentialResult!
+static AtomUI.City.Data.DataCredentialResult.Success(AtomUI.City.Data.DataCredential! credential) -> AtomUI.City.Data.DataCredentialResult!
+static AtomUI.City.Data.DataCredentialResult.Unavailable(string? message = null) -> AtomUI.City.Data.DataCredentialResult!
+static AtomUI.City.Data.DataDiagnosticRecord.operator !=(AtomUI.City.Data.DataDiagnosticRecord? left, AtomUI.City.Data.DataDiagnosticRecord? right) -> bool
+static AtomUI.City.Data.DataDiagnosticRecord.operator ==(AtomUI.City.Data.DataDiagnosticRecord? left, AtomUI.City.Data.DataDiagnosticRecord? right) -> bool
+static AtomUI.City.Data.DataError.operator !=(AtomUI.City.Data.DataError? left, AtomUI.City.Data.DataError? right) -> bool
+static AtomUI.City.Data.DataError.operator ==(AtomUI.City.Data.DataError? left, AtomUI.City.Data.DataError? right) -> bool
+static AtomUI.City.Data.DataErrorMapper.FromGrpcStatus(AtomUI.City.Data.GrpcStatusCode statusCode, string? detail = null) -> AtomUI.City.Data.DataError!
+static AtomUI.City.Data.DataErrorMapper.FromHttpStatusCode(System.Net.HttpStatusCode statusCode) -> AtomUI.City.Data.DataError!
+static AtomUI.City.Data.DataFallbackResult<TResponse>.FromResult(AtomUI.City.Data.DataResult<TResponse>! result) -> AtomUI.City.Data.DataFallbackResult<TResponse>!
+static AtomUI.City.Data.DataFallbackResult<TResponse>.None() -> AtomUI.City.Data.DataFallbackResult<TResponse>!
+static AtomUI.City.Data.DataRateLimitOptions.Disabled.get -> AtomUI.City.Data.DataRateLimitOptions!
+static AtomUI.City.Data.DataRequestContext.Create<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken) -> AtomUI.City.Data.DataRequestContext!
+static AtomUI.City.Data.DataRequestOrigin.Host.get -> AtomUI.City.Data.DataRequestOrigin!
+static AtomUI.City.Data.DataResilienceOptions.None.get -> AtomUI.City.Data.DataResilienceOptions!
+static AtomUI.City.Data.DataResult<T>.Cancelled(string? message = null) -> AtomUI.City.Data.DataResult<T>!
+static AtomUI.City.Data.DataResult<T>.Failed(AtomUI.City.Data.DataError! error) -> AtomUI.City.Data.DataResult<T>!
+static AtomUI.City.Data.DataResult<T>.Partial(T value, AtomUI.City.Data.DataError! error) -> AtomUI.City.Data.DataResult<T>!
+static AtomUI.City.Data.DataResult<T>.StaleSuppressed(string? message = null) -> AtomUI.City.Data.DataResult<T>!
+static AtomUI.City.Data.DataResult<T>.Success(T value) -> AtomUI.City.Data.DataResult<T>!
+static AtomUI.City.Data.DataServiceCollectionExtensions.AddData(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Data.DataStream<T>.Create(System.Collections.Generic.IAsyncEnumerable<T>! source, AtomUI.City.Data.DataStreamOptions? options = null, AtomUI.City.Data.IDataDiagnostics? diagnostics = null, System.Func<System.Exception!, AtomUI.City.Data.DataError!>? errorMapper = null) -> AtomUI.City.Data.DataStream<T>!
+static AtomUI.City.Data.DataStreamOptions.Default.get -> AtomUI.City.Data.DataStreamOptions!
+static AtomUI.City.Data.DataSubscriptionOptions.Default.get -> AtomUI.City.Data.DataSubscriptionOptions!
+static AtomUI.City.Data.DataTransferOptions.Default.get -> AtomUI.City.Data.DataTransferOptions!
+static AtomUI.City.Data.DataTransferProgress.operator !=(AtomUI.City.Data.DataTransferProgress? left, AtomUI.City.Data.DataTransferProgress? right) -> bool
+static AtomUI.City.Data.DataTransferProgress.operator ==(AtomUI.City.Data.DataTransferProgress? left, AtomUI.City.Data.DataTransferProgress? right) -> bool
+static AtomUI.City.Data.DataTransferReceipt.operator !=(AtomUI.City.Data.DataTransferReceipt? left, AtomUI.City.Data.DataTransferReceipt? right) -> bool
+static AtomUI.City.Data.DataTransferReceipt.operator ==(AtomUI.City.Data.DataTransferReceipt? left, AtomUI.City.Data.DataTransferReceipt? right) -> bool
+static AtomUI.City.Data.GrpcCallOptions.Default.get -> AtomUI.City.Data.GrpcCallOptions!
+static AtomUI.City.Data.GrpcCallResult<T>.Failed(AtomUI.City.Data.GrpcStatusCode statusCode, string? detail = null) -> AtomUI.City.Data.GrpcCallResult<T>!
+static AtomUI.City.Data.GrpcCallResult<T>.Success(T value) -> AtomUI.City.Data.GrpcCallResult<T>!
+static AtomUI.City.Data.SignalRRealtimeConnection.Create(AtomUI.City.Data.SignalRConnectionOptions! options, AtomUI.City.Data.IDataDiagnostics? diagnostics = null) -> AtomUI.City.Data.SignalRRealtimeConnection!
+virtual AtomUI.City.Data.DataOperationDelegate<TResponse>.Invoke(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+virtual AtomUI.City.Data.DataRequestHandlerDelegate<TResponse>.Invoke(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+~override AtomUI.City.Data.DataConnectionOwner.Equals(object obj) -> bool
+~override AtomUI.City.Data.DataConnectionOwner.ToString() -> string

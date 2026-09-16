@@ -153,26 +153,26 @@ Tests:
 
 公共 API review 未通过时，不允许进入 pack、tag 或 publish。
 
-### 8.1 Core、EventBus 与 Presentation 的机械门禁
+### 8.1 全部产品项目的机械门禁
 
-`AtomUI.City.Core`、`AtomUI.City.EventBus` 和 `AtomUI.City.Presentation` 当前作为冻结对象执行以下机械检查：
+全部 15 个 `src/AtomUI.City.*` 产品项目都必须执行以下机械检查。Core、EventBus 和 Presentation 已形成首批 `Shipped` 基线；其余模块在逐项 API review 完成前保存在 `Unshipped`，但同样不允许未登记的 public surface 漂移：
 
 - `PublicAPI.Shipped.txt` 保存已经审阅并冻结的签名；删除、改名、移动或修改签名会使编译失败。
 - `PublicAPI.Unshipped.txt` 只保存本轮尚未随版本发布的新签名。新增 API 不允许通过关闭分析器或手工忽略诊断绕过 review。
 - `Microsoft.CodeAnalysis.PublicApiAnalyzers` 的 API diff、可选参数、重载和兼容性诊断按编译错误处理。
-- Core 单独重新启用 `CS1591` 并按错误处理；EventBus 与 Presentation 保留 API card 为规范文档，并必须随包生成 XML documentation 文件。
+- Core 单独重新启用 `CS1591` 并按错误处理；其他模块的 XML documentation 完整性在独立文档门禁议题中收口，不影响签名 diff 已经对全部产品项目生效。
 - Release 构建同时编译 `net10.0` 和生产基线 `net8.0`；SDK package validation 以 strict compatible-framework 模式比较两个程序集的 API。
 - `engineering/check-public-api.sh` 必须真实执行三个冻结模块的 Release build 与 pack，不能只检查 baseline 或 XML 文件是否存在。
 
-由于当前仍处于首次公开发布前，现有审计结果直接形成首份 `PublicAPI.Shipped.txt`。首次 NuGet 版本发布后，还必须配置 package validation baseline version，将新包与已发布包进行二进制兼容比较。
+由于当前仍处于首次公开发布前，尚未完成语义 review 的签名只进入 `PublicAPI.Unshipped.txt`。统一版本保持 prerelease；稳定版本必须配置 `AtomUICityApiBaselineVersion`，由 SDK package validation 将候选包与上一已发布 preview/rc/stable 包进行二进制兼容比较。
 
-## 9. 首批冻结范围
+## 9. 当前冻结范围
 
 当前实现冻结以下 API 合同：
 
 - `AtomUI.City.Core` 的 Host、Lifecycle、Modularity、DI marker、Diagnostics 和 UI dispatcher abstraction。
 - `AtomUI.City.EventBus` 的 contract、channel、subscription、backpressure、plugin contribution 和 diagnostics。
 - `AtomUI.City.Presentation` 的 runtime、Window/Outlet transaction、View、Interaction、resource、plugin cleanup、failure 和 diagnostics。
-- `AtomUI.City.Testing` 的 TestHost、FakeUiDispatcher、DeterministicScheduler、ModuleTestHost、PluginTestHost、RoutingTestHost、SourceGenerationTestCase、AOT check 和 TestLayer。
+- `AtomUI.City.Testing` 的全部现有 public surface 已进入 `Unshipped` 机械基线；TestHost、FakeUiDispatcher、DeterministicScheduler、ModuleTestHost、PluginTestHost、RoutingTestHost、SourceGenerationTestCase、AOT check 和 TestLayer 已有 Preview API Card，其他签名仍需逐项分类。
 
-Routing、State、Data、PluginSystem、Build、Generators、CLI 和 Templates 可以继续使用现有设计文档推进细化，但不能在未通过对应门禁前标记产品级完成。
+Routing、State、Data、PluginSystem、Build、Generators、CLI、Templates、Localization、Mvvm 和 Security 已进入 `Unshipped` 机械基线，可以继续推进语义细化，但不能仅因签名已登记就标记为 Stable。

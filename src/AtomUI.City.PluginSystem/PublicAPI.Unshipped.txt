@@ -1,0 +1,285 @@
+#nullable enable
+AtomUI.City.PluginSystem.ContributionManifestAttribute
+AtomUI.City.PluginSystem.ContributionManifestAttribute.ContributionManifestAttribute(string! type, string! path) -> void
+AtomUI.City.PluginSystem.ContributionManifestAttribute.Path.get -> string!
+AtomUI.City.PluginSystem.ContributionManifestAttribute.Required.get -> bool
+AtomUI.City.PluginSystem.ContributionManifestAttribute.Required.set -> void
+AtomUI.City.PluginSystem.ContributionManifestAttribute.Type.get -> string!
+AtomUI.City.PluginSystem.PluginAttribute
+AtomUI.City.PluginSystem.PluginAttribute.AotCompatible.get -> bool
+AtomUI.City.PluginSystem.PluginAttribute.AotCompatible.set -> void
+AtomUI.City.PluginSystem.PluginAttribute.DescriptionKey.get -> string?
+AtomUI.City.PluginSystem.PluginAttribute.DescriptionKey.set -> void
+AtomUI.City.PluginSystem.PluginAttribute.DisplayNameKey.get -> string?
+AtomUI.City.PluginSystem.PluginAttribute.DisplayNameKey.set -> void
+AtomUI.City.PluginSystem.PluginAttribute.MainAssembly.get -> string?
+AtomUI.City.PluginSystem.PluginAttribute.MainAssembly.set -> void
+AtomUI.City.PluginSystem.PluginAttribute.MaxHostVersion.get -> string?
+AtomUI.City.PluginSystem.PluginAttribute.MaxHostVersion.set -> void
+AtomUI.City.PluginSystem.PluginAttribute.MinHostVersion.get -> string?
+AtomUI.City.PluginSystem.PluginAttribute.MinHostVersion.set -> void
+AtomUI.City.PluginSystem.PluginAttribute.PackageId.get -> string!
+AtomUI.City.PluginSystem.PluginAttribute.PluginApiVersion.get -> string?
+AtomUI.City.PluginSystem.PluginAttribute.PluginApiVersion.set -> void
+AtomUI.City.PluginSystem.PluginAttribute.PluginAttribute(string! pluginId, string! packageId, string! version) -> void
+AtomUI.City.PluginSystem.PluginAttribute.PluginId.get -> string!
+AtomUI.City.PluginSystem.PluginAttribute.Publisher.get -> string?
+AtomUI.City.PluginSystem.PluginAttribute.Publisher.set -> void
+AtomUI.City.PluginSystem.PluginAttribute.TargetFramework.get -> string?
+AtomUI.City.PluginSystem.PluginAttribute.TargetFramework.set -> void
+AtomUI.City.PluginSystem.PluginAttribute.Unloadable.get -> bool
+AtomUI.City.PluginSystem.PluginAttribute.Unloadable.set -> void
+AtomUI.City.PluginSystem.PluginAttribute.Version.get -> string!
+AtomUI.City.PluginSystem.PluginCapabilityAttribute
+AtomUI.City.PluginSystem.PluginCapabilityAttribute.Name.get -> string!
+AtomUI.City.PluginSystem.PluginCapabilityAttribute.PluginCapabilityAttribute(string! name) -> void
+AtomUI.City.PluginSystem.PluginCapabilityAttribute.Scope.get -> string![]!
+AtomUI.City.PluginSystem.PluginCapabilityAttribute.Scope.set -> void
+AtomUI.City.PluginSystem.PluginCapabilityDescriptor
+AtomUI.City.PluginSystem.PluginCapabilityDescriptor.<Clone>$() -> AtomUI.City.PluginSystem.PluginCapabilityDescriptor!
+AtomUI.City.PluginSystem.PluginCapabilityDescriptor.Equals(AtomUI.City.PluginSystem.PluginCapabilityDescriptor? other) -> bool
+AtomUI.City.PluginSystem.PluginCapabilityDescriptor.Name.get -> string!
+AtomUI.City.PluginSystem.PluginCapabilityDescriptor.PluginCapabilityDescriptor(string! name, System.Collections.Generic.IReadOnlyList<string!>! scope) -> void
+AtomUI.City.PluginSystem.PluginCapabilityDescriptor.Scope.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.PluginSystem.PluginContributionDescriptor
+AtomUI.City.PluginSystem.PluginContributionDescriptor.<Clone>$() -> AtomUI.City.PluginSystem.PluginContributionDescriptor!
+AtomUI.City.PluginSystem.PluginContributionDescriptor.Deconstruct(out string! Type, out string! Path, out bool Required) -> void
+AtomUI.City.PluginSystem.PluginContributionDescriptor.Equals(AtomUI.City.PluginSystem.PluginContributionDescriptor? other) -> bool
+AtomUI.City.PluginSystem.PluginContributionDescriptor.Path.get -> string!
+AtomUI.City.PluginSystem.PluginContributionDescriptor.Path.init -> void
+AtomUI.City.PluginSystem.PluginContributionDescriptor.PluginContributionDescriptor(string! Type, string! Path, bool Required) -> void
+AtomUI.City.PluginSystem.PluginContributionDescriptor.Required.get -> bool
+AtomUI.City.PluginSystem.PluginContributionDescriptor.Required.init -> void
+AtomUI.City.PluginSystem.PluginContributionDescriptor.Type.get -> string!
+AtomUI.City.PluginSystem.PluginContributionDescriptor.Type.init -> void
+AtomUI.City.PluginSystem.PluginDependencyAttribute
+AtomUI.City.PluginSystem.PluginDependencyAttribute.PluginDependencyAttribute(string! pluginId) -> void
+AtomUI.City.PluginSystem.PluginDependencyAttribute.PluginId.get -> string!
+AtomUI.City.PluginSystem.PluginDependencyAttribute.VersionRange.get -> string?
+AtomUI.City.PluginSystem.PluginDependencyAttribute.VersionRange.set -> void
+AtomUI.City.PluginSystem.PluginDependencyDescriptor
+AtomUI.City.PluginSystem.PluginDependencyDescriptor.<Clone>$() -> AtomUI.City.PluginSystem.PluginDependencyDescriptor!
+AtomUI.City.PluginSystem.PluginDependencyDescriptor.Deconstruct(out string! PluginId, out string? VersionRange) -> void
+AtomUI.City.PluginSystem.PluginDependencyDescriptor.Equals(AtomUI.City.PluginSystem.PluginDependencyDescriptor? other) -> bool
+AtomUI.City.PluginSystem.PluginDependencyDescriptor.PluginDependencyDescriptor(string! PluginId, string? VersionRange) -> void
+AtomUI.City.PluginSystem.PluginDependencyDescriptor.PluginId.get -> string!
+AtomUI.City.PluginSystem.PluginDependencyDescriptor.PluginId.init -> void
+AtomUI.City.PluginSystem.PluginDependencyDescriptor.VersionRange.get -> string?
+AtomUI.City.PluginSystem.PluginDependencyDescriptor.VersionRange.init -> void
+AtomUI.City.PluginSystem.PluginDependencyValidator
+AtomUI.City.PluginSystem.PluginDescriptor
+AtomUI.City.PluginSystem.PluginDescriptor.MainAssemblyPath.get -> string!
+AtomUI.City.PluginSystem.PluginDescriptor.Manifest.get -> AtomUI.City.PluginSystem.PluginManifest!
+AtomUI.City.PluginSystem.PluginDescriptor.PackageId.get -> string!
+AtomUI.City.PluginSystem.PluginDescriptor.PluginId.get -> string!
+AtomUI.City.PluginSystem.PluginDescriptor.RootPath.get -> string!
+AtomUI.City.PluginSystem.PluginDescriptor.Version.get -> string!
+AtomUI.City.PluginSystem.PluginDiagnostic
+AtomUI.City.PluginSystem.PluginDiagnostic.<Clone>$() -> AtomUI.City.PluginSystem.PluginDiagnostic!
+AtomUI.City.PluginSystem.PluginDiagnostic.Code.get -> string!
+AtomUI.City.PluginSystem.PluginDiagnostic.Code.init -> void
+AtomUI.City.PluginSystem.PluginDiagnostic.Deconstruct(out string! Code, out string! Message, out string? PluginId, out string? Field, out string? Path) -> void
+AtomUI.City.PluginSystem.PluginDiagnostic.Equals(AtomUI.City.PluginSystem.PluginDiagnostic? other) -> bool
+AtomUI.City.PluginSystem.PluginDiagnostic.Field.get -> string?
+AtomUI.City.PluginSystem.PluginDiagnostic.Field.init -> void
+AtomUI.City.PluginSystem.PluginDiagnostic.Message.get -> string!
+AtomUI.City.PluginSystem.PluginDiagnostic.Message.init -> void
+AtomUI.City.PluginSystem.PluginDiagnostic.Path.get -> string?
+AtomUI.City.PluginSystem.PluginDiagnostic.Path.init -> void
+AtomUI.City.PluginSystem.PluginDiagnostic.PluginDiagnostic(string! Code, string! Message, string? PluginId = null, string? Field = null, string? Path = null) -> void
+AtomUI.City.PluginSystem.PluginDiagnostic.PluginId.get -> string?
+AtomUI.City.PluginSystem.PluginDiagnostic.PluginId.init -> void
+AtomUI.City.PluginSystem.PluginDiagnosticIds
+AtomUI.City.PluginSystem.PluginDiscoveryResult
+AtomUI.City.PluginSystem.PluginDiscoveryResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDiagnostic!>!
+AtomUI.City.PluginSystem.PluginDiscoveryResult.PluginDiscoveryResult(System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDescriptor!>! plugins, System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDiagnostic!>! diagnostics) -> void
+AtomUI.City.PluginSystem.PluginDiscoveryResult.Plugins.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDescriptor!>!
+AtomUI.City.PluginSystem.PluginDiscoveryResult.Succeeded.get -> bool
+AtomUI.City.PluginSystem.PluginDiscoveryScanner
+AtomUI.City.PluginSystem.PluginInstallation
+AtomUI.City.PluginSystem.PluginInstallation.<Clone>$() -> AtomUI.City.PluginSystem.PluginInstallation!
+AtomUI.City.PluginSystem.PluginInstallation.Deconstruct(out string! PluginId, out string! PackageId, out string! Version, out string! RootPath, out string! ManifestPath) -> void
+AtomUI.City.PluginSystem.PluginInstallation.Equals(AtomUI.City.PluginSystem.PluginInstallation? other) -> bool
+AtomUI.City.PluginSystem.PluginInstallation.ManifestPath.get -> string!
+AtomUI.City.PluginSystem.PluginInstallation.ManifestPath.init -> void
+AtomUI.City.PluginSystem.PluginInstallation.PackageId.get -> string!
+AtomUI.City.PluginSystem.PluginInstallation.PackageId.init -> void
+AtomUI.City.PluginSystem.PluginInstallation.PluginId.get -> string!
+AtomUI.City.PluginSystem.PluginInstallation.PluginId.init -> void
+AtomUI.City.PluginSystem.PluginInstallation.PluginInstallation(string! PluginId, string! PackageId, string! Version, string! RootPath, string! ManifestPath) -> void
+AtomUI.City.PluginSystem.PluginInstallation.RootPath.get -> string!
+AtomUI.City.PluginSystem.PluginInstallation.RootPath.init -> void
+AtomUI.City.PluginSystem.PluginInstallation.Version.get -> string!
+AtomUI.City.PluginSystem.PluginInstallation.Version.init -> void
+AtomUI.City.PluginSystem.PluginInstallationReader
+AtomUI.City.PluginSystem.PluginInstallResult
+AtomUI.City.PluginSystem.PluginInstallResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDiagnostic!>!
+AtomUI.City.PluginSystem.PluginInstallResult.Installation.get -> AtomUI.City.PluginSystem.PluginInstallation?
+AtomUI.City.PluginSystem.PluginInstallResult.Succeeded.get -> bool
+AtomUI.City.PluginSystem.PluginLoader
+AtomUI.City.PluginSystem.PluginLoader.LoadAsync(AtomUI.City.PluginSystem.PluginDescriptor! descriptor, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.PluginSystem.PluginLoadResult!>
+AtomUI.City.PluginSystem.PluginLoader.PluginLoader() -> void
+AtomUI.City.PluginSystem.PluginLoadResult
+AtomUI.City.PluginSystem.PluginLoadResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDiagnostic!>!
+AtomUI.City.PluginSystem.PluginLoadResult.Runtime.get -> AtomUI.City.PluginSystem.PluginRuntime?
+AtomUI.City.PluginSystem.PluginLoadResult.State.get -> AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginLoadResult.Succeeded.get -> bool
+AtomUI.City.PluginSystem.PluginManifest
+AtomUI.City.PluginSystem.PluginManifest.AotCompatible.get -> bool
+AtomUI.City.PluginSystem.PluginManifest.Capabilities.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginCapabilityDescriptor!>!
+AtomUI.City.PluginSystem.PluginManifest.Contributions.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginContributionDescriptor!>!
+AtomUI.City.PluginSystem.PluginManifest.Dependencies.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDependencyDescriptor!>!
+AtomUI.City.PluginSystem.PluginManifest.DescriptionKey.get -> string?
+AtomUI.City.PluginSystem.PluginManifest.DisplayNameKey.get -> string!
+AtomUI.City.PluginSystem.PluginManifest.MainAssembly.get -> string!
+AtomUI.City.PluginSystem.PluginManifest.MaxHostVersion.get -> string?
+AtomUI.City.PluginSystem.PluginManifest.MinHostVersion.get -> string!
+AtomUI.City.PluginSystem.PluginManifest.Modules.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginModuleDescriptor!>!
+AtomUI.City.PluginSystem.PluginManifest.PackageId.get -> string!
+AtomUI.City.PluginSystem.PluginManifest.PluginApiVersion.get -> string!
+AtomUI.City.PluginSystem.PluginManifest.PluginId.get -> string!
+AtomUI.City.PluginSystem.PluginManifest.PluginManifest(string! schemaVersion, string! pluginId, string! packageId, string! version, string! displayNameKey, string? descriptionKey, string? publisher, string! mainAssembly, string! targetFramework, string! pluginApiVersion, string! minHostVersion, string? maxHostVersion, bool unloadable, bool aotCompatible, System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginCapabilityDescriptor!>! capabilities, System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginContributionDescriptor!>! contributions, System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDependencyDescriptor!>! dependencies, System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginModuleDescriptor!>! modules) -> void
+AtomUI.City.PluginSystem.PluginManifest.Publisher.get -> string?
+AtomUI.City.PluginSystem.PluginManifest.SchemaVersion.get -> string!
+AtomUI.City.PluginSystem.PluginManifest.TargetFramework.get -> string!
+AtomUI.City.PluginSystem.PluginManifest.Unloadable.get -> bool
+AtomUI.City.PluginSystem.PluginManifest.Version.get -> string!
+AtomUI.City.PluginSystem.PluginManifestBuilder
+AtomUI.City.PluginSystem.PluginManifestReader
+AtomUI.City.PluginSystem.PluginManifestValidator
+AtomUI.City.PluginSystem.PluginModuleDescriptor
+AtomUI.City.PluginSystem.PluginModuleDescriptor.<Clone>$() -> AtomUI.City.PluginSystem.PluginModuleDescriptor!
+AtomUI.City.PluginSystem.PluginModuleDescriptor.Dependencies.get -> System.Collections.Generic.IReadOnlyList<string!>?
+AtomUI.City.PluginSystem.PluginModuleDescriptor.Equals(AtomUI.City.PluginSystem.PluginModuleDescriptor? other) -> bool
+AtomUI.City.PluginSystem.PluginModuleDescriptor.Name.get -> string!
+AtomUI.City.PluginSystem.PluginModuleDescriptor.PluginModuleDescriptor(string! name, string! typeName, System.Collections.Generic.IReadOnlyList<string!>? dependencies = null) -> void
+AtomUI.City.PluginSystem.PluginModuleDescriptor.TypeName.get -> string!
+AtomUI.City.PluginSystem.PluginMsBuildContract
+AtomUI.City.PluginSystem.PluginPackageInstaller
+AtomUI.City.PluginSystem.PluginPackageInstaller.InstallFromDirectoryAsync(string! packageRoot, string! pluginsRoot, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.PluginSystem.PluginInstallResult!>
+AtomUI.City.PluginSystem.PluginPackageInstaller.InstallFromPackageAsync(string! packagePath, string! pluginsRoot, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.PluginSystem.PluginInstallResult!>
+AtomUI.City.PluginSystem.PluginPackageInstaller.PluginPackageInstaller() -> void
+AtomUI.City.PluginSystem.PluginPackageLayoutValidator
+AtomUI.City.PluginSystem.PluginPackagePaths
+AtomUI.City.PluginSystem.PluginRuntime
+AtomUI.City.PluginSystem.PluginRuntime.Activate() -> void
+AtomUI.City.PluginSystem.PluginRuntime.DeactivateAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.PluginSystem.PluginRuntime.Descriptor.get -> AtomUI.City.PluginSystem.PluginDescriptor!
+AtomUI.City.PluginSystem.PluginRuntime.Leases.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginRuntimeLease!>!
+AtomUI.City.PluginSystem.PluginRuntime.MainAssembly.get -> System.Reflection.Assembly!
+AtomUI.City.PluginSystem.PluginRuntime.RegisterUnloadLease(string! leaseId, string! kind, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>! revokeAsync) -> AtomUI.City.PluginSystem.PluginRuntimeLease!
+AtomUI.City.PluginSystem.PluginRuntime.State.get -> AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginRuntime.UnloadAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.PluginSystem.PluginUnloadResult!>
+AtomUI.City.PluginSystem.PluginRuntimeLease
+AtomUI.City.PluginSystem.PluginRuntimeLease.Kind.get -> string!
+AtomUI.City.PluginSystem.PluginRuntimeLease.LeaseId.get -> string!
+AtomUI.City.PluginSystem.PluginRuntimeLease.PluginId.get -> string!
+AtomUI.City.PluginSystem.PluginRuntimeLease.State.get -> AtomUI.City.PluginSystem.PluginRuntimeLeaseState
+AtomUI.City.PluginSystem.PluginRuntimeLeaseState
+AtomUI.City.PluginSystem.PluginRuntimeLeaseState.Active = 0 -> AtomUI.City.PluginSystem.PluginRuntimeLeaseState
+AtomUI.City.PluginSystem.PluginRuntimeLeaseState.Revoked = 2 -> AtomUI.City.PluginSystem.PluginRuntimeLeaseState
+AtomUI.City.PluginSystem.PluginRuntimeLeaseState.RevokeFailed = 3 -> AtomUI.City.PluginSystem.PluginRuntimeLeaseState
+AtomUI.City.PluginSystem.PluginRuntimeLeaseState.Revoking = 1 -> AtomUI.City.PluginSystem.PluginRuntimeLeaseState
+AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginRuntimeState.Active = 2 -> AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginRuntimeState.Deactivating = 3 -> AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginRuntimeState.Faulted = 7 -> AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginRuntimeState.Inactive = 4 -> AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginRuntimeState.Loaded = 1 -> AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginRuntimeState.Unloaded = 6 -> AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginRuntimeState.Unloading = 5 -> AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginRuntimeState.UnloadPending = 8 -> AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginRuntimeState.Verified = 0 -> AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginUnloadResult
+AtomUI.City.PluginSystem.PluginUnloadResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDiagnostic!>!
+AtomUI.City.PluginSystem.PluginUnloadResult.State.get -> AtomUI.City.PluginSystem.PluginRuntimeState
+AtomUI.City.PluginSystem.PluginUnloadResult.Succeeded.get -> bool
+AtomUI.City.PluginSystem.PluginValidationResult
+AtomUI.City.PluginSystem.PluginValidationResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDiagnostic!>!
+AtomUI.City.PluginSystem.PluginValidationResult.PluginValidationResult(System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDiagnostic!>! diagnostics) -> void
+AtomUI.City.PluginSystem.PluginValidationResult.Succeeded.get -> bool
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.InvalidContributionPath = "AUCPLG0012" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.InvalidInstallRecord = "AUCPLG0017" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.InvalidMainAssembly = "AUCPLG0006" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.InvalidManifest = "AUCPLG0019" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.InvalidPluginDirectory = "AUCPLG0022" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.InvalidPluginId = "AUCPLG0010" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.InvalidPluginVersion = "AUCPLG0011" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.InvalidTargetFramework = "AUCPLG0013" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.MainAssemblyNotFound = "AUCPLG0002" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.ManifestNotFound = "AUCPLG0000" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.MissingInstallRecord = "AUCPLG0021" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.MissingPluginId = "AUCPLG0001" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.PackageExtractionFailed = "AUCPLG0014" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.PluginAlreadyInstalled = "AUCPLG0007" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.PluginDependencyCycle = "AUCPLG0009" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.PluginDependencyMissing = "AUCPLG0008" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.PluginDependencyVersionMismatch = "AUCPLG0016" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.PluginIdConflict = "AUCPLG0015" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.PluginIdMismatch = "AUCPLG0003" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.PluginPackageIdMismatch = "AUCPLG0020" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.PluginUnloadPending = "AUCPLG0023" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.PluginVersionMismatch = "AUCPLG0018" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.RequiredContributionManifestNotFound = "AUCPLG0005" -> string!
+const AtomUI.City.PluginSystem.PluginDiagnosticIds.UnsupportedManifestSchema = "AUCPLG0004" -> string!
+const AtomUI.City.PluginSystem.PluginPackagePaths.InstalledDirectoryName = "installed" -> string!
+const AtomUI.City.PluginSystem.PluginPackagePaths.InstallRecordFileName = "install.json" -> string!
+const AtomUI.City.PluginSystem.PluginPackagePaths.ManifestRelativePath = "atomui-city/plugin.json" -> string!
+const AtomUI.City.PluginSystem.PluginPackagePaths.RuntimeRootDirectoryName = "root" -> string!
+const AtomUI.City.PluginSystem.PluginPackagePaths.StagingDirectoryName = "staging" -> string!
+override AtomUI.City.PluginSystem.PluginCapabilityDescriptor.Equals(object? obj) -> bool
+override AtomUI.City.PluginSystem.PluginCapabilityDescriptor.GetHashCode() -> int
+override AtomUI.City.PluginSystem.PluginCapabilityDescriptor.ToString() -> string!
+override AtomUI.City.PluginSystem.PluginContributionDescriptor.Equals(object? obj) -> bool
+override AtomUI.City.PluginSystem.PluginContributionDescriptor.GetHashCode() -> int
+override AtomUI.City.PluginSystem.PluginContributionDescriptor.ToString() -> string!
+override AtomUI.City.PluginSystem.PluginDependencyDescriptor.Equals(object? obj) -> bool
+override AtomUI.City.PluginSystem.PluginDependencyDescriptor.GetHashCode() -> int
+override AtomUI.City.PluginSystem.PluginDependencyDescriptor.ToString() -> string!
+override AtomUI.City.PluginSystem.PluginDiagnostic.Equals(object? obj) -> bool
+override AtomUI.City.PluginSystem.PluginDiagnostic.GetHashCode() -> int
+override AtomUI.City.PluginSystem.PluginDiagnostic.ToString() -> string!
+override AtomUI.City.PluginSystem.PluginInstallation.Equals(object? obj) -> bool
+override AtomUI.City.PluginSystem.PluginInstallation.GetHashCode() -> int
+override AtomUI.City.PluginSystem.PluginInstallation.ToString() -> string!
+override AtomUI.City.PluginSystem.PluginModuleDescriptor.Equals(object? obj) -> bool
+override AtomUI.City.PluginSystem.PluginModuleDescriptor.GetHashCode() -> int
+override AtomUI.City.PluginSystem.PluginModuleDescriptor.ToString() -> string!
+static AtomUI.City.PluginSystem.PluginCapabilityDescriptor.operator !=(AtomUI.City.PluginSystem.PluginCapabilityDescriptor? left, AtomUI.City.PluginSystem.PluginCapabilityDescriptor? right) -> bool
+static AtomUI.City.PluginSystem.PluginCapabilityDescriptor.operator ==(AtomUI.City.PluginSystem.PluginCapabilityDescriptor? left, AtomUI.City.PluginSystem.PluginCapabilityDescriptor? right) -> bool
+static AtomUI.City.PluginSystem.PluginContributionDescriptor.operator !=(AtomUI.City.PluginSystem.PluginContributionDescriptor? left, AtomUI.City.PluginSystem.PluginContributionDescriptor? right) -> bool
+static AtomUI.City.PluginSystem.PluginContributionDescriptor.operator ==(AtomUI.City.PluginSystem.PluginContributionDescriptor? left, AtomUI.City.PluginSystem.PluginContributionDescriptor? right) -> bool
+static AtomUI.City.PluginSystem.PluginDependencyDescriptor.operator !=(AtomUI.City.PluginSystem.PluginDependencyDescriptor? left, AtomUI.City.PluginSystem.PluginDependencyDescriptor? right) -> bool
+static AtomUI.City.PluginSystem.PluginDependencyDescriptor.operator ==(AtomUI.City.PluginSystem.PluginDependencyDescriptor? left, AtomUI.City.PluginSystem.PluginDependencyDescriptor? right) -> bool
+static AtomUI.City.PluginSystem.PluginDependencyValidator.Validate(System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDescriptor!>! plugins) -> AtomUI.City.PluginSystem.PluginValidationResult!
+static AtomUI.City.PluginSystem.PluginDescriptor.FromManifest(AtomUI.City.PluginSystem.PluginManifest! manifest, string! rootPath) -> AtomUI.City.PluginSystem.PluginDescriptor!
+static AtomUI.City.PluginSystem.PluginDiagnostic.operator !=(AtomUI.City.PluginSystem.PluginDiagnostic? left, AtomUI.City.PluginSystem.PluginDiagnostic? right) -> bool
+static AtomUI.City.PluginSystem.PluginDiagnostic.operator ==(AtomUI.City.PluginSystem.PluginDiagnostic? left, AtomUI.City.PluginSystem.PluginDiagnostic? right) -> bool
+static AtomUI.City.PluginSystem.PluginDiagnosticIds.All.get -> System.Collections.Generic.IReadOnlyList<string!>!
+static AtomUI.City.PluginSystem.PluginDiscoveryScanner.DiscoverInstalled(string! pluginsRoot) -> AtomUI.City.PluginSystem.PluginDiscoveryResult!
+static AtomUI.City.PluginSystem.PluginInstallation.operator !=(AtomUI.City.PluginSystem.PluginInstallation? left, AtomUI.City.PluginSystem.PluginInstallation? right) -> bool
+static AtomUI.City.PluginSystem.PluginInstallation.operator ==(AtomUI.City.PluginSystem.PluginInstallation? left, AtomUI.City.PluginSystem.PluginInstallation? right) -> bool
+static AtomUI.City.PluginSystem.PluginInstallationReader.Read(string! installRecordPath) -> AtomUI.City.PluginSystem.PluginInstallation!
+static AtomUI.City.PluginSystem.PluginInstallResult.Failed(System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDiagnostic!>! diagnostics) -> AtomUI.City.PluginSystem.PluginInstallResult!
+static AtomUI.City.PluginSystem.PluginInstallResult.Success(AtomUI.City.PluginSystem.PluginInstallation! installation) -> AtomUI.City.PluginSystem.PluginInstallResult!
+static AtomUI.City.PluginSystem.PluginLoadResult.Failed(System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDiagnostic!>! diagnostics) -> AtomUI.City.PluginSystem.PluginLoadResult!
+static AtomUI.City.PluginSystem.PluginLoadResult.Success(AtomUI.City.PluginSystem.PluginRuntime! runtime) -> AtomUI.City.PluginSystem.PluginLoadResult!
+static AtomUI.City.PluginSystem.PluginManifestBuilder.Minimal(string! pluginId, string! packageId, string! version, string! mainAssembly = "Plugin.dll", System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginCapabilityDescriptor!>? capabilities = null, System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginContributionDescriptor!>? contributions = null, System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDependencyDescriptor!>? dependencies = null, System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginModuleDescriptor!>? modules = null) -> AtomUI.City.PluginSystem.PluginManifest!
+static AtomUI.City.PluginSystem.PluginManifestReader.Read(string! manifestPath) -> AtomUI.City.PluginSystem.PluginManifest!
+static AtomUI.City.PluginSystem.PluginManifestValidator.Validate(AtomUI.City.PluginSystem.PluginManifest! manifest) -> AtomUI.City.PluginSystem.PluginValidationResult!
+static AtomUI.City.PluginSystem.PluginModuleDescriptor.operator !=(AtomUI.City.PluginSystem.PluginModuleDescriptor? left, AtomUI.City.PluginSystem.PluginModuleDescriptor? right) -> bool
+static AtomUI.City.PluginSystem.PluginModuleDescriptor.operator ==(AtomUI.City.PluginSystem.PluginModuleDescriptor? left, AtomUI.City.PluginSystem.PluginModuleDescriptor? right) -> bool
+static AtomUI.City.PluginSystem.PluginMsBuildContract.GetManifestOutputPath(string! intermediateOutputPath) -> string!
+static AtomUI.City.PluginSystem.PluginMsBuildContract.Items.get -> System.Collections.Generic.IReadOnlyList<string!>!
+static AtomUI.City.PluginSystem.PluginMsBuildContract.PackageContentRoots.get -> System.Collections.Generic.IReadOnlyList<string!>!
+static AtomUI.City.PluginSystem.PluginMsBuildContract.Properties.get -> System.Collections.Generic.IReadOnlyList<string!>!
+static AtomUI.City.PluginSystem.PluginMsBuildContract.Targets.get -> System.Collections.Generic.IReadOnlyList<string!>!
+static AtomUI.City.PluginSystem.PluginPackageLayoutValidator.Validate(string! packageRoot) -> AtomUI.City.PluginSystem.PluginValidationResult!
+static AtomUI.City.PluginSystem.PluginPackagePaths.GetInstalledRootPath(string! pluginsRoot, string! pluginId, string! version) -> string!
+static AtomUI.City.PluginSystem.PluginPackagePaths.GetInstalledVersionPath(string! pluginsRoot, string! pluginId, string! version) -> string!
+static AtomUI.City.PluginSystem.PluginPackagePaths.GetInstallRecordPath(string! pluginsRoot, string! pluginId, string! version) -> string!
+static AtomUI.City.PluginSystem.PluginPackagePaths.GetMainAssemblyPath(string! rootPath, string! targetFramework, string! mainAssembly) -> string!
+static AtomUI.City.PluginSystem.PluginPackagePaths.GetManifestPath(string! rootPath) -> string!
+static AtomUI.City.PluginSystem.PluginUnloadResult.Pending(System.Collections.Generic.IReadOnlyList<AtomUI.City.PluginSystem.PluginDiagnostic!>! diagnostics) -> AtomUI.City.PluginSystem.PluginUnloadResult!
+static AtomUI.City.PluginSystem.PluginUnloadResult.Success.get -> AtomUI.City.PluginSystem.PluginUnloadResult!
+static AtomUI.City.PluginSystem.PluginValidationResult.Success.get -> AtomUI.City.PluginSystem.PluginValidationResult!

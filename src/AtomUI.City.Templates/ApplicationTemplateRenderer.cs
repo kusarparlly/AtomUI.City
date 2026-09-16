@@ -4,7 +4,7 @@ namespace AtomUI.City.Templates;
 
 public sealed class ApplicationTemplateRenderer
 {
-    private const string AtomUICityPackageVersion = "1.0.0";
+    private const string AtomUICityPackageVersion = "1.0.0-preview.1";
     private const string AvaloniaVersion = "12.0.4";
     private const string MicrosoftNetTestSdkVersion = "17.14.1";
     private const string XUnitVersion = "2.9.3";

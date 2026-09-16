@@ -2,6 +2,10 @@
 
 本文件是实现 public API 的行为合同。它不是源码目录索引；每个关键 API 必须说明用途、生命周期、失败行为、取消、并发和兼容性。
 
+## Stability 基线
+
+本模块当前全部 public 类型、模板变量、文件布局和生成内容 contract 均为 `Preview`。`PublicAPI.Unshipped.txt` 只冻结待审程序集签名，不表示 `Stable`；模板兼容面仍须同时接受 smoke test 和生成物 review。
+
 ## API Family 合同
 
 | API Family | 关键类型 | 职责 | 硬性行为 |

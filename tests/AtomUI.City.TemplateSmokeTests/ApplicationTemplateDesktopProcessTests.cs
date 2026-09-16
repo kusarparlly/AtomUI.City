@@ -40,7 +40,7 @@ public sealed class ApplicationTemplateDesktopProcessTests
             packageSource = Path.Combine(repositoryRoot.FullName, "output", "NuGet", configuration);
         }
 
-        var presentationPackage = Path.Combine(packageSource, "AtomUI.City.Presentation.1.0.0.nupkg");
+        var presentationPackage = Path.Combine(packageSource, "AtomUI.City.Presentation.1.0.0-preview.1.nupkg");
         Assert.True(File.Exists(presentationPackage), $"Expected Presentation package at {presentationPackage}.");
         var packageCacheKey = File.GetLastWriteTimeUtc(presentationPackage)
             .Ticks

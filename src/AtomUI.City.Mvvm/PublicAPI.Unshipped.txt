@@ -1,0 +1,219 @@
+#nullable enable
+AtomUI.City.Mvvm.ActivationContext
+AtomUI.City.Mvvm.ActivationContext.ActivationContext(AtomUI.City.Mvvm.IActivationScope! scope, string? source = null, System.Collections.Generic.IReadOnlyDictionary<string!, object?>? properties = null) -> void
+AtomUI.City.Mvvm.ActivationContext.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>!
+AtomUI.City.Mvvm.ActivationContext.Scope.get -> AtomUI.City.Mvvm.IActivationScope!
+AtomUI.City.Mvvm.ActivationContext.Source.get -> string?
+AtomUI.City.Mvvm.ActivationScope
+AtomUI.City.Mvvm.ActivationScope.ActivationScope(AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Mvvm.ActivationScope.Add(System.IDisposable! disposable) -> void
+AtomUI.City.Mvvm.ActivationScope.AddAsync(System.IAsyncDisposable! disposable) -> void
+AtomUI.City.Mvvm.ActivationScope.CancellationToken.get -> System.Threading.CancellationToken
+AtomUI.City.Mvvm.ActivationScope.Dispose() -> void
+AtomUI.City.Mvvm.ActivationScope.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Mvvm.ActivationScope.Id.get -> System.Guid
+AtomUI.City.Mvvm.ActivationScope.IsDisposed.get -> bool
+AtomUI.City.Mvvm.ActivationScopeAccessor
+AtomUI.City.Mvvm.ActivationScopeAccessor.ActivationScopeAccessor() -> void
+AtomUI.City.Mvvm.ActivationScopeAccessor.Current.get -> AtomUI.City.Mvvm.IActivationScope?
+AtomUI.City.Mvvm.ActivationScopeAccessor.Push(AtomUI.City.Mvvm.IActivationScope! scope) -> System.IDisposable!
+AtomUI.City.Mvvm.ActivationState
+AtomUI.City.Mvvm.ActivationState.Activating = 1 -> AtomUI.City.Mvvm.ActivationState
+AtomUI.City.Mvvm.ActivationState.Active = 2 -> AtomUI.City.Mvvm.ActivationState
+AtomUI.City.Mvvm.ActivationState.Constructed = 0 -> AtomUI.City.Mvvm.ActivationState
+AtomUI.City.Mvvm.ActivationState.Deactivated = 4 -> AtomUI.City.Mvvm.ActivationState
+AtomUI.City.Mvvm.ActivationState.Deactivating = 3 -> AtomUI.City.Mvvm.ActivationState
+AtomUI.City.Mvvm.ActivationState.Disposed = 5 -> AtomUI.City.Mvvm.ActivationState
+AtomUI.City.Mvvm.CommandExecutionState
+AtomUI.City.Mvvm.CommandExecutionState.CancellationToken.get -> System.Threading.CancellationToken
+AtomUI.City.Mvvm.CommandExecutionState.CommandExecutionState(string? commandName = null, System.Type? ownerType = null) -> void
+AtomUI.City.Mvvm.CommandExecutionState.CommandName.get -> string?
+AtomUI.City.Mvvm.CommandExecutionState.IsExecuting.get -> bool
+AtomUI.City.Mvvm.CommandExecutionState.LastError.get -> System.Exception?
+AtomUI.City.Mvvm.CommandExecutionState.LastRejectedResult.get -> AtomUI.City.Mvvm.OperationResult?
+AtomUI.City.Mvvm.CommandExecutionState.LastResult.get -> AtomUI.City.Mvvm.OperationResult?
+AtomUI.City.Mvvm.CommandExecutionState.OwnerType.get -> System.Type?
+AtomUI.City.Mvvm.CommandExecutionState.RejectedExecutionCount.get -> int
+AtomUI.City.Mvvm.CommandFactory
+AtomUI.City.Mvvm.CommandGroup
+AtomUI.City.Mvvm.CommandGroup.CanExecute(object? parameter) -> bool
+AtomUI.City.Mvvm.CommandGroup.CanExecuteChanged -> System.EventHandler?
+AtomUI.City.Mvvm.CommandGroup.CommandGroup() -> void
+AtomUI.City.Mvvm.CommandGroup.Execute(object? parameter) -> void
+AtomUI.City.Mvvm.CommandGroup.NotifyCanExecuteChanged() -> void
+AtomUI.City.Mvvm.CommandGroup.Register(System.Windows.Input.ICommand! command, System.Func<bool>? isActive = null, AtomUI.City.Mvvm.IActivationScope? activationScope = null) -> System.IDisposable!
+AtomUI.City.Mvvm.DeactivationGuard
+AtomUI.City.Mvvm.DeactivationResult
+AtomUI.City.Mvvm.DeactivationResult.<Clone>$() -> AtomUI.City.Mvvm.DeactivationResult!
+AtomUI.City.Mvvm.DeactivationResult.DeactivationResult(AtomUI.City.Mvvm.DeactivationStatus Status, string? Reason = null, System.Exception? Exception = null) -> void
+AtomUI.City.Mvvm.DeactivationResult.Deconstruct(out AtomUI.City.Mvvm.DeactivationStatus Status, out string? Reason, out System.Exception? Exception) -> void
+AtomUI.City.Mvvm.DeactivationResult.Equals(AtomUI.City.Mvvm.DeactivationResult? other) -> bool
+AtomUI.City.Mvvm.DeactivationResult.Exception.get -> System.Exception?
+AtomUI.City.Mvvm.DeactivationResult.Exception.init -> void
+AtomUI.City.Mvvm.DeactivationResult.Reason.get -> string?
+AtomUI.City.Mvvm.DeactivationResult.Reason.init -> void
+AtomUI.City.Mvvm.DeactivationResult.Status.get -> AtomUI.City.Mvvm.DeactivationStatus
+AtomUI.City.Mvvm.DeactivationResult.Status.init -> void
+AtomUI.City.Mvvm.DeactivationStatus
+AtomUI.City.Mvvm.DeactivationStatus.Allow = 0 -> AtomUI.City.Mvvm.DeactivationStatus
+AtomUI.City.Mvvm.DeactivationStatus.Cancel = 2 -> AtomUI.City.Mvvm.DeactivationStatus
+AtomUI.City.Mvvm.DeactivationStatus.Failed = 3 -> AtomUI.City.Mvvm.DeactivationStatus
+AtomUI.City.Mvvm.DeactivationStatus.Reject = 1 -> AtomUI.City.Mvvm.DeactivationStatus
+AtomUI.City.Mvvm.IActivatable
+AtomUI.City.Mvvm.IActivatable.ActivateAsync(AtomUI.City.Mvvm.IActivationScope! scope) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Mvvm.IActivatable.ActivateAsync(AtomUI.City.Mvvm.IActivationScope! scope, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Mvvm.IActivatable.DeactivateAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Mvvm.IActivatable.DeactivateAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Mvvm.IActivationScope
+AtomUI.City.Mvvm.IActivationScope.Add(System.IDisposable! disposable) -> void
+AtomUI.City.Mvvm.IActivationScope.AddAsync(System.IAsyncDisposable! disposable) -> void
+AtomUI.City.Mvvm.IActivationScope.CancellationToken.get -> System.Threading.CancellationToken
+AtomUI.City.Mvvm.IActivationScope.Id.get -> System.Guid
+AtomUI.City.Mvvm.ICanDeactivate
+AtomUI.City.Mvvm.ICanDeactivate.CanDeactivateAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Mvvm.DeactivationResult!>
+AtomUI.City.Mvvm.IConfirmDeactivate
+AtomUI.City.Mvvm.IConfirmDeactivate.ConfirmDeactivateAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Mvvm.DeactivationResult!>
+AtomUI.City.Mvvm.Interaction<TRequest, TResult>
+AtomUI.City.Mvvm.Interaction<TRequest, TResult>.Interaction(AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Mvvm.Interaction<TRequest, TResult>.RegisterHandler(System.Func<AtomUI.City.Mvvm.InteractionContext<TRequest>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<TResult>>! handler, AtomUI.City.Mvvm.IActivationScope? activationScope = null) -> System.IDisposable!
+AtomUI.City.Mvvm.Interaction<TRequest, TResult>.RequestAsync(TRequest request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Mvvm.InteractionResult<TResult>!>
+AtomUI.City.Mvvm.InteractionContext<TRequest>
+AtomUI.City.Mvvm.InteractionContext<TRequest>.ActivationScopeId.get -> System.Guid?
+AtomUI.City.Mvvm.InteractionContext<TRequest>.HandlerType.get -> System.Type?
+AtomUI.City.Mvvm.InteractionContext<TRequest>.InteractionContext(TRequest request) -> void
+AtomUI.City.Mvvm.InteractionContext<TRequest>.Request.get -> TRequest
+AtomUI.City.Mvvm.InteractionContext<TRequest>.RequestId.get -> System.Guid
+AtomUI.City.Mvvm.InteractionContext<TRequest>.RequestType.get -> System.Type!
+AtomUI.City.Mvvm.InteractionResult<TResult>
+AtomUI.City.Mvvm.InteractionResult<TResult>.Exception.get -> System.Exception?
+AtomUI.City.Mvvm.InteractionResult<TResult>.Status.get -> AtomUI.City.Mvvm.InteractionResultStatus
+AtomUI.City.Mvvm.InteractionResult<TResult>.Value.get -> TResult?
+AtomUI.City.Mvvm.InteractionResultStatus
+AtomUI.City.Mvvm.InteractionResultStatus.Canceled = 1 -> AtomUI.City.Mvvm.InteractionResultStatus
+AtomUI.City.Mvvm.InteractionResultStatus.Completed = 0 -> AtomUI.City.Mvvm.InteractionResultStatus
+AtomUI.City.Mvvm.InteractionResultStatus.Failed = 2 -> AtomUI.City.Mvvm.InteractionResultStatus
+AtomUI.City.Mvvm.InteractionResultStatus.NotHandled = 3 -> AtomUI.City.Mvvm.InteractionResultStatus
+AtomUI.City.Mvvm.MvvmDiagnosticIds
+AtomUI.City.Mvvm.OperationResult
+AtomUI.City.Mvvm.OperationResult.<Clone>$() -> AtomUI.City.Mvvm.OperationResult!
+AtomUI.City.Mvvm.OperationResult.Deconstruct(out System.Guid OperationId, out AtomUI.City.Mvvm.OperationStatus Status, out System.TimeSpan Elapsed, out System.Exception? Error) -> void
+AtomUI.City.Mvvm.OperationResult.Elapsed.get -> System.TimeSpan
+AtomUI.City.Mvvm.OperationResult.Elapsed.init -> void
+AtomUI.City.Mvvm.OperationResult.Equals(AtomUI.City.Mvvm.OperationResult? other) -> bool
+AtomUI.City.Mvvm.OperationResult.Error.get -> System.Exception?
+AtomUI.City.Mvvm.OperationResult.Error.init -> void
+AtomUI.City.Mvvm.OperationResult.OperationId.get -> System.Guid
+AtomUI.City.Mvvm.OperationResult.OperationId.init -> void
+AtomUI.City.Mvvm.OperationResult.OperationResult(System.Guid OperationId, AtomUI.City.Mvvm.OperationStatus Status, System.TimeSpan Elapsed, System.Exception? Error = null) -> void
+AtomUI.City.Mvvm.OperationResult.Status.get -> AtomUI.City.Mvvm.OperationStatus
+AtomUI.City.Mvvm.OperationResult.Status.init -> void
+AtomUI.City.Mvvm.OperationScope
+AtomUI.City.Mvvm.OperationScope.Cancel() -> AtomUI.City.Mvvm.OperationResult!
+AtomUI.City.Mvvm.OperationScope.CancellationToken.get -> System.Threading.CancellationToken
+AtomUI.City.Mvvm.OperationScope.Complete() -> AtomUI.City.Mvvm.OperationResult!
+AtomUI.City.Mvvm.OperationScope.Dispose() -> void
+AtomUI.City.Mvvm.OperationScope.Elapsed.get -> System.TimeSpan
+AtomUI.City.Mvvm.OperationScope.Error.get -> System.Exception?
+AtomUI.City.Mvvm.OperationScope.Fail(System.Exception! exception) -> AtomUI.City.Mvvm.OperationResult!
+AtomUI.City.Mvvm.OperationScope.Id.get -> System.Guid
+AtomUI.City.Mvvm.OperationScope.IsDisposed.get -> bool
+AtomUI.City.Mvvm.OperationScope.Reject() -> AtomUI.City.Mvvm.OperationResult!
+AtomUI.City.Mvvm.OperationScope.Result.get -> AtomUI.City.Mvvm.OperationResult?
+AtomUI.City.Mvvm.OperationScope.Status.get -> AtomUI.City.Mvvm.OperationStatus
+AtomUI.City.Mvvm.OperationStatus
+AtomUI.City.Mvvm.OperationStatus.Canceled = 2 -> AtomUI.City.Mvvm.OperationStatus
+AtomUI.City.Mvvm.OperationStatus.Completed = 0 -> AtomUI.City.Mvvm.OperationStatus
+AtomUI.City.Mvvm.OperationStatus.Failed = 1 -> AtomUI.City.Mvvm.OperationStatus
+AtomUI.City.Mvvm.OperationStatus.Rejected = 3 -> AtomUI.City.Mvvm.OperationStatus
+AtomUI.City.Mvvm.OperationStatus.Running = 4 -> AtomUI.City.Mvvm.OperationStatus
+AtomUI.City.Mvvm.ValidationChangedEventArgs
+AtomUI.City.Mvvm.ValidationChangedEventArgs.Errors.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Mvvm.ValidationChangedEventArgs.Key.get -> string!
+AtomUI.City.Mvvm.ValidationChangedEventArgs.Messages.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Mvvm.ValidationMessage!>!
+AtomUI.City.Mvvm.ValidationChangedEventArgs.OwnerScopeId.get -> System.Guid?
+AtomUI.City.Mvvm.ValidationChangedEventArgs.Status.get -> AtomUI.City.Mvvm.ValidationStatus
+AtomUI.City.Mvvm.ValidationChangedEventArgs.ValidationChangedEventArgs(string! key, AtomUI.City.Mvvm.ValidationStatus status, System.Collections.Generic.IReadOnlyList<string!>! errors, System.Collections.Generic.IReadOnlyList<AtomUI.City.Mvvm.ValidationMessage!>! messages, System.Guid? ownerScopeId) -> void
+AtomUI.City.Mvvm.ValidationMessage
+AtomUI.City.Mvvm.ValidationMessage.Key.get -> string!
+AtomUI.City.Mvvm.ValidationMessage.Message.get -> string!
+AtomUI.City.Mvvm.ValidationMessage.MessageArguments.get -> System.Collections.Generic.IReadOnlyList<object?>?
+AtomUI.City.Mvvm.ValidationMessage.MessageKey.get -> string?
+AtomUI.City.Mvvm.ValidationMessage.ValidationMessage(string! key, string! message, string? messageKey = null, System.Collections.Generic.IReadOnlyList<object?>? messageArguments = null) -> void
+AtomUI.City.Mvvm.ValidationScope
+AtomUI.City.Mvvm.ValidationScope.BindTo(AtomUI.City.Mvvm.IActivationScope! activationScope) -> void
+AtomUI.City.Mvvm.ValidationScope.Cancel() -> void
+AtomUI.City.Mvvm.ValidationScope.Dispose() -> void
+AtomUI.City.Mvvm.ValidationScope.Errors.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Collections.Generic.IReadOnlyList<string!>!>!
+AtomUI.City.Mvvm.ValidationScope.Exception.get -> System.Exception?
+AtomUI.City.Mvvm.ValidationScope.IsDisposed.get -> bool
+AtomUI.City.Mvvm.ValidationScope.Messages.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Collections.Generic.IReadOnlyList<AtomUI.City.Mvvm.ValidationMessage!>!>!
+AtomUI.City.Mvvm.ValidationScope.SetFailed(System.Exception! exception) -> void
+AtomUI.City.Mvvm.ValidationScope.SetInvalid(string! key, string! message, string? messageKey = null, System.Collections.Generic.IReadOnlyList<object?>? messageArguments = null) -> void
+AtomUI.City.Mvvm.ValidationScope.SetMessages(string? key, System.Collections.Generic.IEnumerable<AtomUI.City.Mvvm.ValidationMessage?>! messages) -> void
+AtomUI.City.Mvvm.ValidationScope.SetPending() -> void
+AtomUI.City.Mvvm.ValidationScope.Status.get -> AtomUI.City.Mvvm.ValidationStatus
+AtomUI.City.Mvvm.ValidationScope.ValidationChanged -> System.EventHandler<AtomUI.City.Mvvm.ValidationChangedEventArgs!>?
+AtomUI.City.Mvvm.ValidationScope.ValidationScope(AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Mvvm.ValidationStatus
+AtomUI.City.Mvvm.ValidationStatus.Canceled = 3 -> AtomUI.City.Mvvm.ValidationStatus
+AtomUI.City.Mvvm.ValidationStatus.Failed = 4 -> AtomUI.City.Mvvm.ValidationStatus
+AtomUI.City.Mvvm.ValidationStatus.Invalid = 1 -> AtomUI.City.Mvvm.ValidationStatus
+AtomUI.City.Mvvm.ValidationStatus.Pending = 2 -> AtomUI.City.Mvvm.ValidationStatus
+AtomUI.City.Mvvm.ValidationStatus.Valid = 0 -> AtomUI.City.Mvvm.ValidationStatus
+AtomUI.City.Mvvm.ViewModelBase
+AtomUI.City.Mvvm.ViewModelBase.ActivateAsync(AtomUI.City.Mvvm.ActivationContext! context) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Mvvm.ViewModelBase.ActivateAsync(AtomUI.City.Mvvm.ActivationContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Mvvm.ViewModelBase.ActivateAsync(AtomUI.City.Mvvm.IActivationScope! scope) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Mvvm.ViewModelBase.ActivateAsync(AtomUI.City.Mvvm.IActivationScope! scope, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Mvvm.ViewModelBase.ActivationContext.get -> AtomUI.City.Mvvm.ActivationContext?
+AtomUI.City.Mvvm.ViewModelBase.ActivationState.get -> AtomUI.City.Mvvm.ActivationState
+AtomUI.City.Mvvm.ViewModelBase.CurrentActivationScope.get -> AtomUI.City.Mvvm.IActivationScope?
+AtomUI.City.Mvvm.ViewModelBase.DeactivateAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Mvvm.ViewModelBase.DeactivateAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Mvvm.ViewModelBase.Dispose() -> void
+AtomUI.City.Mvvm.ViewModelBase.IsActive.get -> bool
+AtomUI.City.Mvvm.ViewModelBase.IsDisposed.get -> bool
+AtomUI.City.Mvvm.ViewModelBase.SetProperty<T>(ref T field, T newValue, bool validate, string? propertyName = null) -> bool
+AtomUI.City.Mvvm.ViewModelBase.SetProperty<T>(ref T field, T newValue, string? propertyName = null) -> bool
+AtomUI.City.Mvvm.ViewModelBase.SetProperty<T>(ref T field, T newValue, System.Collections.Generic.IEqualityComparer<T>! comparer, bool validate, string? propertyName = null) -> bool
+AtomUI.City.Mvvm.ViewModelBase.SetProperty<T>(ref T field, T newValue, System.Collections.Generic.IEqualityComparer<T>! comparer, string? propertyName = null) -> bool
+AtomUI.City.Mvvm.ViewModelBase.ThrowIfDisposed() -> void
+AtomUI.City.Mvvm.ViewModelBase.ViewModelBase(AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+const AtomUI.City.Mvvm.DeactivationGuard.CanceledReason = "deactivation-cancelled" -> string!
+const AtomUI.City.Mvvm.DeactivationGuard.FailedReason = "deactivation-failed" -> string!
+const AtomUI.City.Mvvm.MvvmDiagnosticIds.ActivationFailed = "AUCMVVM001" -> string!
+const AtomUI.City.Mvvm.MvvmDiagnosticIds.ActivationScopeDisposeFailed = "AUCMVVM007" -> string!
+const AtomUI.City.Mvvm.MvvmDiagnosticIds.CommandFailed = "AUCMVVM003" -> string!
+const AtomUI.City.Mvvm.MvvmDiagnosticIds.CommandRejected = "AUCMVVM004" -> string!
+const AtomUI.City.Mvvm.MvvmDiagnosticIds.DeactivationFailed = "AUCMVVM002" -> string!
+const AtomUI.City.Mvvm.MvvmDiagnosticIds.InteractionFailed = "AUCMVVM006" -> string!
+const AtomUI.City.Mvvm.MvvmDiagnosticIds.InteractionNotHandled = "AUCMVVM005" -> string!
+const AtomUI.City.Mvvm.MvvmDiagnosticIds.ValidationFailed = "AUCMVVM008" -> string!
+override AtomUI.City.Mvvm.DeactivationResult.Equals(object? obj) -> bool
+override AtomUI.City.Mvvm.DeactivationResult.GetHashCode() -> int
+override AtomUI.City.Mvvm.DeactivationResult.ToString() -> string!
+override AtomUI.City.Mvvm.OperationResult.Equals(object? obj) -> bool
+override AtomUI.City.Mvvm.OperationResult.GetHashCode() -> int
+override AtomUI.City.Mvvm.OperationResult.ToString() -> string!
+static AtomUI.City.Mvvm.CommandFactory.Create(System.Action! execute, System.Func<bool>? canExecute = null, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> CommunityToolkit.Mvvm.Input.IRelayCommand!
+static AtomUI.City.Mvvm.CommandFactory.CreateAsync(System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! execute, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Mvvm.IActivationScope? activationScope = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> CommunityToolkit.Mvvm.Input.IAsyncRelayCommand!
+static AtomUI.City.Mvvm.DeactivationGuard.CanDeactivateAsync(object! viewModel, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Mvvm.DeactivationResult!>
+static AtomUI.City.Mvvm.DeactivationResult.Allow() -> AtomUI.City.Mvvm.DeactivationResult!
+static AtomUI.City.Mvvm.DeactivationResult.Cancel(string? reason = null) -> AtomUI.City.Mvvm.DeactivationResult!
+static AtomUI.City.Mvvm.DeactivationResult.Failed(string? reason = null, System.Exception? exception = null) -> AtomUI.City.Mvvm.DeactivationResult!
+static AtomUI.City.Mvvm.DeactivationResult.operator !=(AtomUI.City.Mvvm.DeactivationResult? left, AtomUI.City.Mvvm.DeactivationResult? right) -> bool
+static AtomUI.City.Mvvm.DeactivationResult.operator ==(AtomUI.City.Mvvm.DeactivationResult? left, AtomUI.City.Mvvm.DeactivationResult? right) -> bool
+static AtomUI.City.Mvvm.DeactivationResult.Reject(string? reason = null) -> AtomUI.City.Mvvm.DeactivationResult!
+static AtomUI.City.Mvvm.InteractionResult<TResult>.Canceled() -> AtomUI.City.Mvvm.InteractionResult<TResult>!
+static AtomUI.City.Mvvm.InteractionResult<TResult>.Completed(TResult value) -> AtomUI.City.Mvvm.InteractionResult<TResult>!
+static AtomUI.City.Mvvm.InteractionResult<TResult>.Failed(System.Exception! exception) -> AtomUI.City.Mvvm.InteractionResult<TResult>!
+static AtomUI.City.Mvvm.InteractionResult<TResult>.NotHandled() -> AtomUI.City.Mvvm.InteractionResult<TResult>!
+static AtomUI.City.Mvvm.OperationResult.operator !=(AtomUI.City.Mvvm.OperationResult? left, AtomUI.City.Mvvm.OperationResult? right) -> bool
+static AtomUI.City.Mvvm.OperationResult.operator ==(AtomUI.City.Mvvm.OperationResult? left, AtomUI.City.Mvvm.OperationResult? right) -> bool
+static AtomUI.City.Mvvm.OperationScope.Start(System.Threading.CancellationToken cancellationToken) -> AtomUI.City.Mvvm.OperationScope!
+virtual AtomUI.City.Mvvm.ViewModelBase.OnActivatedAsync(AtomUI.City.Mvvm.ActivationContext! context) -> System.Threading.Tasks.ValueTask
+virtual AtomUI.City.Mvvm.ViewModelBase.OnActivatedAsync(AtomUI.City.Mvvm.ActivationContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+virtual AtomUI.City.Mvvm.ViewModelBase.OnActivatedAsync(AtomUI.City.Mvvm.IActivationScope! scope) -> System.Threading.Tasks.ValueTask
+virtual AtomUI.City.Mvvm.ViewModelBase.OnDeactivatedAsync() -> System.Threading.Tasks.ValueTask
+virtual AtomUI.City.Mvvm.ViewModelBase.OnDeactivatedAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+virtual AtomUI.City.Mvvm.ViewModelBase.OnDisposed() -> void

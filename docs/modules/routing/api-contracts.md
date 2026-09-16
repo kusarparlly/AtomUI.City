@@ -1,5 +1,9 @@
 # AtomUI.City.Routing API Contracts
 
+## Stability 基线
+
+本模块当前全部 public 类型和成员均为 `Preview`。`PublicAPI.Unshipped.txt` 只冻结待审签名，不表示 `Stable`；每个类型升为稳定状态时必须在对应 API Card 中明确记录并完成兼容性 review。
+
 ## API Family
 
 | Family | Public contracts | 1.0 behavior |

@@ -1,0 +1,458 @@
+#nullable enable
+AtomUI.City.Generators.Analyzers.BuildServiceProviderUsageAnalyzer
+AtomUI.City.Generators.Analyzers.BuildServiceProviderUsageAnalyzer.BuildServiceProviderUsageAnalyzer() -> void
+AtomUI.City.Generators.AtomUICityIncrementalGenerator
+AtomUI.City.Generators.AtomUICityIncrementalGenerator.AtomUICityIncrementalGenerator() -> void
+AtomUI.City.Generators.AtomUICityIncrementalGenerator.Initialize(Microsoft.CodeAnalysis.IncrementalGeneratorInitializationContext context) -> void
+AtomUI.City.Generators.Common.GeneratedCodeNames
+AtomUI.City.Generators.Common.GeneratedTypeName
+AtomUI.City.Generators.Common.GeneratedTypeName.FullName.get -> string!
+AtomUI.City.Generators.Common.GeneratedTypeName.GeneratedTypeName(string! namespace, string! name) -> void
+AtomUI.City.Generators.Common.GeneratedTypeName.Name.get -> string!
+AtomUI.City.Generators.Common.GeneratedTypeName.Namespace.get -> string!
+AtomUI.City.Generators.Common.GeneratorFeature
+AtomUI.City.Generators.Common.GeneratorFeature.Data = 8 -> AtomUI.City.Generators.Common.GeneratorFeature
+AtomUI.City.Generators.Common.GeneratorFeature.DependencyInjection = 0 -> AtomUI.City.Generators.Common.GeneratorFeature
+AtomUI.City.Generators.Common.GeneratorFeature.EventBus = 5 -> AtomUI.City.Generators.Common.GeneratorFeature
+AtomUI.City.Generators.Common.GeneratorFeature.Localization = 6 -> AtomUI.City.Generators.Common.GeneratorFeature
+AtomUI.City.Generators.Common.GeneratorFeature.Modularity = 1 -> AtomUI.City.Generators.Common.GeneratorFeature
+AtomUI.City.Generators.Common.GeneratorFeature.PluginSystem = 7 -> AtomUI.City.Generators.Common.GeneratorFeature
+AtomUI.City.Generators.Common.GeneratorFeature.Presentation = 3 -> AtomUI.City.Generators.Common.GeneratorFeature
+AtomUI.City.Generators.Common.GeneratorFeature.Routing = 2 -> AtomUI.City.Generators.Common.GeneratorFeature
+AtomUI.City.Generators.Common.GeneratorFeature.Security = 4 -> AtomUI.City.Generators.Common.GeneratorFeature
+AtomUI.City.Generators.Common.GeneratorFeatureNames
+AtomUI.City.Generators.Data.DataClientGenerationMetadata
+AtomUI.City.Generators.Data.DataClientGenerationMetadata.ClientId.get -> string!
+AtomUI.City.Generators.Data.DataClientGenerationMetadata.DataClientGenerationMetadata(string! typeName, string! clientId, int transportKind, string! version, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Data.DataOperationGenerationMetadata!>! operations, System.Collections.Generic.IReadOnlyList<string!>! issues, Microsoft.CodeAnalysis.Location? location) -> void
+AtomUI.City.Generators.Data.DataClientGenerationMetadata.Issues.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Data.DataClientGenerationMetadata.Location.get -> Microsoft.CodeAnalysis.Location?
+AtomUI.City.Generators.Data.DataClientGenerationMetadata.Operations.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Data.DataOperationGenerationMetadata!>!
+AtomUI.City.Generators.Data.DataClientGenerationMetadata.TransportKind.get -> int
+AtomUI.City.Generators.Data.DataClientGenerationMetadata.TypeName.get -> string!
+AtomUI.City.Generators.Data.DataClientGenerationMetadata.Version.get -> string!
+AtomUI.City.Generators.Data.DataClientMetadataReader
+AtomUI.City.Generators.Data.DataClientRegistrarSourceBuilder
+AtomUI.City.Generators.Data.DataOperationGenerationMetadata
+AtomUI.City.Generators.Data.DataOperationGenerationMetadata.AccessMode.get -> int
+AtomUI.City.Generators.Data.DataOperationGenerationMetadata.AuthenticationPolicy.get -> string!
+AtomUI.City.Generators.Data.DataOperationGenerationMetadata.CacheEnabled.get -> bool
+AtomUI.City.Generators.Data.DataOperationGenerationMetadata.ConcurrencyPolicy.get -> int
+AtomUI.City.Generators.Data.DataOperationGenerationMetadata.DataOperationGenerationMetadata(string! operationName, string! requestTypeName, string! responseTypeName, int accessMode, int concurrencyPolicy, int timeoutMilliseconds, int maxRetryAttempts, bool cacheEnabled, string! authenticationPolicy) -> void
+AtomUI.City.Generators.Data.DataOperationGenerationMetadata.MaxRetryAttempts.get -> int
+AtomUI.City.Generators.Data.DataOperationGenerationMetadata.OperationName.get -> string!
+AtomUI.City.Generators.Data.DataOperationGenerationMetadata.RequestTypeName.get -> string!
+AtomUI.City.Generators.Data.DataOperationGenerationMetadata.ResponseTypeName.get -> string!
+AtomUI.City.Generators.Data.DataOperationGenerationMetadata.TimeoutMilliseconds.get -> int
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrarSourceBuilder
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationLifetime
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationLifetime.Scoped = 1 -> AtomUI.City.Generators.DependencyInjection.ServiceRegistrationLifetime
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationLifetime.Singleton = 0 -> AtomUI.City.Generators.DependencyInjection.ServiceRegistrationLifetime
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationLifetime.Transient = 2 -> AtomUI.City.Generators.DependencyInjection.ServiceRegistrationLifetime
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationManifest
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationManifest.Registrations.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata!>!
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationManifest.ServiceRegistrationManifest(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata!>! registrations) -> void
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationManifestBuilder
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationManifestResult
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationManifestResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>!
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationManifestResult.Manifest.get -> AtomUI.City.Generators.DependencyInjection.ServiceRegistrationManifest!
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationManifestResult.ServiceRegistrationManifestResult(AtomUI.City.Generators.DependencyInjection.ServiceRegistrationManifest! manifest, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>! diagnostics) -> void
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata.ExposedServiceTypeNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata.ImplementationTypeName.get -> string!
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata.IsDisposable.get -> bool
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata.Key.get -> string?
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata.Lifetime.get -> AtomUI.City.Generators.DependencyInjection.ServiceRegistrationLifetime
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata.Replace.get -> bool
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata.ServiceRegistrationMetadata(string! implementationTypeName, AtomUI.City.Generators.DependencyInjection.ServiceRegistrationLifetime lifetime, System.Collections.Generic.IReadOnlyList<string!>! exposedServiceTypeNames, bool replace, bool tryAdd, string? key, bool isDisposable = false) -> void
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata.TryAdd.get -> bool
+AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadataReader
+AtomUI.City.Generators.Diagnostics.AnalyzerDiagnosticIds
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic.Definition.get -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition!
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic.GeneratorDiagnostic(AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition! definition, string? message = null, string? target = null) -> void
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic.Id.get -> string!
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic.Message.get -> string!
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic.Severity.get -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticSeverity
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic.Target.get -> string?
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic.Title.get -> string!
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition.GeneratorDiagnosticDefinition(string! id, string! title, string! message, AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticSeverity severity) -> void
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition.Id.get -> string!
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition.Message.get -> string!
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition.Severity.get -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticSeverity
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition.Title.get -> string!
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticIds
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnostics
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticSeverity
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticSeverity.Error = 2 -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticSeverity
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticSeverity.Info = 0 -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticSeverity
+AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticSeverity.Warning = 1 -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticSeverity
+AtomUI.City.Generators.EventBus.EventGenerationManifest
+AtomUI.City.Generators.EventBus.EventGenerationManifest.Contracts.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.EventBus.GeneratedEventContractMetadata!>!
+AtomUI.City.Generators.EventBus.EventGenerationManifest.EventGenerationManifest(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.EventBus.GeneratedEventContractMetadata!>! contracts, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata!>! handlers) -> void
+AtomUI.City.Generators.EventBus.EventGenerationManifest.Handlers.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata!>!
+AtomUI.City.Generators.EventBus.EventGenerationManifest.IsEmpty.get -> bool
+AtomUI.City.Generators.EventBus.GeneratedEventChannelMetadata
+AtomUI.City.Generators.EventBus.GeneratedEventChannelMetadata.BackpressurePolicy.get -> int
+AtomUI.City.Generators.EventBus.GeneratedEventChannelMetadata.Capacity.get -> int
+AtomUI.City.Generators.EventBus.GeneratedEventChannelMetadata.ExecutionMode.get -> int
+AtomUI.City.Generators.EventBus.GeneratedEventChannelMetadata.GeneratedEventChannelMetadata(string! name, int capacity, int backpressurePolicy, int executionMode, int maximumConcurrency, int queueWaitTimeoutMilliseconds) -> void
+AtomUI.City.Generators.EventBus.GeneratedEventChannelMetadata.MaximumConcurrency.get -> int
+AtomUI.City.Generators.EventBus.GeneratedEventChannelMetadata.Name.get -> string!
+AtomUI.City.Generators.EventBus.GeneratedEventChannelMetadata.QueueWaitTimeoutMilliseconds.get -> int
+AtomUI.City.Generators.EventBus.GeneratedEventContractMetadata
+AtomUI.City.Generators.EventBus.GeneratedEventContractMetadata.Channels.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.EventBus.GeneratedEventChannelMetadata!>!
+AtomUI.City.Generators.EventBus.GeneratedEventContractMetadata.ContractId.get -> string!
+AtomUI.City.Generators.EventBus.GeneratedEventContractMetadata.EventTypeName.get -> string!
+AtomUI.City.Generators.EventBus.GeneratedEventContractMetadata.EventTypeSymbol.get -> Microsoft.CodeAnalysis.ITypeSymbol!
+AtomUI.City.Generators.EventBus.GeneratedEventContractMetadata.GeneratedEventContractMetadata(Microsoft.CodeAnalysis.ITypeSymbol! eventTypeSymbol, string! ownerTypeName, string! eventTypeName, string! contractId, int schemaVersion, string! schemaFingerprint, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.EventBus.GeneratedEventChannelMetadata!>! channels) -> void
+AtomUI.City.Generators.EventBus.GeneratedEventContractMetadata.OwnerTypeName.get -> string!
+AtomUI.City.Generators.EventBus.GeneratedEventContractMetadata.SchemaFingerprint.get -> string!
+AtomUI.City.Generators.EventBus.GeneratedEventContractMetadata.SchemaVersion.get -> int
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata.ChannelName.get -> string!
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata.ConstructorParameterTypeNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata.DisableAfterFailures.get -> int
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata.DispatchMode.get -> int
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata.DispatchPolicy.get -> int
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata.ErrorPolicy.get -> int
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata.EventTypeName.get -> string!
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata.EventTypeSymbol.get -> Microsoft.CodeAnalysis.ITypeSymbol!
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata.GeneratedEventHandlerMetadata(Microsoft.CodeAnalysis.ITypeSymbol! eventTypeSymbol, string! ownerTypeName, string! eventTypeName, string! handlerTypeName, string! channelName, int dispatchPolicy, int dispatchMode, int errorPolicy, int handlerTimeoutMilliseconds, int disableAfterFailures, System.Collections.Generic.IReadOnlyList<string!>! constructorParameterTypeNames) -> void
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata.HandlerTimeoutMilliseconds.get -> int
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata.HandlerTypeName.get -> string!
+AtomUI.City.Generators.EventBus.GeneratedEventHandlerMetadata.OwnerTypeName.get -> string!
+AtomUI.City.Generators.Localization.CultureFallbackManifestEntry
+AtomUI.City.Generators.Localization.CultureFallbackManifestEntry.Culture.get -> string!
+AtomUI.City.Generators.Localization.CultureFallbackManifestEntry.CultureFallbackManifestEntry(string! culture, string! fallbackCulture) -> void
+AtomUI.City.Generators.Localization.CultureFallbackManifestEntry.FallbackCulture.get -> string!
+AtomUI.City.Generators.Localization.LanguagePackageManifestEntry
+AtomUI.City.Generators.Localization.LanguagePackageManifestEntry.Checksum.get -> string?
+AtomUI.City.Generators.Localization.LanguagePackageManifestEntry.ContributionId.get -> string?
+AtomUI.City.Generators.Localization.LanguagePackageManifestEntry.Culture.get -> string!
+AtomUI.City.Generators.Localization.LanguagePackageManifestEntry.FallbackCulture.get -> string?
+AtomUI.City.Generators.Localization.LanguagePackageManifestEntry.LanguagePackageManifestEntry(string! packageId, string! culture, AtomUI.City.Generators.Localization.ResourceScopeMetadata scope, string? resourceBaseName, string? fallbackCulture, string? version, string? checksum, string? scopeId = null, string? contributionId = null) -> void
+AtomUI.City.Generators.Localization.LanguagePackageManifestEntry.PackageId.get -> string!
+AtomUI.City.Generators.Localization.LanguagePackageManifestEntry.ResourceBaseName.get -> string?
+AtomUI.City.Generators.Localization.LanguagePackageManifestEntry.Scope.get -> AtomUI.City.Generators.Localization.ResourceScopeMetadata
+AtomUI.City.Generators.Localization.LanguagePackageManifestEntry.ScopeId.get -> string?
+AtomUI.City.Generators.Localization.LanguagePackageManifestEntry.Version.get -> string?
+AtomUI.City.Generators.Localization.LanguagePackageMetadata
+AtomUI.City.Generators.Localization.LanguagePackageMetadata.Checksum.get -> string?
+AtomUI.City.Generators.Localization.LanguagePackageMetadata.ContributionId.get -> string?
+AtomUI.City.Generators.Localization.LanguagePackageMetadata.Culture.get -> string!
+AtomUI.City.Generators.Localization.LanguagePackageMetadata.FallbackCulture.get -> string?
+AtomUI.City.Generators.Localization.LanguagePackageMetadata.LanguagePackageMetadata(string! packageId, string! culture, AtomUI.City.Generators.Localization.ResourceScopeMetadata scope, string? resourceBaseName, string? fallbackCulture, string? version, string? checksum, string? scopeId = null, string? contributionId = null) -> void
+AtomUI.City.Generators.Localization.LanguagePackageMetadata.PackageId.get -> string!
+AtomUI.City.Generators.Localization.LanguagePackageMetadata.ResourceBaseName.get -> string?
+AtomUI.City.Generators.Localization.LanguagePackageMetadata.Scope.get -> AtomUI.City.Generators.Localization.ResourceScopeMetadata
+AtomUI.City.Generators.Localization.LanguagePackageMetadata.ScopeId.get -> string?
+AtomUI.City.Generators.Localization.LanguagePackageMetadata.Version.get -> string?
+AtomUI.City.Generators.Localization.LocalizationManifest
+AtomUI.City.Generators.Localization.LocalizationManifest.Fallbacks.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Localization.CultureFallbackManifestEntry!>!
+AtomUI.City.Generators.Localization.LocalizationManifest.LocalizationManifest(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Localization.LanguagePackageManifestEntry!>! packages, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Localization.LocalizedResourceManifestEntry!>! resources, System.Collections.Generic.IReadOnlyList<string!>! supportedCultures, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Localization.CultureFallbackManifestEntry!>! fallbacks) -> void
+AtomUI.City.Generators.Localization.LocalizationManifest.Packages.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Localization.LanguagePackageManifestEntry!>!
+AtomUI.City.Generators.Localization.LocalizationManifest.Resources.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Localization.LocalizedResourceManifestEntry!>!
+AtomUI.City.Generators.Localization.LocalizationManifest.SupportedCultures.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Localization.LocalizationManifestBuilder
+AtomUI.City.Generators.Localization.LocalizationManifestResult
+AtomUI.City.Generators.Localization.LocalizationManifestResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>!
+AtomUI.City.Generators.Localization.LocalizationManifestResult.LocalizationManifestResult(AtomUI.City.Generators.Localization.LocalizationManifest! manifest, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>! diagnostics) -> void
+AtomUI.City.Generators.Localization.LocalizationManifestResult.Manifest.get -> AtomUI.City.Generators.Localization.LocalizationManifest!
+AtomUI.City.Generators.Localization.LocalizationMetadata
+AtomUI.City.Generators.Localization.LocalizationMetadata.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>!
+AtomUI.City.Generators.Localization.LocalizationMetadata.LocalizationMetadata(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Localization.LanguagePackageMetadata!>! packages, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Localization.LocalizedResourceMetadata!>! resources, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>? diagnostics = null) -> void
+AtomUI.City.Generators.Localization.LocalizationMetadata.Packages.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Localization.LanguagePackageMetadata!>!
+AtomUI.City.Generators.Localization.LocalizationMetadata.Resources.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Localization.LocalizedResourceMetadata!>!
+AtomUI.City.Generators.Localization.LocalizationMetadataReader
+AtomUI.City.Generators.Localization.LocalizationRegistrarSourceBuilder
+AtomUI.City.Generators.Localization.LocalizedResourceManifestEntry
+AtomUI.City.Generators.Localization.LocalizedResourceManifestEntry.Critical.get -> bool
+AtomUI.City.Generators.Localization.LocalizedResourceManifestEntry.Culture.get -> string!
+AtomUI.City.Generators.Localization.LocalizedResourceManifestEntry.Key.get -> string!
+AtomUI.City.Generators.Localization.LocalizedResourceManifestEntry.Kind.get -> AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.LocalizedResourceManifestEntry.LocalizedResourceManifestEntry(string! key, string! packageId, string! culture, AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind kind, AtomUI.City.Generators.Localization.ResourceScopeMetadata scope, string? version, bool critical, string? scopeId = null) -> void
+AtomUI.City.Generators.Localization.LocalizedResourceManifestEntry.PackageId.get -> string!
+AtomUI.City.Generators.Localization.LocalizedResourceManifestEntry.Scope.get -> AtomUI.City.Generators.Localization.ResourceScopeMetadata
+AtomUI.City.Generators.Localization.LocalizedResourceManifestEntry.ScopeId.get -> string?
+AtomUI.City.Generators.Localization.LocalizedResourceManifestEntry.Version.get -> string?
+AtomUI.City.Generators.Localization.LocalizedResourceMetadata
+AtomUI.City.Generators.Localization.LocalizedResourceMetadata.Critical.get -> bool
+AtomUI.City.Generators.Localization.LocalizedResourceMetadata.Culture.get -> string?
+AtomUI.City.Generators.Localization.LocalizedResourceMetadata.Key.get -> string!
+AtomUI.City.Generators.Localization.LocalizedResourceMetadata.Kind.get -> AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.LocalizedResourceMetadata.LocalizedResourceMetadata(string! key, string! packageId, AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind kind, AtomUI.City.Generators.Localization.ResourceScopeMetadata scope, string? version, bool critical, string? scopeId = null, string? culture = null) -> void
+AtomUI.City.Generators.Localization.LocalizedResourceMetadata.PackageId.get -> string!
+AtomUI.City.Generators.Localization.LocalizedResourceMetadata.Scope.get -> AtomUI.City.Generators.Localization.ResourceScopeMetadata
+AtomUI.City.Generators.Localization.LocalizedResourceMetadata.ScopeId.get -> string?
+AtomUI.City.Generators.Localization.LocalizedResourceMetadata.Version.get -> string?
+AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind.CommandText = 8 -> AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind.CultureMetadata = 5 -> AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind.ErrorMessage = 7 -> AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind.FlowDirection = 4 -> AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind.FormattedString = 1 -> AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind.Pluralization = 2 -> AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind.ResourceObject = 3 -> AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind.RouteTitle = 9 -> AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind.String = 0 -> AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind.ValidationMessage = 6 -> AtomUI.City.Generators.Localization.LocalizedResourceMetadataKind
+AtomUI.City.Generators.Localization.ResourceScopeMetadata
+AtomUI.City.Generators.Localization.ResourceScopeMetadata.Host = 0 -> AtomUI.City.Generators.Localization.ResourceScopeMetadata
+AtomUI.City.Generators.Localization.ResourceScopeMetadata.Module = 1 -> AtomUI.City.Generators.Localization.ResourceScopeMetadata
+AtomUI.City.Generators.Localization.ResourceScopeMetadata.Plugin = 2 -> AtomUI.City.Generators.Localization.ResourceScopeMetadata
+AtomUI.City.Generators.Localization.ResourceScopeMetadata.Presentation = 5 -> AtomUI.City.Generators.Localization.ResourceScopeMetadata
+AtomUI.City.Generators.Localization.ResourceScopeMetadata.Route = 3 -> AtomUI.City.Generators.Localization.ResourceScopeMetadata
+AtomUI.City.Generators.Localization.ResourceScopeMetadata.Window = 4 -> AtomUI.City.Generators.Localization.ResourceScopeMetadata
+AtomUI.City.Generators.Modularity.ModuleDependencyGraphBuilder
+AtomUI.City.Generators.Modularity.ModuleDependencyGraphResult
+AtomUI.City.Generators.Modularity.ModuleDependencyGraphResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>!
+AtomUI.City.Generators.Modularity.ModuleDependencyGraphResult.ModuleDependencyGraphResult(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Modularity.ModuleMetadata!>! orderedModules, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>! diagnostics) -> void
+AtomUI.City.Generators.Modularity.ModuleDependencyGraphResult.OrderedModules.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Modularity.ModuleMetadata!>!
+AtomUI.City.Generators.Modularity.ModuleDependencyMetadata
+AtomUI.City.Generators.Modularity.ModuleDependencyMetadata.ModuleDependencyMetadata(string! typeName, bool optional) -> void
+AtomUI.City.Generators.Modularity.ModuleDependencyMetadata.Optional.get -> bool
+AtomUI.City.Generators.Modularity.ModuleDependencyMetadata.TypeName.get -> string!
+AtomUI.City.Generators.Modularity.ModuleMetadata
+AtomUI.City.Generators.Modularity.ModuleMetadata.Dependencies.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Modularity.ModuleDependencyMetadata!>!
+AtomUI.City.Generators.Modularity.ModuleMetadata.Description.get -> string?
+AtomUI.City.Generators.Modularity.ModuleMetadata.IsApplicationRoot.get -> bool
+AtomUI.City.Generators.Modularity.ModuleMetadata.ModuleMetadata(string! name, string! typeName, string? version, string? description, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Modularity.ModuleDependencyMetadata!>! dependencies, bool isApplicationRoot = false) -> void
+AtomUI.City.Generators.Modularity.ModuleMetadata.Name.get -> string!
+AtomUI.City.Generators.Modularity.ModuleMetadata.TypeName.get -> string!
+AtomUI.City.Generators.Modularity.ModuleMetadata.Version.get -> string?
+AtomUI.City.Generators.Modularity.ModuleMetadataReader
+AtomUI.City.Generators.Modularity.ModuleRegistrarSourceBuilder
+AtomUI.City.Generators.PluginSystem.PluginCapabilityManifestEntry
+AtomUI.City.Generators.PluginSystem.PluginCapabilityManifestEntry.Name.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginCapabilityManifestEntry.PluginCapabilityManifestEntry(string! name, System.Collections.Generic.IReadOnlyList<string!>! scope) -> void
+AtomUI.City.Generators.PluginSystem.PluginCapabilityManifestEntry.Scope.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.PluginSystem.PluginCapabilityMetadata
+AtomUI.City.Generators.PluginSystem.PluginCapabilityMetadata.Name.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginCapabilityMetadata.PluginCapabilityMetadata(string! name, System.Collections.Generic.IReadOnlyList<string!>! scope) -> void
+AtomUI.City.Generators.PluginSystem.PluginCapabilityMetadata.Scope.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.PluginSystem.PluginContributionManifestEntry
+AtomUI.City.Generators.PluginSystem.PluginContributionManifestEntry.Path.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginContributionManifestEntry.PluginContributionManifestEntry(string! type, string! path, bool required) -> void
+AtomUI.City.Generators.PluginSystem.PluginContributionManifestEntry.Required.get -> bool
+AtomUI.City.Generators.PluginSystem.PluginContributionManifestEntry.Type.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginContributionManifestMetadata
+AtomUI.City.Generators.PluginSystem.PluginContributionManifestMetadata.Path.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginContributionManifestMetadata.PluginContributionManifestMetadata(string! type, string! path, bool required) -> void
+AtomUI.City.Generators.PluginSystem.PluginContributionManifestMetadata.Required.get -> bool
+AtomUI.City.Generators.PluginSystem.PluginContributionManifestMetadata.Type.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginDependencyManifestEntry
+AtomUI.City.Generators.PluginSystem.PluginDependencyManifestEntry.PluginDependencyManifestEntry(string! pluginId, string? versionRange) -> void
+AtomUI.City.Generators.PluginSystem.PluginDependencyManifestEntry.PluginId.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginDependencyManifestEntry.VersionRange.get -> string?
+AtomUI.City.Generators.PluginSystem.PluginDependencyMetadata
+AtomUI.City.Generators.PluginSystem.PluginDependencyMetadata.PluginDependencyMetadata(string! pluginId, string? versionRange) -> void
+AtomUI.City.Generators.PluginSystem.PluginDependencyMetadata.PluginId.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginDependencyMetadata.VersionRange.get -> string?
+AtomUI.City.Generators.PluginSystem.PluginManifest
+AtomUI.City.Generators.PluginSystem.PluginManifest.AotCompatible.get -> bool
+AtomUI.City.Generators.PluginSystem.PluginManifest.Capabilities.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.PluginSystem.PluginCapabilityManifestEntry!>!
+AtomUI.City.Generators.PluginSystem.PluginManifest.Contributions.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.PluginSystem.PluginContributionManifestEntry!>!
+AtomUI.City.Generators.PluginSystem.PluginManifest.Dependencies.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.PluginSystem.PluginDependencyManifestEntry!>!
+AtomUI.City.Generators.PluginSystem.PluginManifest.DescriptionKey.get -> string?
+AtomUI.City.Generators.PluginSystem.PluginManifest.DisplayNameKey.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginManifest.MainAssembly.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginManifest.MaxHostVersion.get -> string?
+AtomUI.City.Generators.PluginSystem.PluginManifest.MinHostVersion.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginManifest.PackageId.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginManifest.PluginApiVersion.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginManifest.PluginId.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginManifest.PluginManifest(string! schemaVersion, string! pluginId, string! packageId, string! version, string! displayNameKey, string? descriptionKey, string? publisher, string! mainAssembly, string! targetFramework, string! pluginApiVersion, string! minHostVersion, string? maxHostVersion, bool unloadable, bool aotCompatible, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.PluginSystem.PluginCapabilityManifestEntry!>! capabilities, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.PluginSystem.PluginContributionManifestEntry!>! contributions, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.PluginSystem.PluginDependencyManifestEntry!>! dependencies) -> void
+AtomUI.City.Generators.PluginSystem.PluginManifest.Publisher.get -> string?
+AtomUI.City.Generators.PluginSystem.PluginManifest.SchemaVersion.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginManifest.TargetFramework.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginManifest.Unloadable.get -> bool
+AtomUI.City.Generators.PluginSystem.PluginManifest.Version.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginManifestBuilder
+AtomUI.City.Generators.PluginSystem.PluginManifestResult
+AtomUI.City.Generators.PluginSystem.PluginManifestResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>!
+AtomUI.City.Generators.PluginSystem.PluginManifestResult.Manifest.get -> AtomUI.City.Generators.PluginSystem.PluginManifest!
+AtomUI.City.Generators.PluginSystem.PluginManifestResult.PluginManifestResult(AtomUI.City.Generators.PluginSystem.PluginManifest! manifest, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>! diagnostics) -> void
+AtomUI.City.Generators.PluginSystem.PluginMetadata
+AtomUI.City.Generators.PluginSystem.PluginMetadata.AotCompatible.get -> bool
+AtomUI.City.Generators.PluginSystem.PluginMetadata.Capabilities.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.PluginSystem.PluginCapabilityMetadata!>!
+AtomUI.City.Generators.PluginSystem.PluginMetadata.Contributions.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.PluginSystem.PluginContributionManifestMetadata!>!
+AtomUI.City.Generators.PluginSystem.PluginMetadata.Dependencies.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.PluginSystem.PluginDependencyMetadata!>!
+AtomUI.City.Generators.PluginSystem.PluginMetadata.DescriptionKey.get -> string?
+AtomUI.City.Generators.PluginSystem.PluginMetadata.DisplayNameKey.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginMetadata.MainAssembly.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginMetadata.MaxHostVersion.get -> string?
+AtomUI.City.Generators.PluginSystem.PluginMetadata.MinHostVersion.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginMetadata.PackageId.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginMetadata.PluginApiVersion.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginMetadata.PluginId.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginMetadata.PluginMetadata(string! schemaVersion, string! pluginId, string! packageId, string! version, string! displayNameKey, string? descriptionKey, string? publisher, string! mainAssembly, string! targetFramework, string! pluginApiVersion, string! minHostVersion, string? maxHostVersion, bool unloadable, bool aotCompatible, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.PluginSystem.PluginCapabilityMetadata!>! capabilities, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.PluginSystem.PluginContributionManifestMetadata!>! contributions, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.PluginSystem.PluginDependencyMetadata!>! dependencies) -> void
+AtomUI.City.Generators.PluginSystem.PluginMetadata.Publisher.get -> string?
+AtomUI.City.Generators.PluginSystem.PluginMetadata.SchemaVersion.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginMetadata.TargetFramework.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginMetadata.Unloadable.get -> bool
+AtomUI.City.Generators.PluginSystem.PluginMetadata.Version.get -> string!
+AtomUI.City.Generators.PluginSystem.PluginMetadataReader
+AtomUI.City.Generators.Presentation.PresentationViewConstructorParameter
+AtomUI.City.Generators.Presentation.PresentationViewConstructorParameter.PresentationViewConstructorParameter(string! typeName) -> void
+AtomUI.City.Generators.Presentation.PresentationViewConstructorParameter.TypeName.get -> string!
+AtomUI.City.Generators.Presentation.PresentationViewManifest
+AtomUI.City.Generators.Presentation.PresentationViewManifest.PresentationViewManifest(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Presentation.PresentationViewManifestEntry!>! views) -> void
+AtomUI.City.Generators.Presentation.PresentationViewManifest.Views.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Presentation.PresentationViewManifestEntry!>!
+AtomUI.City.Generators.Presentation.PresentationViewManifestBuilder
+AtomUI.City.Generators.Presentation.PresentationViewManifestEntry
+AtomUI.City.Generators.Presentation.PresentationViewManifestEntry.ConstructorParameters.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Presentation.PresentationViewConstructorParameter!>!
+AtomUI.City.Generators.Presentation.PresentationViewManifestEntry.ContributionId.get -> string?
+AtomUI.City.Generators.Presentation.PresentationViewManifestEntry.PluginId.get -> string?
+AtomUI.City.Generators.Presentation.PresentationViewManifestEntry.PresentationViewManifestEntry(string! viewTypeName, string! viewModelTypeName, string? viewKey, string? pluginId, string? contributionId, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Presentation.PresentationViewConstructorParameter!>? constructorParameters = null) -> void
+AtomUI.City.Generators.Presentation.PresentationViewManifestEntry.ViewKey.get -> string?
+AtomUI.City.Generators.Presentation.PresentationViewManifestEntry.ViewModelTypeName.get -> string!
+AtomUI.City.Generators.Presentation.PresentationViewManifestEntry.ViewTypeName.get -> string!
+AtomUI.City.Generators.Presentation.PresentationViewManifestResult
+AtomUI.City.Generators.Presentation.PresentationViewManifestResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>!
+AtomUI.City.Generators.Presentation.PresentationViewManifestResult.Manifest.get -> AtomUI.City.Generators.Presentation.PresentationViewManifest!
+AtomUI.City.Generators.Presentation.PresentationViewManifestResult.PresentationViewManifestResult(AtomUI.City.Generators.Presentation.PresentationViewManifest! manifest, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>! diagnostics) -> void
+AtomUI.City.Generators.Presentation.PresentationViewMetadata
+AtomUI.City.Generators.Presentation.PresentationViewMetadata.ConstructorParameters.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Presentation.PresentationViewConstructorParameter!>!
+AtomUI.City.Generators.Presentation.PresentationViewMetadata.ContributionId.get -> string?
+AtomUI.City.Generators.Presentation.PresentationViewMetadata.HasAmbiguousConstructors.get -> bool
+AtomUI.City.Generators.Presentation.PresentationViewMetadata.Location.get -> Microsoft.CodeAnalysis.Location?
+AtomUI.City.Generators.Presentation.PresentationViewMetadata.PluginId.get -> string?
+AtomUI.City.Generators.Presentation.PresentationViewMetadata.PresentationViewMetadata(string! viewTypeName, string! viewModelTypeName, string? viewKey, string? pluginId, string? contributionId, Microsoft.CodeAnalysis.Location? location = null, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Presentation.PresentationViewConstructorParameter!>? constructorParameters = null, bool hasAmbiguousConstructors = false) -> void
+AtomUI.City.Generators.Presentation.PresentationViewMetadata.ViewKey.get -> string?
+AtomUI.City.Generators.Presentation.PresentationViewMetadata.ViewModelTypeName.get -> string!
+AtomUI.City.Generators.Presentation.PresentationViewMetadata.ViewTypeName.get -> string!
+AtomUI.City.Generators.Presentation.PresentationViewMetadataReader
+AtomUI.City.Generators.Presentation.PresentationViewRegistrarSourceBuilder
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.ActivationHint.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.BreadcrumbKey.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.DescriptionKey.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.EnterGuardTypeNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.ErrorTitleKey.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.ExtensionPoint.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.GroupKey.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.Id.get -> string!
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.Kind.get -> AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.LeaveGuardTypeNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.MatchPolicyTypeNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.MethodName.get -> string!
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.MiddlewareTypeNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.OutletName.get -> string!
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.ParameterBindings.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Routing.RouteParameterBindingMetadata!>!
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.ParameterTypeName.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.ParentMethodName.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.RedirectTargetMethodName.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.ResolverTypeNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.ReuseKey.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.RouteDefinitionMetadata(string! routeMapTypeName, string! methodName, string! id, AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind kind, string? template, string? viewModelTypeName, string? parentMethodName, string! outletName, string? extensionPoint, string? redirectTargetMethodName, string? titleKey = null, string? descriptionKey = null, string? breadcrumbKey = null, string? groupKey = null, string? errorTitleKey = null, string? routeReferenceTypeName = null, string? parameterTypeName = null, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Routing.RouteParameterBindingMetadata!>? parameterBindings = null, System.Collections.Generic.IReadOnlyList<string!>? enterGuardTypeNames = null, System.Collections.Generic.IReadOnlyList<string!>? leaveGuardTypeNames = null, System.Collections.Generic.IReadOnlyList<string!>? matchPolicyTypeNames = null, System.Collections.Generic.IReadOnlyList<string!>? resolverTypeNames = null, System.Collections.Generic.IReadOnlyList<string!>? middlewareTypeNames = null, string? reuseKey = null, string? activationHint = null) -> void
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.RouteMapTypeName.get -> string!
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.RouteReferenceTypeName.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.Template.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.TitleKey.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadata.ViewModelTypeName.get -> string?
+AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind
+AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind.ExtensionPoint = 5 -> AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind
+AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind.Group = 3 -> AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind
+AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind.Index = 2 -> AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind
+AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind.Layout = 1 -> AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind
+AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind.Redirect = 4 -> AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind
+AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind.Route = 0 -> AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind
+AtomUI.City.Generators.Routing.RouteManifest
+AtomUI.City.Generators.Routing.RouteManifest.RouteManifest(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Routing.RouteManifestRoute!>! routes) -> void
+AtomUI.City.Generators.Routing.RouteManifest.Routes.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Routing.RouteManifestRoute!>!
+AtomUI.City.Generators.Routing.RouteManifestBuilder
+AtomUI.City.Generators.Routing.RouteManifestResult
+AtomUI.City.Generators.Routing.RouteManifestResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>!
+AtomUI.City.Generators.Routing.RouteManifestResult.Manifest.get -> AtomUI.City.Generators.Routing.RouteManifest!
+AtomUI.City.Generators.Routing.RouteManifestResult.RouteManifestResult(AtomUI.City.Generators.Routing.RouteManifest! manifest, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic!>! diagnostics) -> void
+AtomUI.City.Generators.Routing.RouteManifestRoute
+AtomUI.City.Generators.Routing.RouteManifestRoute.ActivationHint.get -> string?
+AtomUI.City.Generators.Routing.RouteManifestRoute.BreadcrumbKey.get -> string?
+AtomUI.City.Generators.Routing.RouteManifestRoute.DescriptionKey.get -> string?
+AtomUI.City.Generators.Routing.RouteManifestRoute.EnterGuardTypeNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Routing.RouteManifestRoute.ErrorTitleKey.get -> string?
+AtomUI.City.Generators.Routing.RouteManifestRoute.ExtensionPoint.get -> string?
+AtomUI.City.Generators.Routing.RouteManifestRoute.GroupKey.get -> string?
+AtomUI.City.Generators.Routing.RouteManifestRoute.Id.get -> string!
+AtomUI.City.Generators.Routing.RouteManifestRoute.Kind.get -> AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind
+AtomUI.City.Generators.Routing.RouteManifestRoute.LeaveGuardTypeNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Routing.RouteManifestRoute.MatchPolicyTypeNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Routing.RouteManifestRoute.MiddlewareTypeNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Routing.RouteManifestRoute.OutletName.get -> string!
+AtomUI.City.Generators.Routing.RouteManifestRoute.ParameterBindingNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Routing.RouteManifestRoute.ParentRouteId.get -> string?
+AtomUI.City.Generators.Routing.RouteManifestRoute.RedirectTargetRouteId.get -> string?
+AtomUI.City.Generators.Routing.RouteManifestRoute.ResolverTypeNames.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Routing.RouteManifestRoute.ReuseKey.get -> string?
+AtomUI.City.Generators.Routing.RouteManifestRoute.RouteManifestRoute(string! id, AtomUI.City.Generators.Routing.RouteDefinitionMetadataKind kind, string? template, string? viewModelTypeName, string? parentRouteId, string! outletName, string? extensionPoint, string? redirectTargetRouteId, string? titleKey = null, string? descriptionKey = null, string? breadcrumbKey = null, string? groupKey = null, string? errorTitleKey = null, System.Collections.Generic.IReadOnlyList<string!>? enterGuardTypeNames = null, System.Collections.Generic.IReadOnlyList<string!>? leaveGuardTypeNames = null, System.Collections.Generic.IReadOnlyList<string!>? matchPolicyTypeNames = null, System.Collections.Generic.IReadOnlyList<string!>? resolverTypeNames = null, System.Collections.Generic.IReadOnlyList<string!>? middlewareTypeNames = null, System.Collections.Generic.IReadOnlyList<string!>? parameterBindingNames = null, string? reuseKey = null, string? activationHint = null) -> void
+AtomUI.City.Generators.Routing.RouteManifestRoute.Template.get -> string?
+AtomUI.City.Generators.Routing.RouteManifestRoute.TitleKey.get -> string?
+AtomUI.City.Generators.Routing.RouteManifestRoute.ViewModelTypeName.get -> string?
+AtomUI.City.Generators.Routing.RouteMapMetadata
+AtomUI.City.Generators.Routing.RouteMapMetadata.Issues.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Generators.Routing.RouteMapMetadata.Location.get -> Microsoft.CodeAnalysis.Location?
+AtomUI.City.Generators.Routing.RouteMapMetadata.RouteMapMetadata(string! typeName, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Routing.RouteDefinitionMetadata!>! routes, Microsoft.CodeAnalysis.Location? location = null, System.Collections.Generic.IReadOnlyList<string!>? issues = null) -> void
+AtomUI.City.Generators.Routing.RouteMapMetadata.Routes.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Routing.RouteDefinitionMetadata!>!
+AtomUI.City.Generators.Routing.RouteMapMetadata.TypeName.get -> string!
+AtomUI.City.Generators.Routing.RouteMetadataReader
+AtomUI.City.Generators.Routing.RouteParameterBindingMetadata
+AtomUI.City.Generators.Routing.RouteParameterBindingMetadata.MemberName.get -> string!
+AtomUI.City.Generators.Routing.RouteParameterBindingMetadata.RouteName.get -> string!
+AtomUI.City.Generators.Routing.RouteParameterBindingMetadata.RouteParameterBindingMetadata(string! routeName, string! memberName) -> void
+AtomUI.City.Generators.Routing.RouteSourceBuilder
+const AtomUI.City.Generators.Common.GeneratedCodeNames.GeneratedNamespace = "AtomUI.City.Generated" -> string!
+const AtomUI.City.Generators.Common.GeneratedCodeNames.RootHintFolder = "AtomUI.City" -> string!
+const AtomUI.City.Generators.Common.GeneratorFeatureNames.Data = "Data" -> string!
+const AtomUI.City.Generators.Common.GeneratorFeatureNames.DependencyInjection = "DependencyInjection" -> string!
+const AtomUI.City.Generators.Common.GeneratorFeatureNames.EventBus = "EventBus" -> string!
+const AtomUI.City.Generators.Common.GeneratorFeatureNames.Localization = "Localization" -> string!
+const AtomUI.City.Generators.Common.GeneratorFeatureNames.Modularity = "Modularity" -> string!
+const AtomUI.City.Generators.Common.GeneratorFeatureNames.PluginSystem = "PluginSystem" -> string!
+const AtomUI.City.Generators.Common.GeneratorFeatureNames.Presentation = "Presentation" -> string!
+const AtomUI.City.Generators.Common.GeneratorFeatureNames.Routing = "Routing" -> string!
+const AtomUI.City.Generators.Common.GeneratorFeatureNames.Security = "Security" -> string!
+const AtomUI.City.Generators.Diagnostics.AnalyzerDiagnosticIds.BuildServiceProviderNotAllowed = "AUCANL0001" -> string!
+const AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticIds.CircularModuleDependency = "AUCGEN003" -> string!
+const AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticIds.DuplicateModuleName = "AUCGEN002" -> string!
+const AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticIds.DuplicatePresentationView = "AUCGEN006" -> string!
+const AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticIds.DuplicateRoute = "AUCGEN004" -> string!
+const AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticIds.InvalidGeneratedModule = "AUCGEN008" -> string!
+const AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticIds.InvalidManifestInput = "AUCGEN005" -> string!
+const AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticIds.MultipleApplicationModules = "AUCGEN007" -> string!
+override AtomUI.City.Generators.Analyzers.BuildServiceProviderUsageAnalyzer.Initialize(Microsoft.CodeAnalysis.Diagnostics.AnalysisContext! context) -> void
+override AtomUI.City.Generators.Analyzers.BuildServiceProviderUsageAnalyzer.SupportedDiagnostics.get -> System.Collections.Immutable.ImmutableArray<Microsoft.CodeAnalysis.DiagnosticDescriptor!>
+static AtomUI.City.Generators.Common.GeneratedCodeNames.CreateHintName(AtomUI.City.Generators.Common.GeneratorFeature feature, string! assemblyName, string! suffix) -> string!
+static AtomUI.City.Generators.Common.GeneratedCodeNames.CreateRegistrarTypeName(AtomUI.City.Generators.Common.GeneratorFeature feature, string! suffix) -> AtomUI.City.Generators.Common.GeneratedTypeName!
+static AtomUI.City.Generators.Common.GeneratorFeatureNames.GetName(AtomUI.City.Generators.Common.GeneratorFeature feature) -> string!
+static AtomUI.City.Generators.Data.DataClientMetadataReader.TryRead(Microsoft.CodeAnalysis.INamedTypeSymbol! symbol) -> AtomUI.City.Generators.Data.DataClientGenerationMetadata?
+static AtomUI.City.Generators.Data.DataClientRegistrarSourceBuilder.Build(string! assemblyName, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Data.DataClientGenerationMetadata!>! clients) -> string!
+static AtomUI.City.Generators.Data.DataClientRegistrarSourceBuilder.GetRegistrarTypeName(string! assemblyName) -> string!
+static AtomUI.City.Generators.DependencyInjection.ServiceRegistrarSourceBuilder.Build(string! assemblyName, string? ownerModuleTypeName, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata!>! registrations, System.Collections.Generic.IReadOnlyList<string!>! referencedRegistrarTypeNames, AtomUI.City.Generators.EventBus.EventGenerationManifest? eventManifest = null) -> string!
+static AtomUI.City.Generators.DependencyInjection.ServiceRegistrarSourceBuilder.GetRegistrarTypeName(string! assemblyName) -> string!
+static AtomUI.City.Generators.DependencyInjection.ServiceRegistrationManifestBuilder.Build(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata!>! registrations) -> AtomUI.City.Generators.DependencyInjection.ServiceRegistrationManifestResult!
+static AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadataReader.TryRead(Microsoft.CodeAnalysis.INamedTypeSymbol! type) -> AtomUI.City.Generators.DependencyInjection.ServiceRegistrationMetadata?
+static AtomUI.City.Generators.Diagnostics.GeneratorDiagnostics.All.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition!>!
+static AtomUI.City.Generators.Diagnostics.GeneratorDiagnostics.CreateRoslynDiagnostic(AtomUI.City.Generators.Common.GeneratorFeature feature, AtomUI.City.Generators.Diagnostics.GeneratorDiagnostic! diagnostic, Microsoft.CodeAnalysis.Location? location = null, params object?[]! messageArgs) -> Microsoft.CodeAnalysis.Diagnostic!
+static AtomUI.City.Generators.Localization.LocalizationManifestBuilder.Build(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Localization.LanguagePackageMetadata!>! packages, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Localization.LocalizedResourceMetadata!>! resources) -> AtomUI.City.Generators.Localization.LocalizationManifestResult!
+static AtomUI.City.Generators.Localization.LocalizationMetadataReader.Read(Microsoft.CodeAnalysis.Compilation! compilation) -> AtomUI.City.Generators.Localization.LocalizationMetadata!
+static AtomUI.City.Generators.Localization.LocalizationRegistrarSourceBuilder.Build(AtomUI.City.Generators.Localization.LocalizationManifest! manifest) -> string!
+static AtomUI.City.Generators.Modularity.ModuleDependencyGraphBuilder.Build(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Modularity.ModuleMetadata!>! modules, System.Collections.Generic.ISet<string!>? availableDependencyTypeNames = null) -> AtomUI.City.Generators.Modularity.ModuleDependencyGraphResult!
+static AtomUI.City.Generators.Modularity.ModuleMetadataReader.TryRead(Microsoft.CodeAnalysis.INamedTypeSymbol! type) -> AtomUI.City.Generators.Modularity.ModuleMetadata?
+static AtomUI.City.Generators.Modularity.ModuleRegistrarSourceBuilder.Build(string! assemblyName, System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Modularity.ModuleMetadata!>! modules, System.Collections.Generic.IReadOnlyList<string!>! referencedRegistrarTypeNames) -> string!
+static AtomUI.City.Generators.Modularity.ModuleRegistrarSourceBuilder.GetRegistrarTypeName(string! assemblyName) -> string!
+static AtomUI.City.Generators.PluginSystem.PluginManifestBuilder.Build(AtomUI.City.Generators.PluginSystem.PluginMetadata! metadata) -> AtomUI.City.Generators.PluginSystem.PluginManifestResult!
+static AtomUI.City.Generators.PluginSystem.PluginMetadataReader.Read(Microsoft.CodeAnalysis.Compilation! compilation) -> AtomUI.City.Generators.PluginSystem.PluginMetadata?
+static AtomUI.City.Generators.Presentation.PresentationViewManifestBuilder.Build(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Presentation.PresentationViewMetadata!>! views) -> AtomUI.City.Generators.Presentation.PresentationViewManifestResult!
+static AtomUI.City.Generators.Presentation.PresentationViewMetadataReader.Read(Microsoft.CodeAnalysis.INamedTypeSymbol! type) -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Presentation.PresentationViewMetadata!>!
+static AtomUI.City.Generators.Presentation.PresentationViewRegistrarSourceBuilder.Build(AtomUI.City.Generators.Presentation.PresentationViewManifest! manifest) -> string!
+static AtomUI.City.Generators.Routing.RouteManifestBuilder.Build(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Routing.RouteDefinitionMetadata!>! routes) -> AtomUI.City.Generators.Routing.RouteManifestResult!
+static AtomUI.City.Generators.Routing.RouteMetadataReader.TryRead(Microsoft.CodeAnalysis.INamedTypeSymbol! type) -> AtomUI.City.Generators.Routing.RouteMapMetadata?
+static AtomUI.City.Generators.Routing.RouteSourceBuilder.Build(System.Collections.Generic.IReadOnlyList<AtomUI.City.Generators.Routing.RouteMapMetadata!>! routeMaps, AtomUI.City.Generators.Routing.RouteManifest! manifest) -> string!
+static readonly AtomUI.City.Generators.Diagnostics.GeneratorDiagnostics.CircularModuleDependency -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition!
+static readonly AtomUI.City.Generators.Diagnostics.GeneratorDiagnostics.DuplicateModuleName -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition!
+static readonly AtomUI.City.Generators.Diagnostics.GeneratorDiagnostics.DuplicatePresentationView -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition!
+static readonly AtomUI.City.Generators.Diagnostics.GeneratorDiagnostics.DuplicateRoute -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition!
+static readonly AtomUI.City.Generators.Diagnostics.GeneratorDiagnostics.InvalidGeneratedModule -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition!
+static readonly AtomUI.City.Generators.Diagnostics.GeneratorDiagnostics.InvalidManifestInput -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition!
+static readonly AtomUI.City.Generators.Diagnostics.GeneratorDiagnostics.MultipleApplicationModules -> AtomUI.City.Generators.Diagnostics.GeneratorDiagnosticDefinition!

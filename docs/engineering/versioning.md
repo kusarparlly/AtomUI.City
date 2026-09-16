@@ -31,6 +31,13 @@
 
 可选适配包可以跟随主版本，也可以在形成独立兼容边界后单独版本化。
 
+### 3.1 Preview 与 API baseline
+
+- API 尚处于逐项收口阶段时，统一包版本必须包含 SemVer prerelease 后缀，例如 `1.0.0-preview.1`；不得用稳定 `1.0.0` 包装仍标记为 `Preview` 的 API。
+- `build/Version.props` 的 `AtomUICityApiBaselineVersion` 指向紧邻的上一已发布候选包，并映射到 SDK `PackageValidationBaselineVersion`。
+- prerelease 尚无历史发布包时 baseline 可以为空；稳定版本不允许为空。首次稳定 `1.0.0` 必须至少与最后一个已发布 preview/rc 包比较。
+- baseline 版本不得等于当前候选版本。历史包无法恢复或兼容比较失败时，发布门禁失败，不能以手工确认替代。
+
 ## 4. 插件 API 版本
 
 PluginSystem 必须区分：

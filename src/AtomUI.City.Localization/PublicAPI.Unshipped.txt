@@ -1,0 +1,336 @@
+#nullable enable
+AtomUI.City.Localization.AssemblyLanguagePackageProvider
+AtomUI.City.Localization.AssemblyLanguagePackageProvider.AssemblyLanguagePackageProvider() -> void
+AtomUI.City.Localization.AssemblyLanguagePackageProvider.Discover(System.Reflection.Assembly! assembly) -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Localization.LanguagePackageDescriptor!>!
+AtomUI.City.Localization.AssemblyLanguagePackageProvider.Kind.get -> AtomUI.City.Localization.LanguagePackageProviderKind
+AtomUI.City.Localization.AssemblyLanguagePackageProvider.LoadAsync(AtomUI.City.Localization.LanguagePackageDescriptor! descriptor, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LanguagePackageLoadResult!>
+AtomUI.City.Localization.CultureState
+AtomUI.City.Localization.CultureState.CultureState(System.Globalization.CultureInfo! currentCulture, System.Globalization.CultureInfo! currentUICulture, System.Collections.Generic.IReadOnlyList<System.Globalization.CultureInfo!>! fallbackCultures, long revision, System.Collections.Generic.IReadOnlyList<string!>! loadedPackageIds) -> void
+AtomUI.City.Localization.CultureState.CurrentCulture.get -> System.Globalization.CultureInfo!
+AtomUI.City.Localization.CultureState.CurrentUICulture.get -> System.Globalization.CultureInfo!
+AtomUI.City.Localization.CultureState.FallbackCultures.get -> System.Collections.Generic.IReadOnlyList<System.Globalization.CultureInfo!>!
+AtomUI.City.Localization.CultureState.LoadedPackageIds.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Localization.CultureState.Revision.get -> long
+AtomUI.City.Localization.FileLanguagePackageProvider
+AtomUI.City.Localization.FileLanguagePackageProvider.FileLanguagePackageProvider() -> void
+AtomUI.City.Localization.FileLanguagePackageProvider.Kind.get -> AtomUI.City.Localization.LanguagePackageProviderKind
+AtomUI.City.Localization.FileLanguagePackageProvider.LoadAsync(AtomUI.City.Localization.LanguagePackageDescriptor! descriptor, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LanguagePackageLoadResult!>
+AtomUI.City.Localization.ILanguagePackageProvider
+AtomUI.City.Localization.ILanguagePackageProvider.Kind.get -> AtomUI.City.Localization.LanguagePackageProviderKind
+AtomUI.City.Localization.ILanguagePackageProvider.LoadAsync(AtomUI.City.Localization.LanguagePackageDescriptor! descriptor, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LanguagePackageLoadResult!>
+AtomUI.City.Localization.ILocalizationDiagnostics
+AtomUI.City.Localization.ILocalizationDiagnostics.Records.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Localization.LocalizationDiagnosticRecord!>!
+AtomUI.City.Localization.ILocalizationDiagnostics.Write(AtomUI.City.Localization.LocalizationDiagnosticRecord! record) -> void
+AtomUI.City.Localization.ILocalizationScopeLease
+AtomUI.City.Localization.ILocalizationScopeLease.Context.get -> AtomUI.City.Localization.LocalizationLookupContext!
+AtomUI.City.Localization.ILocalizationScopeLease.IsDisposed.get -> bool
+AtomUI.City.Localization.ILocalizationService
+AtomUI.City.Localization.ILocalizationService.ActivateScope(AtomUI.City.Localization.LocalizationLookupContext! context) -> AtomUI.City.Localization.ILocalizationScopeLease!
+AtomUI.City.Localization.ILocalizationService.CreateMessageTextAsync(string! key, System.Collections.Generic.IReadOnlyList<object?>! arguments, AtomUI.City.Localization.LocalizationLookupContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.ILocalizedText!>
+AtomUI.City.Localization.ILocalizationService.CreateMessageTextAsync(string! key, System.Collections.Generic.IReadOnlyList<object?>! arguments, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.ILocalizedText!>
+AtomUI.City.Localization.ILocalizationService.CreateTextAsync(string! key, AtomUI.City.Localization.LocalizationLookupContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.ILocalizedText!>
+AtomUI.City.Localization.ILocalizationService.CreateTextAsync(string! key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.ILocalizedText!>
+AtomUI.City.Localization.ILocalizationService.CultureRevision.get -> long
+AtomUI.City.Localization.ILocalizationService.CultureState.get -> AtomUI.City.State.IReadOnlyState<AtomUI.City.Localization.CultureState!>!
+AtomUI.City.Localization.ILocalizationService.CurrentCulture.get -> System.Globalization.CultureInfo!
+AtomUI.City.Localization.ILocalizationService.GetMessageAsync(string! key, System.Collections.Generic.IReadOnlyList<object?>! arguments, AtomUI.City.Localization.LocalizationLookupContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LocalizedMessage!>
+AtomUI.City.Localization.ILocalizationService.GetMessageAsync(string! key, System.Collections.Generic.IReadOnlyList<object?>! arguments, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LocalizedMessage!>
+AtomUI.City.Localization.ILocalizationService.GetStringAsync(string! key, AtomUI.City.Localization.LocalizationLookupContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LocalizedString!>
+AtomUI.City.Localization.ILocalizationService.GetStringAsync(string! key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LocalizedString!>
+AtomUI.City.Localization.ILocalizationService.RevokePackagesByContributionIdAsync(string! contributionId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<int>
+AtomUI.City.Localization.ILocalizationService.SetCultureAsync(string! cultureName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LocalizationResult!>
+AtomUI.City.Localization.ILocalizedText
+AtomUI.City.Localization.ILocalizedText.Changed -> System.EventHandler<AtomUI.City.Localization.LocalizedTextChangedEventArgs!>?
+AtomUI.City.Localization.ILocalizedText.Culture.get -> System.Globalization.CultureInfo!
+AtomUI.City.Localization.ILocalizedText.IsFallback.get -> bool
+AtomUI.City.Localization.ILocalizedText.IsMissing.get -> bool
+AtomUI.City.Localization.ILocalizedText.Key.get -> string!
+AtomUI.City.Localization.ILocalizedText.RefreshAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Localization.ILocalizedText.Revision.get -> long
+AtomUI.City.Localization.ILocalizedText.Value.get -> string!
+AtomUI.City.Localization.InMemoryLanguagePackageProvider
+AtomUI.City.Localization.InMemoryLanguagePackageProvider.InMemoryLanguagePackageProvider() -> void
+AtomUI.City.Localization.InMemoryLanguagePackageProvider.Kind.get -> AtomUI.City.Localization.LanguagePackageProviderKind
+AtomUI.City.Localization.InMemoryLanguagePackageProvider.LoadAsync(AtomUI.City.Localization.LanguagePackageDescriptor! descriptor, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LanguagePackageLoadResult!>
+AtomUI.City.Localization.InMemoryLocalizationDiagnostics
+AtomUI.City.Localization.InMemoryLocalizationDiagnostics.InMemoryLocalizationDiagnostics() -> void
+AtomUI.City.Localization.InMemoryLocalizationDiagnostics.Records.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Localization.LocalizationDiagnosticRecord!>!
+AtomUI.City.Localization.InMemoryLocalizationDiagnostics.Write(AtomUI.City.Localization.LocalizationDiagnosticRecord! record) -> void
+AtomUI.City.Localization.IPresentationLocalizationBridge
+AtomUI.City.Localization.IPresentationLocalizationBridge.ApplyCultureAsync(AtomUI.City.Localization.CultureState! state, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LocalizationResult!>
+AtomUI.City.Localization.LanguagePackage
+AtomUI.City.Localization.LanguagePackage.Descriptor.get -> AtomUI.City.Localization.LanguagePackageDescriptor!
+AtomUI.City.Localization.LanguagePackage.Dispose() -> void
+AtomUI.City.Localization.LanguagePackage.IsDisposed.get -> bool
+AtomUI.City.Localization.LanguagePackage.TryGetString(string! key, out string! value) -> bool
+AtomUI.City.Localization.LanguagePackageAttribute
+AtomUI.City.Localization.LanguagePackageAttribute.Checksum.get -> string?
+AtomUI.City.Localization.LanguagePackageAttribute.Checksum.set -> void
+AtomUI.City.Localization.LanguagePackageAttribute.ContributionId.get -> string?
+AtomUI.City.Localization.LanguagePackageAttribute.ContributionId.set -> void
+AtomUI.City.Localization.LanguagePackageAttribute.Culture.get -> string!
+AtomUI.City.Localization.LanguagePackageAttribute.FallbackCulture.get -> string?
+AtomUI.City.Localization.LanguagePackageAttribute.FallbackCulture.set -> void
+AtomUI.City.Localization.LanguagePackageAttribute.LanguagePackageAttribute(string! packageId, string! culture) -> void
+AtomUI.City.Localization.LanguagePackageAttribute.PackageId.get -> string!
+AtomUI.City.Localization.LanguagePackageAttribute.ResourceBaseName.get -> string?
+AtomUI.City.Localization.LanguagePackageAttribute.ResourceBaseName.set -> void
+AtomUI.City.Localization.LanguagePackageAttribute.Scope.get -> AtomUI.City.Localization.ResourceScope
+AtomUI.City.Localization.LanguagePackageAttribute.Scope.set -> void
+AtomUI.City.Localization.LanguagePackageAttribute.ScopeId.get -> string?
+AtomUI.City.Localization.LanguagePackageAttribute.ScopeId.set -> void
+AtomUI.City.Localization.LanguagePackageAttribute.Version.get -> string?
+AtomUI.City.Localization.LanguagePackageAttribute.Version.set -> void
+AtomUI.City.Localization.LanguagePackageDescriptor
+AtomUI.City.Localization.LanguagePackageDescriptor.AllowedRootPath.get -> string?
+AtomUI.City.Localization.LanguagePackageDescriptor.AllowedRootPath.init -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.Checksum.get -> string?
+AtomUI.City.Localization.LanguagePackageDescriptor.Checksum.init -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.ContributionId.get -> string?
+AtomUI.City.Localization.LanguagePackageDescriptor.ContributionId.init -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.CriticalResourceKeys.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Localization.LanguagePackageDescriptor.CriticalResourceKeys.init -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.Culture.get -> System.Globalization.CultureInfo!
+AtomUI.City.Localization.LanguagePackageDescriptor.FallbackCulture.get -> System.Globalization.CultureInfo?
+AtomUI.City.Localization.LanguagePackageDescriptor.FallbackCulture.init -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.InMemoryResources.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>?
+AtomUI.City.Localization.LanguagePackageDescriptor.InMemoryResources.init -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.LanguagePackageDescriptor(string! packageId, System.Globalization.CultureInfo! culture, AtomUI.City.Localization.ResourceScope scope) -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.LoadContext.get -> System.Runtime.Loader.AssemblyLoadContext?
+AtomUI.City.Localization.LanguagePackageDescriptor.LoadContext.init -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.Location.get -> string?
+AtomUI.City.Localization.LanguagePackageDescriptor.Location.init -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.PackageId.get -> string!
+AtomUI.City.Localization.LanguagePackageDescriptor.ProviderKind.get -> AtomUI.City.Localization.LanguagePackageProviderKind
+AtomUI.City.Localization.LanguagePackageDescriptor.ProviderKind.init -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.ResourceBaseName.get -> string?
+AtomUI.City.Localization.LanguagePackageDescriptor.ResourceBaseName.init -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.Scope.get -> AtomUI.City.Localization.ResourceScope
+AtomUI.City.Localization.LanguagePackageDescriptor.ScopeId.get -> string?
+AtomUI.City.Localization.LanguagePackageDescriptor.ScopeId.init -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.Version.get -> string?
+AtomUI.City.Localization.LanguagePackageDescriptor.Version.init -> void
+AtomUI.City.Localization.LanguagePackageLoadResult
+AtomUI.City.Localization.LanguagePackageLoadResult.Error.get -> AtomUI.City.Localization.LocalizationError?
+AtomUI.City.Localization.LanguagePackageLoadResult.Package.get -> AtomUI.City.Localization.LanguagePackage?
+AtomUI.City.Localization.LanguagePackageLoadResult.Succeeded.get -> bool
+AtomUI.City.Localization.LanguagePackageProviderKind
+AtomUI.City.Localization.LanguagePackageProviderKind.Assembly = 1 -> AtomUI.City.Localization.LanguagePackageProviderKind
+AtomUI.City.Localization.LanguagePackageProviderKind.File = 2 -> AtomUI.City.Localization.LanguagePackageProviderKind
+AtomUI.City.Localization.LanguagePackageProviderKind.InMemory = 0 -> AtomUI.City.Localization.LanguagePackageProviderKind
+AtomUI.City.Localization.LanguagePackageRegistration
+AtomUI.City.Localization.LanguagePackageRegistration.Descriptor.get -> AtomUI.City.Localization.LanguagePackageDescriptor!
+AtomUI.City.Localization.LanguagePackageRegistration.LanguagePackageRegistration(AtomUI.City.Localization.LanguagePackageDescriptor! descriptor, string! ownerId) -> void
+AtomUI.City.Localization.LanguagePackageRegistration.OwnerId.get -> string!
+AtomUI.City.Localization.LanguagePackageRegistry
+AtomUI.City.Localization.LanguagePackageRegistry.Descriptors.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Localization.LanguagePackageDescriptor!>!
+AtomUI.City.Localization.LanguagePackageRegistry.LanguagePackageRegistry() -> void
+AtomUI.City.Localization.LanguagePackageRegistry.Register(AtomUI.City.Localization.LanguagePackageDescriptor! descriptor, string! ownerId) -> AtomUI.City.Localization.LocalizationResult!
+AtomUI.City.Localization.LanguagePackageRegistry.RegisterRange(System.Collections.Generic.IEnumerable<AtomUI.City.Localization.LanguagePackageDescriptor!>! descriptors, string! ownerId) -> AtomUI.City.Localization.LocalizationResult!
+AtomUI.City.Localization.LanguagePackageRegistry.Registrations.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Localization.LanguagePackageRegistration!>!
+AtomUI.City.Localization.LanguagePackageRegistry.RevokeOwner(string! ownerId) -> int
+AtomUI.City.Localization.LocalizationDiagnosticIds
+AtomUI.City.Localization.LocalizationDiagnosticRecord
+AtomUI.City.Localization.LocalizationDiagnosticRecord.<Clone>$() -> AtomUI.City.Localization.LocalizationDiagnosticRecord!
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Attempt.get -> int?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Attempt.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Code.get -> string!
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Code.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.ContributionId.get -> string?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.ContributionId.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.CultureName.get -> string?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.CultureName.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.CultureRevision.get -> long?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.CultureRevision.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Deconstruct(out string! Code, out string! Message, out AtomUI.City.Localization.LocalizationDiagnosticSeverity Severity, out string? CultureName, out string? FallbackCultureName, out string? ResourceKey, out string? PackageId, out AtomUI.City.Localization.ResourceScope? Scope, out long? CultureRevision, out AtomUI.City.Localization.LocalizationErrorKind? ErrorKind, out string? ContributionId, out int? RevokedPackageCount, out string? ScopeId, out AtomUI.City.Localization.LanguagePackageProviderKind? ProviderKind, out string? Location, out string? OperationId, out int? Attempt, out double? ElapsedMilliseconds) -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.ElapsedMilliseconds.get -> double?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.ElapsedMilliseconds.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Equals(AtomUI.City.Localization.LocalizationDiagnosticRecord? other) -> bool
+AtomUI.City.Localization.LocalizationDiagnosticRecord.ErrorKind.get -> AtomUI.City.Localization.LocalizationErrorKind?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.ErrorKind.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.FallbackCultureName.get -> string?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.FallbackCultureName.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.LocalizationDiagnosticRecord(string! Code, string! Message, AtomUI.City.Localization.LocalizationDiagnosticSeverity Severity, string? CultureName = null, string? FallbackCultureName = null, string? ResourceKey = null, string? PackageId = null, AtomUI.City.Localization.ResourceScope? Scope = null, long? CultureRevision = null, AtomUI.City.Localization.LocalizationErrorKind? ErrorKind = null, string? ContributionId = null, int? RevokedPackageCount = null, string? ScopeId = null, AtomUI.City.Localization.LanguagePackageProviderKind? ProviderKind = null, string? Location = null, string? OperationId = null, int? Attempt = null, double? ElapsedMilliseconds = null) -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Location.get -> string?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Location.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Message.get -> string!
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Message.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.OperationId.get -> string?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.OperationId.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.PackageId.get -> string?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.PackageId.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.ProviderKind.get -> AtomUI.City.Localization.LanguagePackageProviderKind?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.ProviderKind.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.ResourceKey.get -> string?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.ResourceKey.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.RevokedPackageCount.get -> int?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.RevokedPackageCount.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Scope.get -> AtomUI.City.Localization.ResourceScope?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Scope.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.ScopeId.get -> string?
+AtomUI.City.Localization.LocalizationDiagnosticRecord.ScopeId.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Severity.get -> AtomUI.City.Localization.LocalizationDiagnosticSeverity
+AtomUI.City.Localization.LocalizationDiagnosticRecord.Severity.init -> void
+AtomUI.City.Localization.LocalizationDiagnosticSeverity
+AtomUI.City.Localization.LocalizationDiagnosticSeverity.Error = 3 -> AtomUI.City.Localization.LocalizationDiagnosticSeverity
+AtomUI.City.Localization.LocalizationDiagnosticSeverity.Info = 1 -> AtomUI.City.Localization.LocalizationDiagnosticSeverity
+AtomUI.City.Localization.LocalizationDiagnosticSeverity.Trace = 0 -> AtomUI.City.Localization.LocalizationDiagnosticSeverity
+AtomUI.City.Localization.LocalizationDiagnosticSeverity.Warning = 2 -> AtomUI.City.Localization.LocalizationDiagnosticSeverity
+AtomUI.City.Localization.LocalizationError
+AtomUI.City.Localization.LocalizationError.<Clone>$() -> AtomUI.City.Localization.LocalizationError!
+AtomUI.City.Localization.LocalizationError.Deconstruct(out AtomUI.City.Localization.LocalizationErrorKind Kind, out string! Message, out System.Exception? Exception) -> void
+AtomUI.City.Localization.LocalizationError.Equals(AtomUI.City.Localization.LocalizationError? other) -> bool
+AtomUI.City.Localization.LocalizationError.Exception.get -> System.Exception?
+AtomUI.City.Localization.LocalizationError.Exception.init -> void
+AtomUI.City.Localization.LocalizationError.Kind.get -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationError.Kind.init -> void
+AtomUI.City.Localization.LocalizationError.LocalizationError(AtomUI.City.Localization.LocalizationErrorKind Kind, string! Message, System.Exception? Exception = null) -> void
+AtomUI.City.Localization.LocalizationError.Message.get -> string!
+AtomUI.City.Localization.LocalizationError.Message.init -> void
+AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.Cancelled = 8 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.FormatFailed = 6 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.InvalidCulture = 10 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.InvalidDescriptor = 14 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.InvalidResource = 21 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.OwnerRevoked = 12 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.PackageAlreadyRegistered = 11 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.PackageChecksumMismatch = 18 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.PackageCultureMismatch = 3 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.PackageIdentityMismatch = 17 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.PackageLoadFailed = 1 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.PackageNotFound = 0 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.PackageSchemaMismatch = 19 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.PackageTooLarge = 20 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.PackageVersionMismatch = 2 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.PresentationApplyFailed = 4 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.ReentrantOperation = 15 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.RefreshFailed = 7 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.ResourceMissing = 5 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.ResourceRevoked = 13 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.ServiceDisposed = 16 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationErrorKind.Unknown = 9 -> AtomUI.City.Localization.LocalizationErrorKind
+AtomUI.City.Localization.LocalizationLookupContext
+AtomUI.City.Localization.LocalizationLookupContext.LocalizationLookupContext(string? moduleId = null, string? pluginId = null, string? routeId = null, string? windowId = null) -> void
+AtomUI.City.Localization.LocalizationLookupContext.ModuleId.get -> string?
+AtomUI.City.Localization.LocalizationLookupContext.PluginId.get -> string?
+AtomUI.City.Localization.LocalizationLookupContext.RouteId.get -> string?
+AtomUI.City.Localization.LocalizationLookupContext.WindowId.get -> string?
+AtomUI.City.Localization.LocalizationOptions
+AtomUI.City.Localization.LocalizationOptions.DefaultCulture.get -> System.Globalization.CultureInfo!
+AtomUI.City.Localization.LocalizationOptions.DefaultCulture.set -> void
+AtomUI.City.Localization.LocalizationOptions.DefaultUICulture.get -> System.Globalization.CultureInfo!
+AtomUI.City.Localization.LocalizationOptions.DefaultUICulture.set -> void
+AtomUI.City.Localization.LocalizationOptions.FallbackCultures.get -> System.Collections.Generic.IList<System.Globalization.CultureInfo!>!
+AtomUI.City.Localization.LocalizationOptions.LanguagePackages.get -> System.Collections.Generic.IList<AtomUI.City.Localization.LanguagePackageDescriptor!>!
+AtomUI.City.Localization.LocalizationOptions.LocalizationOptions() -> void
+AtomUI.City.Localization.LocalizationResult
+AtomUI.City.Localization.LocalizationResult.Error.get -> AtomUI.City.Localization.LocalizationError?
+AtomUI.City.Localization.LocalizationResult.Succeeded.get -> bool
+AtomUI.City.Localization.LocalizationService
+AtomUI.City.Localization.LocalizationService.ActivateScope(AtomUI.City.Localization.LocalizationLookupContext! context) -> AtomUI.City.Localization.ILocalizationScopeLease!
+AtomUI.City.Localization.LocalizationService.CreateMessageTextAsync(string! key, System.Collections.Generic.IReadOnlyList<object?>! arguments, AtomUI.City.Localization.LocalizationLookupContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.ILocalizedText!>
+AtomUI.City.Localization.LocalizationService.CreateMessageTextAsync(string! key, System.Collections.Generic.IReadOnlyList<object?>! arguments, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.ILocalizedText!>
+AtomUI.City.Localization.LocalizationService.CreateTextAsync(string! key, AtomUI.City.Localization.LocalizationLookupContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.ILocalizedText!>
+AtomUI.City.Localization.LocalizationService.CreateTextAsync(string! key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.ILocalizedText!>
+AtomUI.City.Localization.LocalizationService.CultureRevision.get -> long
+AtomUI.City.Localization.LocalizationService.CultureState.get -> AtomUI.City.State.IReadOnlyState<AtomUI.City.Localization.CultureState!>!
+AtomUI.City.Localization.LocalizationService.CurrentCulture.get -> System.Globalization.CultureInfo!
+AtomUI.City.Localization.LocalizationService.Dispose() -> void
+AtomUI.City.Localization.LocalizationService.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Localization.LocalizationService.GetMessageAsync(string! key, System.Collections.Generic.IReadOnlyList<object?>! arguments, AtomUI.City.Localization.LocalizationLookupContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LocalizedMessage!>
+AtomUI.City.Localization.LocalizationService.GetMessageAsync(string! key, System.Collections.Generic.IReadOnlyList<object?>! arguments, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LocalizedMessage!>
+AtomUI.City.Localization.LocalizationService.GetStringAsync(string! key, AtomUI.City.Localization.LocalizationLookupContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LocalizedString!>
+AtomUI.City.Localization.LocalizationService.GetStringAsync(string! key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LocalizedString!>
+AtomUI.City.Localization.LocalizationService.LocalizationService(AtomUI.City.Localization.LocalizationOptions! options, System.Collections.Generic.IEnumerable<AtomUI.City.Localization.ILanguagePackageProvider!>! providers, AtomUI.City.Localization.IPresentationLocalizationBridge? bridge = null, AtomUI.City.Localization.ILocalizationDiagnostics? diagnostics = null) -> void
+AtomUI.City.Localization.LocalizationService.LocalizationService(System.Collections.Generic.IReadOnlyList<AtomUI.City.Localization.LanguagePackageDescriptor!>! descriptors, System.Collections.Generic.IEnumerable<AtomUI.City.Localization.ILanguagePackageProvider!>! providers, AtomUI.City.Localization.IPresentationLocalizationBridge? bridge = null, AtomUI.City.Localization.ILocalizationDiagnostics? diagnostics = null) -> void
+AtomUI.City.Localization.LocalizationService.RevokePackagesByContributionIdAsync(string! contributionId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<int>
+AtomUI.City.Localization.LocalizationService.SetCultureAsync(string! cultureName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LocalizationResult!>
+AtomUI.City.Localization.LocalizationService.State.get -> AtomUI.City.Localization.CultureState!
+AtomUI.City.Localization.LocalizationServiceCollectionExtensions
+AtomUI.City.Localization.LocalizedMessage
+AtomUI.City.Localization.LocalizedMessage.Culture.get -> System.Globalization.CultureInfo!
+AtomUI.City.Localization.LocalizedMessage.IsFallback.get -> bool
+AtomUI.City.Localization.LocalizedMessage.IsFormatFailed.get -> bool
+AtomUI.City.Localization.LocalizedMessage.IsMissing.get -> bool
+AtomUI.City.Localization.LocalizedMessage.Key.get -> string!
+AtomUI.City.Localization.LocalizedMessage.Value.get -> string!
+AtomUI.City.Localization.LocalizedResourceAttribute
+AtomUI.City.Localization.LocalizedResourceAttribute.Critical.get -> bool
+AtomUI.City.Localization.LocalizedResourceAttribute.Critical.set -> void
+AtomUI.City.Localization.LocalizedResourceAttribute.Culture.get -> string?
+AtomUI.City.Localization.LocalizedResourceAttribute.Culture.set -> void
+AtomUI.City.Localization.LocalizedResourceAttribute.Key.get -> string!
+AtomUI.City.Localization.LocalizedResourceAttribute.Kind.get -> AtomUI.City.Localization.LocalizedResourceKind
+AtomUI.City.Localization.LocalizedResourceAttribute.Kind.set -> void
+AtomUI.City.Localization.LocalizedResourceAttribute.LocalizedResourceAttribute(string! key, string! packageId) -> void
+AtomUI.City.Localization.LocalizedResourceAttribute.PackageId.get -> string!
+AtomUI.City.Localization.LocalizedResourceAttribute.Scope.get -> AtomUI.City.Localization.ResourceScope
+AtomUI.City.Localization.LocalizedResourceAttribute.Scope.set -> void
+AtomUI.City.Localization.LocalizedResourceAttribute.ScopeId.get -> string?
+AtomUI.City.Localization.LocalizedResourceAttribute.ScopeId.set -> void
+AtomUI.City.Localization.LocalizedResourceAttribute.Version.get -> string?
+AtomUI.City.Localization.LocalizedResourceAttribute.Version.set -> void
+AtomUI.City.Localization.LocalizedResourceKind
+AtomUI.City.Localization.LocalizedResourceKind.CommandText = 8 -> AtomUI.City.Localization.LocalizedResourceKind
+AtomUI.City.Localization.LocalizedResourceKind.CultureMetadata = 5 -> AtomUI.City.Localization.LocalizedResourceKind
+AtomUI.City.Localization.LocalizedResourceKind.ErrorMessage = 7 -> AtomUI.City.Localization.LocalizedResourceKind
+AtomUI.City.Localization.LocalizedResourceKind.FlowDirection = 4 -> AtomUI.City.Localization.LocalizedResourceKind
+AtomUI.City.Localization.LocalizedResourceKind.FormattedString = 1 -> AtomUI.City.Localization.LocalizedResourceKind
+AtomUI.City.Localization.LocalizedResourceKind.Pluralization = 2 -> AtomUI.City.Localization.LocalizedResourceKind
+AtomUI.City.Localization.LocalizedResourceKind.ResourceObject = 3 -> AtomUI.City.Localization.LocalizedResourceKind
+AtomUI.City.Localization.LocalizedResourceKind.RouteTitle = 9 -> AtomUI.City.Localization.LocalizedResourceKind
+AtomUI.City.Localization.LocalizedResourceKind.String = 0 -> AtomUI.City.Localization.LocalizedResourceKind
+AtomUI.City.Localization.LocalizedResourceKind.ValidationMessage = 6 -> AtomUI.City.Localization.LocalizedResourceKind
+AtomUI.City.Localization.LocalizedString
+AtomUI.City.Localization.LocalizedString.Culture.get -> System.Globalization.CultureInfo!
+AtomUI.City.Localization.LocalizedString.IsFallback.get -> bool
+AtomUI.City.Localization.LocalizedString.IsMissing.get -> bool
+AtomUI.City.Localization.LocalizedString.Key.get -> string!
+AtomUI.City.Localization.LocalizedString.Value.get -> string!
+AtomUI.City.Localization.LocalizedTextChangedEventArgs
+AtomUI.City.Localization.LocalizedTextChangedEventArgs.Culture.get -> System.Globalization.CultureInfo!
+AtomUI.City.Localization.LocalizedTextChangedEventArgs.IsFallback.get -> bool
+AtomUI.City.Localization.LocalizedTextChangedEventArgs.IsMissing.get -> bool
+AtomUI.City.Localization.LocalizedTextChangedEventArgs.Key.get -> string!
+AtomUI.City.Localization.LocalizedTextChangedEventArgs.LocalizedTextChangedEventArgs(AtomUI.City.Localization.LocalizedString! text, long revision) -> void
+AtomUI.City.Localization.LocalizedTextChangedEventArgs.Revision.get -> long
+AtomUI.City.Localization.LocalizedTextChangedEventArgs.Value.get -> string!
+AtomUI.City.Localization.ResourceScope
+AtomUI.City.Localization.ResourceScope.Host = 0 -> AtomUI.City.Localization.ResourceScope
+AtomUI.City.Localization.ResourceScope.Module = 1 -> AtomUI.City.Localization.ResourceScope
+AtomUI.City.Localization.ResourceScope.Plugin = 2 -> AtomUI.City.Localization.ResourceScope
+AtomUI.City.Localization.ResourceScope.Presentation = 5 -> AtomUI.City.Localization.ResourceScope
+AtomUI.City.Localization.ResourceScope.Route = 3 -> AtomUI.City.Localization.ResourceScope
+AtomUI.City.Localization.ResourceScope.Window = 4 -> AtomUI.City.Localization.ResourceScope
+const AtomUI.City.Localization.LocalizationDiagnosticIds.AtomUiApplyFailed = "AUCLOC004" -> string!
+const AtomUI.City.Localization.LocalizationDiagnosticIds.CultureChanged = "AUCLOC007" -> string!
+const AtomUI.City.Localization.LocalizationDiagnosticIds.CultureSwitchRejected = "AUCLOC008" -> string!
+const AtomUI.City.Localization.LocalizationDiagnosticIds.CultureSwitchSkipped = "AUCLOC009" -> string!
+const AtomUI.City.Localization.LocalizationDiagnosticIds.FallbackMissing = "AUCLOC002" -> string!
+const AtomUI.City.Localization.LocalizationDiagnosticIds.MessageFormatFailed = "AUCLOC005" -> string!
+const AtomUI.City.Localization.LocalizationDiagnosticIds.PackageLoadFailed = "AUCLOC003" -> string!
+const AtomUI.City.Localization.LocalizationDiagnosticIds.PluginPackagesRevoked = "AUCLOC010" -> string!
+const AtomUI.City.Localization.LocalizationDiagnosticIds.ResourceMissing = "AUCLOC001" -> string!
+const AtomUI.City.Localization.LocalizationDiagnosticIds.TextRefreshFailed = "AUCLOC006" -> string!
+override AtomUI.City.Localization.LocalizationDiagnosticRecord.Equals(object? obj) -> bool
+override AtomUI.City.Localization.LocalizationDiagnosticRecord.GetHashCode() -> int
+override AtomUI.City.Localization.LocalizationDiagnosticRecord.ToString() -> string!
+override AtomUI.City.Localization.LocalizationError.Equals(object? obj) -> bool
+override AtomUI.City.Localization.LocalizationError.GetHashCode() -> int
+override AtomUI.City.Localization.LocalizationError.ToString() -> string!
+static AtomUI.City.Localization.LanguagePackage.Create(AtomUI.City.Localization.LanguagePackageDescriptor! descriptor, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! strings) -> AtomUI.City.Localization.LanguagePackage!
+static AtomUI.City.Localization.LanguagePackageLoadResult.Failed(AtomUI.City.Localization.LocalizationError! error) -> AtomUI.City.Localization.LanguagePackageLoadResult!
+static AtomUI.City.Localization.LanguagePackageLoadResult.Success(AtomUI.City.Localization.LanguagePackage! package) -> AtomUI.City.Localization.LanguagePackageLoadResult!
+static AtomUI.City.Localization.LocalizationDiagnosticRecord.operator !=(AtomUI.City.Localization.LocalizationDiagnosticRecord? left, AtomUI.City.Localization.LocalizationDiagnosticRecord? right) -> bool
+static AtomUI.City.Localization.LocalizationDiagnosticRecord.operator ==(AtomUI.City.Localization.LocalizationDiagnosticRecord? left, AtomUI.City.Localization.LocalizationDiagnosticRecord? right) -> bool
+static AtomUI.City.Localization.LocalizationError.operator !=(AtomUI.City.Localization.LocalizationError? left, AtomUI.City.Localization.LocalizationError? right) -> bool
+static AtomUI.City.Localization.LocalizationError.operator ==(AtomUI.City.Localization.LocalizationError? left, AtomUI.City.Localization.LocalizationError? right) -> bool
+static AtomUI.City.Localization.LocalizationLookupContext.Global.get -> AtomUI.City.Localization.LocalizationLookupContext!
+static AtomUI.City.Localization.LocalizationResult.Failed(AtomUI.City.Localization.LocalizationError! error) -> AtomUI.City.Localization.LocalizationResult!
+static AtomUI.City.Localization.LocalizationResult.Success() -> AtomUI.City.Localization.LocalizationResult!
+static AtomUI.City.Localization.LocalizationServiceCollectionExtensions.AddLocalization(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<AtomUI.City.Localization.LocalizationOptions!>? configure = null) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Localization.LocalizedMessage.FromString(AtomUI.City.Localization.LocalizedString! localizedString, string! value, bool isFormatFailed = false) -> AtomUI.City.Localization.LocalizedMessage!
+static AtomUI.City.Localization.LocalizedString.Fallback(string! key, string! value, System.Globalization.CultureInfo! culture) -> AtomUI.City.Localization.LocalizedString!
+static AtomUI.City.Localization.LocalizedString.Found(string! key, string! value, System.Globalization.CultureInfo! culture) -> AtomUI.City.Localization.LocalizedString!
+static AtomUI.City.Localization.LocalizedString.Missing(string! key, System.Globalization.CultureInfo! culture) -> AtomUI.City.Localization.LocalizedString!

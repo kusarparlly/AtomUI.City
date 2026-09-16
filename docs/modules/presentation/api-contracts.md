@@ -1,5 +1,9 @@
 # AtomUI.City.Presentation API Contracts
 
+## Stability 基线
+
+`PublicAPI.Shipped.txt` 中现有签名当前全部为 `Preview-frozen`：门禁阻止未经 review 的漂移，但不等价于已经对外发布的 `Stable` API。每个类型升为稳定状态时必须在对应类型族中明确记录，并同步 compatibility 和测试证据。
+
 本文记录 1.0 public API 的用途、前置条件、所有权、失败、取消、并发和释放语义。源码新增 public 类型时必须同步更新本文。
 
 ## 注册与 Runtime

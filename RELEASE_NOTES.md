@@ -1,10 +1,10 @@
 # AtomUI.City Release Notes
 
-## 1.0.0 (unreleased candidate)
+## 1.0.0-preview.1 (unreleased candidate)
 
 ### New features
 
-- Candidate for the first stable AtomUI.City package line for Avalonia and AtomUI desktop applications.
+- Preview candidate for the first stable AtomUI.City package line for Avalonia and AtomUI desktop applications.
 - Product-level contracts for Core host lifecycle, module ordering, diagnostics, DI markers, and dispatcher abstraction.
 - Runtime modules for Routing, Presentation, MVVM, State, EventBus, Localization, Security, Data, and PluginSystem.
 - Build and source generator integration plus implemented CLI, template, and testing baselines with local release gates.

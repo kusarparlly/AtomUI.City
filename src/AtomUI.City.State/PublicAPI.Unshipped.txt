@@ -1,0 +1,306 @@
+#nullable enable
+AtomUI.City.State.ApplicationStateRegistry
+AtomUI.City.State.ApplicationStateRegistry.Add<T>(AtomUI.City.State.StateDefinition<T>! definition) -> void
+AtomUI.City.State.ApplicationStateRegistry.ApplicationStateRegistry(AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.State.ApplicationStateRegistry.CreateSnapshot() -> AtomUI.City.State.StateSnapshot!
+AtomUI.City.State.ApplicationStateRegistry.CreateWriter(AtomUI.City.State.StateWriteAuthority! authority) -> AtomUI.City.State.IApplicationStateWriter!
+AtomUI.City.State.ApplicationStateRegistry.Get<T>(AtomUI.City.State.StateKey<T> key) -> AtomUI.City.State.IReadOnlyState<T>!
+AtomUI.City.State.ApplicationStateRegistry.GetWritable<T>(AtomUI.City.State.StateKey<T> key) -> AtomUI.City.State.IWritableState<T>!
+AtomUI.City.State.ApplicationStateRegistry.OnChange<T>(AtomUI.City.State.StateKey<T> key, System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.ApplicationStateRegistry.Restore(AtomUI.City.State.StateSnapshot! snapshot) -> void
+AtomUI.City.State.ApplicationStateRegistry.Set<T>(AtomUI.City.State.StateKey<T> key, T value) -> bool
+AtomUI.City.State.ApplicationStateRegistry.Update<T>(AtomUI.City.State.StateKey<T> key, System.Func<T, T>! updater) -> bool
+AtomUI.City.State.ComputedState<T>
+AtomUI.City.State.ComputedState<T>.ComputedState(System.Func<T>! compute, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics, params AtomUI.City.State.IReadOnlyState![]! dependencies) -> void
+AtomUI.City.State.ComputedState<T>.ComputedState(System.Func<T>! compute, params AtomUI.City.State.IReadOnlyState![]! dependencies) -> void
+AtomUI.City.State.ComputedState<T>.Dispose() -> void
+AtomUI.City.State.ComputedState<T>.LastError.get -> System.Exception?
+AtomUI.City.State.ComputedState<T>.OnChange(System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.ComputedState<T>.OnChange(System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.ComputedState<T>.Value.get -> T
+AtomUI.City.State.ComputedState<T>.ValueType.get -> System.Type!
+AtomUI.City.State.ComputedState<T>.Version.get -> long
+AtomUI.City.State.IApplicationState
+AtomUI.City.State.IApplicationState.Get<T>(AtomUI.City.State.StateKey<T> key) -> AtomUI.City.State.IReadOnlyState<T>!
+AtomUI.City.State.IApplicationState.OnChange<T>(AtomUI.City.State.StateKey<T> key, System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IApplicationStateWriter
+AtomUI.City.State.IApplicationStateWriter.GetWritable<T>(AtomUI.City.State.StateKey<T> key) -> AtomUI.City.State.IWritableState<T>!
+AtomUI.City.State.IApplicationStateWriter.Set<T>(AtomUI.City.State.StateKey<T> key, T value) -> bool
+AtomUI.City.State.IApplicationStateWriter.Update<T>(AtomUI.City.State.StateKey<T> key, System.Func<T, T>! updater) -> bool
+AtomUI.City.State.IComputedState<T>
+AtomUI.City.State.IReadOnlyState
+AtomUI.City.State.IReadOnlyState.OnChange(System.Action<AtomUI.City.State.StateChangedEventArgs!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IReadOnlyState.OnChange(System.Action<AtomUI.City.State.StateChangedEventArgs!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IReadOnlyState.Value.get -> object?
+AtomUI.City.State.IReadOnlyState.ValueType.get -> System.Type!
+AtomUI.City.State.IReadOnlyState.Version.get -> long
+AtomUI.City.State.IReadOnlyState<T>
+AtomUI.City.State.IReadOnlyState<T>.OnChange(System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IReadOnlyState<T>.OnChange(System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IReadOnlyState<T>.Value.get -> T
+AtomUI.City.State.IStateCollection<TKey, TItem>
+AtomUI.City.State.IStateCollection<TKey, TItem>.AddOrUpdate(TKey key, TItem item) -> bool
+AtomUI.City.State.IStateCollection<TKey, TItem>.AddOrUpdateRange(System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<TKey, TItem>>! items) -> bool
+AtomUI.City.State.IStateCollection<TKey, TItem>.Clear() -> bool
+AtomUI.City.State.IStateCollection<TKey, TItem>.CreateSnapshot() -> AtomUI.City.State.StateCollectionSnapshot<TKey, TItem>!
+AtomUI.City.State.IStateCollection<TKey, TItem>.Items.get -> System.Collections.Generic.IReadOnlyDictionary<TKey, TItem>!
+AtomUI.City.State.IStateCollection<TKey, TItem>.OnChange(System.Action<AtomUI.City.State.StateCollectionChangedEventArgs<TKey, TItem>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IStateCollection<TKey, TItem>.OnChange(System.Action<AtomUI.City.State.StateCollectionChangedEventArgs<TKey, TItem>!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IStateCollection<TKey, TItem>.Remove(TKey key) -> bool
+AtomUI.City.State.IStateCollection<TKey, TItem>.RestoreSnapshot(AtomUI.City.State.StateCollectionSnapshot<TKey, TItem>! snapshot) -> bool
+AtomUI.City.State.IStateCollection<TKey, TItem>.TryGetItemVersion(TKey key, out long version) -> bool
+AtomUI.City.State.IStateCollection<TKey, TItem>.Version.get -> long
+AtomUI.City.State.IStateFactory
+AtomUI.City.State.IStateFactory.CreateComputed<T>(System.Func<T>! compute, params AtomUI.City.State.IReadOnlyState![]! dependencies) -> AtomUI.City.State.ComputedState<T>!
+AtomUI.City.State.IStateFactory.CreateScope(string! id) -> AtomUI.City.State.StateScope!
+AtomUI.City.State.IStateFactory.CreateWritable<T>(T initialValue, System.Collections.Generic.IEqualityComparer<T>? comparer = null, string? stateName = null, AtomUI.City.State.StateAccessPolicy access = AtomUI.City.State.StateAccessPolicy.HostWrite) -> AtomUI.City.State.WritableState<T>!
+AtomUI.City.State.IStateReaction
+AtomUI.City.State.IStateRegistry
+AtomUI.City.State.IStateRegistry.Add<T>(AtomUI.City.State.StateDefinition<T>! definition) -> void
+AtomUI.City.State.IStateScope
+AtomUI.City.State.IStateScope.Add(System.IDisposable! subscription) -> void
+AtomUI.City.State.IStateScope.Id.get -> string!
+AtomUI.City.State.IStateScope.State.get -> AtomUI.City.State.StateScopeState
+AtomUI.City.State.IStateScopeAccessor
+AtomUI.City.State.IStateScopeAccessor.Current.get -> AtomUI.City.State.IStateScope?
+AtomUI.City.State.IStateScopeAccessor.Push(AtomUI.City.State.IStateScope! scope) -> System.IDisposable!
+AtomUI.City.State.IStateSubscription
+AtomUI.City.State.IStateValue<T>
+AtomUI.City.State.IStateValue<T>.Value.get -> T
+AtomUI.City.State.IWritableState<T>
+AtomUI.City.State.IWritableState<T>.Changed -> System.EventHandler<AtomUI.City.State.StateChangedEventArgs<T>!>?
+AtomUI.City.State.IWritableState<T>.Set(T value) -> void
+AtomUI.City.State.IWritableState<T>.SetValue(T value) -> bool
+AtomUI.City.State.IWritableState<T>.Update(System.Func<T, T>! updater) -> bool
+AtomUI.City.State.StateAccessDeniedException
+AtomUI.City.State.StateAccessDeniedException.StateAccessDeniedException(string! stateName) -> void
+AtomUI.City.State.StateAccessDeniedException.StateName.get -> string!
+AtomUI.City.State.StateAccessPolicy
+AtomUI.City.State.StateAccessPolicy.AuthorizedWrite = 3 -> AtomUI.City.State.StateAccessPolicy
+AtomUI.City.State.StateAccessPolicy.HostWrite = 2 -> AtomUI.City.State.StateAccessPolicy
+AtomUI.City.State.StateAccessPolicy.OwnerWrite = 1 -> AtomUI.City.State.StateAccessPolicy
+AtomUI.City.State.StateAccessPolicy.PluginIsolated = 4 -> AtomUI.City.State.StateAccessPolicy
+AtomUI.City.State.StateAccessPolicy.ReadOnly = 0 -> AtomUI.City.State.StateAccessPolicy
+AtomUI.City.State.StateChangedEventArgs
+AtomUI.City.State.StateChangedEventArgs.NewValue.get -> object?
+AtomUI.City.State.StateChangedEventArgs.OldValue.get -> object?
+AtomUI.City.State.StateChangedEventArgs.StateChangedEventArgs(object? oldValue, object? newValue, long version) -> void
+AtomUI.City.State.StateChangedEventArgs.Version.get -> long
+AtomUI.City.State.StateChangedEventArgs<T>
+AtomUI.City.State.StateChangedEventArgs<T>.NewValue.get -> T
+AtomUI.City.State.StateChangedEventArgs<T>.OldValue.get -> T
+AtomUI.City.State.StateChangedEventArgs<T>.StateChangedEventArgs(T oldValue, T newValue) -> void
+AtomUI.City.State.StateChangedEventArgs<T>.StateChangedEventArgs(T oldValue, T newValue, long version) -> void
+AtomUI.City.State.StateCollection<TKey, TItem>
+AtomUI.City.State.StateCollection<TKey, TItem>.AddOrUpdate(TKey key, TItem item) -> bool
+AtomUI.City.State.StateCollection<TKey, TItem>.AddOrUpdateRange(System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<TKey, TItem>>! items) -> bool
+AtomUI.City.State.StateCollection<TKey, TItem>.Changed -> System.EventHandler<AtomUI.City.State.StateCollectionChangedEventArgs<TKey, TItem>!>?
+AtomUI.City.State.StateCollection<TKey, TItem>.Clear() -> bool
+AtomUI.City.State.StateCollection<TKey, TItem>.CreateSnapshot() -> AtomUI.City.State.StateCollectionSnapshot<TKey, TItem>!
+AtomUI.City.State.StateCollection<TKey, TItem>.Dispose() -> void
+AtomUI.City.State.StateCollection<TKey, TItem>.Items.get -> System.Collections.Generic.IReadOnlyDictionary<TKey, TItem>!
+AtomUI.City.State.StateCollection<TKey, TItem>.OnChange(System.Action<AtomUI.City.State.StateCollectionChangedEventArgs<TKey, TItem>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.StateCollection<TKey, TItem>.OnChange(System.Action<AtomUI.City.State.StateCollectionChangedEventArgs<TKey, TItem>!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.StateCollection<TKey, TItem>.Remove(TKey key) -> bool
+AtomUI.City.State.StateCollection<TKey, TItem>.RestoreSnapshot(AtomUI.City.State.StateCollectionSnapshot<TKey, TItem>! snapshot) -> bool
+AtomUI.City.State.StateCollection<TKey, TItem>.StateCollection(System.Collections.Generic.IEqualityComparer<TKey>? keyComparer = null, System.Collections.Generic.IEqualityComparer<TItem>? itemComparer = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.State.StateCollection<TKey, TItem>.TryGetItemVersion(TKey key, out long version) -> bool
+AtomUI.City.State.StateCollection<TKey, TItem>.Version.get -> long
+AtomUI.City.State.StateCollectionChange<TKey, TItem>
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.<Clone>$() -> AtomUI.City.State.StateCollectionChange<TKey, TItem>!
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.CollectionVersion.get -> long
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.CollectionVersion.init -> void
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.Equals(AtomUI.City.State.StateCollectionChange<TKey, TItem>? other) -> bool
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.HasNewItem.get -> bool
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.HasNewItem.init -> void
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.HasOldItem.get -> bool
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.HasOldItem.init -> void
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.ItemVersion.get -> long
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.ItemVersion.init -> void
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.Key.get -> TKey
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.Key.init -> void
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.Kind.get -> AtomUI.City.State.StateCollectionChangeKind
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.Kind.init -> void
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.NewItem.get -> TItem?
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.NewItem.init -> void
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.OldItem.get -> TItem?
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.OldItem.init -> void
+AtomUI.City.State.StateCollectionChange<TKey, TItem>.StateCollectionChange(AtomUI.City.State.StateCollectionChangeKind Kind, TKey Key, bool HasOldItem, TItem? OldItem, bool HasNewItem, TItem? NewItem, long CollectionVersion, long ItemVersion) -> void
+AtomUI.City.State.StateCollectionChangedEventArgs<TKey, TItem>
+AtomUI.City.State.StateCollectionChangedEventArgs<TKey, TItem>.Change.get -> AtomUI.City.State.StateCollectionChange<TKey, TItem>!
+AtomUI.City.State.StateCollectionChangedEventArgs<TKey, TItem>.Changes.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.State.StateCollectionChange<TKey, TItem>!>!
+AtomUI.City.State.StateCollectionChangedEventArgs<TKey, TItem>.StateCollectionChangedEventArgs(AtomUI.City.State.StateCollectionChange<TKey, TItem>! change) -> void
+AtomUI.City.State.StateCollectionChangedEventArgs<TKey, TItem>.StateCollectionChangedEventArgs(System.Collections.Generic.IReadOnlyList<AtomUI.City.State.StateCollectionChange<TKey, TItem>!>! changes) -> void
+AtomUI.City.State.StateCollectionChangeKind
+AtomUI.City.State.StateCollectionChangeKind.Added = 0 -> AtomUI.City.State.StateCollectionChangeKind
+AtomUI.City.State.StateCollectionChangeKind.Cleared = 3 -> AtomUI.City.State.StateCollectionChangeKind
+AtomUI.City.State.StateCollectionChangeKind.Removed = 2 -> AtomUI.City.State.StateCollectionChangeKind
+AtomUI.City.State.StateCollectionChangeKind.Reset = 4 -> AtomUI.City.State.StateCollectionChangeKind
+AtomUI.City.State.StateCollectionChangeKind.Updated = 1 -> AtomUI.City.State.StateCollectionChangeKind
+AtomUI.City.State.StateCollectionSnapshot<TKey, TItem>
+AtomUI.City.State.StateCollectionSnapshot<TKey, TItem>.CollectionVersion.get -> long
+AtomUI.City.State.StateCollectionSnapshot<TKey, TItem>.ItemCount.get -> int
+AtomUI.City.State.StateCollectionSnapshot<TKey, TItem>.Items.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>!>!
+AtomUI.City.State.StateCollectionSnapshot<TKey, TItem>.StateCollectionSnapshot(long collectionVersion, System.Collections.Generic.IReadOnlyList<AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>!>! items) -> void
+AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>
+AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.<Clone>$() -> AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>!
+AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.Equals(AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>? other) -> bool
+AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.Item.get -> TItem
+AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.Item.init -> void
+AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.ItemVersion.get -> long
+AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.ItemVersion.init -> void
+AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.Key.get -> TKey
+AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.Key.init -> void
+AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.StateCollectionSnapshotEntry(TKey Key, TItem Item, long ItemVersion) -> void
+AtomUI.City.State.StateDefinition
+AtomUI.City.State.StateDefinition.Access.get -> AtomUI.City.State.StateAccessPolicy
+AtomUI.City.State.StateDefinition.Lifetime.get -> AtomUI.City.State.StateLifetime
+AtomUI.City.State.StateDefinition.Name.get -> string!
+AtomUI.City.State.StateDefinition.OwnerModule.get -> string?
+AtomUI.City.State.StateDefinition.PluginId.get -> string?
+AtomUI.City.State.StateDefinition.SchemaVersion.get -> int
+AtomUI.City.State.StateDefinition.SnapshotPolicy.get -> AtomUI.City.State.StateSnapshotPolicy
+AtomUI.City.State.StateDefinition.StateDefinition(string! name, System.Type! valueType, AtomUI.City.State.StateLifetime lifetime, AtomUI.City.State.StateAccessPolicy access, AtomUI.City.State.StateSnapshotPolicy snapshotPolicy, int schemaVersion, string? ownerModule, string? pluginId, string? writeCapability) -> void
+AtomUI.City.State.StateDefinition.ValueType.get -> System.Type!
+AtomUI.City.State.StateDefinition.WriteCapability.get -> string?
+AtomUI.City.State.StateDefinition<T>
+AtomUI.City.State.StateDefinition<T>.Comparer.get -> System.Collections.Generic.IEqualityComparer<T>?
+AtomUI.City.State.StateDefinition<T>.DefaultValue.get -> T
+AtomUI.City.State.StateDefinition<T>.Key.get -> AtomUI.City.State.StateKey<T>
+AtomUI.City.State.StateDiagnosticIds
+AtomUI.City.State.StateDispatchPolicy
+AtomUI.City.State.StateDispatchPolicy.Background = 3 -> AtomUI.City.State.StateDispatchPolicy
+AtomUI.City.State.StateDispatchPolicy.Dispatcher = 2 -> AtomUI.City.State.StateDispatchPolicy
+AtomUI.City.State.StateDispatchPolicy.Immediate = 0 -> AtomUI.City.State.StateDispatchPolicy
+AtomUI.City.State.StateDispatchPolicy.Queued = 1 -> AtomUI.City.State.StateDispatchPolicy
+AtomUI.City.State.StateFactory
+AtomUI.City.State.StateFactory.CreateComputed<T>(System.Func<T>! compute, params AtomUI.City.State.IReadOnlyState![]! dependencies) -> AtomUI.City.State.ComputedState<T>!
+AtomUI.City.State.StateFactory.CreateScope(string! id) -> AtomUI.City.State.StateScope!
+AtomUI.City.State.StateFactory.CreateWritable<T>(T initialValue, System.Collections.Generic.IEqualityComparer<T>? comparer = null, string? stateName = null, AtomUI.City.State.StateAccessPolicy access = AtomUI.City.State.StateAccessPolicy.HostWrite) -> AtomUI.City.State.WritableState<T>!
+AtomUI.City.State.StateFactory.StateFactory(AtomUI.City.State.IStateScopeAccessor! scopeAccessor, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.State.StateKey<T>
+AtomUI.City.State.StateKey<T>.Equals(AtomUI.City.State.StateKey<T> other) -> bool
+AtomUI.City.State.StateKey<T>.Name.get -> string!
+AtomUI.City.State.StateKey<T>.StateKey() -> void
+AtomUI.City.State.StateKey<T>.StateKey(string! name) -> void
+AtomUI.City.State.StateLifetime
+AtomUI.City.State.StateLifetime.Activation = 3 -> AtomUI.City.State.StateLifetime
+AtomUI.City.State.StateLifetime.Application = 0 -> AtomUI.City.State.StateLifetime
+AtomUI.City.State.StateLifetime.Module = 1 -> AtomUI.City.State.StateLifetime
+AtomUI.City.State.StateLifetime.Plugin = 4 -> AtomUI.City.State.StateLifetime
+AtomUI.City.State.StateLifetime.Route = 2 -> AtomUI.City.State.StateLifetime
+AtomUI.City.State.StateNotRegisteredException
+AtomUI.City.State.StateNotRegisteredException.StateName.get -> string!
+AtomUI.City.State.StateNotRegisteredException.StateNotRegisteredException(string! stateName) -> void
+AtomUI.City.State.StateScope
+AtomUI.City.State.StateScope.Add(System.IDisposable! subscription) -> void
+AtomUI.City.State.StateScope.Dispose() -> void
+AtomUI.City.State.StateScope.Id.get -> string!
+AtomUI.City.State.StateScope.State.get -> AtomUI.City.State.StateScopeState
+AtomUI.City.State.StateScope.StateScope(string! id, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.State.StateScopeAccessor
+AtomUI.City.State.StateScopeAccessor.Current.get -> AtomUI.City.State.IStateScope?
+AtomUI.City.State.StateScopeAccessor.Push(AtomUI.City.State.IStateScope! scope) -> System.IDisposable!
+AtomUI.City.State.StateScopeAccessor.StateScopeAccessor() -> void
+AtomUI.City.State.StateScopeState
+AtomUI.City.State.StateScopeState.Active = 0 -> AtomUI.City.State.StateScopeState
+AtomUI.City.State.StateScopeState.Disposed = 2 -> AtomUI.City.State.StateScopeState
+AtomUI.City.State.StateScopeState.Disposing = 1 -> AtomUI.City.State.StateScopeState
+AtomUI.City.State.StateServiceCollectionExtensions
+AtomUI.City.State.StateSnapshot
+AtomUI.City.State.StateSnapshot.Entries.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.State.StateSnapshotEntry!>!
+AtomUI.City.State.StateSnapshot.StateSnapshot(System.Collections.Generic.IReadOnlyList<AtomUI.City.State.StateSnapshotEntry!>! entries) -> void
+AtomUI.City.State.StateSnapshotEntry
+AtomUI.City.State.StateSnapshotEntry.<Clone>$() -> AtomUI.City.State.StateSnapshotEntry!
+AtomUI.City.State.StateSnapshotEntry.Equals(AtomUI.City.State.StateSnapshotEntry? other) -> bool
+AtomUI.City.State.StateSnapshotEntry.Lifetime.get -> AtomUI.City.State.StateLifetime
+AtomUI.City.State.StateSnapshotEntry.Lifetime.init -> void
+AtomUI.City.State.StateSnapshotEntry.OwnerModule.get -> string?
+AtomUI.City.State.StateSnapshotEntry.OwnerModule.init -> void
+AtomUI.City.State.StateSnapshotEntry.PluginId.get -> string?
+AtomUI.City.State.StateSnapshotEntry.PluginId.init -> void
+AtomUI.City.State.StateSnapshotEntry.SchemaVersion.get -> int
+AtomUI.City.State.StateSnapshotEntry.SchemaVersion.init -> void
+AtomUI.City.State.StateSnapshotEntry.StateName.get -> string!
+AtomUI.City.State.StateSnapshotEntry.StateName.init -> void
+AtomUI.City.State.StateSnapshotEntry.StateSnapshotEntry(string! stateName, System.Type! valueType, object? value, long version, int schemaVersion, string? ownerModule, string? pluginId) -> void
+AtomUI.City.State.StateSnapshotEntry.StateSnapshotEntry(string! stateName, System.Type! valueType, object? value, long version, int schemaVersion, string? ownerModule, string? pluginId, AtomUI.City.State.StateLifetime lifetime) -> void
+AtomUI.City.State.StateSnapshotEntry.Timestamp.get -> System.DateTimeOffset
+AtomUI.City.State.StateSnapshotEntry.Timestamp.init -> void
+AtomUI.City.State.StateSnapshotEntry.Value.get -> object?
+AtomUI.City.State.StateSnapshotEntry.Value.init -> void
+AtomUI.City.State.StateSnapshotEntry.ValueType.get -> System.Type!
+AtomUI.City.State.StateSnapshotEntry.ValueType.init -> void
+AtomUI.City.State.StateSnapshotEntry.Version.get -> long
+AtomUI.City.State.StateSnapshotEntry.Version.init -> void
+AtomUI.City.State.StateSnapshotPolicy
+AtomUI.City.State.StateSnapshotPolicy.Persisted = 1 -> AtomUI.City.State.StateSnapshotPolicy
+AtomUI.City.State.StateSnapshotPolicy.Transient = 0 -> AtomUI.City.State.StateSnapshotPolicy
+AtomUI.City.State.StateSubscriptionOptions
+AtomUI.City.State.StateSubscriptionOptions.DispatchPolicy.get -> AtomUI.City.State.StateDispatchPolicy
+AtomUI.City.State.StateSubscriptionOptions.MaxPendingNotifications.get -> int
+AtomUI.City.State.StateSubscriptionOptions.UiDispatcher.get -> AtomUI.City.Core.Threading.IUiDispatcher?
+AtomUI.City.State.StateWriteAuthority
+AtomUI.City.State.StateWriteAuthority.Capabilities.get -> System.Collections.Generic.IReadOnlySet<string!>!
+AtomUI.City.State.StateWriteAuthority.Kind.get -> AtomUI.City.State.StateWriteAuthorityKind
+AtomUI.City.State.StateWriteAuthority.ModuleName.get -> string?
+AtomUI.City.State.StateWriteAuthority.PluginId.get -> string?
+AtomUI.City.State.StateWriteAuthorityKind
+AtomUI.City.State.StateWriteAuthorityKind.Host = 0 -> AtomUI.City.State.StateWriteAuthorityKind
+AtomUI.City.State.StateWriteAuthorityKind.Module = 1 -> AtomUI.City.State.StateWriteAuthorityKind
+AtomUI.City.State.StateWriteAuthorityKind.Plugin = 2 -> AtomUI.City.State.StateWriteAuthorityKind
+AtomUI.City.State.WritableState<T>
+AtomUI.City.State.WritableState<T>.Changed -> System.EventHandler<AtomUI.City.State.StateChangedEventArgs<T>!>?
+AtomUI.City.State.WritableState<T>.Dispose() -> void
+AtomUI.City.State.WritableState<T>.OnChange(System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.WritableState<T>.OnChange(System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.WritableState<T>.Set(T value) -> void
+AtomUI.City.State.WritableState<T>.SetValue(T value) -> bool
+AtomUI.City.State.WritableState<T>.Update(System.Func<T, T>! updater) -> bool
+AtomUI.City.State.WritableState<T>.Value.get -> T
+AtomUI.City.State.WritableState<T>.ValueType.get -> System.Type!
+AtomUI.City.State.WritableState<T>.Version.get -> long
+AtomUI.City.State.WritableState<T>.WritableState(T initialValue, System.Collections.Generic.IEqualityComparer<T>? comparer = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null, string? stateName = null, AtomUI.City.State.StateAccessPolicy access = AtomUI.City.State.StateAccessPolicy.HostWrite) -> void
+const AtomUI.City.State.StateDiagnosticIds.ApplicationStateAlreadyRegistered = "AUCSTA008" -> string!
+const AtomUI.City.State.StateDiagnosticIds.ApplicationStateNotRegistered = "AUCSTA003" -> string!
+const AtomUI.City.State.StateDiagnosticIds.ApplicationStateWriteDenied = "AUCSTA004" -> string!
+const AtomUI.City.State.StateDiagnosticIds.ChangedEventHandlerFailed = "AUCSTA001" -> string!
+const AtomUI.City.State.StateDiagnosticIds.ComputedStateComputeFailed = "AUCSTA005" -> string!
+const AtomUI.City.State.StateDiagnosticIds.ComputedStateDisposeFailed = "AUCSTA010" -> string!
+const AtomUI.City.State.StateDiagnosticIds.SnapshotRestoreFailed = "AUCSTA007" -> string!
+const AtomUI.City.State.StateDiagnosticIds.StateScopeDisposeFailed = "AUCSTA009" -> string!
+const AtomUI.City.State.StateDiagnosticIds.SubscriptionHandlerFailed = "AUCSTA002" -> string!
+const AtomUI.City.State.StateDiagnosticIds.SubscriptionQueueOverflow = "AUCSTA011" -> string!
+const AtomUI.City.State.StateDiagnosticIds.WritableStateUpdateFailed = "AUCSTA006" -> string!
+override AtomUI.City.State.StateCollectionChange<TKey, TItem>.Equals(object? obj) -> bool
+override AtomUI.City.State.StateCollectionChange<TKey, TItem>.GetHashCode() -> int
+override AtomUI.City.State.StateCollectionChange<TKey, TItem>.ToString() -> string!
+override AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.Equals(object? obj) -> bool
+override AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.GetHashCode() -> int
+override AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.ToString() -> string!
+override AtomUI.City.State.StateKey<T>.GetHashCode() -> int
+override AtomUI.City.State.StateKey<T>.ToString() -> string!
+override AtomUI.City.State.StateSnapshotEntry.Equals(object? obj) -> bool
+override AtomUI.City.State.StateSnapshotEntry.GetHashCode() -> int
+override AtomUI.City.State.StateSnapshotEntry.ToString() -> string!
+static AtomUI.City.State.StateCollectionChange<TKey, TItem>.operator !=(AtomUI.City.State.StateCollectionChange<TKey, TItem>? left, AtomUI.City.State.StateCollectionChange<TKey, TItem>? right) -> bool
+static AtomUI.City.State.StateCollectionChange<TKey, TItem>.operator ==(AtomUI.City.State.StateCollectionChange<TKey, TItem>? left, AtomUI.City.State.StateCollectionChange<TKey, TItem>? right) -> bool
+static AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.operator !=(AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>? left, AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>? right) -> bool
+static AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.operator ==(AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>? left, AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>? right) -> bool
+static AtomUI.City.State.StateDefinition.Create<T>(AtomUI.City.State.StateKey<T> key, T defaultValue, AtomUI.City.State.StateLifetime lifetime = AtomUI.City.State.StateLifetime.Application, AtomUI.City.State.StateAccessPolicy access = AtomUI.City.State.StateAccessPolicy.HostWrite, AtomUI.City.State.StateSnapshotPolicy snapshotPolicy = AtomUI.City.State.StateSnapshotPolicy.Transient, int schemaVersion = 1, string? ownerModule = null, string? pluginId = null, System.Collections.Generic.IEqualityComparer<T>? comparer = null, string? writeCapability = null) -> AtomUI.City.State.StateDefinition<T>!
+static AtomUI.City.State.StateDefinition<T>.Create(AtomUI.City.State.StateKey<T> key, T defaultValue, AtomUI.City.State.StateLifetime lifetime = AtomUI.City.State.StateLifetime.Application, AtomUI.City.State.StateAccessPolicy access = AtomUI.City.State.StateAccessPolicy.HostWrite, AtomUI.City.State.StateSnapshotPolicy snapshotPolicy = AtomUI.City.State.StateSnapshotPolicy.Transient, int schemaVersion = 1, string? ownerModule = null, string? pluginId = null, System.Collections.Generic.IEqualityComparer<T>? comparer = null, string? writeCapability = null) -> AtomUI.City.State.StateDefinition<T>!
+static AtomUI.City.State.StateKey<T>.operator !=(AtomUI.City.State.StateKey<T> left, AtomUI.City.State.StateKey<T> right) -> bool
+static AtomUI.City.State.StateKey<T>.operator ==(AtomUI.City.State.StateKey<T> left, AtomUI.City.State.StateKey<T> right) -> bool
+static AtomUI.City.State.StateServiceCollectionExtensions.AddState(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.State.StateSnapshotEntry.operator !=(AtomUI.City.State.StateSnapshotEntry? left, AtomUI.City.State.StateSnapshotEntry? right) -> bool
+static AtomUI.City.State.StateSnapshotEntry.operator ==(AtomUI.City.State.StateSnapshotEntry? left, AtomUI.City.State.StateSnapshotEntry? right) -> bool
+static AtomUI.City.State.StateSubscriptionOptions.Background() -> AtomUI.City.State.StateSubscriptionOptions!
+static AtomUI.City.State.StateSubscriptionOptions.Background(int maxPendingNotifications) -> AtomUI.City.State.StateSubscriptionOptions!
+static AtomUI.City.State.StateSubscriptionOptions.Dispatcher(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher) -> AtomUI.City.State.StateSubscriptionOptions!
+static AtomUI.City.State.StateSubscriptionOptions.Dispatcher(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, int maxPendingNotifications) -> AtomUI.City.State.StateSubscriptionOptions!
+static AtomUI.City.State.StateSubscriptionOptions.Immediate.get -> AtomUI.City.State.StateSubscriptionOptions!
+static AtomUI.City.State.StateSubscriptionOptions.Queued() -> AtomUI.City.State.StateSubscriptionOptions!
+static AtomUI.City.State.StateSubscriptionOptions.Queued(int maxPendingNotifications) -> AtomUI.City.State.StateSubscriptionOptions!
+static AtomUI.City.State.StateWriteAuthority.Module(string! moduleName, System.Collections.Generic.IEnumerable<string!>? capabilities = null) -> AtomUI.City.State.StateWriteAuthority!
+static AtomUI.City.State.StateWriteAuthority.Plugin(string! pluginId, System.Collections.Generic.IEnumerable<string!>? capabilities = null) -> AtomUI.City.State.StateWriteAuthority!
+~override AtomUI.City.State.StateKey<T>.Equals(object obj) -> bool

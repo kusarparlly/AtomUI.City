@@ -1,0 +1,470 @@
+#nullable enable
+AtomUI.City.Security.AccessTokenRequest
+AtomUI.City.Security.AccessTokenRequest.AccessTokenRequest(string! resourceName, string? scheme = null, string? operationName = null) -> void
+AtomUI.City.Security.AccessTokenRequest.OperationName.get -> string?
+AtomUI.City.Security.AccessTokenRequest.ResourceName.get -> string!
+AtomUI.City.Security.AccessTokenRequest.Scheme.get -> string?
+AtomUI.City.Security.AccessTokenResult
+AtomUI.City.Security.AccessTokenResult.Exception.get -> System.Exception?
+AtomUI.City.Security.AccessTokenResult.ExpiresAt.get -> System.DateTimeOffset?
+AtomUI.City.Security.AccessTokenResult.Message.get -> string?
+AtomUI.City.Security.AccessTokenResult.Scheme.get -> string?
+AtomUI.City.Security.AccessTokenResult.Status.get -> AtomUI.City.Security.AccessTokenResultStatus
+AtomUI.City.Security.AccessTokenResult.Succeeded.get -> bool
+AtomUI.City.Security.AccessTokenResult.Token.get -> string?
+AtomUI.City.Security.AccessTokenResultStatus
+AtomUI.City.Security.AccessTokenResultStatus.Cancelled = 6 -> AtomUI.City.Security.AccessTokenResultStatus
+AtomUI.City.Security.AccessTokenResultStatus.Expired = 3 -> AtomUI.City.Security.AccessTokenResultStatus
+AtomUI.City.Security.AccessTokenResultStatus.Failed = 4 -> AtomUI.City.Security.AccessTokenResultStatus
+AtomUI.City.Security.AccessTokenResultStatus.None = 0 -> AtomUI.City.Security.AccessTokenResultStatus
+AtomUI.City.Security.AccessTokenResultStatus.Required = 2 -> AtomUI.City.Security.AccessTokenResultStatus
+AtomUI.City.Security.AccessTokenResultStatus.Success = 1 -> AtomUI.City.Security.AccessTokenResultStatus
+AtomUI.City.Security.AccessTokenResultStatus.Unavailable = 5 -> AtomUI.City.Security.AccessTokenResultStatus
+AtomUI.City.Security.AccountCredentialContext
+AtomUI.City.Security.AccountCredentialContext.AccountCredentialContext(string! resourceName, string? scheme, System.DateTimeOffset? expiresAt, bool hasCredential) -> void
+AtomUI.City.Security.AccountCredentialContext.ExpiresAt.get -> System.DateTimeOffset?
+AtomUI.City.Security.AccountCredentialContext.HasCredential.get -> bool
+AtomUI.City.Security.AccountCredentialContext.IsExpired(System.DateTimeOffset now) -> bool
+AtomUI.City.Security.AccountCredentialContext.ResourceName.get -> string!
+AtomUI.City.Security.AccountCredentialContext.Scheme.get -> string?
+AtomUI.City.Security.AccountCredentialSnapshot
+AtomUI.City.Security.AccountCredentialSnapshot.AccessToken.get -> string!
+AtomUI.City.Security.AccountCredentialSnapshot.AccountCredentialSnapshot(AtomUI.City.Security.SecurityAccountKey! accountKey, string! resourceName, string! accessToken, string! scheme, string? refreshToken = null, System.DateTimeOffset? expiresAt = null, int schemaVersion = 1) -> void
+AtomUI.City.Security.AccountCredentialSnapshot.AccountKey.get -> AtomUI.City.Security.SecurityAccountKey!
+AtomUI.City.Security.AccountCredentialSnapshot.ExpiresAt.get -> System.DateTimeOffset?
+AtomUI.City.Security.AccountCredentialSnapshot.RefreshToken.get -> string?
+AtomUI.City.Security.AccountCredentialSnapshot.ResourceName.get -> string!
+AtomUI.City.Security.AccountCredentialSnapshot.SchemaVersion.get -> int
+AtomUI.City.Security.AccountCredentialSnapshot.Scheme.get -> string!
+AtomUI.City.Security.AccountProfileSnapshot
+AtomUI.City.Security.AccountProfileSnapshot.AccountKey.get -> AtomUI.City.Security.SecurityAccountKey!
+AtomUI.City.Security.AccountProfileSnapshot.AccountProfileSnapshot(AtomUI.City.Security.SecurityAccountKey! accountKey, string! displayName, System.Uri? avatarUri = null, System.DateTimeOffset? lastUsedAt = null, int schemaVersion = 1) -> void
+AtomUI.City.Security.AccountProfileSnapshot.AvatarUri.get -> System.Uri?
+AtomUI.City.Security.AccountProfileSnapshot.DisplayName.get -> string!
+AtomUI.City.Security.AccountProfileSnapshot.LastUsedAt.get -> System.DateTimeOffset
+AtomUI.City.Security.AccountProfileSnapshot.SchemaVersion.get -> int
+AtomUI.City.Security.AccountRecordSnapshot
+AtomUI.City.Security.AccountRecordSnapshot.AccountKey.get -> AtomUI.City.Security.SecurityAccountKey!
+AtomUI.City.Security.AccountRecordSnapshot.AccountRecordSnapshot(AtomUI.City.Security.AccountProfileSnapshot! profile, AtomUI.City.Security.PersistedPermissionSnapshot! permissions) -> void
+AtomUI.City.Security.AccountRecordSnapshot.Permissions.get -> AtomUI.City.Security.PersistedPermissionSnapshot!
+AtomUI.City.Security.AccountRecordSnapshot.Profile.get -> AtomUI.City.Security.AccountProfileSnapshot!
+AtomUI.City.Security.AccountSessionChangedEventArgs
+AtomUI.City.Security.AccountSessionChangedEventArgs.AccountSessionChangedEventArgs(AtomUI.City.Security.AccountSessionSnapshot! previous, AtomUI.City.Security.AccountSessionSnapshot! current, System.Guid operationId) -> void
+AtomUI.City.Security.AccountSessionChangedEventArgs.Current.get -> AtomUI.City.Security.AccountSessionSnapshot!
+AtomUI.City.Security.AccountSessionChangedEventArgs.OperationId.get -> System.Guid
+AtomUI.City.Security.AccountSessionChangedEventArgs.Previous.get -> AtomUI.City.Security.AccountSessionSnapshot!
+AtomUI.City.Security.AccountSessionManager
+AtomUI.City.Security.AccountSessionManager.AccountSessionManager(AtomUI.City.Security.IAccountSessionStore! accountStore, AtomUI.City.Security.ICredentialStore! credentialStore, AtomUI.City.Security.AuthenticationStateStore! authenticationState, AtomUI.City.Security.SecurityPersistenceOptions! options, System.TimeProvider! timeProvider, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Security.AccountSessionManager.Current.get -> AtomUI.City.Security.AccountSessionSnapshot!
+AtomUI.City.Security.AccountSessionManager.GetTokenAsync(AtomUI.City.Security.AccessTokenRequest! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccessTokenResult!>
+AtomUI.City.Security.AccountSessionManager.ListAccountsAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<System.Collections.Generic.IReadOnlyList<AtomUI.City.Security.AccountRecordSnapshot!>!>!>
+AtomUI.City.Security.AccountSessionManager.RefreshAccountAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, AtomUI.City.Security.AccountSwitchOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccountSwitchResult!>
+AtomUI.City.Security.AccountSessionManager.RemoveAccountAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccountSwitchResult!>
+AtomUI.City.Security.AccountSessionManager.RestoreAsync(AtomUI.City.Security.AccountSwitchOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccountSwitchResult!>
+AtomUI.City.Security.AccountSessionManager.SessionChanged -> System.EventHandler<AtomUI.City.Security.AccountSessionChangedEventArgs!>?
+AtomUI.City.Security.AccountSessionManager.SwitchAccountAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, AtomUI.City.Security.AccountSwitchOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccountSwitchResult!>
+AtomUI.City.Security.AccountSessionMode
+AtomUI.City.Security.AccountSessionMode.Anonymous = 0 -> AtomUI.City.Security.AccountSessionMode
+AtomUI.City.Security.AccountSessionMode.OfflineRestricted = 2 -> AtomUI.City.Security.AccountSessionMode
+AtomUI.City.Security.AccountSessionMode.Online = 1 -> AtomUI.City.Security.AccountSessionMode
+AtomUI.City.Security.AccountSessionSnapshot
+AtomUI.City.Security.AccountSessionSnapshot.AccountKey.get -> AtomUI.City.Security.SecurityAccountKey?
+AtomUI.City.Security.AccountSessionSnapshot.AccountSessionSnapshot(AtomUI.City.Security.AccountSessionMode mode, long revision, AtomUI.City.Security.AccountProfileSnapshot? profile = null, AtomUI.City.Security.PersistedPermissionSnapshot? permissions = null, AtomUI.City.Security.AccountCredentialContext? credential = null, System.Security.Claims.ClaimsPrincipal? principal = null) -> void
+AtomUI.City.Security.AccountSessionSnapshot.Credential.get -> AtomUI.City.Security.AccountCredentialContext?
+AtomUI.City.Security.AccountSessionSnapshot.IsActive.get -> bool
+AtomUI.City.Security.AccountSessionSnapshot.Mode.get -> AtomUI.City.Security.AccountSessionMode
+AtomUI.City.Security.AccountSessionSnapshot.Permissions.get -> AtomUI.City.Security.PersistedPermissionSnapshot?
+AtomUI.City.Security.AccountSessionSnapshot.Principal.get -> System.Security.Claims.ClaimsPrincipal!
+AtomUI.City.Security.AccountSessionSnapshot.Profile.get -> AtomUI.City.Security.AccountProfileSnapshot?
+AtomUI.City.Security.AccountSessionSnapshot.Revision.get -> long
+AtomUI.City.Security.AccountSwitchOptions
+AtomUI.City.Security.AccountSwitchOptions.AccountSwitchOptions(bool allowOffline = false, string? credentialResourceName = null) -> void
+AtomUI.City.Security.AccountSwitchOptions.AllowOffline.get -> bool
+AtomUI.City.Security.AccountSwitchOptions.CredentialResourceName.get -> string?
+AtomUI.City.Security.AccountSwitchResult
+AtomUI.City.Security.AccountSwitchResult.Exception.get -> System.Exception?
+AtomUI.City.Security.AccountSwitchResult.FailureStage.get -> string?
+AtomUI.City.Security.AccountSwitchResult.Message.get -> string?
+AtomUI.City.Security.AccountSwitchResult.OperationId.get -> System.Guid
+AtomUI.City.Security.AccountSwitchResult.Session.get -> AtomUI.City.Security.AccountSessionSnapshot!
+AtomUI.City.Security.AccountSwitchResult.Status.get -> AtomUI.City.Security.AccountSwitchResultStatus
+AtomUI.City.Security.AccountSwitchResult.Succeeded.get -> bool
+AtomUI.City.Security.AccountSwitchResultStatus
+AtomUI.City.Security.AccountSwitchResultStatus.Cancelled = 5 -> AtomUI.City.Security.AccountSwitchResultStatus
+AtomUI.City.Security.AccountSwitchResultStatus.CredentialUnavailable = 2 -> AtomUI.City.Security.AccountSwitchResultStatus
+AtomUI.City.Security.AccountSwitchResultStatus.Failed = 6 -> AtomUI.City.Security.AccountSwitchResultStatus
+AtomUI.City.Security.AccountSwitchResultStatus.InvalidData = 4 -> AtomUI.City.Security.AccountSwitchResultStatus
+AtomUI.City.Security.AccountSwitchResultStatus.NotFound = 1 -> AtomUI.City.Security.AccountSwitchResultStatus
+AtomUI.City.Security.AccountSwitchResultStatus.PermissionUnavailable = 3 -> AtomUI.City.Security.AccountSwitchResultStatus
+AtomUI.City.Security.AccountSwitchResultStatus.Success = 0 -> AtomUI.City.Security.AccountSwitchResultStatus
+AtomUI.City.Security.AuthenticationState
+AtomUI.City.Security.AuthenticationState.Anonymous = 1 -> AtomUI.City.Security.AuthenticationState
+AtomUI.City.Security.AuthenticationState.Authenticated = 3 -> AtomUI.City.Security.AuthenticationState
+AtomUI.City.Security.AuthenticationState.Authenticating = 2 -> AtomUI.City.Security.AuthenticationState
+AtomUI.City.Security.AuthenticationState.Expired = 5 -> AtomUI.City.Security.AuthenticationState
+AtomUI.City.Security.AuthenticationState.Failed = 7 -> AtomUI.City.Security.AuthenticationState
+AtomUI.City.Security.AuthenticationState.Refreshing = 4 -> AtomUI.City.Security.AuthenticationState
+AtomUI.City.Security.AuthenticationState.SignedOut = 6 -> AtomUI.City.Security.AuthenticationState
+AtomUI.City.Security.AuthenticationState.Unknown = 0 -> AtomUI.City.Security.AuthenticationState
+AtomUI.City.Security.AuthenticationStateChangedEventArgs
+AtomUI.City.Security.AuthenticationStateChangedEventArgs.AuthenticationStateChangedEventArgs(AtomUI.City.Security.AuthenticationStateSnapshot! previous, AtomUI.City.Security.AuthenticationStateSnapshot! current) -> void
+AtomUI.City.Security.AuthenticationStateChangedEventArgs.Current.get -> AtomUI.City.Security.AuthenticationStateSnapshot!
+AtomUI.City.Security.AuthenticationStateChangedEventArgs.Previous.get -> AtomUI.City.Security.AuthenticationStateSnapshot!
+AtomUI.City.Security.AuthenticationStateSnapshot
+AtomUI.City.Security.AuthenticationStateSnapshot.AuthenticationStateSnapshot(AtomUI.City.Security.AuthenticationState state, System.Security.Claims.ClaimsPrincipal! principal, long revision, string? scheme = null, System.DateTimeOffset? expiresAt = null, string? failureMessage = null) -> void
+AtomUI.City.Security.AuthenticationStateSnapshot.ExpiresAt.get -> System.DateTimeOffset?
+AtomUI.City.Security.AuthenticationStateSnapshot.FailureMessage.get -> string?
+AtomUI.City.Security.AuthenticationStateSnapshot.Principal.get -> System.Security.Claims.ClaimsPrincipal!
+AtomUI.City.Security.AuthenticationStateSnapshot.Revision.get -> long
+AtomUI.City.Security.AuthenticationStateSnapshot.Scheme.get -> string?
+AtomUI.City.Security.AuthenticationStateSnapshot.State.get -> AtomUI.City.Security.AuthenticationState
+AtomUI.City.Security.AuthenticationStateStore
+AtomUI.City.Security.AuthenticationStateStore.AuthenticationStateStore() -> void
+AtomUI.City.Security.AuthenticationStateStore.AuthenticationStateStore(AtomUI.City.Core.Diagnostics.IHostDiagnostics! diagnostics) -> void
+AtomUI.City.Security.AuthenticationStateStore.Current.get -> AtomUI.City.Security.AuthenticationStateSnapshot!
+AtomUI.City.Security.AuthenticationStateStore.Principal.get -> System.Security.Claims.ClaimsPrincipal!
+AtomUI.City.Security.AuthenticationStateStore.SetAnonymous() -> AtomUI.City.Security.AuthenticationStateSnapshot!
+AtomUI.City.Security.AuthenticationStateStore.SetAuthenticated(System.Security.Claims.ClaimsPrincipal! principal, string? scheme = null, System.DateTimeOffset? expiresAt = null) -> AtomUI.City.Security.AuthenticationStateSnapshot!
+AtomUI.City.Security.AuthenticationStateStore.SetAuthenticating(System.Security.Claims.ClaimsPrincipal? principal = null, string? scheme = null) -> AtomUI.City.Security.AuthenticationStateSnapshot!
+AtomUI.City.Security.AuthenticationStateStore.SetExpired(System.Security.Claims.ClaimsPrincipal! principal, string? scheme = null) -> AtomUI.City.Security.AuthenticationStateSnapshot!
+AtomUI.City.Security.AuthenticationStateStore.SetFailed(string! failureMessage) -> AtomUI.City.Security.AuthenticationStateSnapshot!
+AtomUI.City.Security.AuthenticationStateStore.SetRefreshing(System.Security.Claims.ClaimsPrincipal! principal, string? scheme = null) -> AtomUI.City.Security.AuthenticationStateSnapshot!
+AtomUI.City.Security.AuthenticationStateStore.SetSignedOut() -> AtomUI.City.Security.AuthenticationStateSnapshot!
+AtomUI.City.Security.AuthenticationStateStore.StateChanged -> System.EventHandler<AtomUI.City.Security.AuthenticationStateChangedEventArgs!>?
+AtomUI.City.Security.AuthorizationEvaluator
+AtomUI.City.Security.AuthorizationEvaluator.AuthorizationEvaluator(AtomUI.City.Security.IPermissionRegistry! permissions) -> void
+AtomUI.City.Security.AuthorizationEvaluator.AuthorizationEvaluator(AtomUI.City.Security.IPermissionRegistry! permissions, AtomUI.City.Security.IAuthorizationPolicyProvider! policyProvider) -> void
+AtomUI.City.Security.AuthorizationEvaluator.AuthorizationEvaluator(AtomUI.City.Security.IPermissionRegistry! permissions, AtomUI.City.Security.IAuthorizationPolicyProvider? policyProvider, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Security.AuthorizationEvaluator.EvaluateAsync(AtomUI.City.Security.AuthorizationRequest! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationResult!>
+AtomUI.City.Security.AuthorizationEvaluator.EvaluatePolicyAsync(System.Security.Claims.ClaimsPrincipal? principal, string! policyName, string? resourceName = null, string? contributionId = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationResult!>
+AtomUI.City.Security.AuthorizationPolicy
+AtomUI.City.Security.AuthorizationPolicy.AuthorizationPolicy(string! name, System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Security.AuthorizationRequirement!>! requirements, string? contributionId = null) -> void
+AtomUI.City.Security.AuthorizationPolicy.ContributionId.get -> string?
+AtomUI.City.Security.AuthorizationPolicy.Name.get -> string!
+AtomUI.City.Security.AuthorizationPolicy.Requirements.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Security.AuthorizationRequirement!>!
+AtomUI.City.Security.AuthorizationRequest
+AtomUI.City.Security.AuthorizationRequest.AuthorizationRequest(System.Security.Claims.ClaimsPrincipal? principal, AtomUI.City.Security.AuthorizationPolicy! policy, string? resourceName = null, string? contributionId = null) -> void
+AtomUI.City.Security.AuthorizationRequest.ContributionId.get -> string?
+AtomUI.City.Security.AuthorizationRequest.Policy.get -> AtomUI.City.Security.AuthorizationPolicy!
+AtomUI.City.Security.AuthorizationRequest.Principal.get -> System.Security.Claims.ClaimsPrincipal!
+AtomUI.City.Security.AuthorizationRequest.ResourceName.get -> string?
+AtomUI.City.Security.AuthorizationRequirement
+AtomUI.City.Security.AuthorizationRequirement.Kind.get -> AtomUI.City.Security.AuthorizationRequirementKind
+AtomUI.City.Security.AuthorizationRequirement.Name.get -> string!
+AtomUI.City.Security.AuthorizationRequirement.Value.get -> string?
+AtomUI.City.Security.AuthorizationRequirementKind
+AtomUI.City.Security.AuthorizationRequirementKind.Authenticated = 0 -> AtomUI.City.Security.AuthorizationRequirementKind
+AtomUI.City.Security.AuthorizationRequirementKind.Claim = 2 -> AtomUI.City.Security.AuthorizationRequirementKind
+AtomUI.City.Security.AuthorizationRequirementKind.Permission = 1 -> AtomUI.City.Security.AuthorizationRequirementKind
+AtomUI.City.Security.AuthorizationRequirementKind.Role = 3 -> AtomUI.City.Security.AuthorizationRequirementKind
+AtomUI.City.Security.AuthorizationResult
+AtomUI.City.Security.AuthorizationResult.Exception.get -> System.Exception?
+AtomUI.City.Security.AuthorizationResult.FailedRequirement.get -> string?
+AtomUI.City.Security.AuthorizationResult.FailureKind.get -> AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.AuthorizationResult.Message.get -> string?
+AtomUI.City.Security.AuthorizationResult.MessageArguments.get -> System.Collections.Generic.IReadOnlyList<object?>?
+AtomUI.City.Security.AuthorizationResult.MessageKey.get -> string?
+AtomUI.City.Security.AuthorizationResult.Status.get -> AtomUI.City.Security.AuthorizationResultStatus
+AtomUI.City.Security.AuthorizationResult.Succeeded.get -> bool
+AtomUI.City.Security.AuthorizationResultStatus
+AtomUI.City.Security.AuthorizationResultStatus.Allowed = 0 -> AtomUI.City.Security.AuthorizationResultStatus
+AtomUI.City.Security.AuthorizationResultStatus.Cancelled = 5 -> AtomUI.City.Security.AuthorizationResultStatus
+AtomUI.City.Security.AuthorizationResultStatus.Challenge = 3 -> AtomUI.City.Security.AuthorizationResultStatus
+AtomUI.City.Security.AuthorizationResultStatus.Denied = 1 -> AtomUI.City.Security.AuthorizationResultStatus
+AtomUI.City.Security.AuthorizationResultStatus.Failed = 4 -> AtomUI.City.Security.AuthorizationResultStatus
+AtomUI.City.Security.AuthorizationResultStatus.Forbidden = 2 -> AtomUI.City.Security.AuthorizationResultStatus
+AtomUI.City.Security.CommandAuthorizationChangedEventArgs
+AtomUI.City.Security.CommandAuthorizationChangedEventArgs.CommandAuthorizationChangedEventArgs(AtomUI.City.Security.CommandAuthorizationChangeReason reason, long revision, string? commandId = null) -> void
+AtomUI.City.Security.CommandAuthorizationChangedEventArgs.CommandId.get -> string?
+AtomUI.City.Security.CommandAuthorizationChangedEventArgs.Reason.get -> AtomUI.City.Security.CommandAuthorizationChangeReason
+AtomUI.City.Security.CommandAuthorizationChangedEventArgs.Revision.get -> long
+AtomUI.City.Security.CommandAuthorizationChangeReason
+AtomUI.City.Security.CommandAuthorizationChangeReason.AuthenticationStateChanged = 0 -> AtomUI.City.Security.CommandAuthorizationChangeReason
+AtomUI.City.Security.CommandAuthorizationChangeReason.DescriptorChanged = 2 -> AtomUI.City.Security.CommandAuthorizationChangeReason
+AtomUI.City.Security.CommandAuthorizationChangeReason.PermissionChanged = 1 -> AtomUI.City.Security.CommandAuthorizationChangeReason
+AtomUI.City.Security.CommandAuthorizationContext
+AtomUI.City.Security.CommandAuthorizationContext.CommandAuthorizationContext(string! commandId, string? resourceName = null, string? contributionId = null) -> void
+AtomUI.City.Security.CommandAuthorizationContext.CommandId.get -> string!
+AtomUI.City.Security.CommandAuthorizationContext.ContributionId.get -> string?
+AtomUI.City.Security.CommandAuthorizationContext.ResourceName.get -> string?
+AtomUI.City.Security.CommandAuthorizationDescriptor
+AtomUI.City.Security.CommandAuthorizationDescriptor.CommandAuthorizationDescriptor(string! commandId, AtomUI.City.Security.AuthorizationPolicy! policy, AtomUI.City.Security.CommandUnauthorizedBehavior unauthorizedBehavior = AtomUI.City.Security.CommandUnauthorizedBehavior.Disable, string? deniedMessageKey = null, string? contributionId = null) -> void
+AtomUI.City.Security.CommandAuthorizationDescriptor.CommandId.get -> string!
+AtomUI.City.Security.CommandAuthorizationDescriptor.ContributionId.get -> string?
+AtomUI.City.Security.CommandAuthorizationDescriptor.DeniedMessageKey.get -> string?
+AtomUI.City.Security.CommandAuthorizationDescriptor.Policy.get -> AtomUI.City.Security.AuthorizationPolicy!
+AtomUI.City.Security.CommandAuthorizationDescriptor.UnauthorizedBehavior.get -> AtomUI.City.Security.CommandUnauthorizedBehavior
+AtomUI.City.Security.CommandAuthorizationSource
+AtomUI.City.Security.CommandAuthorizationSource.AuthorizationChanged -> System.EventHandler<AtomUI.City.Security.CommandAuthorizationChangedEventArgs!>?
+AtomUI.City.Security.CommandAuthorizationSource.CheckExecutionAsync(AtomUI.City.Security.CommandAuthorizationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationResult!>
+AtomUI.City.Security.CommandAuthorizationSource.CommandAuthorizationSource(AtomUI.City.Security.IAuthorizationEvaluator! authorizationEvaluator, AtomUI.City.Security.ICurrentPrincipalAccessor! principalAccessor, AtomUI.City.Security.ICommandAuthorizationDescriptorProvider! descriptorProvider, AtomUI.City.Security.IAuthenticationStateProvider? authenticationStateProvider = null, AtomUI.City.Security.IPermissionRegistry? permissionRegistry = null) -> void
+AtomUI.City.Security.CommandAuthorizationSource.CommandAuthorizationSource(AtomUI.City.Security.IAuthorizationEvaluator! authorizationEvaluator, AtomUI.City.Security.ICurrentPrincipalAccessor! principalAccessor, AtomUI.City.Security.ICommandAuthorizationDescriptorProvider! descriptorProvider, AtomUI.City.Security.IAuthenticationStateProvider? authenticationStateProvider, AtomUI.City.Security.IPermissionRegistry? permissionRegistry, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Security.CommandAuthorizationSource.Dispose() -> void
+AtomUI.City.Security.CommandAuthorizationSource.GetStateAsync(AtomUI.City.Security.CommandAuthorizationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.CommandAuthorizationState!>
+AtomUI.City.Security.CommandAuthorizationState
+AtomUI.City.Security.CommandAuthorizationState.Authorization.get -> AtomUI.City.Security.AuthorizationResult!
+AtomUI.City.Security.CommandAuthorizationState.CanExecute.get -> bool
+AtomUI.City.Security.CommandAuthorizationState.CommandAuthorizationState(string! commandId, bool canExecute, bool isVisible, AtomUI.City.Security.CommandUnauthorizedBehavior unauthorizedBehavior, AtomUI.City.Security.AuthorizationResult! authorization, long revision, string? deniedMessageKey = null) -> void
+AtomUI.City.Security.CommandAuthorizationState.CommandId.get -> string!
+AtomUI.City.Security.CommandAuthorizationState.DeniedMessageKey.get -> string?
+AtomUI.City.Security.CommandAuthorizationState.IsVisible.get -> bool
+AtomUI.City.Security.CommandAuthorizationState.Revision.get -> long
+AtomUI.City.Security.CommandAuthorizationState.UnauthorizedBehavior.get -> AtomUI.City.Security.CommandUnauthorizedBehavior
+AtomUI.City.Security.CommandUnauthorizedBehavior
+AtomUI.City.Security.CommandUnauthorizedBehavior.Disable = 0 -> AtomUI.City.Security.CommandUnauthorizedBehavior
+AtomUI.City.Security.CommandUnauthorizedBehavior.Hide = 1 -> AtomUI.City.Security.CommandUnauthorizedBehavior
+AtomUI.City.Security.DelegateAccessTokenProvider
+AtomUI.City.Security.DelegateAccessTokenProvider.DelegateAccessTokenProvider(System.Func<AtomUI.City.Security.AccessTokenRequest!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccessTokenResult!>>! provider) -> void
+AtomUI.City.Security.DelegateAccessTokenProvider.DelegateAccessTokenProvider(System.Func<AtomUI.City.Security.AccessTokenRequest!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccessTokenResult!>>! provider, AtomUI.City.Core.Diagnostics.IHostDiagnostics! diagnostics) -> void
+AtomUI.City.Security.DelegateAccessTokenProvider.GetTokenAsync(AtomUI.City.Security.AccessTokenRequest! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccessTokenResult!>
+AtomUI.City.Security.FileAccountSessionStore
+AtomUI.City.Security.FileAccountSessionStore.FileAccountSessionStore(string! rootPath, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Security.FileAccountSessionStore.GetAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<AtomUI.City.Security.AccountRecordSnapshot!>!>
+AtomUI.City.Security.FileAccountSessionStore.GetLastActiveAccountAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<AtomUI.City.Security.SecurityAccountKey?>!>
+AtomUI.City.Security.FileAccountSessionStore.ListAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<System.Collections.Generic.IReadOnlyList<AtomUI.City.Security.AccountRecordSnapshot!>!>!>
+AtomUI.City.Security.FileAccountSessionStore.RemoveAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<bool>!>
+AtomUI.City.Security.FileAccountSessionStore.RootPath.get -> string!
+AtomUI.City.Security.FileAccountSessionStore.SaveAsync(AtomUI.City.Security.AccountRecordSnapshot! account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<bool>!>
+AtomUI.City.Security.FileAccountSessionStore.SetLastActiveAccountAsync(AtomUI.City.Security.SecurityAccountKey? accountKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<bool>!>
+AtomUI.City.Security.FileCredentialStore
+AtomUI.City.Security.FileCredentialStore.FileCredentialStore(string! rootPath, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Security.FileCredentialStore.GetAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, string! resourceName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<AtomUI.City.Security.AccountCredentialSnapshot!>!>
+AtomUI.City.Security.FileCredentialStore.RemoveAllAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<bool>!>
+AtomUI.City.Security.FileCredentialStore.RemoveAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, string! resourceName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<bool>!>
+AtomUI.City.Security.FileCredentialStore.RootPath.get -> string!
+AtomUI.City.Security.FileCredentialStore.SaveAsync(AtomUI.City.Security.AccountCredentialSnapshot! credential, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<bool>!>
+AtomUI.City.Security.IAccessTokenProvider
+AtomUI.City.Security.IAccessTokenProvider.GetTokenAsync(AtomUI.City.Security.AccessTokenRequest! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccessTokenResult!>
+AtomUI.City.Security.IAccountSessionManager
+AtomUI.City.Security.IAccountSessionManager.Current.get -> AtomUI.City.Security.AccountSessionSnapshot!
+AtomUI.City.Security.IAccountSessionManager.ListAccountsAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<System.Collections.Generic.IReadOnlyList<AtomUI.City.Security.AccountRecordSnapshot!>!>!>
+AtomUI.City.Security.IAccountSessionManager.RefreshAccountAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, AtomUI.City.Security.AccountSwitchOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccountSwitchResult!>
+AtomUI.City.Security.IAccountSessionManager.RemoveAccountAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccountSwitchResult!>
+AtomUI.City.Security.IAccountSessionManager.RestoreAsync(AtomUI.City.Security.AccountSwitchOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccountSwitchResult!>
+AtomUI.City.Security.IAccountSessionManager.SessionChanged -> System.EventHandler<AtomUI.City.Security.AccountSessionChangedEventArgs!>?
+AtomUI.City.Security.IAccountSessionManager.SwitchAccountAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, AtomUI.City.Security.AccountSwitchOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccountSwitchResult!>
+AtomUI.City.Security.IAccountSessionStore
+AtomUI.City.Security.IAccountSessionStore.GetAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<AtomUI.City.Security.AccountRecordSnapshot!>!>
+AtomUI.City.Security.IAccountSessionStore.GetLastActiveAccountAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<AtomUI.City.Security.SecurityAccountKey?>!>
+AtomUI.City.Security.IAccountSessionStore.ListAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<System.Collections.Generic.IReadOnlyList<AtomUI.City.Security.AccountRecordSnapshot!>!>!>
+AtomUI.City.Security.IAccountSessionStore.RemoveAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<bool>!>
+AtomUI.City.Security.IAccountSessionStore.SaveAsync(AtomUI.City.Security.AccountRecordSnapshot! account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<bool>!>
+AtomUI.City.Security.IAccountSessionStore.SetLastActiveAccountAsync(AtomUI.City.Security.SecurityAccountKey? accountKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<bool>!>
+AtomUI.City.Security.IAuthenticationStateProvider
+AtomUI.City.Security.IAuthenticationStateProvider.Current.get -> AtomUI.City.Security.AuthenticationStateSnapshot!
+AtomUI.City.Security.IAuthenticationStateProvider.StateChanged -> System.EventHandler<AtomUI.City.Security.AuthenticationStateChangedEventArgs!>?
+AtomUI.City.Security.IAuthorizationEvaluator
+AtomUI.City.Security.IAuthorizationEvaluator.EvaluateAsync(AtomUI.City.Security.AuthorizationRequest! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationResult!>
+AtomUI.City.Security.IAuthorizationEvaluator.EvaluatePolicyAsync(System.Security.Claims.ClaimsPrincipal? principal, string! policyName, string? resourceName = null, string? contributionId = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationResult!>
+AtomUI.City.Security.IAuthorizationPolicyProvider
+AtomUI.City.Security.IAuthorizationPolicyProvider.Contains(string! name) -> bool
+AtomUI.City.Security.IAuthorizationPolicyProvider.GetPolicyAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationPolicy?>
+AtomUI.City.Security.IAuthorizationPolicyProvider.Policies.get -> System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Security.AuthorizationPolicy!>!
+AtomUI.City.Security.IAuthorizationPolicyProvider.Revision.get -> long
+AtomUI.City.Security.IAuthorizationPolicyProvider.TryGet(string! name, out AtomUI.City.Security.AuthorizationPolicy? policy) -> bool
+AtomUI.City.Security.ICommandAuthorizationDescriptorProvider
+AtomUI.City.Security.ICommandAuthorizationDescriptorProvider.DescriptorChanged -> System.EventHandler<AtomUI.City.Security.CommandAuthorizationChangedEventArgs!>?
+AtomUI.City.Security.ICommandAuthorizationDescriptorProvider.GetDescriptorAsync(AtomUI.City.Security.CommandAuthorizationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.CommandAuthorizationDescriptor?>
+AtomUI.City.Security.ICommandAuthorizationSource
+AtomUI.City.Security.ICommandAuthorizationSource.AuthorizationChanged -> System.EventHandler<AtomUI.City.Security.CommandAuthorizationChangedEventArgs!>?
+AtomUI.City.Security.ICommandAuthorizationSource.CheckExecutionAsync(AtomUI.City.Security.CommandAuthorizationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationResult!>
+AtomUI.City.Security.ICommandAuthorizationSource.GetStateAsync(AtomUI.City.Security.CommandAuthorizationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.CommandAuthorizationState!>
+AtomUI.City.Security.ICredentialStore
+AtomUI.City.Security.ICredentialStore.GetAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, string! resourceName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<AtomUI.City.Security.AccountCredentialSnapshot!>!>
+AtomUI.City.Security.ICredentialStore.RemoveAllAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<bool>!>
+AtomUI.City.Security.ICredentialStore.RemoveAsync(AtomUI.City.Security.SecurityAccountKey! accountKey, string! resourceName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<bool>!>
+AtomUI.City.Security.ICredentialStore.SaveAsync(AtomUI.City.Security.AccountCredentialSnapshot! credential, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.SecurityStoreResult<bool>!>
+AtomUI.City.Security.ICurrentPrincipalAccessor
+AtomUI.City.Security.ICurrentPrincipalAccessor.Principal.get -> System.Security.Claims.ClaimsPrincipal!
+AtomUI.City.Security.InMemoryAuthorizationPolicyProvider
+AtomUI.City.Security.InMemoryAuthorizationPolicyProvider.Add(AtomUI.City.Security.AuthorizationPolicy! policy) -> bool
+AtomUI.City.Security.InMemoryAuthorizationPolicyProvider.Contains(string! name) -> bool
+AtomUI.City.Security.InMemoryAuthorizationPolicyProvider.GetPolicyAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationPolicy?>
+AtomUI.City.Security.InMemoryAuthorizationPolicyProvider.InMemoryAuthorizationPolicyProvider() -> void
+AtomUI.City.Security.InMemoryAuthorizationPolicyProvider.Policies.get -> System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Security.AuthorizationPolicy!>!
+AtomUI.City.Security.InMemoryAuthorizationPolicyProvider.Remove(string! name) -> bool
+AtomUI.City.Security.InMemoryAuthorizationPolicyProvider.RemoveByContribution(string! contributionId) -> int
+AtomUI.City.Security.InMemoryAuthorizationPolicyProvider.Revision.get -> long
+AtomUI.City.Security.InMemoryAuthorizationPolicyProvider.TryGet(string! name, out AtomUI.City.Security.AuthorizationPolicy? policy) -> bool
+AtomUI.City.Security.InMemoryCommandAuthorizationDescriptorProvider
+AtomUI.City.Security.InMemoryCommandAuthorizationDescriptorProvider.Add(AtomUI.City.Security.CommandAuthorizationDescriptor! descriptor) -> bool
+AtomUI.City.Security.InMemoryCommandAuthorizationDescriptorProvider.DescriptorChanged -> System.EventHandler<AtomUI.City.Security.CommandAuthorizationChangedEventArgs!>?
+AtomUI.City.Security.InMemoryCommandAuthorizationDescriptorProvider.GetDescriptorAsync(AtomUI.City.Security.CommandAuthorizationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.CommandAuthorizationDescriptor?>
+AtomUI.City.Security.InMemoryCommandAuthorizationDescriptorProvider.InMemoryCommandAuthorizationDescriptorProvider() -> void
+AtomUI.City.Security.InMemoryCommandAuthorizationDescriptorProvider.InMemoryCommandAuthorizationDescriptorProvider(AtomUI.City.Core.Diagnostics.IHostDiagnostics! diagnostics) -> void
+AtomUI.City.Security.InMemoryCommandAuthorizationDescriptorProvider.Remove(string! commandId) -> bool
+AtomUI.City.Security.InMemoryCommandAuthorizationDescriptorProvider.RemoveByContribution(string! contributionId) -> int
+AtomUI.City.Security.InMemoryCommandAuthorizationDescriptorProvider.Revision.get -> long
+AtomUI.City.Security.InMemoryRouteAuthorizationPolicyProvider
+AtomUI.City.Security.InMemoryRouteAuthorizationPolicyProvider.Add(string! routeId, AtomUI.City.Security.AuthorizationPolicy! policy) -> bool
+AtomUI.City.Security.InMemoryRouteAuthorizationPolicyProvider.GetPolicyAsync(AtomUI.City.Routing.RouteGuardContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationPolicy?>
+AtomUI.City.Security.InMemoryRouteAuthorizationPolicyProvider.InMemoryRouteAuthorizationPolicyProvider() -> void
+AtomUI.City.Security.InMemoryRouteAuthorizationPolicyProvider.Remove(string! routeId) -> bool
+AtomUI.City.Security.InMemoryRouteAuthorizationPolicyProvider.RemoveByContribution(string! contributionId) -> int
+AtomUI.City.Security.IPermissionChecker
+AtomUI.City.Security.IPermissionChecker.CheckAsync(System.Security.Claims.ClaimsPrincipal? principal, string! permissionName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationResult!>
+AtomUI.City.Security.IPermissionChecker.CheckCurrentAsync(string! permissionName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationResult!>
+AtomUI.City.Security.IPermissionRegistry
+AtomUI.City.Security.IPermissionRegistry.Changed -> System.EventHandler<AtomUI.City.Security.PermissionRegistryChangedEventArgs!>?
+AtomUI.City.Security.IPermissionRegistry.Contains(string! name) -> bool
+AtomUI.City.Security.IPermissionRegistry.Permissions.get -> System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Security.PermissionDescriptor!>!
+AtomUI.City.Security.IPermissionRegistry.Revision.get -> long
+AtomUI.City.Security.IPermissionRegistry.TryGet(string! name, out AtomUI.City.Security.PermissionDescriptor? descriptor) -> bool
+AtomUI.City.Security.IRouteAuthorizationPolicyProvider
+AtomUI.City.Security.IRouteAuthorizationPolicyProvider.GetPolicyAsync(AtomUI.City.Routing.RouteGuardContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationPolicy?>
+AtomUI.City.Security.PermissionChecker
+AtomUI.City.Security.PermissionChecker.CheckAsync(System.Security.Claims.ClaimsPrincipal? principal, string! permissionName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationResult!>
+AtomUI.City.Security.PermissionChecker.CheckCurrentAsync(string! permissionName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AuthorizationResult!>
+AtomUI.City.Security.PermissionChecker.PermissionChecker(AtomUI.City.Security.IAuthorizationEvaluator! authorizationEvaluator, AtomUI.City.Security.ICurrentPrincipalAccessor? principalAccessor = null) -> void
+AtomUI.City.Security.PermissionChecker.PermissionChecker(AtomUI.City.Security.IPermissionRegistry! permissions, AtomUI.City.Security.ICurrentPrincipalAccessor? principalAccessor = null) -> void
+AtomUI.City.Security.PermissionDescriptor
+AtomUI.City.Security.PermissionDescriptor.Category.get -> string?
+AtomUI.City.Security.PermissionDescriptor.ContributionId.get -> string?
+AtomUI.City.Security.PermissionDescriptor.DefaultPolicy.get -> string?
+AtomUI.City.Security.PermissionDescriptor.DescriptionKey.get -> string?
+AtomUI.City.Security.PermissionDescriptor.DisplayNameKey.get -> string?
+AtomUI.City.Security.PermissionDescriptor.IsHostOnly.get -> bool
+AtomUI.City.Security.PermissionDescriptor.Name.get -> string!
+AtomUI.City.Security.PermissionDescriptor.PermissionDescriptor(string! name, string? displayNameKey = null, string? descriptionKey = null, string? category = null, string? contributionId = null, string? defaultPolicy = null, bool isHostOnly = false) -> void
+AtomUI.City.Security.PermissionRegistry
+AtomUI.City.Security.PermissionRegistry.Add(AtomUI.City.Security.PermissionDescriptor! descriptor) -> bool
+AtomUI.City.Security.PermissionRegistry.Changed -> System.EventHandler<AtomUI.City.Security.PermissionRegistryChangedEventArgs!>?
+AtomUI.City.Security.PermissionRegistry.Contains(string! name) -> bool
+AtomUI.City.Security.PermissionRegistry.PermissionRegistry() -> void
+AtomUI.City.Security.PermissionRegistry.PermissionRegistry(AtomUI.City.Core.Diagnostics.IHostDiagnostics! diagnostics) -> void
+AtomUI.City.Security.PermissionRegistry.Permissions.get -> System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Security.PermissionDescriptor!>!
+AtomUI.City.Security.PermissionRegistry.Remove(string! name) -> bool
+AtomUI.City.Security.PermissionRegistry.RemoveByContribution(string! contributionId) -> int
+AtomUI.City.Security.PermissionRegistry.Revision.get -> long
+AtomUI.City.Security.PermissionRegistry.TryGet(string! name, out AtomUI.City.Security.PermissionDescriptor? descriptor) -> bool
+AtomUI.City.Security.PermissionRegistryChangedEventArgs
+AtomUI.City.Security.PermissionRegistryChangedEventArgs.ContributionId.get -> string?
+AtomUI.City.Security.PermissionRegistryChangedEventArgs.PermissionName.get -> string?
+AtomUI.City.Security.PermissionRegistryChangedEventArgs.PermissionRegistryChangedEventArgs(long revision, string? permissionName = null, string? contributionId = null) -> void
+AtomUI.City.Security.PermissionRegistryChangedEventArgs.Revision.get -> long
+AtomUI.City.Security.PersistedPermissionSnapshot
+AtomUI.City.Security.PersistedPermissionSnapshot.AccountKey.get -> AtomUI.City.Security.SecurityAccountKey!
+AtomUI.City.Security.PersistedPermissionSnapshot.ExpiresAt.get -> System.DateTimeOffset
+AtomUI.City.Security.PersistedPermissionSnapshot.IsExpired(System.DateTimeOffset now) -> bool
+AtomUI.City.Security.PersistedPermissionSnapshot.IssuedAt.get -> System.DateTimeOffset
+AtomUI.City.Security.PersistedPermissionSnapshot.Permissions.get -> System.Collections.Generic.IReadOnlyList<string!>!
+AtomUI.City.Security.PersistedPermissionSnapshot.PersistedPermissionSnapshot(AtomUI.City.Security.SecurityAccountKey! accountKey, System.Collections.Generic.IReadOnlyCollection<string!>! permissions, long revision, System.DateTimeOffset issuedAt, System.DateTimeOffset expiresAt, int schemaVersion = 1) -> void
+AtomUI.City.Security.PersistedPermissionSnapshot.Revision.get -> long
+AtomUI.City.Security.PersistedPermissionSnapshot.SchemaVersion.get -> int
+AtomUI.City.Security.SecurityAccountKey
+AtomUI.City.Security.SecurityAccountKey.AuthenticationScheme.get -> string!
+AtomUI.City.Security.SecurityAccountKey.Authority.get -> string!
+AtomUI.City.Security.SecurityAccountKey.Equals(AtomUI.City.Security.SecurityAccountKey? other) -> bool
+AtomUI.City.Security.SecurityAccountKey.SecurityAccountKey(string! authenticationScheme, string! authority, string? tenantId, string! subjectId) -> void
+AtomUI.City.Security.SecurityAccountKey.SubjectId.get -> string!
+AtomUI.City.Security.SecurityAccountKey.TenantId.get -> string?
+AtomUI.City.Security.SecurityAccountKey.ToStorageKey() -> string!
+AtomUI.City.Security.SecurityClaimTypes
+AtomUI.City.Security.SecurityDiagnosticIds
+AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.SecurityFailureKind.AuthenticationExpired = 2 -> AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.SecurityFailureKind.AuthenticationRequired = 1 -> AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.SecurityFailureKind.Cancelled = 10 -> AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.SecurityFailureKind.CapabilityDenied = 9 -> AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.SecurityFailureKind.ContributionRevoked = 8 -> AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.SecurityFailureKind.EvaluatorFailed = 7 -> AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.SecurityFailureKind.Forbidden = 3 -> AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.SecurityFailureKind.None = 0 -> AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.SecurityFailureKind.PermissionNotFound = 5 -> AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.SecurityFailureKind.PolicyNotFound = 4 -> AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.SecurityFailureKind.RequirementFailed = 6 -> AtomUI.City.Security.SecurityFailureKind
+AtomUI.City.Security.SecurityPersistenceOptions
+AtomUI.City.Security.SecurityPersistenceOptions.DefaultCredentialResource.get -> string!
+AtomUI.City.Security.SecurityPersistenceOptions.RootPath.get -> string?
+AtomUI.City.Security.SecurityPersistenceOptions.SecurityPersistenceOptions(string? rootPath = null, string! defaultCredentialResource = "default") -> void
+AtomUI.City.Security.SecurityPrincipals
+AtomUI.City.Security.SecurityRouteGuard
+AtomUI.City.Security.SecurityRouteGuard.CanEnterAsync(AtomUI.City.Routing.RouteGuardContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.RouteGuardResult!>
+AtomUI.City.Security.SecurityRouteGuard.SecurityRouteGuard(AtomUI.City.Security.IAuthorizationEvaluator! authorizationEvaluator, AtomUI.City.Security.ICurrentPrincipalAccessor! principalAccessor, AtomUI.City.Security.IRouteAuthorizationPolicyProvider! policyProvider) -> void
+AtomUI.City.Security.SecurityRouteGuard.SecurityRouteGuard(AtomUI.City.Security.IAuthorizationEvaluator! authorizationEvaluator, AtomUI.City.Security.ICurrentPrincipalAccessor! principalAccessor, AtomUI.City.Security.IRouteAuthorizationPolicyProvider! policyProvider, AtomUI.City.Security.SecurityRouteGuardOptions! options) -> void
+AtomUI.City.Security.SecurityRouteGuard.SecurityRouteGuard(AtomUI.City.Security.IAuthorizationEvaluator! authorizationEvaluator, AtomUI.City.Security.ICurrentPrincipalAccessor! principalAccessor, AtomUI.City.Security.IRouteAuthorizationPolicyProvider! policyProvider, AtomUI.City.Security.SecurityRouteGuardOptions! options, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
+AtomUI.City.Security.SecurityRouteGuardOptions
+AtomUI.City.Security.SecurityRouteGuardOptions.LoginNavigationOptions.get -> AtomUI.City.Routing.NavigationOptions!
+AtomUI.City.Security.SecurityRouteGuardOptions.LoginNavigationOptions.init -> void
+AtomUI.City.Security.SecurityRouteGuardOptions.LoginRouteId.get -> string?
+AtomUI.City.Security.SecurityRouteGuardOptions.LoginRouteId.init -> void
+AtomUI.City.Security.SecurityRouteGuardOptions.SecurityRouteGuardOptions() -> void
+AtomUI.City.Security.SecurityRouteGuardResultCodes
+AtomUI.City.Security.SecurityServiceCollectionExtensions
+AtomUI.City.Security.SecurityStoreResult<T>
+AtomUI.City.Security.SecurityStoreResult<T>.Exception.get -> System.Exception?
+AtomUI.City.Security.SecurityStoreResult<T>.Message.get -> string?
+AtomUI.City.Security.SecurityStoreResult<T>.Status.get -> AtomUI.City.Security.SecurityStoreResultStatus
+AtomUI.City.Security.SecurityStoreResult<T>.Succeeded.get -> bool
+AtomUI.City.Security.SecurityStoreResult<T>.Value.get -> T?
+AtomUI.City.Security.SecurityStoreResultStatus
+AtomUI.City.Security.SecurityStoreResultStatus.AccessDenied = 4 -> AtomUI.City.Security.SecurityStoreResultStatus
+AtomUI.City.Security.SecurityStoreResultStatus.Cancelled = 6 -> AtomUI.City.Security.SecurityStoreResultStatus
+AtomUI.City.Security.SecurityStoreResultStatus.InvalidData = 2 -> AtomUI.City.Security.SecurityStoreResultStatus
+AtomUI.City.Security.SecurityStoreResultStatus.IoFailed = 5 -> AtomUI.City.Security.SecurityStoreResultStatus
+AtomUI.City.Security.SecurityStoreResultStatus.NotFound = 1 -> AtomUI.City.Security.SecurityStoreResultStatus
+AtomUI.City.Security.SecurityStoreResultStatus.Success = 0 -> AtomUI.City.Security.SecurityStoreResultStatus
+AtomUI.City.Security.SecurityStoreResultStatus.UnsupportedSchema = 3 -> AtomUI.City.Security.SecurityStoreResultStatus
+AtomUI.City.Security.UnavailableAccessTokenProvider
+AtomUI.City.Security.UnavailableAccessTokenProvider.GetTokenAsync(AtomUI.City.Security.AccessTokenRequest! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Security.AccessTokenResult!>
+AtomUI.City.Security.UnavailableAccessTokenProvider.UnavailableAccessTokenProvider() -> void
+AtomUI.City.Security.UnavailableAccessTokenProvider.UnavailableAccessTokenProvider(AtomUI.City.Core.Diagnostics.IHostDiagnostics! diagnostics) -> void
+const AtomUI.City.Security.AccountCredentialSnapshot.CurrentSchemaVersion = 1 -> int
+const AtomUI.City.Security.AccountProfileSnapshot.CurrentSchemaVersion = 1 -> int
+const AtomUI.City.Security.PersistedPermissionSnapshot.CurrentSchemaVersion = 1 -> int
+const AtomUI.City.Security.SecurityClaimTypes.Authority = "authority" -> string!
+const AtomUI.City.Security.SecurityClaimTypes.Permission = "permission" -> string!
+const AtomUI.City.Security.SecurityClaimTypes.TenantId = "tenant_id" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.AccessTokenProviderFailed = "AUCSEC501" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.AccessTokenResolved = "AUCSEC500" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.AccountPersistenceCompleted = "AUCSEC600" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.AccountPersistenceFailed = "AUCSEC601" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.AccountSessionChanged = "AUCSEC700" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.AccountSessionObserverFailed = "AUCSEC702" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.AccountSessionOperationFailed = "AUCSEC701" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.AuthenticationObserverFailed = "AUCSEC002" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.AuthenticationStateChanged = "AUCSEC001" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.AuthorizationDenied = "AUCSEC200" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.AuthorizationEvaluationFailed = "AUCSEC201" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.CommandAuthorizationChanged = "AUCSEC400" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.CommandAuthorizationEvaluated = "AUCSEC403" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.CommandAuthorizationFailed = "AUCSEC401" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.CommandAuthorizationObserverFailed = "AUCSEC402" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.CredentialPersistenceCompleted = "AUCSEC610" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.CredentialPersistenceFailed = "AUCSEC611" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.PermissionObserverFailed = "AUCSEC102" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.PermissionRegistryChanged = "AUCSEC101" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.RouteAuthorizationCompleted = "AUCSEC300" -> string!
+const AtomUI.City.Security.SecurityDiagnosticIds.RouteAuthorizationFailed = "AUCSEC301" -> string!
+const AtomUI.City.Security.SecurityRouteGuardResultCodes.AuthenticationRequired = "authentication-required" -> string!
+const AtomUI.City.Security.SecurityRouteGuardResultCodes.AuthorizationFailed = "authorization-failed" -> string!
+const AtomUI.City.Security.SecurityRouteGuardResultCodes.Forbidden = "authorization-forbidden" -> string!
+override AtomUI.City.Security.AccountCredentialSnapshot.ToString() -> string!
+override AtomUI.City.Security.SecurityAccountKey.Equals(object? obj) -> bool
+override AtomUI.City.Security.SecurityAccountKey.GetHashCode() -> int
+override AtomUI.City.Security.SecurityAccountKey.ToString() -> string!
+static AtomUI.City.Security.AccessTokenResult.Cancelled(string? message = null) -> AtomUI.City.Security.AccessTokenResult!
+static AtomUI.City.Security.AccessTokenResult.Expired(string? message = null) -> AtomUI.City.Security.AccessTokenResult!
+static AtomUI.City.Security.AccessTokenResult.Failed(string? message = null, System.Exception? exception = null) -> AtomUI.City.Security.AccessTokenResult!
+static AtomUI.City.Security.AccessTokenResult.None() -> AtomUI.City.Security.AccessTokenResult!
+static AtomUI.City.Security.AccessTokenResult.Required(string? message = null) -> AtomUI.City.Security.AccessTokenResult!
+static AtomUI.City.Security.AccessTokenResult.Success(string! token, string! scheme, System.DateTimeOffset? expiresAt = null) -> AtomUI.City.Security.AccessTokenResult!
+static AtomUI.City.Security.AccessTokenResult.Unavailable(string? message = null) -> AtomUI.City.Security.AccessTokenResult!
+static AtomUI.City.Security.AccountSessionSnapshot.Anonymous(long revision = 0) -> AtomUI.City.Security.AccountSessionSnapshot!
+static AtomUI.City.Security.AuthorizationPolicy.RequireAuthenticated(string! name) -> AtomUI.City.Security.AuthorizationPolicy!
+static AtomUI.City.Security.AuthorizationPolicy.RequirePermission(string! name, string! permissionName, string? contributionId = null) -> AtomUI.City.Security.AuthorizationPolicy!
+static AtomUI.City.Security.AuthorizationRequirement.RequireAuthenticated() -> AtomUI.City.Security.AuthorizationRequirement!
+static AtomUI.City.Security.AuthorizationRequirement.RequireClaim(string! claimType, string? claimValue = null) -> AtomUI.City.Security.AuthorizationRequirement!
+static AtomUI.City.Security.AuthorizationRequirement.RequirePermission(string! permissionName) -> AtomUI.City.Security.AuthorizationRequirement!
+static AtomUI.City.Security.AuthorizationRequirement.RequireRole(string! roleName) -> AtomUI.City.Security.AuthorizationRequirement!
+static AtomUI.City.Security.AuthorizationResult.Allowed() -> AtomUI.City.Security.AuthorizationResult!
+static AtomUI.City.Security.AuthorizationResult.Cancelled(string? message = null, string? messageKey = "Errors.Cancelled", System.Collections.Generic.IReadOnlyList<object?>? messageArguments = null) -> AtomUI.City.Security.AuthorizationResult!
+static AtomUI.City.Security.AuthorizationResult.Challenge(string? message = null, string? messageKey = "Errors.AuthenticationRequired", System.Collections.Generic.IReadOnlyList<object?>? messageArguments = null) -> AtomUI.City.Security.AuthorizationResult!
+static AtomUI.City.Security.AuthorizationResult.Denied(string! failedRequirement, string? message = null, string? messageKey = "Errors.AuthorizationDenied", System.Collections.Generic.IReadOnlyList<object?>? messageArguments = null) -> AtomUI.City.Security.AuthorizationResult!
+static AtomUI.City.Security.AuthorizationResult.Failed(AtomUI.City.Security.SecurityFailureKind failureKind, string? failedRequirement = null, string? message = null, string? messageKey = null, System.Collections.Generic.IReadOnlyList<object?>? messageArguments = null, System.Exception? exception = null) -> AtomUI.City.Security.AuthorizationResult!
+static AtomUI.City.Security.AuthorizationResult.Forbidden(string! failedRequirement, string? message = null, string? messageKey = "Errors.AuthorizationForbidden", System.Collections.Generic.IReadOnlyList<object?>? messageArguments = null) -> AtomUI.City.Security.AuthorizationResult!
+static AtomUI.City.Security.SecurityPrincipals.Anonymous.get -> System.Security.Claims.ClaimsPrincipal!
+static AtomUI.City.Security.SecurityServiceCollectionExtensions.AddSecurity(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Security.SecurityServiceCollectionExtensions.AddSecurity(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, AtomUI.City.Security.SecurityPersistenceOptions! persistenceOptions) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static AtomUI.City.Security.SecurityStoreResult<T>.Failed(AtomUI.City.Security.SecurityStoreResultStatus status, string? message = null, System.Exception? exception = null) -> AtomUI.City.Security.SecurityStoreResult<T>!
+static AtomUI.City.Security.SecurityStoreResult<T>.Success(T value) -> AtomUI.City.Security.SecurityStoreResult<T>!

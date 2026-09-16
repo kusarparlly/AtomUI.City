@@ -74,9 +74,9 @@ public sealed class ApplicationTemplateBuildSmokeTests
         Assert.Contains("<ImplicitUsings>enable</ImplicitUsings>", appProject, StringComparison.Ordinal);
         Assert.Contains("<Nullable>enable</Nullable>", appProject, StringComparison.Ordinal);
         Assert.Contains("<OutputType>WinExe</OutputType>", appProject, StringComparison.Ordinal);
-        Assert.Contains("""<PackageReference Include="AtomUI.City.Core" Version="1.0.0" />""", appProject, StringComparison.Ordinal);
-        Assert.Contains("""<PackageReference Include="AtomUI.City.Build" Version="1.0.0" PrivateAssets="all" />""", appProject, StringComparison.Ordinal);
-        Assert.Contains("""<PackageReference Include="AtomUI.City.Presentation" Version="1.0.0" />""", appProject, StringComparison.Ordinal);
+        Assert.Contains("""<PackageReference Include="AtomUI.City.Core" Version="1.0.0-preview.1" />""", appProject, StringComparison.Ordinal);
+        Assert.Contains("""<PackageReference Include="AtomUI.City.Build" Version="1.0.0-preview.1" PrivateAssets="all" />""", appProject, StringComparison.Ordinal);
+        Assert.Contains("""<PackageReference Include="AtomUI.City.Presentation" Version="1.0.0-preview.1" />""", appProject, StringComparison.Ordinal);
         Assert.Contains("""<PackageReference Include="Avalonia.Desktop" Version="12.0.4" />""", appProject, StringComparison.Ordinal);
         Assert.Contains("""<PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.4" />""", appProject, StringComparison.Ordinal);
 
@@ -249,9 +249,9 @@ public sealed class ApplicationTemplateBuildSmokeTests
             packageSource = Path.Combine(repositoryRoot.FullName, "output", "NuGet", configuration);
         }
         Assert.True(Directory.Exists(packageSource), $"Expected local package source at {packageSource}.");
-        var corePackagePath = Path.Combine(packageSource, "AtomUI.City.Core.1.0.0.nupkg");
+        var corePackagePath = Path.Combine(packageSource, "AtomUI.City.Core.1.0.0-preview.1.nupkg");
         Assert.True(File.Exists(corePackagePath), $"Expected Core package at {corePackagePath}.");
-        var presentationPackagePath = Path.Combine(packageSource, "AtomUI.City.Presentation.1.0.0.nupkg");
+        var presentationPackagePath = Path.Combine(packageSource, "AtomUI.City.Presentation.1.0.0-preview.1.nupkg");
         Assert.True(
             File.Exists(presentationPackagePath),
             $"Expected Presentation package at {presentationPackagePath}.");

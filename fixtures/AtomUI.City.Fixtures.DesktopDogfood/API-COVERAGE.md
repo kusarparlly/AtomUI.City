@@ -1,15 +1,15 @@
 # Public API 覆盖设计
 
-> 当前状态：本文件定义最终 API 覆盖门禁，不是当前通过报告。运行账本已经记录 Service、Route、ViewModel、Command、并发和跨模块动作覆盖点，但 `api-coverage.json`、exported API inventory、BUILD/NEG 全量 profile 及 `required-uncovered=0` 尚未落地，因此不得把行为账本等同于全部开发者公开 API 覆盖。
+> 当前状态：公开面 inventory、SHA 漂移检测和多场景族运行证据已经落地。该门禁精确证明“公开成员集合没有未经 review 的变化”和“模块要求的行为场景族均执行”；它不把场景族证据夸大为每个 public member 都已被直接调用。逐成员调用覆盖必须由专门探针或测试映射另行证明。
 
 ## 1. 目标定义
 
 “使用全部公开给开发者的 API”不能靠人工印象判断。Dogfood 实现必须建立机器可检查的 API inventory，并满足：
 
 1. 9 个运行期模块全部 Completed/Verified 且未 Retired 的 Feature 有场景证据；Testing/Generators/Build/CLI/Templates 的开发者工具入口有工程场景证据。
-2. `api-contracts.md` 的 Public 类型和关键方法全部映射到 coverage point。
+2. `api-contracts.md` 与 PublicAPI baseline 精确约束 public member 集合；行为场景按独立 evidence category 验收。
 3. assembly 新增 public API 后，未分类项立即让门禁失败。
-4. 可调用成员至少被一个成功路径或失败路径真实执行；纯 descriptor/result/snapshot 成员必须被构造和断言。
+4. 不允许用一次模块级动作宣称全部成员已执行；报告必须分别输出公开成员 inventory 和缺失的场景族。
 5. Attribute、Generator、DI extension 等编译/组合入口由 build fixture 覆盖，不强行在 UI 点击路径重复。
 6. 明确不属于开发者入口的 public 实现类型也必须分类并说明由哪个接口场景间接覆盖。
 
@@ -156,6 +156,6 @@ Windows `InteractiveDesktop` 门禁补充 Headless 无法证明的 OS 边界：�
 
 ## 16. 机械实现
 
-`Automation/api-coverage.json` 固化九个运行时程序集的分类、运行证据类别和规范化 SHA-256。`api` profile 反射枚举 exported type 以及 declared public constructor/method/property/event/field，排除 special-name accessor 后形成稳定排序清单。公开面哈希变化视为未分类漂移；证据类别在本轮 ledger 中没有动作视为 required-uncovered。
+`Automation/api-coverage.json` 固化九个运行时程序集的 surface 分类、多个必需运行证据类别和规范化 SHA-256。`api` profile 反射枚举 exported type 以及 declared public constructor/method/property/event/field，排除 special-name accessor 后形成稳定排序清单。公开面哈希变化视为未分类漂移；每个缺失的 evidence category 单独计入 `required-uncovered`。模块只有一个笼统 evidence category 的配置属于非法降级，不能再用一次动作代表整个程序集。
 
 运行报告保留完整成员清单与 observed/expected hash。提交基线只保存九个摘要，避免维护数千行易受格式变化影响的手工清单。允许分类只有 `UI/RT/NEG/BUILD/MODEL/INDIRECT/BLOCKED/RETIRED`，禁止 `IGNORED/N/A`。任何公开面有意变化都必须先补测试证据，再审核更新摘要。

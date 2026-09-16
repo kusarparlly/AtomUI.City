@@ -161,7 +161,7 @@ public sealed class PackagingReleaseGateTests
         var versionProps = XDocument.Load(Path.Combine(repositoryRoot, "build", "Version.props"));
         var properties = ReadProperties(versionProps);
 
-        Assert.Equal("1.0.0", properties["AtomUICityVersion"]);
+        Assert.Equal("1.0.0-preview.1", properties["AtomUICityVersion"]);
         Assert.Equal("$(AtomUICityVersion)", properties["AtomUICityTemplatesVersion"]);
 
         var sourceProjectsWithLiteralVersions = RepositoryPaths
@@ -178,7 +178,7 @@ public sealed class PackagingReleaseGateTests
         var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
         var releaseNotes = File.ReadAllText(Path.Combine(repositoryRoot, "RELEASE_NOTES.md"));
 
-        Assert.Contains("## 1.0.0 (unreleased candidate)", releaseNotes, StringComparison.Ordinal);
+        Assert.Contains("## 1.0.0-preview.1 (unreleased candidate)", releaseNotes, StringComparison.Ordinal);
         Assert.Contains("Plugin API compatibility", releaseNotes, StringComparison.Ordinal);
         Assert.Contains("Plugin API compatibility starts only when stable `1.0` is published", releaseNotes, StringComparison.Ordinal);
         Assert.Contains("full 1.0 package family is not publishable yet", releaseNotes, StringComparison.Ordinal);

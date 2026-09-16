@@ -1,0 +1,373 @@
+#nullable enable
+AtomUI.City.Testing.AotCompatibilityCheck
+AtomUI.City.Testing.AotCompatibilityCheck.Evaluate(System.Collections.Generic.IEnumerable<AtomUI.City.Testing.SourceFile!>! sources, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Testing.AotCompatibilityDiagnostic!>!
+AtomUI.City.Testing.AotCompatibilityCheck.ForbidDefaultAotPatterns() -> AtomUI.City.Testing.AotCompatibilityCheck!
+AtomUI.City.Testing.AotCompatibilityCheck.ForbidPattern(string! diagnosticId, string! pattern) -> AtomUI.City.Testing.AotCompatibilityCheck!
+AtomUI.City.Testing.AotCompatibilityDiagnostic
+AtomUI.City.Testing.AotCompatibilityDiagnostic.<Clone>$() -> AtomUI.City.Testing.AotCompatibilityDiagnostic!
+AtomUI.City.Testing.AotCompatibilityDiagnostic.AotCompatibilityDiagnostic(string! Id, string! SourcePath, string! Message) -> void
+AtomUI.City.Testing.AotCompatibilityDiagnostic.Deconstruct(out string! Id, out string! SourcePath, out string! Message) -> void
+AtomUI.City.Testing.AotCompatibilityDiagnostic.Equals(AtomUI.City.Testing.AotCompatibilityDiagnostic? other) -> bool
+AtomUI.City.Testing.AotCompatibilityDiagnostic.Id.get -> string!
+AtomUI.City.Testing.AotCompatibilityDiagnostic.Id.init -> void
+AtomUI.City.Testing.AotCompatibilityDiagnostic.Message.get -> string!
+AtomUI.City.Testing.AotCompatibilityDiagnostic.Message.init -> void
+AtomUI.City.Testing.AotCompatibilityDiagnostic.SourcePath.get -> string!
+AtomUI.City.Testing.AotCompatibilityDiagnostic.SourcePath.init -> void
+AtomUI.City.Testing.DeterministicScheduledWorkItem
+AtomUI.City.Testing.DeterministicScheduledWorkItem.Cancel() -> void
+AtomUI.City.Testing.DeterministicScheduledWorkItem.DueAt.get -> System.DateTimeOffset
+AtomUI.City.Testing.DeterministicScheduledWorkItem.Exception.get -> System.Exception?
+AtomUI.City.Testing.DeterministicScheduledWorkItem.Id.get -> long
+AtomUI.City.Testing.DeterministicScheduledWorkItem.IsCanceled.get -> bool
+AtomUI.City.Testing.DeterministicScheduledWorkItem.IsCompleted.get -> bool
+AtomUI.City.Testing.DeterministicScheduledWorkItem.IsFaulted.get -> bool
+AtomUI.City.Testing.DeterministicScheduler
+AtomUI.City.Testing.DeterministicScheduler.AdvanceBy(System.TimeSpan duration) -> void
+AtomUI.City.Testing.DeterministicScheduler.DeterministicScheduler() -> void
+AtomUI.City.Testing.DeterministicScheduler.DeterministicScheduler(AtomUI.City.Testing.TestDiagnostics! diagnostics) -> void
+AtomUI.City.Testing.DeterministicScheduler.Dispose() -> void
+AtomUI.City.Testing.DeterministicScheduler.Now.get -> System.DateTimeOffset
+AtomUI.City.Testing.DeterministicScheduler.RunDueWork() -> void
+AtomUI.City.Testing.DeterministicScheduler.Schedule(System.TimeSpan delay, System.Action! callback) -> AtomUI.City.Testing.DeterministicScheduledWorkItem!
+AtomUI.City.Testing.DeterministicScheduler.ScheduledCount.get -> int
+AtomUI.City.Testing.DisposableTracker
+AtomUI.City.Testing.DisposableTracker.DisposableTracker() -> void
+AtomUI.City.Testing.DisposableTracker.Dispose() -> void
+AtomUI.City.Testing.DisposableTracker.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Testing.DisposableTracker.Track<T>(T resource) -> T
+AtomUI.City.Testing.ExpectedDiagnostic
+AtomUI.City.Testing.ExpectedDiagnostic.<Clone>$() -> AtomUI.City.Testing.ExpectedDiagnostic!
+AtomUI.City.Testing.ExpectedDiagnostic.Deconstruct(out string! Id) -> void
+AtomUI.City.Testing.ExpectedDiagnostic.Equals(AtomUI.City.Testing.ExpectedDiagnostic? other) -> bool
+AtomUI.City.Testing.ExpectedDiagnostic.ExpectedDiagnostic(string! Id) -> void
+AtomUI.City.Testing.ExpectedDiagnostic.Id.get -> string!
+AtomUI.City.Testing.ExpectedDiagnostic.Id.init -> void
+AtomUI.City.Testing.FakeDataConnection
+AtomUI.City.Testing.FakeDataConnection.ConnectionId.get -> string!
+AtomUI.City.Testing.FakeDataConnection.FakeDataConnection(string! connectionId, AtomUI.City.Data.DataConnectionOwner owner, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>? start = null, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>? stop = null) -> void
+AtomUI.City.Testing.FakeDataConnection.Owner.get -> AtomUI.City.Data.DataConnectionOwner
+AtomUI.City.Testing.FakeDataConnection.StartAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Testing.FakeDataConnection.StartCount.get -> int
+AtomUI.City.Testing.FakeDataConnection.State.get -> AtomUI.City.Data.DataConnectionState
+AtomUI.City.Testing.FakeDataConnection.StopAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Testing.FakeDataConnection.StopCount.get -> int
+AtomUI.City.Testing.FakeUiDispatcher
+AtomUI.City.Testing.FakeUiDispatcher.CheckAccess() -> bool
+AtomUI.City.Testing.FakeUiDispatcher.Dispose() -> void
+AtomUI.City.Testing.FakeUiDispatcher.Drain() -> void
+AtomUI.City.Testing.FakeUiDispatcher.FakeUiDispatcher() -> void
+AtomUI.City.Testing.FakeUiDispatcher.FakeUiDispatcher(AtomUI.City.Testing.TestDiagnostics! diagnostics) -> void
+AtomUI.City.Testing.FakeUiDispatcher.InvokeAsync(System.Action! callback, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Testing.FakeUiDispatcher.InvokeAsync<T>(System.Func<T>! callback, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<T>
+AtomUI.City.Testing.FakeUiDispatcher.PendingCount.get -> int
+AtomUI.City.Testing.FakeUiDispatcher.Post(System.Action! callback) -> AtomUI.City.Testing.FakeUiWorkItem!
+AtomUI.City.Testing.FakeUiDispatcher.PostAsync(System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>! callback, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Testing.FakeUiWorkItem
+AtomUI.City.Testing.FakeUiWorkItem.Cancel() -> void
+AtomUI.City.Testing.FakeUiWorkItem.Exception.get -> System.Exception?
+AtomUI.City.Testing.FakeUiWorkItem.Id.get -> long
+AtomUI.City.Testing.FakeUiWorkItem.IsCanceled.get -> bool
+AtomUI.City.Testing.FakeUiWorkItem.IsCompleted.get -> bool
+AtomUI.City.Testing.FakeUiWorkItem.IsFaulted.get -> bool
+AtomUI.City.Testing.GeneratedSource
+AtomUI.City.Testing.GeneratedSource.<Clone>$() -> AtomUI.City.Testing.GeneratedSource!
+AtomUI.City.Testing.GeneratedSource.Deconstruct(out string! HintName, out string! SourceText) -> void
+AtomUI.City.Testing.GeneratedSource.Equals(AtomUI.City.Testing.GeneratedSource? other) -> bool
+AtomUI.City.Testing.GeneratedSource.GeneratedSource(string! HintName, string! SourceText) -> void
+AtomUI.City.Testing.GeneratedSource.HintName.get -> string!
+AtomUI.City.Testing.GeneratedSource.HintName.init -> void
+AtomUI.City.Testing.GeneratedSource.SourceText.get -> string!
+AtomUI.City.Testing.GeneratedSource.SourceText.init -> void
+AtomUI.City.Testing.GeneratedSourceSnapshot
+AtomUI.City.Testing.GeneratedSourceSnapshot.Text.get -> string!
+AtomUI.City.Testing.ModuleTestHost
+AtomUI.City.Testing.ModuleTestHost.Dispose() -> void
+AtomUI.City.Testing.ModuleTestHost.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Testing.ModuleTestHost.Host.get -> AtomUI.City.Testing.TestHost!
+AtomUI.City.Testing.ModuleTestHost.InitializeAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Testing.ModuleTestHost.Modules.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Testing.ModuleTestRecord!>!
+AtomUI.City.Testing.ModuleTestHost.ShutdownAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Testing.ModuleTestHostBuilder
+AtomUI.City.Testing.ModuleTestHostBuilder.Build() -> AtomUI.City.Testing.ModuleTestHost!
+AtomUI.City.Testing.ModuleTestHostBuilder.ModuleTestHostBuilder() -> void
+AtomUI.City.Testing.ModuleTestHostBuilder.UseHostProperty(string! key, object? value) -> AtomUI.City.Testing.ModuleTestHostBuilder!
+AtomUI.City.Testing.ModuleTestHostBuilder.UseModule(string! name, AtomUI.City.Core.Modularity.IModule! module) -> AtomUI.City.Testing.ModuleTestHostBuilder!
+AtomUI.City.Testing.ModuleTestRecord
+AtomUI.City.Testing.ModuleTestRecord.<Clone>$() -> AtomUI.City.Testing.ModuleTestRecord!
+AtomUI.City.Testing.ModuleTestRecord.Deconstruct(out string! Name, out AtomUI.City.Core.Modularity.IModule! Module) -> void
+AtomUI.City.Testing.ModuleTestRecord.Equals(AtomUI.City.Testing.ModuleTestRecord? other) -> bool
+AtomUI.City.Testing.ModuleTestRecord.Module.get -> AtomUI.City.Core.Modularity.IModule!
+AtomUI.City.Testing.ModuleTestRecord.Module.init -> void
+AtomUI.City.Testing.ModuleTestRecord.ModuleTestRecord(string! Name, AtomUI.City.Core.Modularity.IModule! Module) -> void
+AtomUI.City.Testing.ModuleTestRecord.Name.get -> string!
+AtomUI.City.Testing.ModuleTestRecord.Name.init -> void
+AtomUI.City.Testing.PluginTestHost
+AtomUI.City.Testing.PluginTestHost.ActivateAsync(string! pluginId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Testing.PluginTestRecord!>
+AtomUI.City.Testing.PluginTestHost.DeactivateAsync(string! pluginId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Testing.PluginTestRecord!>
+AtomUI.City.Testing.PluginTestHost.Dispose() -> void
+AtomUI.City.Testing.PluginTestHost.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Testing.PluginTestHost.Host.get -> AtomUI.City.Testing.TestHost!
+AtomUI.City.Testing.PluginTestHost.InstallAsync(string! pluginId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Testing.PluginTestRecord!>
+AtomUI.City.Testing.PluginTestHost.Records.get -> System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Testing.PluginTestRecord!>!
+AtomUI.City.Testing.PluginTestHost.RegisterContribution(string! pluginId, string! contributionId) -> AtomUI.City.Testing.PluginTestRecord!
+AtomUI.City.Testing.PluginTestHost.UnloadAsync(string! pluginId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Testing.PluginTestRecord!>
+AtomUI.City.Testing.PluginTestHostBuilder
+AtomUI.City.Testing.PluginTestHostBuilder.Build() -> AtomUI.City.Testing.PluginTestHost!
+AtomUI.City.Testing.PluginTestHostBuilder.PluginTestHostBuilder() -> void
+AtomUI.City.Testing.PluginTestHostBuilder.UsePlugin(string! id, string! version) -> AtomUI.City.Testing.PluginTestHostBuilder!
+AtomUI.City.Testing.PluginTestPackage
+AtomUI.City.Testing.PluginTestPackage.<Clone>$() -> AtomUI.City.Testing.PluginTestPackage!
+AtomUI.City.Testing.PluginTestPackage.Deconstruct(out string! Id, out string! Version) -> void
+AtomUI.City.Testing.PluginTestPackage.Equals(AtomUI.City.Testing.PluginTestPackage? other) -> bool
+AtomUI.City.Testing.PluginTestPackage.Id.get -> string!
+AtomUI.City.Testing.PluginTestPackage.Id.init -> void
+AtomUI.City.Testing.PluginTestPackage.PluginTestPackage(string! Id, string! Version) -> void
+AtomUI.City.Testing.PluginTestPackage.Version.get -> string!
+AtomUI.City.Testing.PluginTestPackage.Version.init -> void
+AtomUI.City.Testing.PluginTestRecord
+AtomUI.City.Testing.PluginTestRecord.Contributions.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
+AtomUI.City.Testing.PluginTestRecord.Id.get -> string!
+AtomUI.City.Testing.PluginTestRecord.InstallPath.get -> string!
+AtomUI.City.Testing.PluginTestRecord.PluginTestRecord(string! id, string! version, string! installPath, AtomUI.City.Testing.PluginTestState state) -> void
+AtomUI.City.Testing.PluginTestRecord.RevokedContributionCount.get -> int
+AtomUI.City.Testing.PluginTestRecord.State.get -> AtomUI.City.Testing.PluginTestState
+AtomUI.City.Testing.PluginTestRecord.Version.get -> string!
+AtomUI.City.Testing.PluginTestState
+AtomUI.City.Testing.PluginTestState.Active = 1 -> AtomUI.City.Testing.PluginTestState
+AtomUI.City.Testing.PluginTestState.Inactive = 2 -> AtomUI.City.Testing.PluginTestState
+AtomUI.City.Testing.PluginTestState.Installed = 0 -> AtomUI.City.Testing.PluginTestState
+AtomUI.City.Testing.PluginTestState.Unloaded = 3 -> AtomUI.City.Testing.PluginTestState
+AtomUI.City.Testing.RecordedDataRequest
+AtomUI.City.Testing.RecordedDataRequest.<Clone>$() -> AtomUI.City.Testing.RecordedDataRequest!
+AtomUI.City.Testing.RecordedDataRequest.Context.get -> AtomUI.City.Data.DataRequestContext!
+AtomUI.City.Testing.RecordedDataRequest.Context.init -> void
+AtomUI.City.Testing.RecordedDataRequest.Deconstruct(out object! Request, out AtomUI.City.Data.DataRequestContext! Context, out bool IsEntering) -> void
+AtomUI.City.Testing.RecordedDataRequest.Equals(AtomUI.City.Testing.RecordedDataRequest? other) -> bool
+AtomUI.City.Testing.RecordedDataRequest.IsEntering.get -> bool
+AtomUI.City.Testing.RecordedDataRequest.IsEntering.init -> void
+AtomUI.City.Testing.RecordedDataRequest.RecordedDataRequest(object! Request, AtomUI.City.Data.DataRequestContext! Context, bool IsEntering) -> void
+AtomUI.City.Testing.RecordedDataRequest.Request.get -> object!
+AtomUI.City.Testing.RecordedDataRequest.Request.init -> void
+AtomUI.City.Testing.RecordingDataRequestHandler
+AtomUI.City.Testing.RecordingDataRequestHandler.InvokeAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataRequestContext! context, AtomUI.City.Data.DataRequestHandlerDelegate<TResponse>! next, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Testing.RecordingDataRequestHandler.Order.get -> int
+AtomUI.City.Testing.RecordingDataRequestHandler.RecordingDataRequestHandler(int order = 0, System.Func<object!, AtomUI.City.Data.DataRequestContext!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>? before = null) -> void
+AtomUI.City.Testing.RecordingDataRequestHandler.Records.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Testing.RecordedDataRequest!>!
+AtomUI.City.Testing.RouteTestDefinition
+AtomUI.City.Testing.RouteTestDefinition.<Clone>$() -> AtomUI.City.Testing.RouteTestDefinition!
+AtomUI.City.Testing.RouteTestDefinition.Deconstruct(out string! Name, out string! Pattern, out System.Type! ViewModelType) -> void
+AtomUI.City.Testing.RouteTestDefinition.Equals(AtomUI.City.Testing.RouteTestDefinition? other) -> bool
+AtomUI.City.Testing.RouteTestDefinition.Name.get -> string!
+AtomUI.City.Testing.RouteTestDefinition.Name.init -> void
+AtomUI.City.Testing.RouteTestDefinition.Pattern.get -> string!
+AtomUI.City.Testing.RouteTestDefinition.Pattern.init -> void
+AtomUI.City.Testing.RouteTestDefinition.RouteTestDefinition(string! Name, string! Pattern, System.Type! ViewModelType) -> void
+AtomUI.City.Testing.RouteTestDefinition.ViewModelType.get -> System.Type!
+AtomUI.City.Testing.RouteTestDefinition.ViewModelType.init -> void
+AtomUI.City.Testing.RouteTestMatch
+AtomUI.City.Testing.RouteTestMatch.ErrorCode.get -> string?
+AtomUI.City.Testing.RouteTestMatch.IsMatch.get -> bool
+AtomUI.City.Testing.RouteTestMatch.Parameters.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+AtomUI.City.Testing.RouteTestMatch.RouteName.get -> string?
+AtomUI.City.Testing.RouteTestMatch.ViewModelType.get -> System.Type?
+AtomUI.City.Testing.RoutingTestHost
+AtomUI.City.Testing.RoutingTestHost.Diagnostics.get -> AtomUI.City.Testing.TestDiagnostics!
+AtomUI.City.Testing.RoutingTestHost.Match(string! path) -> AtomUI.City.Testing.RouteTestMatch!
+AtomUI.City.Testing.RoutingTestHost.NavigateAsync(string! path, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Testing.RouteTestMatch!>
+AtomUI.City.Testing.RoutingTestHost.Routes.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Testing.RouteTestDefinition!>!
+AtomUI.City.Testing.RoutingTestHostBuilder
+AtomUI.City.Testing.RoutingTestHostBuilder.Build() -> AtomUI.City.Testing.RoutingTestHost!
+AtomUI.City.Testing.RoutingTestHostBuilder.MapRoute(string! name, string! pattern, System.Type! viewModelType) -> AtomUI.City.Testing.RoutingTestHostBuilder!
+AtomUI.City.Testing.RoutingTestHostBuilder.RoutingTestHostBuilder() -> void
+AtomUI.City.Testing.ScriptedDataCredentialProvider
+AtomUI.City.Testing.ScriptedDataCredentialProvider.Enqueue(AtomUI.City.Data.DataCredentialResult! response) -> void
+AtomUI.City.Testing.ScriptedDataCredentialProvider.Enqueue(System.Func<AtomUI.City.Data.DataAuthenticationContext!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataCredentialResult!>>! response) -> void
+AtomUI.City.Testing.ScriptedDataCredentialProvider.GetCredentialAsync(AtomUI.City.Data.DataAuthenticationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataCredentialResult!>
+AtomUI.City.Testing.ScriptedDataCredentialProvider.Requests.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Data.DataAuthenticationContext!>!
+AtomUI.City.Testing.ScriptedDataCredentialProvider.ScriptedDataCredentialProvider() -> void
+AtomUI.City.Testing.ScriptedDataInvocation
+AtomUI.City.Testing.ScriptedDataInvocation.<Clone>$() -> AtomUI.City.Testing.ScriptedDataInvocation!
+AtomUI.City.Testing.ScriptedDataInvocation.CancellationToken.get -> System.Threading.CancellationToken
+AtomUI.City.Testing.ScriptedDataInvocation.CancellationToken.init -> void
+AtomUI.City.Testing.ScriptedDataInvocation.Context.get -> AtomUI.City.Data.DataRequestContext!
+AtomUI.City.Testing.ScriptedDataInvocation.Context.init -> void
+AtomUI.City.Testing.ScriptedDataInvocation.Deconstruct(out object! Request, out AtomUI.City.Data.DataRequestContext! Context, out System.Threading.CancellationToken CancellationToken) -> void
+AtomUI.City.Testing.ScriptedDataInvocation.Equals(AtomUI.City.Testing.ScriptedDataInvocation? other) -> bool
+AtomUI.City.Testing.ScriptedDataInvocation.Request.get -> object!
+AtomUI.City.Testing.ScriptedDataInvocation.Request.init -> void
+AtomUI.City.Testing.ScriptedDataInvocation.ScriptedDataInvocation(object! Request, AtomUI.City.Data.DataRequestContext! Context, System.Threading.CancellationToken CancellationToken) -> void
+AtomUI.City.Testing.ScriptedDataResponse
+AtomUI.City.Testing.ScriptedDataResponse.<Clone>$() -> AtomUI.City.Testing.ScriptedDataResponse!
+AtomUI.City.Testing.ScriptedDataResponse.Deconstruct(out AtomUI.City.Data.DataResultStatus Status, out object? Value, out AtomUI.City.Data.DataError? Error) -> void
+AtomUI.City.Testing.ScriptedDataResponse.Equals(AtomUI.City.Testing.ScriptedDataResponse? other) -> bool
+AtomUI.City.Testing.ScriptedDataResponse.Error.get -> AtomUI.City.Data.DataError?
+AtomUI.City.Testing.ScriptedDataResponse.Error.init -> void
+AtomUI.City.Testing.ScriptedDataResponse.ScriptedDataResponse(AtomUI.City.Data.DataResultStatus Status, object? Value = null, AtomUI.City.Data.DataError? Error = null) -> void
+AtomUI.City.Testing.ScriptedDataResponse.Status.get -> AtomUI.City.Data.DataResultStatus
+AtomUI.City.Testing.ScriptedDataResponse.Status.init -> void
+AtomUI.City.Testing.ScriptedDataResponse.Value.get -> object?
+AtomUI.City.Testing.ScriptedDataResponse.Value.init -> void
+AtomUI.City.Testing.ScriptedDataTransport
+AtomUI.City.Testing.ScriptedDataTransport.Enqueue(AtomUI.City.Testing.ScriptedDataResponse! response) -> void
+AtomUI.City.Testing.ScriptedDataTransport.Enqueue(System.Func<AtomUI.City.Testing.ScriptedDataInvocation!, System.Threading.Tasks.ValueTask<AtomUI.City.Testing.ScriptedDataResponse!>>! response) -> void
+AtomUI.City.Testing.ScriptedDataTransport.Invocations.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Testing.ScriptedDataInvocation!>!
+AtomUI.City.Testing.ScriptedDataTransport.Kind.get -> AtomUI.City.Data.DataTransportKind
+AtomUI.City.Testing.ScriptedDataTransport.ScriptedDataTransport(AtomUI.City.Data.DataTransportKind kind = AtomUI.City.Data.DataTransportKind.Http) -> void
+AtomUI.City.Testing.ScriptedDataTransport.SendAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataRequestContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Testing.SourceFile
+AtomUI.City.Testing.SourceFile.<Clone>$() -> AtomUI.City.Testing.SourceFile!
+AtomUI.City.Testing.SourceFile.Deconstruct(out string! Path, out string! Text) -> void
+AtomUI.City.Testing.SourceFile.Equals(AtomUI.City.Testing.SourceFile? other) -> bool
+AtomUI.City.Testing.SourceFile.Path.get -> string!
+AtomUI.City.Testing.SourceFile.Path.init -> void
+AtomUI.City.Testing.SourceFile.SourceFile(string! Path, string! Text) -> void
+AtomUI.City.Testing.SourceFile.Text.get -> string!
+AtomUI.City.Testing.SourceFile.Text.init -> void
+AtomUI.City.Testing.SourceGenerationTestCase
+AtomUI.City.Testing.SourceGenerationTestCase.AddSource(string! path, string! text) -> AtomUI.City.Testing.SourceGenerationTestCase!
+AtomUI.City.Testing.SourceGenerationTestCase.ExpectDiagnostic(string! id) -> AtomUI.City.Testing.SourceGenerationTestCase!
+AtomUI.City.Testing.SourceGenerationTestCase.ExpectedDiagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Testing.ExpectedDiagnostic!>!
+AtomUI.City.Testing.SourceGenerationTestCase.Name.get -> string!
+AtomUI.City.Testing.SourceGenerationTestCase.Run(Microsoft.CodeAnalysis.ISourceGenerator! generator, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> AtomUI.City.Testing.SourceGenerationTestResult!
+AtomUI.City.Testing.SourceGenerationTestCase.Sources.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Testing.SourceFile!>!
+AtomUI.City.Testing.SourceGenerationTestResult
+AtomUI.City.Testing.SourceGenerationTestResult.CompilationDiagnostics.get -> System.Collections.Generic.IReadOnlyList<Microsoft.CodeAnalysis.Diagnostic!>!
+AtomUI.City.Testing.SourceGenerationTestResult.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<Microsoft.CodeAnalysis.Diagnostic!>!
+AtomUI.City.Testing.SourceGenerationTestResult.Snapshot.get -> AtomUI.City.Testing.GeneratedSourceSnapshot!
+AtomUI.City.Testing.TestDiagnosticEntry
+AtomUI.City.Testing.TestDiagnosticEntry.<Clone>$() -> AtomUI.City.Testing.TestDiagnosticEntry!
+AtomUI.City.Testing.TestDiagnosticEntry.Code.get -> string!
+AtomUI.City.Testing.TestDiagnosticEntry.Code.init -> void
+AtomUI.City.Testing.TestDiagnosticEntry.Deconstruct(out string! Code, out string! Message, out AtomUI.City.Testing.TestLayer? Layer) -> void
+AtomUI.City.Testing.TestDiagnosticEntry.Equals(AtomUI.City.Testing.TestDiagnosticEntry? other) -> bool
+AtomUI.City.Testing.TestDiagnosticEntry.Layer.get -> AtomUI.City.Testing.TestLayer?
+AtomUI.City.Testing.TestDiagnosticEntry.Layer.init -> void
+AtomUI.City.Testing.TestDiagnosticEntry.Message.get -> string!
+AtomUI.City.Testing.TestDiagnosticEntry.Message.init -> void
+AtomUI.City.Testing.TestDiagnosticEntry.TestDiagnosticEntry(string! Code, string! Message, AtomUI.City.Testing.TestLayer? Layer = null) -> void
+AtomUI.City.Testing.TestDiagnostics
+AtomUI.City.Testing.TestDiagnostics.Add(string! code, string! message, AtomUI.City.Testing.TestLayer? layer = null) -> void
+AtomUI.City.Testing.TestDiagnostics.Contains(string! code) -> bool
+AtomUI.City.Testing.TestDiagnostics.Entries.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Testing.TestDiagnosticEntry!>!
+AtomUI.City.Testing.TestDiagnostics.TestDiagnostics() -> void
+AtomUI.City.Testing.TestDirectory
+AtomUI.City.Testing.TestDirectory.Dispose() -> void
+AtomUI.City.Testing.TestDirectory.GetPath(params string![]! segments) -> string!
+AtomUI.City.Testing.TestDirectory.KeepOnDispose.get -> bool
+AtomUI.City.Testing.TestDirectory.RootPath.get -> string!
+AtomUI.City.Testing.TestHost
+AtomUI.City.Testing.TestHost.ApplicationContext.get -> AtomUI.City.Core.Hosting.IApplicationContext!
+AtomUI.City.Testing.TestHost.Diagnostics.get -> AtomUI.City.Testing.TestDiagnostics!
+AtomUI.City.Testing.TestHost.Directory.get -> AtomUI.City.Testing.TestDirectory!
+AtomUI.City.Testing.TestHost.Dispatcher.get -> AtomUI.City.Testing.FakeUiDispatcher!
+AtomUI.City.Testing.TestHost.Dispose() -> void
+AtomUI.City.Testing.TestHost.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Testing.TestHost.IsStopped.get -> bool
+AtomUI.City.Testing.TestHost.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object?>!
+AtomUI.City.Testing.TestHost.Scheduler.get -> AtomUI.City.Testing.DeterministicScheduler!
+AtomUI.City.Testing.TestHost.StopAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Testing.TestHostBuilder
+AtomUI.City.Testing.TestHostBuilder.Build() -> AtomUI.City.Testing.TestHost!
+AtomUI.City.Testing.TestHostBuilder.KeepDirectoryOnDispose() -> AtomUI.City.Testing.TestHostBuilder!
+AtomUI.City.Testing.TestHostBuilder.TestHostBuilder() -> void
+AtomUI.City.Testing.TestHostBuilder.UseDirectoryName(string! name) -> AtomUI.City.Testing.TestHostBuilder!
+AtomUI.City.Testing.TestHostBuilder.UseProperty(string! key, object? value) -> AtomUI.City.Testing.TestHostBuilder!
+AtomUI.City.Testing.TestLayer
+AtomUI.City.Testing.TestLayer.Analyzer = 8 -> AtomUI.City.Testing.TestLayer
+AtomUI.City.Testing.TestLayer.Build = 9 -> AtomUI.City.Testing.TestLayer
+AtomUI.City.Testing.TestLayer.Contract = 1 -> AtomUI.City.Testing.TestLayer
+AtomUI.City.Testing.TestLayer.FrameworkIntegration = 2 -> AtomUI.City.Testing.TestLayer
+AtomUI.City.Testing.TestLayer.Generator = 7 -> AtomUI.City.Testing.TestLayer
+AtomUI.City.Testing.TestLayer.PlatformIntegration = 5 -> AtomUI.City.Testing.TestLayer
+AtomUI.City.Testing.TestLayer.PluginLifecycle = 4 -> AtomUI.City.Testing.TestLayer
+AtomUI.City.Testing.TestLayer.RuntimeLifecycle = 3 -> AtomUI.City.Testing.TestLayer
+AtomUI.City.Testing.TestLayer.TemplateSmoke = 6 -> AtomUI.City.Testing.TestLayer
+AtomUI.City.Testing.TestLayer.Unit = 0 -> AtomUI.City.Testing.TestLayer
+AtomUI.City.Testing.TestLayerAttribute
+AtomUI.City.Testing.TestLayerAttribute.Category.get -> string!
+AtomUI.City.Testing.TestLayerAttribute.Layer.get -> AtomUI.City.Testing.TestLayer
+AtomUI.City.Testing.TestLayerAttribute.TestLayerAttribute(AtomUI.City.Testing.TestLayer layer) -> void
+AtomUI.City.Testing.TestLayerAttribute.TestLayerAttribute(string! category) -> void
+AtomUI.City.Testing.TestLayerNames
+const AtomUI.City.Testing.TestLayerNames.Analyzer = "Analyzer" -> string!
+const AtomUI.City.Testing.TestLayerNames.Build = "Build" -> string!
+const AtomUI.City.Testing.TestLayerNames.Contract = "Contract" -> string!
+const AtomUI.City.Testing.TestLayerNames.FrameworkIntegration = "FrameworkIntegration" -> string!
+const AtomUI.City.Testing.TestLayerNames.Generator = "Generator" -> string!
+const AtomUI.City.Testing.TestLayerNames.PlatformIntegration = "PlatformIntegration" -> string!
+const AtomUI.City.Testing.TestLayerNames.PluginLifecycle = "PluginLifecycle" -> string!
+const AtomUI.City.Testing.TestLayerNames.RuntimeLifecycle = "RuntimeLifecycle" -> string!
+const AtomUI.City.Testing.TestLayerNames.TemplateSmoke = "TemplateSmoke" -> string!
+const AtomUI.City.Testing.TestLayerNames.Unit = "Unit" -> string!
+override AtomUI.City.Testing.AotCompatibilityDiagnostic.Equals(object? obj) -> bool
+override AtomUI.City.Testing.AotCompatibilityDiagnostic.GetHashCode() -> int
+override AtomUI.City.Testing.AotCompatibilityDiagnostic.ToString() -> string!
+override AtomUI.City.Testing.ExpectedDiagnostic.Equals(object? obj) -> bool
+override AtomUI.City.Testing.ExpectedDiagnostic.GetHashCode() -> int
+override AtomUI.City.Testing.ExpectedDiagnostic.ToString() -> string!
+override AtomUI.City.Testing.GeneratedSource.Equals(object? obj) -> bool
+override AtomUI.City.Testing.GeneratedSource.GetHashCode() -> int
+override AtomUI.City.Testing.GeneratedSource.ToString() -> string!
+override AtomUI.City.Testing.ModuleTestRecord.Equals(object? obj) -> bool
+override AtomUI.City.Testing.ModuleTestRecord.GetHashCode() -> int
+override AtomUI.City.Testing.ModuleTestRecord.ToString() -> string!
+override AtomUI.City.Testing.PluginTestPackage.Equals(object? obj) -> bool
+override AtomUI.City.Testing.PluginTestPackage.GetHashCode() -> int
+override AtomUI.City.Testing.PluginTestPackage.ToString() -> string!
+override AtomUI.City.Testing.RecordedDataRequest.Equals(object? obj) -> bool
+override AtomUI.City.Testing.RecordedDataRequest.GetHashCode() -> int
+override AtomUI.City.Testing.RecordedDataRequest.ToString() -> string!
+override AtomUI.City.Testing.RouteTestDefinition.Equals(object? obj) -> bool
+override AtomUI.City.Testing.RouteTestDefinition.GetHashCode() -> int
+override AtomUI.City.Testing.RouteTestDefinition.ToString() -> string!
+override AtomUI.City.Testing.ScriptedDataInvocation.Equals(object? obj) -> bool
+override AtomUI.City.Testing.ScriptedDataInvocation.GetHashCode() -> int
+override AtomUI.City.Testing.ScriptedDataInvocation.ToString() -> string!
+override AtomUI.City.Testing.ScriptedDataResponse.Equals(object? obj) -> bool
+override AtomUI.City.Testing.ScriptedDataResponse.GetHashCode() -> int
+override AtomUI.City.Testing.ScriptedDataResponse.ToString() -> string!
+override AtomUI.City.Testing.SourceFile.Equals(object? obj) -> bool
+override AtomUI.City.Testing.SourceFile.GetHashCode() -> int
+override AtomUI.City.Testing.SourceFile.ToString() -> string!
+override AtomUI.City.Testing.TestDiagnosticEntry.Equals(object? obj) -> bool
+override AtomUI.City.Testing.TestDiagnosticEntry.GetHashCode() -> int
+override AtomUI.City.Testing.TestDiagnosticEntry.ToString() -> string!
+static AtomUI.City.Testing.AotCompatibilityCheck.Create() -> AtomUI.City.Testing.AotCompatibilityCheck!
+static AtomUI.City.Testing.AotCompatibilityDiagnostic.operator !=(AtomUI.City.Testing.AotCompatibilityDiagnostic? left, AtomUI.City.Testing.AotCompatibilityDiagnostic? right) -> bool
+static AtomUI.City.Testing.AotCompatibilityDiagnostic.operator ==(AtomUI.City.Testing.AotCompatibilityDiagnostic? left, AtomUI.City.Testing.AotCompatibilityDiagnostic? right) -> bool
+static AtomUI.City.Testing.ExpectedDiagnostic.operator !=(AtomUI.City.Testing.ExpectedDiagnostic? left, AtomUI.City.Testing.ExpectedDiagnostic? right) -> bool
+static AtomUI.City.Testing.ExpectedDiagnostic.operator ==(AtomUI.City.Testing.ExpectedDiagnostic? left, AtomUI.City.Testing.ExpectedDiagnostic? right) -> bool
+static AtomUI.City.Testing.GeneratedSource.operator !=(AtomUI.City.Testing.GeneratedSource? left, AtomUI.City.Testing.GeneratedSource? right) -> bool
+static AtomUI.City.Testing.GeneratedSource.operator ==(AtomUI.City.Testing.GeneratedSource? left, AtomUI.City.Testing.GeneratedSource? right) -> bool
+static AtomUI.City.Testing.GeneratedSourceSnapshot.Create(System.Collections.Generic.IEnumerable<AtomUI.City.Testing.GeneratedSource!>! sources) -> AtomUI.City.Testing.GeneratedSourceSnapshot!
+static AtomUI.City.Testing.ModuleTestHost.CreateBuilder() -> AtomUI.City.Testing.ModuleTestHostBuilder!
+static AtomUI.City.Testing.ModuleTestRecord.operator !=(AtomUI.City.Testing.ModuleTestRecord? left, AtomUI.City.Testing.ModuleTestRecord? right) -> bool
+static AtomUI.City.Testing.ModuleTestRecord.operator ==(AtomUI.City.Testing.ModuleTestRecord? left, AtomUI.City.Testing.ModuleTestRecord? right) -> bool
+static AtomUI.City.Testing.PluginTestHost.CreateBuilder() -> AtomUI.City.Testing.PluginTestHostBuilder!
+static AtomUI.City.Testing.PluginTestPackage.operator !=(AtomUI.City.Testing.PluginTestPackage? left, AtomUI.City.Testing.PluginTestPackage? right) -> bool
+static AtomUI.City.Testing.PluginTestPackage.operator ==(AtomUI.City.Testing.PluginTestPackage? left, AtomUI.City.Testing.PluginTestPackage? right) -> bool
+static AtomUI.City.Testing.RecordedDataRequest.operator !=(AtomUI.City.Testing.RecordedDataRequest? left, AtomUI.City.Testing.RecordedDataRequest? right) -> bool
+static AtomUI.City.Testing.RecordedDataRequest.operator ==(AtomUI.City.Testing.RecordedDataRequest? left, AtomUI.City.Testing.RecordedDataRequest? right) -> bool
+static AtomUI.City.Testing.RouteTestDefinition.operator !=(AtomUI.City.Testing.RouteTestDefinition? left, AtomUI.City.Testing.RouteTestDefinition? right) -> bool
+static AtomUI.City.Testing.RouteTestDefinition.operator ==(AtomUI.City.Testing.RouteTestDefinition? left, AtomUI.City.Testing.RouteTestDefinition? right) -> bool
+static AtomUI.City.Testing.RouteTestMatch.NotFound() -> AtomUI.City.Testing.RouteTestMatch!
+static AtomUI.City.Testing.RouteTestMatch.Success(AtomUI.City.Testing.RouteTestDefinition! route, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! parameters) -> AtomUI.City.Testing.RouteTestMatch!
+static AtomUI.City.Testing.RoutingTestHost.CreateBuilder() -> AtomUI.City.Testing.RoutingTestHostBuilder!
+static AtomUI.City.Testing.ScriptedDataInvocation.operator !=(AtomUI.City.Testing.ScriptedDataInvocation? left, AtomUI.City.Testing.ScriptedDataInvocation? right) -> bool
+static AtomUI.City.Testing.ScriptedDataInvocation.operator ==(AtomUI.City.Testing.ScriptedDataInvocation? left, AtomUI.City.Testing.ScriptedDataInvocation? right) -> bool
+static AtomUI.City.Testing.ScriptedDataResponse.Cancelled(string? message = null) -> AtomUI.City.Testing.ScriptedDataResponse!
+static AtomUI.City.Testing.ScriptedDataResponse.Failed(AtomUI.City.Data.DataError! error) -> AtomUI.City.Testing.ScriptedDataResponse!
+static AtomUI.City.Testing.ScriptedDataResponse.operator !=(AtomUI.City.Testing.ScriptedDataResponse? left, AtomUI.City.Testing.ScriptedDataResponse? right) -> bool
+static AtomUI.City.Testing.ScriptedDataResponse.operator ==(AtomUI.City.Testing.ScriptedDataResponse? left, AtomUI.City.Testing.ScriptedDataResponse? right) -> bool
+static AtomUI.City.Testing.ScriptedDataResponse.Success(object? value = null) -> AtomUI.City.Testing.ScriptedDataResponse!
+static AtomUI.City.Testing.SourceFile.operator !=(AtomUI.City.Testing.SourceFile? left, AtomUI.City.Testing.SourceFile? right) -> bool
+static AtomUI.City.Testing.SourceFile.operator ==(AtomUI.City.Testing.SourceFile? left, AtomUI.City.Testing.SourceFile? right) -> bool
+static AtomUI.City.Testing.SourceGenerationTestCase.Create(string! name) -> AtomUI.City.Testing.SourceGenerationTestCase!
+static AtomUI.City.Testing.TestDiagnosticEntry.operator !=(AtomUI.City.Testing.TestDiagnosticEntry? left, AtomUI.City.Testing.TestDiagnosticEntry? right) -> bool
+static AtomUI.City.Testing.TestDiagnosticEntry.operator ==(AtomUI.City.Testing.TestDiagnosticEntry? left, AtomUI.City.Testing.TestDiagnosticEntry? right) -> bool
+static AtomUI.City.Testing.TestDirectory.Create(string? name = null, bool keepOnDispose = false) -> AtomUI.City.Testing.TestDirectory!
+static AtomUI.City.Testing.TestHost.CreateBuilder() -> AtomUI.City.Testing.TestHostBuilder!
+static AtomUI.City.Testing.TestLayerNames.AllCategories.get -> System.Collections.Generic.IReadOnlyList<string!>!
+static AtomUI.City.Testing.TestLayerNames.GetCategory(AtomUI.City.Testing.TestLayer layer) -> string!
+static AtomUI.City.Testing.TestLayerNames.IsKnownCategory(string! category) -> bool

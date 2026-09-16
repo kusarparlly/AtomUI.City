@@ -16,7 +16,7 @@
     <AtomUICityPluginPublisher>Company</AtomUICityPluginPublisher>
     <AtomUICityPluginDisplayNameKey>Plugin.DisplayName</AtomUICityPluginDisplayNameKey>
     <AtomUICityPluginDescriptionKey>Plugin.Description</AtomUICityPluginDescriptionKey>
-    <AtomUICityMinHostVersion>1.0.0</AtomUICityMinHostVersion>
+    <AtomUICityMinHostVersion>1.0.0-preview.1</AtomUICityMinHostVersion>
     <AtomUICityPluginApiVersion>1.0</AtomUICityPluginApiVersion>
     <AtomUICityPluginUnloadable>true</AtomUICityPluginUnloadable>
     <AtomUICityPluginNativeAotCompatible>false</AtomUICityPluginNativeAotCompatible>
@@ -26,9 +26,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AtomUI.City.Build" Version="1.0.0" PrivateAssets="all" />
-    <PackageReference Include="AtomUI.City.Core" Version="1.0.0" />
-    <PackageReference Include="AtomUI.City.PluginSystem" Version="1.0.0" />
+    <PackageReference Include="AtomUI.City.Build" Version="1.0.0-preview.1" PrivateAssets="all" />
+    <PackageReference Include="AtomUI.City.Core" Version="1.0.0-preview.1" />
+    <PackageReference Include="AtomUI.City.PluginSystem" Version="1.0.0-preview.1" />
   </ItemGroup>
 
   <ItemGroup>

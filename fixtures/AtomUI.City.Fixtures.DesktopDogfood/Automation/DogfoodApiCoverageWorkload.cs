@@ -34,6 +34,12 @@ internal sealed class DogfoodApiCoverageWorkload
             await File.ReadAllTextAsync(policyPath, cancellationToken).ConfigureAwait(false),
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
             ?? throw new InvalidOperationException("The Dogfood API coverage policy is empty.");
+        if (policy.SchemaVersion != 2)
+        {
+            throw new InvalidOperationException(
+                $"Unsupported Dogfood API coverage policy schema '{policy.SchemaVersion}'. Expected schema 2.");
+        }
+
         var results = new List<DogfoodApiModuleResult>();
         var unclassified = 0;
         var uncovered = 0;
@@ -46,6 +52,15 @@ internal sealed class DogfoodApiCoverageWorkload
                 continue;
             }
 
+            if (module.RequiredEvidenceCategories.Count == 0 ||
+                module.RequiredEvidenceCategories.Any(string.IsNullOrWhiteSpace) ||
+                module.RequiredEvidenceCategories.Distinct(StringComparer.Ordinal).Count() !=
+                module.RequiredEvidenceCategories.Count)
+            {
+                throw new InvalidOperationException(
+                    $"API coverage policy for {module.Module} must declare unique, non-empty evidence categories.");
+            }
+
             var assembly = AppDomain.CurrentDomain.GetAssemblies()
                 .SingleOrDefault(candidate =>
                     string.Equals(candidate.GetName().Name, module.Assembly, StringComparison.Ordinal))
@@ -55,11 +70,11 @@ internal sealed class DogfoodApiCoverageWorkload
                 Encoding.UTF8.GetBytes(string.Join('\n', members))));
             var drifted = !string.IsNullOrWhiteSpace(module.ExpectedSha256) &&
                 !string.Equals(hash, module.ExpectedSha256, StringComparison.OrdinalIgnoreCase);
-            var covered = _ledger.Count(module.EvidenceCategory) > 0;
-            if (!covered)
-            {
-                uncovered++;
-            }
+            var missingEvidenceCategories = module.RequiredEvidenceCategories
+                .Where(category => _ledger.Count(category) == 0)
+                .Order(StringComparer.Ordinal)
+                .ToArray();
+            uncovered += missingEvidenceCategories.Length;
 
             if (drifted)
             {
@@ -70,18 +85,18 @@ internal sealed class DogfoodApiCoverageWorkload
                 module.Module,
                 module.Assembly,
                 module.Classification,
-                module.EvidenceCategory,
+                module.RequiredEvidenceCategories,
+                missingEvidenceCategories,
                 members.Count,
                 hash,
                 module.ExpectedSha256,
-                covered,
                 drifted,
                 members));
             _ledger.Record("api-module", module.Module);
         }
 
         var report = new DogfoodApiCoverageReport(
-            1,
+            2,
             results.Sum(static result => result.PublicMemberCount),
             unclassified,
             uncovered,
@@ -193,7 +208,7 @@ internal sealed record DogfoodApiModulePolicy(
     string Module,
     string Assembly,
     string Classification,
-    string EvidenceCategory,
+    IReadOnlyList<string> RequiredEvidenceCategories,
     string ExpectedSha256);
 
 internal sealed record DogfoodApiCoverageReport(
@@ -207,10 +222,10 @@ internal sealed record DogfoodApiModuleResult(
     string Module,
     string Assembly,
     string Classification,
-    string EvidenceCategory,
+    IReadOnlyList<string> RequiredEvidenceCategories,
+    IReadOnlyList<string> MissingEvidenceCategories,
     int PublicMemberCount,
     string ObservedSha256,
     string ExpectedSha256,
-    bool Covered,
     bool Drifted,
     IReadOnlyList<string> Members);

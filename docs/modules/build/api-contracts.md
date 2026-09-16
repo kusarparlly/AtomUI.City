@@ -2,6 +2,10 @@
 
 本文件是实现 public API 的行为合同。它不是源码目录索引；每个关键 API 必须说明用途、生命周期、失败行为、取消、并发和兼容性。
 
+## Stability 基线
+
+本模块当前全部 public 类型、成员、MSBuild property/item/target 和 package layout contract 均为 `Preview`。`PublicAPI.Unshipped.txt` 只冻结待审签名，不表示 `Stable`；任何 API 只有在本文件逐项改标 `Stable` 并通过发布 review 后才形成 1.x 稳定承诺。未列入 public contract 的实现细节不得仅因源码使用 `public` 自动升级为稳定 API。
+
 ## API Family 合同
 
 | API Family | 关键类型 | 职责 | 硬性行为 |

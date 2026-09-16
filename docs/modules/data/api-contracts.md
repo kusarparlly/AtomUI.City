@@ -2,6 +2,10 @@
 
 本文件是实现 public API 的行为合同。它不是源码目录索引；每个关键 API 必须说明用途、生命周期、失败行为、取消、并发和兼容性。
 
+## Stability 基线
+
+本模块当前全部 public 类型和成员均为 `Preview`。`PublicAPI.Unshipped.txt` 是待审机械基线而不是稳定性声明；每个类型在升为 `Stable` 前必须完成独立 API Card、测试映射和兼容性 review。
+
 ## API Family 合同
 
 | API Family | 关键类型 | 职责 | 硬性行为 |

@@ -2,6 +2,8 @@
 set -euo pipefail
 
 configuration="${CONFIGURATION:-Release}"
+version="$(sed -n 's:.*<AtomUICityVersion>\(.*\)</AtomUICityVersion>.*:\1:p' build/Version.props | head -n 1)"
+api_baseline_version="$(sed -n 's:.*<AtomUICityApiBaselineVersion>\(.*\)</AtomUICityApiBaselineVersion>.*:\1:p' build/Version.props | head -n 1)"
 core_project="src/AtomUI.City.Core/AtomUI.City.Core.csproj"
 shipped_api="src/AtomUI.City.Core/PublicAPI.Shipped.txt"
 unshipped_api="src/AtomUI.City.Core/PublicAPI.Unshipped.txt"
@@ -12,6 +14,33 @@ presentation_project="src/AtomUI.City.Presentation/AtomUI.City.Presentation.cspr
 presentation_shipped_api="src/AtomUI.City.Presentation/PublicAPI.Shipped.txt"
 presentation_unshipped_api="src/AtomUI.City.Presentation/PublicAPI.Unshipped.txt"
 validation_output="output/public-api/package-validation"
+product_names=(
+  Build
+  Cli
+  Core
+  Data
+  EventBus
+  Generators
+  Localization
+  Mvvm
+  PluginSystem
+  Presentation
+  Routing
+  Security
+  State
+  Templates
+  Testing
+)
+
+if [[ "$version" != *-* && -z "$api_baseline_version" ]]; then
+  printf 'Stable version %s requires AtomUICityApiBaselineVersion to identify the previous published package.\n' "$version" >&2
+  exit 1
+fi
+
+if [[ -n "$api_baseline_version" && "$api_baseline_version" == "$version" ]]; then
+  printf 'API baseline version must differ from the candidate version: %s\n' "$version" >&2
+  exit 1
+fi
 
 validate_build_artifacts() {
   local product_name="$1"
@@ -90,12 +119,21 @@ validate_build_artifacts() {
     "$xml_document_count"
 }
 
-for required_file in \
-  "$core_project" "$shipped_api" "$unshipped_api" \
-  "$eventbus_project" "$eventbus_shipped_api" "$eventbus_unshipped_api" \
-  "$presentation_project" "$presentation_shipped_api" "$presentation_unshipped_api"; do
-  if [[ ! -f "$required_file" ]]; then
-    printf 'Missing public API gate input: %s\n' "$required_file" >&2
+for product_name in "${product_names[@]}"; do
+  project="src/AtomUI.City.$product_name/AtomUI.City.$product_name.csproj"
+  product_shipped="src/AtomUI.City.$product_name/PublicAPI.Shipped.txt"
+  product_unshipped="src/AtomUI.City.$product_name/PublicAPI.Unshipped.txt"
+
+  for required_file in "$project" "$product_shipped" "$product_unshipped"; do
+    if [[ ! -f "$required_file" ]]; then
+      printf 'Missing public API gate input: %s\n' "$required_file" >&2
+      exit 1
+    fi
+  done
+
+  product_signature_count="$(cat "$product_shipped" "$product_unshipped" | grep -cEv '^[[:space:]]*(#|$)' || true)"
+  if [[ "$product_signature_count" -eq 0 ]]; then
+    printf '%s public API baseline is empty.\n' "$product_name" >&2
     exit 1
   fi
 done
@@ -148,24 +186,14 @@ if ! grep -q '<EnablePackageValidation>true</EnablePackageValidation>' "$present
   exit 1
 fi
 
-dotnet restore "$core_project" -p:Configuration="$configuration"
-dotnet restore "$eventbus_project" -p:Configuration="$configuration"
-dotnet restore "$presentation_project" -p:Configuration="$configuration"
-
-dotnet build "$core_project" \
-  --configuration "$configuration" \
-  --no-restore \
-  -p:TreatWarningsAsErrors=true
-
-dotnet build "$eventbus_project" \
-  --configuration "$configuration" \
-  --no-restore \
-  -p:TreatWarningsAsErrors=true
-
-dotnet build "$presentation_project" \
-  --configuration "$configuration" \
-  --no-restore \
-  -p:TreatWarningsAsErrors=true
+for product_name in "${product_names[@]}"; do
+  project="src/AtomUI.City.$product_name/AtomUI.City.$product_name.csproj"
+  dotnet restore "$project" -p:Configuration="$configuration"
+  dotnet build "$project" \
+    --configuration "$configuration" \
+    --no-restore \
+    -p:TreatWarningsAsErrors=true
+done
 
 mkdir -p "$validation_output"
 head_revision="$(git rev-parse HEAD)"

@@ -2,6 +2,10 @@
 
 本文件是实现 public API 的行为合同。它不是源码目录索引；每个关键 API 必须说明用途、生命周期、失败行为、取消、并发和兼容性。
 
+## Stability 基线
+
+本模块当前全部 public 类型、diagnostic、generated name 和 manifest shape 均为 `Preview`。`PublicAPI.Unshipped.txt` 仅用于在 API 边界审计期间阻止静默变化；它不决定某个 Roslyn reader/builder 是开发者 API 还是 `InternalContract`，该归类必须经过单独审查后写入本文。
+
 ## API Family 合同
 
 | API Family | 关键类型 | 职责 | 硬性行为 |

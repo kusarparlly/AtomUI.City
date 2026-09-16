@@ -2,6 +2,10 @@
 
 本文件是实现 public API 的行为合同。它不是源码目录索引；每个关键 API 必须说明用途、生命周期、失败行为、取消、并发和兼容性。
 
+## Stability 基线
+
+`PublicAPI.Shipped.txt` 中现有签名当前全部为 `Preview-frozen`：门禁阻止未经 review 的签名漂移，但不把它们解释为已经对外发布的 `Stable` API。后续只有在本文件逐项标记 `Stable` 的类型和成员才获得 1.x 稳定兼容承诺。
+
 ## API Family 合同
 
 | API Family | 关键类型 | 职责 | 硬性行为 |
