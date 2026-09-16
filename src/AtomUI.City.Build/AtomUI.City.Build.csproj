@@ -15,7 +15,7 @@
     <None Include="buildTransitive/AtomUI.City.Build.targets" Pack="true" PackagePath="buildTransitive/" Visible="false" />
     <None Include="buildTransitive/AtomUI.City.Application.targets" Pack="true" PackagePath="buildTransitive/" Visible="false" />
     <None Include="buildTransitive/AtomUI.City.Plugin.targets" Pack="true" PackagePath="buildTransitive/" Visible="false" />
-    <None Include="buildTransitive/AtomUI.City.Diagnostics.targets" Pack="true" PackagePath="buildTransitive/" Visible="false" />
+    <None Include="buildTransitive/AtomUI.City.Core.Diagnostics.targets" Pack="true" PackagePath="buildTransitive/" Visible="false" />
     <None Include="$(AtomUICityGeneratorAnalyzerPath)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" Condition="Exists('$(AtomUICityGeneratorAnalyzerPath)')" />
     <None Include="$(AtomUICityGeneratorAnalyzerPdbPath)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" Condition="Exists('$(AtomUICityGeneratorAnalyzerPdbPath)')" />
   </ItemGroup>

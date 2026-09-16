@@ -27,6 +27,8 @@ public sealed class BuildAssemblyTests
         Assert.Contains("ValidateAtomUICityManifests", BuildMsBuildContract.Targets);
         Assert.Contains("WriteAtomUICityBuildDiagnostics", BuildMsBuildContract.Targets);
         Assert.Contains("buildTransitive/AtomUI.City.Build.props", BuildMsBuildContract.PackageAssets);
+        Assert.Contains("buildTransitive/AtomUI.City.Core.Diagnostics.targets", BuildMsBuildContract.PackageAssets);
+        Assert.DoesNotContain("buildTransitive/AtomUI.City.Diagnostics.targets", BuildMsBuildContract.PackageAssets);
         Assert.Contains("analyzers/dotnet/cs/AtomUI.City.Generators.dll", BuildMsBuildContract.PackageAssets);
     }
 

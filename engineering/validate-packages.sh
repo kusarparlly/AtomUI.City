@@ -128,7 +128,7 @@ while IFS= read -r project; do
       require_entry "$nupkg" "$entries" "buildTransitive/AtomUI.City.Build.targets"
       require_entry "$nupkg" "$entries" "buildTransitive/AtomUI.City.Application.targets"
       require_entry "$nupkg" "$entries" "buildTransitive/AtomUI.City.Plugin.targets"
-      require_entry "$nupkg" "$entries" "buildTransitive/AtomUI.City.Diagnostics.targets"
+      require_entry "$nupkg" "$entries" "buildTransitive/AtomUI.City.Core.Diagnostics.targets"
       require_entry "$nupkg" "$entries" "analyzers/dotnet/cs/AtomUI.City.Generators.dll"
       snupkg_entries="$(unzip -Z1 "$snupkg")"
       require_entry_pattern "$snupkg" "$snupkg_entries" "^lib/.+/$project_name\\.pdb$"
