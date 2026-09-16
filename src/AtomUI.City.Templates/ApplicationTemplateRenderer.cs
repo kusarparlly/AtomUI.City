@@ -504,12 +504,12 @@ public sealed class ApplicationTemplateRenderer
                 <RootNamespace>{{rootNamespace}}</RootNamespace>
                 <ImplicitUsings>enable</ImplicitUsings>
                 <Nullable>enable</Nullable>
-                <AtomUICityManifestGeneration>true</AtomUICityManifestGeneration>
-                <AtomUICityAotFriendly>{{options.UseAot.ToString().ToLowerInvariant()}}</AtomUICityAotFriendly>
+                <AtomUICityGenerateManifests>true</AtomUICityGenerateManifests>
+                <AtomUICityStrictAot>{{options.UseAot.ToString().ToLowerInvariant()}}</AtomUICityStrictAot>
               </PropertyGroup>
 
               <ItemGroup>
-                <PackageReference Include="AtomUI.City.Build" Version="{{AtomUICityPackageVersion}}" PrivateAssets="all" />
+                <PackageReference Include="AtomUI.City.Build" Version="{{AtomUICityPackageVersion}}" PrivateAssets="all" IncludeAssets="build;buildTransitive;analyzers" />
                 <PackageReference Include="AtomUI.City.Core" Version="{{AtomUICityPackageVersion}}" />
                 <PackageReference Include="AtomUI.City.Mvvm" Version="{{AtomUICityPackageVersion}}" />
                 <PackageReference Include="AtomUI.City.Routing" Version="{{AtomUICityPackageVersion}}" />
@@ -519,6 +519,10 @@ public sealed class ApplicationTemplateRenderer
                 <PackageReference Include="Avalonia.Themes.Fluent" Version="{{AvaloniaVersion}}" />
             {{dynamicPlugins}}
               </ItemGroup>
+
+              <Target Name="EnsureAtomUICityBuildIntegration" BeforeTargets="PrepareForBuild">
+                <Error Condition="'$(AtomUICityBuildIntegrationLoaded)' != 'true'" Code="AUCBLD0002" Text="City application projects require AtomUI.City.Build." />
+              </Target>
 
             </Project>
             """;

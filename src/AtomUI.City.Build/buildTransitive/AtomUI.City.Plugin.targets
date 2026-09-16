@@ -1,16 +1,105 @@
 <Project>
   <PropertyGroup>
-    <AtomUICityPluginManifestOutputPath Condition="'$(AtomUICityPluginManifestOutputPath)' == ''">$(AtomUICityManifestIntermediateOutputPath)plugin/</AtomUICityPluginManifestOutputPath>
+    <AtomUICityPluginGenerateManifest Condition="'$(AtomUICityPluginGenerateManifest)' == ''">true</AtomUICityPluginGenerateManifest>
+    <AtomUICityPluginValidateManifest Condition="'$(AtomUICityPluginValidateManifest)' == ''">true</AtomUICityPluginValidateManifest>
+    <AtomUICityPluginVersion Condition="'$(AtomUICityPluginVersion)' == ''">$(Version)</AtomUICityPluginVersion>
+    <AtomUICityPluginDisplayNameKey Condition="'$(AtomUICityPluginDisplayNameKey)' == ''">$(AtomUICityPluginId)</AtomUICityPluginDisplayNameKey>
+    <AtomUICityPluginUnloadable Condition="'$(AtomUICityPluginUnloadable)' == ''">true</AtomUICityPluginUnloadable>
+    <AtomUICityPluginNativeAotCompatible Condition="'$(AtomUICityPluginNativeAotCompatible)' == ''">false</AtomUICityPluginNativeAotCompatible>
+    <AtomUICityPluginResourceMode Condition="'$(AtomUICityPluginResourceMode)' == ''">Both</AtomUICityPluginResourceMode>
+    <AtomUICityPluginDevelopmentMode Condition="'$(AtomUICityPluginDevelopmentMode)' == ''">false</AtomUICityPluginDevelopmentMode>
+    <AtomUICityPluginManifestOutputPath Condition="'$(AtomUICityPluginManifestOutputPath)' == ''">$(IntermediateOutputPath)AtomUI.City/plugin/atomui-city/plugin.json</AtomUICityPluginManifestOutputPath>
+    <AtomUICityPluginContractOutputPath Condition="'$(AtomUICityPluginContractOutputPath)' == ''">$(IntermediateOutputPath)AtomUI.City/plugin/atomui-city/manifests/contracts.json</AtomUICityPluginContractOutputPath>
     <AtomUICityPluginPackageOutputPath Condition="'$(AtomUICityPluginPackageOutputPath)' == ''">$(AtomUICityOutputRoot)/packages/plugins</AtomUICityPluginPackageOutputPath>
+    <AtomUICityPluginDevelopmentCachePath Condition="'$(AtomUICityPluginDevelopmentCachePath)' == ''">$(AtomUICityOutputRoot)/development/plugins</AtomUICityPluginDevelopmentCachePath>
+    <PackageOutputPath Condition="'$(AtomUICityPackageAsPlugin)' == 'true' or '$(AtomUICityPackagePlugin)' == 'true'">$(AtomUICityPluginPackageOutputPath)</PackageOutputPath>
+    <TargetsForTfmSpecificContentInPackage Condition="'$(AtomUICityPackageAsPlugin)' == 'true' or '$(AtomUICityPackagePlugin)' == 'true'">$(TargetsForTfmSpecificContentInPackage);CollectAtomUICityPluginPackageContent</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
-  <Target Name="GenerateAtomUICityPluginManifest" AfterTargets="GenerateAtomUICityManifests" Condition="'$(AtomUICityPlugin)' == 'true' or '$(AtomUICityPackageAsPlugin)' == 'true' or '$(AtomUICityPackagePlugin)' == 'true'">
-    <MakeDir Directories="$(AtomUICityPluginManifestOutputPath)" />
+  <Target Name="GenerateAtomUICityPluginManifest"
+          AfterTargets="CoreCompile"
+          Condition="('$(AtomUICityPlugin)' == 'true' or '$(AtomUICityPackageAsPlugin)' == 'true' or '$(AtomUICityPackagePlugin)' == 'true') and '$(AtomUICityGenerateManifests)' == 'true' and '$(AtomUICityPluginGenerateManifest)' == 'true'">
+    <Error Condition="'$(AtomUICityPluginId)' == ''" Code="AUCBLD0101" Text="AtomUICityPluginId is required for a plugin project." />
+    <Error Condition="'$(AtomUICityMinHostVersion)' == ''" Code="AUCBLD0101" Text="AtomUICityMinHostVersion is required for a plugin project." />
+    <Error Condition="'$(AtomUICityPluginResourceMode)' != 'Assembly' and '$(AtomUICityPluginResourceMode)' != 'LocPack' and '$(AtomUICityPluginResourceMode)' != 'Both'" Code="AUCBLD0002" Text="AtomUICityPluginResourceMode must be Assembly, LocPack, or Both." />
+    <Error Condition="'$(AtomUICityPluginResourceMode)' == 'Assembly' and '@(AtomUICityLanguagePackage)' != ''" Code="AUCBLD0102" Text="AtomUICityLanguagePackage requires AtomUICityPluginResourceMode=LocPack or Both." />
+    <Error Condition="'%(AtomUICityLanguagePackage.Culture)' == '' and '@(AtomUICityLanguagePackage)' != ''" Code="AUCBLD0101" Text="AtomUICityLanguagePackage '%(AtomUICityLanguagePackage.Identity)' requires Culture metadata." />
+    <Error Condition="'%(AtomUICityPluginNativeAsset.RuntimeIdentifier)' == '' and '@(AtomUICityPluginNativeAsset)' != ''" Code="AUCBLD0101" Text="AtomUICityPluginNativeAsset '%(AtomUICityPluginNativeAsset.Identity)' requires RuntimeIdentifier metadata." />
+    <Error Condition="'%(AtomUICityContributionManifest.Type)' == '' and '@(AtomUICityContributionManifest)' != ''" Code="AUCBLD0101" Text="AtomUICityContributionManifest '%(AtomUICityContributionManifest.Identity)' requires Type metadata." />
+
+    <GeneratePluginManifestTask
+      PluginId="$(AtomUICityPluginId)" PackageId="$(PackageId)" PluginVersion="$(AtomUICityPluginVersion)"
+      DisplayNameKey="$(AtomUICityPluginDisplayNameKey)" DescriptionKey="$(AtomUICityPluginDescriptionKey)"
+      Publisher="$(AtomUICityPluginPublisher)" MainAssembly="$(TargetName)$(TargetExt)" TargetFramework="$(TargetFramework)"
+      PluginApiVersion="$(AtomUICityPluginApiVersion)" MinHostVersion="$(AtomUICityMinHostVersion)"
+      MaxHostVersion="$(AtomUICityMaxHostVersion)" Unloadable="$(AtomUICityPluginUnloadable)"
+      AotCompatible="$(AtomUICityPluginNativeAotCompatible)" Capabilities="@(AtomUICityPluginCapability)"
+      Dependencies="@(AtomUICityPluginDependency)" Contributions="@(AtomUICityContributionManifest)"
+      Contracts="@(AtomUICityPluginContract)" OutputPath="$(AtomUICityPluginManifestOutputPath)"
+      ContractOutputPath="$(AtomUICityPluginContractOutputPath)">
+      <Output TaskParameter="GeneratedFiles" ItemName="AtomUICityGeneratedManifest" />
+    </GeneratePluginManifestTask>
+
   </Target>
 
-  <Target Name="ValidateAtomUICityPluginPackage" AfterTargets="GenerateAtomUICityPluginManifest" Condition="'$(AtomUICityPackageAsPlugin)' == 'true' or '$(AtomUICityPackagePlugin)' == 'true'" />
+  <Target Name="GenerateAtomUICityContributionManifests" DependsOnTargets="GenerateAtomUICityPluginManifest" />
 
-  <Target Name="PackAtomUICityPlugin" AfterTargets="ValidateAtomUICityPluginPackage" Condition="'$(AtomUICityPackageAsPlugin)' == 'true' or '$(AtomUICityPackagePlugin)' == 'true'">
-    <MakeDir Directories="$(AtomUICityPluginPackageOutputPath)" />
+  <Target Name="ValidateAtomUICityPluginManifest"
+          AfterTargets="GenerateAtomUICityPluginManifest"
+          Condition="'$(AtomUICityValidateManifests)' == 'true' and '$(AtomUICityPluginValidateManifest)' == 'true' and '@(AtomUICityGeneratedManifest)' != ''">
+    <ValidateManifestFilesTask Manifests="@(AtomUICityGeneratedManifest)" />
+  </Target>
+
+  <Target Name="CollectAtomUICityPluginPackageContent"
+          DependsOnTargets="GenerateAtomUICityPluginManifest"
+          Returns="@(TfmSpecificPackageFileWithRecursiveDir)">
+    <ItemGroup>
+      <TfmSpecificPackageFileWithRecursiveDir Include="$(AtomUICityPluginManifestOutputPath)" PackagePath="atomui-city/plugin.json" />
+      <TfmSpecificPackageFileWithRecursiveDir Include="$(AtomUICityPluginContractOutputPath)" Condition="Exists('$(AtomUICityPluginContractOutputPath)')" PackagePath="atomui-city/manifests/contracts.json" />
+      <_AtomUICityLanguagePackage Include="@(AtomUICityLanguagePackage)"><PackagePath>atomui-city/locales/%(Culture)/%(Filename)%(Extension)</PackagePath></_AtomUICityLanguagePackage>
+      <_AtomUICityPluginAsset Include="@(AtomUICityPluginAsset)">
+        <PackagePath Condition="'%(AtomUICityPluginAsset.TargetPath)' != ''">atomui-city/assets/%(AtomUICityPluginAsset.TargetPath)</PackagePath>
+        <PackagePath Condition="'%(AtomUICityPluginAsset.TargetPath)' == ''">atomui-city/assets/%(AtomUICityPluginAsset.RecursiveDir)%(AtomUICityPluginAsset.Filename)%(AtomUICityPluginAsset.Extension)</PackagePath>
+      </_AtomUICityPluginAsset>
+      <_AtomUICityPluginNativeAsset Include="@(AtomUICityPluginNativeAsset)"><PackagePath>runtimes/%(RuntimeIdentifier)/native/%(Filename)%(Extension)</PackagePath></_AtomUICityPluginNativeAsset>
+      <_AtomUICityContributionManifest Include="@(AtomUICityContributionManifest)">
+        <PackagePath Condition="'%(AtomUICityContributionManifest.TargetPath)' != ''">%(AtomUICityContributionManifest.TargetPath)</PackagePath>
+        <PackagePath Condition="'%(AtomUICityContributionManifest.TargetPath)' == ''">atomui-city/manifests/%(AtomUICityContributionManifest.Filename)%(AtomUICityContributionManifest.Extension)</PackagePath>
+      </_AtomUICityContributionManifest>
+      <TfmSpecificPackageFileWithRecursiveDir Include="@(_AtomUICityLanguagePackage)" PackagePath="%(_AtomUICityLanguagePackage.PackagePath)" />
+      <TfmSpecificPackageFileWithRecursiveDir Include="@(_AtomUICityPluginAsset)" PackagePath="%(_AtomUICityPluginAsset.PackagePath)" />
+      <TfmSpecificPackageFileWithRecursiveDir Include="@(_AtomUICityPluginNativeAsset)" PackagePath="%(_AtomUICityPluginNativeAsset.PackagePath)" />
+      <TfmSpecificPackageFileWithRecursiveDir Include="@(_AtomUICityContributionManifest)" PackagePath="%(_AtomUICityContributionManifest.PackagePath)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="PackAtomUICityPlugin" DependsOnTargets="GenerateAtomUICityPluginManifest" Condition="'$(AtomUICityPackageAsPlugin)' == 'true' or '$(AtomUICityPackagePlugin)' == 'true'">
+    <CallTarget Targets="Pack" />
+  </Target>
+
+  <Target Name="ValidateAtomUICityPluginPackage" AfterTargets="Pack" Condition="'$(AtomUICityPackageAsPlugin)' == 'true' or '$(AtomUICityPackagePlugin)' == 'true'">
+    <ValidatePluginPackageTask PackagePath="$(PackageOutputPath)/$(PackageId).$(PackageVersion).nupkg"
+                               TargetFramework="$(TargetFramework)"
+                               MainAssembly="$(TargetName)$(TargetExt)" />
+  </Target>
+
+  <Target Name="InstallAtomUICityPluginToLocalCache"
+          DependsOnTargets="Pack"
+          Condition="'$(AtomUICityPluginDevelopmentMode)' == 'true'">
+    <PropertyGroup>
+      <_AtomUICityPluginDevelopmentInstallPath>$(AtomUICityPluginDevelopmentCachePath)/$(AtomUICityPluginId)/$(PackageVersion)</_AtomUICityPluginDevelopmentInstallPath>
+      <_AtomUICityPluginPackagePath>$(PackageOutputPath)/$(PackageId).$(PackageVersion).nupkg</_AtomUICityPluginPackagePath>
+    </PropertyGroup>
+    <Error Condition="'$(AtomUICityPluginId)' == ''" Code="AUCBLD0101" Text="Development installation requires AtomUICityPluginId." />
+    <Error Condition="!Exists('$(_AtomUICityPluginPackagePath)')" Code="AUCBLD0201" Text="Development installation package was not found: $(_AtomUICityPluginPackagePath)." />
+    <MakeDir Directories="$(_AtomUICityPluginDevelopmentInstallPath)" />
+    <Copy SourceFiles="$(_AtomUICityPluginPackagePath)" DestinationFolder="$(_AtomUICityPluginDevelopmentInstallPath)" SkipUnchangedFiles="true" />
+    <WriteLinesToFile File="$(_AtomUICityPluginDevelopmentInstallPath)/.atomui-city-development.lock"
+                      Lines="$(AtomUICityPluginId)|$(PackageVersion)|$(_AtomUICityPluginDevelopmentInstallPath)/$(PackageId).$(PackageVersion).nupkg"
+                      Overwrite="true" Encoding="UTF-8" />
+  </Target>
+
+  <Target Name="CleanAtomUICityPluginArtifacts" BeforeTargets="Clean">
+    <RemoveDir Directories="$(IntermediateOutputPath)AtomUI.City/plugin" />
   </Target>
 </Project>

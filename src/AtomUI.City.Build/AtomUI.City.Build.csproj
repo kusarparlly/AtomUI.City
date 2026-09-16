@@ -4,10 +4,13 @@
     <TargetFrameworks>$(AtomUICityTargetFrameworks)</TargetFrameworks>
     <AtomUICityGeneratorAnalyzerPath>$(AtomUICityOutputRoot)/bin/$(Configuration)/AtomUI.City.Generators/netstandard2.0/AtomUI.City.Generators.dll</AtomUICityGeneratorAnalyzerPath>
     <AtomUICityGeneratorAnalyzerPdbPath>$(AtomUICityOutputRoot)/bin/$(Configuration)/AtomUI.City.Generators/netstandard2.0/AtomUI.City.Generators.pdb</AtomUICityGeneratorAnalyzerPdbPath>
+    <AtomUICityBuildTasksPath>$(AtomUICityOutputRoot)/bin/$(Configuration)/AtomUI.City.Build.Tasks/net10.0/AtomUI.City.Build.Tasks.dll</AtomUICityBuildTasksPath>
+    <AtomUICityBuildTasksPdbPath>$(AtomUICityOutputRoot)/bin/$(Configuration)/AtomUI.City.Build.Tasks/net10.0/AtomUI.City.Build.Tasks.pdb</AtomUICityBuildTasksPdbPath>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="../AtomUI.City.Generators/AtomUI.City.Generators.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+    <ProjectReference Include="../AtomUI.City.Build.Tasks/AtomUI.City.Build.Tasks.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,10 +21,13 @@
     <None Include="buildTransitive/AtomUI.City.Core.Diagnostics.targets" Pack="true" PackagePath="buildTransitive/" Visible="false" />
     <None Include="$(AtomUICityGeneratorAnalyzerPath)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" Condition="Exists('$(AtomUICityGeneratorAnalyzerPath)')" />
     <None Include="$(AtomUICityGeneratorAnalyzerPdbPath)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" Condition="Exists('$(AtomUICityGeneratorAnalyzerPdbPath)')" />
+    <None Include="$(AtomUICityBuildTasksPath)" Pack="true" PackagePath="tools/net10.0" Visible="false" Condition="Exists('$(AtomUICityBuildTasksPath)')" />
+    <None Include="$(AtomUICityBuildTasksPdbPath)" Pack="true" PackagePath="tools/net10.0" Visible="false" Condition="Exists('$(AtomUICityBuildTasksPdbPath)')" />
   </ItemGroup>
 
   <Target Name="ValidateAtomUICityBuildPackageInputs" BeforeTargets="Pack">
     <Error Condition="!Exists('$(AtomUICityGeneratorAnalyzerPath)')" Text="AtomUI.City.Build package input is missing: $(AtomUICityGeneratorAnalyzerPath)" />
+    <Error Condition="!Exists('$(AtomUICityBuildTasksPath)')" Text="AtomUI.City.Build package input is missing: $(AtomUICityBuildTasksPath)" />
   </Target>
 
 </Project>

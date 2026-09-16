@@ -75,7 +75,7 @@ public sealed class ApplicationTemplateBuildSmokeTests
         Assert.Contains("<Nullable>enable</Nullable>", appProject, StringComparison.Ordinal);
         Assert.Contains("<OutputType>WinExe</OutputType>", appProject, StringComparison.Ordinal);
         Assert.Contains("""<PackageReference Include="AtomUI.City.Core" Version="1.0.0-preview.1" />""", appProject, StringComparison.Ordinal);
-        Assert.Contains("""<PackageReference Include="AtomUI.City.Build" Version="1.0.0-preview.1" PrivateAssets="all" />""", appProject, StringComparison.Ordinal);
+        Assert.Contains("""<PackageReference Include="AtomUI.City.Build" Version="1.0.0-preview.1" PrivateAssets="all" IncludeAssets="build;buildTransitive;analyzers" />""", appProject, StringComparison.Ordinal);
         Assert.Contains("""<PackageReference Include="AtomUI.City.Presentation" Version="1.0.0-preview.1" />""", appProject, StringComparison.Ordinal);
         Assert.Contains("""<PackageReference Include="Avalonia.Desktop" Version="12.0.4" />""", appProject, StringComparison.Ordinal);
         Assert.Contains("""<PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.4" />""", appProject, StringComparison.Ordinal);

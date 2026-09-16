@@ -1,9 +1,20 @@
 <Project>
   <PropertyGroup>
-    <AtomUICityApplicationPublishOutputPath Condition="'$(AtomUICityApplicationPublishOutputPath)' == ''">$(AtomUICityOutputRoot)/publish/apps/$(MSBuildProjectName)</AtomUICityApplicationPublishOutputPath>
+    <_AtomUICityApplicationRidSegment Condition="'$(RuntimeIdentifier)' != ''">/$(RuntimeIdentifier)</_AtomUICityApplicationRidSegment>
+    <AtomUICityApplicationPublishOutputPath Condition="'$(AtomUICityApplicationPublishOutputPath)' == ''">$(AtomUICityOutputRoot)/publish/apps/$(AtomUICityApplicationId)/$(Configuration)/$(TargetFramework)$(_AtomUICityApplicationRidSegment)</AtomUICityApplicationPublishOutputPath>
+    <AtomUICityApplicationManifestOutputPath Condition="'$(AtomUICityApplicationManifestOutputPath)' == ''">$(AtomUICityApplicationPublishOutputPath)/atomui-city/application.manifest.json</AtomUICityApplicationManifestOutputPath>
+    <PublishDir Condition="'$(AtomUICityPackageApplication)' == 'true'">$(AtomUICityApplicationPublishOutputPath)/app/</PublishDir>
   </PropertyGroup>
 
   <Target Name="PublishAtomUICityApplication" AfterTargets="Publish" Condition="'$(AtomUICityPackageApplication)' == 'true'">
-    <MakeDir Directories="$(AtomUICityApplicationPublishOutputPath)" />
+    <GenerateApplicationManifestTask
+      ApplicationId="$(AtomUICityApplicationId)" FrameworkVersion="$(AtomUICityFrameworkVersion)"
+      PluginApiVersion="$(AtomUICityPluginApiVersion)" PluginProfile="$(AtomUICityPluginProfile)"
+      TargetFramework="$(TargetFramework)" RuntimeIdentifier="$(RuntimeIdentifier)" AotMode="$(PublishAot)"
+      StaticPlugins="@(AtomUICityStaticPlugin)" ResourcePacks="@(AtomUICityResourcePack)"
+      PublishRoot="$(AtomUICityApplicationPublishOutputPath)" OutputPath="$(AtomUICityApplicationManifestOutputPath)">
+      <Output TaskParameter="CopiedFiles" ItemName="AtomUICityGeneratedManifest" />
+    </GenerateApplicationManifestTask>
+    <ValidateManifestFilesTask Manifests="$(AtomUICityApplicationManifestOutputPath)" Condition="'$(AtomUICityValidateManifests)' == 'true'" />
   </Target>
 </Project>

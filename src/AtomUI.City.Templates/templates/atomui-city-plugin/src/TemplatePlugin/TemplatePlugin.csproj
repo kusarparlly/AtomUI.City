@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AtomUI.City.Build" Version="1.0.0-preview.1" PrivateAssets="all" />
+    <PackageReference Include="AtomUI.City.Build" Version="1.0.0-preview.1" PrivateAssets="all" IncludeAssets="build;buildTransitive;analyzers" />
     <PackageReference Include="AtomUI.City.Core" Version="1.0.0-preview.1" />
     <PackageReference Include="AtomUI.City.PluginSystem" Version="1.0.0-preview.1" />
   </ItemGroup>
@@ -35,5 +35,9 @@
     <None Include="../../README.md" Pack="true" PackagePath="" />
     <None Include="atomui-city/plugin.json" Pack="true" PackagePath="atomui-city/" />
   </ItemGroup>
+
+  <Target Name="EnsureAtomUICityBuildIntegration" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(AtomUICityBuildIntegrationLoaded)' != 'true'" Code="AUCBLD0002" Text="City plugin projects require AtomUI.City.Build." />
+  </Target>
 
 </Project>

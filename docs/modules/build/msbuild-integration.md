@@ -95,6 +95,8 @@ tools/
 - `buildTransitive` 用于应用和插件项目自动获得构建规则。
 - Roslyn generator/analyzer 作为 analyzer asset 引入。
 - MSBuild task 不进入运行时包主链路。
+- `AtomUI.City.Build.Tasks` 是 tools-only internal contract，由 targets 自动加载；应用开发者不得直接引用。
+- 标准应用和插件只引用 `AtomUI.City.Build`，模板用 `PrivateAssets=all` 与 `IncludeAssets=build;buildTransitive;analyzers` 防止 Build 程序集进入应用运行时。
 
 ### 3. 推荐属性
 
@@ -110,6 +112,9 @@ tools/
 | `AtomUICityPackageApplication` | `false` | 是否打包应用。 |
 | `AtomUICityPluginProfile` | 空 | 插件兼容 profile。 |
 | `AtomUICityBuildDiagnosticsLevel` | `Normal` | 诊断详细程度。 |
+| `AtomUICityApplicationId` | `AssemblyName` | application manifest 稳定身份。 |
+
+`application.manifest.json` v1 固定包含 `schemaVersion`、`appId`、`frameworkVersion`、`pluginApiVersion`、`pluginProfile`、`targetFramework`、`runtimeIdentifier`、`aotMode`、`staticPlugins`、`resourcePacks`；文件项包含规范相对路径与 SHA-256。
 
 ### 4. 插件属性
 

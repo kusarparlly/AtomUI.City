@@ -82,8 +82,9 @@ Manifest 是 AtomUI.City 在构建期沉淀框架元数据的核心产物。Buil
 ### 3. 生成流程
 
 ```text
-Source generators emit intermediate manifests
--> MSBuild task collects intermediate manifests
+Source generators emit deterministic strongly typed C# catalogs
+-> compiler includes catalogs in the target assembly
+-> MSBuild task collects explicit package/application properties and items
 -> Normalize paths and ids
 -> Validate schema
 -> Sort deterministic
@@ -94,13 +95,13 @@ Source generators emit intermediate manifests
 
 ### 4. 中间产物
 
-中间 manifest 可以位于：
+package/application 中间 manifest 位于：
 
 ```text
 obj/AtomUI.City/manifests/
 ```
 
-最终快照进入：
+Module、DI、Event、Route 等 Generator Catalog 不另外写入 JSON；其真实来源是目标程序集中的 generated catalog。最终 package/application 快照进入：
 
 ```text
 output/artifacts/manifests/

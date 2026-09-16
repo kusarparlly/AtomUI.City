@@ -10,7 +10,16 @@
 
 ## 当前源码诊断码
 
-当前源码没有模块专属诊断 ID。产品级实现如果新增诊断，必须先在本文件登记。
+| Code | Name | Meaning |
+| --- | --- | --- |
+| `AUCBLD0001` | InvalidOutputPath | 构建输出路径为空、越界或无法规范化。 |
+| `AUCBLD0002` | InvalidBuildProperty | Build Property 值不在公开合同允许范围内。 |
+| `AUCBLD0101` | ManifestGenerationFailed | package/application manifest 无法生成。 |
+| `AUCBLD0102` | ManifestValidationFailed | manifest 内容或 Item metadata 不合法。 |
+| `AUCBLD0201` | InvalidPluginPackageLayout | 插件包缺少必需资产或存在路径逃逸。 |
+| `AUCBLD0202` | MultiplePluginMainAssemblies | 插件包主程序集布局不唯一。 |
+| `AUCBLD0301` | DynamicPluginNotAotCompatible | Strict AOT 与动态插件配置冲突。 |
+| `AUCBLD0401` | InvalidApplicationPublishLayout | 应用发布布局或 application manifest 无效。 |
 
 ## 产品级必须诊断的失败
 

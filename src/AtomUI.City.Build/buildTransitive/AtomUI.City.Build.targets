@@ -3,9 +3,30 @@
   <Import Project="$(MSBuildThisFileDirectory)AtomUI.City.Plugin.targets" Condition="Exists('$(MSBuildThisFileDirectory)AtomUI.City.Plugin.targets')" />
   <Import Project="$(MSBuildThisFileDirectory)AtomUI.City.Core.Diagnostics.targets" Condition="Exists('$(MSBuildThisFileDirectory)AtomUI.City.Core.Diagnostics.targets')" />
 
+  <PropertyGroup>
+    <AtomUICityBuildTasksAssembly>$(MSBuildThisFileDirectory)../tools/net10.0/AtomUI.City.Build.Tasks.dll</AtomUICityBuildTasksAssembly>
+  </PropertyGroup>
+
+  <UsingTask TaskName="AtomUI.City.Build.Tasks.GeneratePluginManifestTask" AssemblyFile="$(AtomUICityBuildTasksAssembly)" />
+  <UsingTask TaskName="AtomUI.City.Build.Tasks.GenerateApplicationManifestTask" AssemblyFile="$(AtomUICityBuildTasksAssembly)" />
+  <UsingTask TaskName="AtomUI.City.Build.Tasks.ValidatePluginPackageTask" AssemblyFile="$(AtomUICityBuildTasksAssembly)" />
+  <UsingTask TaskName="AtomUI.City.Build.Tasks.ValidateManifestFilesTask" AssemblyFile="$(AtomUICityBuildTasksAssembly)" />
+
   <ItemGroup Condition="'$(AtomUICityEnableAnalyzers)' != 'true'">
     <Analyzer Remove="@(Analyzer)" Condition="'%(Filename)%(Extension)' == 'AtomUI.City.Generators.dll'" />
   </ItemGroup>
+
+  <Target Name="ValidateAtomUICityBuildProperties" BeforeTargets="CoreCompile">
+    <Error Condition="'$(AtomUICitySourceGenerationMode)' != 'Strict' and '$(AtomUICitySourceGenerationMode)' != 'Compatible' and '$(AtomUICitySourceGenerationMode)' != 'Off'"
+           Code="AUCBLD0002"
+           Text="AtomUICitySourceGenerationMode must be Strict, Compatible, or Off." />
+    <Error Condition="'$(AtomUICityBuildDiagnosticsLevel)' != 'Off' and '$(AtomUICityBuildDiagnosticsLevel)' != 'Normal' and '$(AtomUICityBuildDiagnosticsLevel)' != 'Detailed'"
+           Code="AUCBLD0002"
+           Text="AtomUICityBuildDiagnosticsLevel must be Off, Normal, or Detailed." />
+    <Error Condition="!Exists('$(AtomUICityBuildTasksAssembly)')"
+           Code="AUCBLD0001"
+           Text="AtomUI.City Build Tasks assembly is missing: $(AtomUICityBuildTasksAssembly)." />
+  </Target>
 
   <Target Name="GenerateAtomUICityManifests" AfterTargets="CoreCompile" Condition="'$(AtomUICityGenerateManifests)' == 'true'">
     <MakeDir Directories="$(AtomUICityManifestIntermediateOutputPath)" />
@@ -14,9 +35,15 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="ValidateAtomUICityManifests" AfterTargets="GenerateAtomUICityManifests" Condition="'$(AtomUICityValidateManifests)' == 'true'" />
+  <Target Name="ValidateAtomUICityManifests" AfterTargets="GenerateAtomUICityManifests" Condition="'$(AtomUICityValidateManifests)' == 'true' and '@(AtomUICityGeneratedManifest)' != ''">
+    <ValidateManifestFilesTask Manifests="@(AtomUICityGeneratedManifest)" />
+  </Target>
 
-  <Target Name="ValidateAtomUICityAotCompatibility" AfterTargets="CoreCompile" Condition="'$(AtomUICityStrictAot)' == 'true'" />
+  <Target Name="ValidateAtomUICityAotCompatibility" AfterTargets="CoreCompile" Condition="'$(AtomUICityStrictAot)' == 'true'">
+    <Error Condition="'$(AtomUICityPlugin)' == 'true' and '$(AtomUICityPluginNativeAotCompatible)' != 'true'"
+           Code="AUCBLD0301"
+           Text="Strict AOT requires AtomUICityPluginNativeAotCompatible=true for plugin projects." />
+  </Target>
 
   <Target Name="CleanAtomUICityOutput" BeforeTargets="Clean">
     <RemoveDir Directories="$(AtomUICityManifestIntermediateOutputPath);$(AtomUICityBuildDiagnosticsOutputPath)" />

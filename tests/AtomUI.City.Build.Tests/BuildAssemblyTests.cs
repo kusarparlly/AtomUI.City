@@ -20,16 +20,26 @@ public sealed class BuildAssemblyTests
         Assert.Contains("AtomUICityValidateManifests", BuildMsBuildContract.Properties);
         Assert.Contains("AtomUICityEnableAnalyzers", BuildMsBuildContract.Properties);
         Assert.Contains("AtomUICitySourceGenerationMode", BuildMsBuildContract.Properties);
+        Assert.Contains("AtomUICityApplicationId", BuildMsBuildContract.Properties);
         Assert.DoesNotContain("AtomUICityAllowDynamicDiscovery", BuildMsBuildContract.Properties);
         Assert.Contains("AtomUICityPluginCapability", BuildMsBuildContract.Items);
         Assert.Contains("AtomUICityLanguagePackage", BuildMsBuildContract.Items);
         Assert.Contains("GenerateAtomUICityManifests", BuildMsBuildContract.Targets);
         Assert.Contains("ValidateAtomUICityManifests", BuildMsBuildContract.Targets);
+        Assert.Contains("GenerateAtomUICityContributionManifests", BuildMsBuildContract.Targets);
+        Assert.Contains("ValidateAtomUICityPluginManifest", BuildMsBuildContract.Targets);
+        Assert.Contains("InstallAtomUICityPluginToLocalCache", BuildMsBuildContract.Targets);
+        Assert.Contains("CleanAtomUICityPluginArtifacts", BuildMsBuildContract.Targets);
         Assert.Contains("WriteAtomUICityBuildDiagnostics", BuildMsBuildContract.Targets);
         Assert.Contains("buildTransitive/AtomUI.City.Build.props", BuildMsBuildContract.PackageAssets);
         Assert.Contains("buildTransitive/AtomUI.City.Core.Diagnostics.targets", BuildMsBuildContract.PackageAssets);
         Assert.DoesNotContain("buildTransitive/AtomUI.City.Diagnostics.targets", BuildMsBuildContract.PackageAssets);
         Assert.Contains("analyzers/dotnet/cs/AtomUI.City.Generators.dll", BuildMsBuildContract.PackageAssets);
+        Assert.Contains("tools/net10.0/AtomUI.City.Build.Tasks.dll", BuildMsBuildContract.PackageAssets);
+
+        var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
+        var packageGate = File.ReadAllText(Path.Combine(repositoryRoot, "engineering", "validate-packages.sh"));
+        Assert.Contains("AtomUI.City.Build.Tasks", packageGate, StringComparison.Ordinal);
     }
 
     [Fact]

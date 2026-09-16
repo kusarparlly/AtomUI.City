@@ -36,15 +36,28 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        InitializeDependencyInjection(context);
-        InitializeModularity(context);
-        InitializeRouting(context);
-        InitializePresentation(context);
-        InitializeLocalization(context);
-        InitializeData(context);
+        var generationEnabled = context.AnalyzerConfigOptionsProvider
+            .Select(static (options, _) =>
+                !string.Equals(
+                    options.GlobalOptions.TryGetValue(
+                        "build_property.AtomUICitySourceGenerationMode",
+                        out var mode)
+                        ? mode
+                        : null,
+                    "Off",
+                    StringComparison.OrdinalIgnoreCase));
+
+        InitializeDependencyInjection(context, generationEnabled);
+        InitializeModularity(context, generationEnabled);
+        InitializeRouting(context, generationEnabled);
+        InitializePresentation(context, generationEnabled);
+        InitializeLocalization(context, generationEnabled);
+        InitializeData(context, generationEnabled);
     }
 
-    private static void InitializeData(IncrementalGeneratorInitializationContext context)
+    private static void InitializeData(
+        IncrementalGeneratorInitializationContext context,
+        IncrementalValueProvider<bool> generationEnabled)
     {
         var candidates = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -56,9 +69,15 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
             .Collect();
 
         context.RegisterSourceOutput(
-            context.CompilationProvider.Combine(candidates),
-            static (sourceContext, value) =>
+            context.CompilationProvider.Combine(candidates).Combine(generationEnabled),
+            static (sourceContext, input) =>
             {
+                if (!input.Right)
+                {
+                    return;
+                }
+
+                var value = input.Left;
                 var clients = value.Right.Where(static candidate => candidate is not null).Select(static candidate => candidate!).ToArray();
                 if (clients.Length == 0)
                 {
@@ -103,12 +122,20 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
             });
     }
 
-    private static void InitializeLocalization(IncrementalGeneratorInitializationContext context)
+    private static void InitializeLocalization(
+        IncrementalGeneratorInitializationContext context,
+        IncrementalValueProvider<bool> generationEnabled)
     {
         context.RegisterSourceOutput(
-            context.CompilationProvider,
-            static (sourceContext, compilation) =>
+            context.CompilationProvider.Combine(generationEnabled),
+            static (sourceContext, input) =>
             {
+                if (!input.Right)
+                {
+                    return;
+                }
+
+                var compilation = input.Left;
                 var metadata = LocalizationMetadataReader.Read(compilation);
                 foreach (var diagnostic in metadata.Diagnostics)
                 {
@@ -156,7 +183,9 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
             });
     }
 
-    private static void InitializeDependencyInjection(IncrementalGeneratorInitializationContext context)
+    private static void InitializeDependencyInjection(
+        IncrementalGeneratorInitializationContext context,
+        IncrementalValueProvider<bool> generationEnabled)
     {
         var candidates = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -172,9 +201,15 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
             .Collect();
 
         context.RegisterSourceOutput(
-            context.CompilationProvider.Combine(candidates).Combine(eventCandidates),
-            static (sourceContext, value) =>
+            context.CompilationProvider.Combine(candidates).Combine(eventCandidates).Combine(generationEnabled),
+            static (sourceContext, input) =>
             {
+                if (!input.Right)
+                {
+                    return;
+                }
+
+                var value = input.Left;
                 var compilation = value.Left.Left;
                 var allCandidates = value.Left.Right.Where(candidate => candidate is not null).Select(candidate => candidate!).ToArray();
                 var allEventCandidates = value.Right.Where(candidate => candidate is not null).Select(candidate => candidate!).ToArray();
@@ -586,7 +621,9 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
             location));
     }
 
-    private static void InitializeModularity(IncrementalGeneratorInitializationContext context)
+    private static void InitializeModularity(
+        IncrementalGeneratorInitializationContext context,
+        IncrementalValueProvider<bool> generationEnabled)
     {
         var moduleCandidates = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -596,9 +633,15 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
             .Collect();
 
         context.RegisterSourceOutput(
-            context.CompilationProvider.Combine(moduleCandidates),
-            static (sourceContext, value) =>
+            context.CompilationProvider.Combine(moduleCandidates).Combine(generationEnabled),
+            static (sourceContext, input) =>
             {
+                if (!input.Right)
+                {
+                    return;
+                }
+
+                var value = input.Left;
                 var compilation = value.Left;
                 var candidates = value.Right
                     .Where(candidate => candidate is not null)
@@ -727,7 +770,9 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
             });
     }
 
-    private static void InitializePresentation(IncrementalGeneratorInitializationContext context)
+    private static void InitializePresentation(
+        IncrementalGeneratorInitializationContext context,
+        IncrementalValueProvider<bool> generationEnabled)
     {
         var presentationViews = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -737,9 +782,15 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
             .Collect();
 
         context.RegisterSourceOutput(
-            context.CompilationProvider.Combine(presentationViews),
-            static (sourceContext, value) =>
+            context.CompilationProvider.Combine(presentationViews).Combine(generationEnabled),
+            static (sourceContext, input) =>
             {
+                if (!input.Right)
+                {
+                    return;
+                }
+
+                var value = input.Left;
                 var views = value.Right
                     .SelectMany(group => group)
                     .ToArray();
@@ -771,7 +822,9 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
             });
     }
 
-    private static void InitializeRouting(IncrementalGeneratorInitializationContext context)
+    private static void InitializeRouting(
+        IncrementalGeneratorInitializationContext context,
+        IncrementalValueProvider<bool> generationEnabled)
     {
         var routeMaps = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -781,9 +834,15 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
             .Collect();
 
         context.RegisterSourceOutput(
-            context.CompilationProvider.Combine(routeMaps),
-            static (sourceContext, value) =>
+            context.CompilationProvider.Combine(routeMaps).Combine(generationEnabled),
+            static (sourceContext, input) =>
             {
+                if (!input.Right)
+                {
+                    return;
+                }
+
+                var value = input.Left;
                 var maps = value.Right
                     .Where(routeMap => routeMap is not null)
                     .Select(routeMap => routeMap!)

@@ -12,6 +12,7 @@ public static class BuildMsBuildContract
         "AtomUICityStrictAot",
         "AtomUICityPackagePlugin",
         "AtomUICityPackageApplication",
+        "AtomUICityApplicationId",
         "AtomUICityPluginProfile",
         "AtomUICityBuildDiagnosticsLevel",
     ];
@@ -34,8 +35,12 @@ public static class BuildMsBuildContract
         "GenerateAtomUICityManifests",
         "ValidateAtomUICityManifests",
         "GenerateAtomUICityPluginManifest",
+        "GenerateAtomUICityContributionManifests",
+        "ValidateAtomUICityPluginManifest",
         "ValidateAtomUICityPluginPackage",
         "PackAtomUICityPlugin",
+        "InstallAtomUICityPluginToLocalCache",
+        "CleanAtomUICityPluginArtifacts",
         "PublishAtomUICityApplication",
         "ValidateAtomUICityAotCompatibility",
         "WriteAtomUICityBuildDiagnostics",
@@ -50,6 +55,7 @@ public static class BuildMsBuildContract
         "buildTransitive/AtomUI.City.Plugin.targets",
         "buildTransitive/AtomUI.City.Core.Diagnostics.targets",
         "analyzers/dotnet/cs/AtomUI.City.Generators.dll",
+        "tools/net10.0/AtomUI.City.Build.Tasks.dll",
     ];
 
     public static string GetManifestOutputPath(string intermediateOutputPath, string manifestFileName)

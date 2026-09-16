@@ -3,6 +3,7 @@ using AtomUI.City.Generators.Analyzers;
 using AtomUI.City.Generators.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AtomUI.City.Generators.Tests;
 
@@ -127,6 +128,41 @@ public sealed class IncrementalGeneratorInfrastructureTests
         Assert.Empty(generatorResult.Diagnostics);
     }
 
+    [Fact]
+    public void SourceGenerationModeOffSuppressesAllGeneratorFeatures()
+    {
+        var compilation = CreateCompilation(
+            """
+            namespace AtomUI.City.Presentation
+            {
+                [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = true)]
+                public sealed class ViewForAttribute : System.Attribute
+                {
+                    public ViewForAttribute(System.Type viewModelType) { }
+                }
+            }
+
+            namespace Sample.App
+            {
+                public sealed class ViewModel { }
+                [AtomUI.City.Presentation.ViewFor(typeof(ViewModel))]
+                public sealed class FirstView { }
+                [AtomUI.City.Presentation.ViewFor(typeof(ViewModel))]
+                public sealed class SecondView { }
+            }
+            """);
+        var driver = CSharpGeneratorDriver.Create(
+            [new AtomUICityIncrementalGenerator().AsSourceGenerator()],
+            optionsProvider: new TestAnalyzerConfigOptionsProvider(
+                "build_property.AtomUICitySourceGenerationMode",
+                "Off"));
+
+        var generatorResult = Assert.Single(driver.RunGenerators(compilation).GetRunResult().Results);
+
+        Assert.Empty(generatorResult.GeneratedSources);
+        Assert.Empty(generatorResult.Diagnostics);
+    }
+
     private static CSharpCompilation CreateCompilation(string source)
     {
         var sourceTree = CSharpSyntaxTree.ParseText(source);
@@ -142,5 +178,32 @@ public sealed class IncrementalGeneratorInfrastructureTests
             [sourceTree],
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+    }
+
+    private sealed class TestAnalyzerConfigOptionsProvider(string key, string value) : AnalyzerConfigOptionsProvider
+    {
+        private static readonly AnalyzerConfigOptions Empty = new TestAnalyzerConfigOptions(new Dictionary<string, string>());
+
+        public override AnalyzerConfigOptions GlobalOptions { get; } =
+            new TestAnalyzerConfigOptions(new Dictionary<string, string> { [key] = value });
+
+        public override AnalyzerConfigOptions GetOptions(SyntaxTree tree) => Empty;
+
+        public override AnalyzerConfigOptions GetOptions(AdditionalText textFile) => Empty;
+    }
+
+    private sealed class TestAnalyzerConfigOptions(IReadOnlyDictionary<string, string> values) : AnalyzerConfigOptions
+    {
+        public override bool TryGetValue(string key, out string value)
+        {
+            if (values.TryGetValue(key, out var configured))
+            {
+                value = configured;
+                return true;
+            }
+
+            value = string.Empty;
+            return false;
+        }
     }
 }

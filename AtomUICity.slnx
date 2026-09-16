@@ -5,6 +5,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/AtomUI.City.Build/AtomUI.City.Build.csproj" />
+    <Project Path="src/AtomUI.City.Build.Tasks/AtomUI.City.Build.Tasks.csproj" />
     <Project Path="src/AtomUI.City.Cli/AtomUI.City.Cli.csproj" />
     <Project Path="src/AtomUI.City.Core/AtomUI.City.Core.csproj" />
     <Project Path="src/AtomUI.City.Data/AtomUI.City.Data.csproj" />
@@ -21,6 +22,7 @@
     <Project Path="src/AtomUI.City.Testing/AtomUI.City.Testing.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/AtomUI.City.Build.Tasks.Tests/AtomUI.City.Build.Tasks.Tests.csproj" />
     <Project Path="tests/AtomUI.City.Build.Tests/AtomUI.City.Build.Tests.csproj" />
     <Project Path="tests/AtomUI.City.Cli.Tests/AtomUI.City.Cli.Tests.csproj" />
     <Project Path="tests/AtomUI.City.Core.Tests/AtomUI.City.Core.Tests.csproj" />

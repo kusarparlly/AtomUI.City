@@ -108,11 +108,11 @@
 | `AtomUICityPluginApiVersion` | 插件 API 版本。 |
 | `AtomUICityPluginUnloadable` | 是否设计为可卸载。 |
 | `AtomUICityPluginNativeAotCompatible` | 是否声明 AOT 兼容。 |
-| `AtomUICityPluginResourceMode` | `Assembly`、`LocPack` 或 `Both`。 |
+| `AtomUICityPluginResourceMode` | `Assembly`、`LocPack` 或 `Both`；默认 `Both`，`Assembly` 禁止声明外置 `AtomUICityLanguagePackage`。 |
 | `AtomUICityPluginGenerateManifest` | 是否生成清单。 |
 | `AtomUICityPluginValidateManifest` | 是否验证清单。 |
 | `AtomUICityPackageAsPlugin` | 是否按插件包布局打包。 |
-| `AtomUICityPluginDevelopmentMode` | 是否启用开发期本地安装辅助。 |
+| `AtomUICityPluginDevelopmentMode` | 是否启用开发期本地安装辅助；默认关闭。显式调用安装 target 时写入 `AtomUICityPluginDevelopmentCachePath`（默认位于项目 `output/development/plugins`），不触碰真实用户插件目录。 |
 
 ### 4. 推荐 Item
 
@@ -125,6 +125,20 @@
 | `AtomUICityPluginAsset` | 声明插件资产。 |
 | `AtomUICityPluginNativeAsset` | 声明 native/RID 资产。 |
 | `AtomUICityContributionManifest` | 声明额外贡献清单。 |
+
+Item metadata 合同：
+
+| Item | Metadata |
+|---|---|
+| `AtomUICityPluginCapability` | `Scope`，分号分隔，允许为空。 |
+| `AtomUICityPluginDependency` | 可选 `VersionRange`。 |
+| `AtomUICityPluginContract` | 可选 `VersionRange`，生成确定性 contracts contribution。 |
+| `AtomUICityLanguagePackage` | 必需 `Culture`。 |
+| `AtomUICityPluginAsset` | 可选 `TargetPath`，默认保持相对目录。 |
+| `AtomUICityPluginNativeAsset` | 必需 `RuntimeIdentifier`。 |
+| `AtomUICityContributionManifest` | 必需 `Type`；`Required` 默认 `true`；可选 `TargetPath`。 |
+
+Capability、Dependency 和 Contribution 写入现有 `plugin.json` schema；Contract 生成独立 contribution；语言、普通和 native 资产只进入规范包布局，不扩展运行时 manifest 模型。
 
 示例：
 

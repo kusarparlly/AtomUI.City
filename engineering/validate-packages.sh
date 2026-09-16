@@ -105,6 +105,10 @@ require_nuspec_text() {
 
 while IFS= read -r project; do
   project_name="$(basename "$project" .csproj)"
+  if [[ "$project_name" == "AtomUI.City.Build.Tasks" ]]; then
+    continue
+  fi
+
   nupkg="$package_dir/$project_name.$version.nupkg"
   snupkg="$package_dir/$project_name.$version.snupkg"
 
@@ -128,6 +132,7 @@ while IFS= read -r project; do
       require_entry "$nupkg" "$entries" "buildTransitive/AtomUI.City.Build.targets"
       require_entry "$nupkg" "$entries" "buildTransitive/AtomUI.City.Application.targets"
       require_entry "$nupkg" "$entries" "buildTransitive/AtomUI.City.Plugin.targets"
+      require_entry "$nupkg" "$entries" "tools/net10.0/AtomUI.City.Build.Tasks.dll"
       require_entry "$nupkg" "$entries" "buildTransitive/AtomUI.City.Core.Diagnostics.targets"
       require_entry "$nupkg" "$entries" "analyzers/dotnet/cs/AtomUI.City.Generators.dll"
       snupkg_entries="$(unzip -Z1 "$snupkg")"

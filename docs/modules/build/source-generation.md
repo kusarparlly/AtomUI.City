@@ -154,6 +154,8 @@ output/artifacts/manifests/
 | `Compatible` | 为未来明确声明的兼容能力预留；当前不启用运行时模块扫描。 |
 | `Off` | 关闭框架生成器，仅用于特殊调试。 |
 
+`AtomUICitySourceGenerationMode` 必须通过 `CompilerVisibleProperty` 进入 Roslyn incremental pipeline；仅把值写入诊断文本不算实现。Generator 的稳定产物是编译进程序集的强类型 C# Catalog，不通过副作用写入任意 JSON 文件。`Build.Tasks` 只处理 package/application 级物理 manifest。
+
 ### 7. 测试矩阵
 
 | 功能点 | 测试类型 | 必测场景 |

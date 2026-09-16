@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RestoreSources>$(MSBuildThisFileDirectory)../../../output/NuGet/Debug;https://api.nuget.org/v3/index.json</RestoreSources>
+    <AtomUICityPlugin>true</AtomUICityPlugin>
+    <AtomUICityPluginId>atomui.city.fixture.plugin</AtomUICityPluginId>
+    <AtomUICityPluginDisplayNameKey>Fixture.Plugin.DisplayName</AtomUICityPluginDisplayNameKey>
+    <AtomUICityMinHostVersion>1.0.0-preview.1</AtomUICityMinHostVersion>
+    <AtomUICityPackageAsPlugin>true</AtomUICityPackageAsPlugin>
+    <AtomUICityPluginNativeAotCompatible>true</AtomUICityPluginNativeAotCompatible>
+    <PackageId>AtomUI.City.Fixture.Plugin</PackageId>
+    <Version>1.0.0-preview.1</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AtomUI.City.Build" VersionOverride="1.0.0-preview.1" PrivateAssets="all" IncludeAssets="build;buildTransitive;analyzers" />
+    <AtomUICityPluginCapability Include="routes" Scope="/fixture/**" />
+    <AtomUICityPluginDependency Include="atomui.city.host" VersionRange="[1.0.0,2.0.0)" />
+    <AtomUICityPluginContract Include="atomui.city.fixture.contract" VersionRange="[1.0.0,2.0.0)" />
+    <AtomUICityLanguagePackage Include="Assets/fixture.zh-CN.json" Culture="zh-CN" />
+    <AtomUICityPluginAsset Include="Assets/icon.txt" TargetPath="images/icon.txt" />
+    <AtomUICityPluginNativeAsset Include="Assets/native.bin" RuntimeIdentifier="win-x64" />
+    <AtomUICityContributionManifest Include="Assets/routes.json" Type="routes" />
+  </ItemGroup>
+</Project>

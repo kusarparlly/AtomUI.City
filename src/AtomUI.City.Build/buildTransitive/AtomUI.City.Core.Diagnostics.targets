@@ -5,5 +5,10 @@
       File="$(AtomUICityBuildDiagnosticsOutputPath)build.txt"
       Lines="Project=$(MSBuildProjectName);SourceGenerationMode=$(AtomUICitySourceGenerationMode);GenerateManifests=$(AtomUICityGenerateManifests)"
       Overwrite="true" />
+    <WriteLinesToFile
+      Condition="'$(AtomUICityBuildDiagnosticsLevel)' == 'Detailed'"
+      File="$(AtomUICityBuildDiagnosticsOutputPath)build.txt"
+      Lines="TargetFramework=$(TargetFramework);RuntimeIdentifier=$(RuntimeIdentifier);StrictAot=$(AtomUICityStrictAot);PackagePlugin=$(AtomUICityPackagePlugin);PackageApplication=$(AtomUICityPackageApplication)"
+      Overwrite="false" />
   </Target>
 </Project>

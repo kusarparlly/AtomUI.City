@@ -5,8 +5,8 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd "$script_dir/.." && pwd)"
 cd "$repo_root"
 
-readonly runtime_excluded_projects="|AtomUI.City.Build|AtomUI.City.Cli|AtomUI.City.Generators|AtomUI.City.Templates|AtomUI.City.Testing|"
-readonly forbidden_runtime_projects="|AtomUI.City.Build|AtomUI.City.Cli|AtomUI.City.Generators|AtomUI.City.Templates|AtomUI.City.Testing|"
+readonly runtime_excluded_projects="|AtomUI.City.Build|AtomUI.City.Build.Tasks|AtomUI.City.Cli|AtomUI.City.Generators|AtomUI.City.Templates|AtomUI.City.Testing|"
+readonly forbidden_runtime_projects="|AtomUI.City.Build|AtomUI.City.Build.Tasks|AtomUI.City.Cli|AtomUI.City.Generators|AtomUI.City.Templates|AtomUI.City.Testing|"
 readonly forbidden_runtime_packages="|Microsoft.CodeAnalysis|Microsoft.CodeAnalysis.CSharp|Microsoft.NET.Test.Sdk|ReactiveUI|Spectre.Console|System.Reactive|coverlet.collector|xunit|xunit.runner.visualstudio|"
 
 failure_count=0

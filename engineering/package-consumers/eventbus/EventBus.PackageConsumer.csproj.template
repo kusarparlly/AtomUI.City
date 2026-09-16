@@ -7,7 +7,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AtomUI.City.Build" Version="$(AtomUICityConsumerVersion)" PrivateAssets="all" />
+    <PackageReference Include="AtomUI.City.Build" Version="$(AtomUICityConsumerVersion)" PrivateAssets="all" IncludeAssets="build;buildTransitive;analyzers" />
     <PackageReference Include="AtomUI.City.Core" Version="$(AtomUICityConsumerVersion)" />
     <PackageReference Include="AtomUI.City.EventBus" Version="$(AtomUICityConsumerVersion)" />
   </ItemGroup>

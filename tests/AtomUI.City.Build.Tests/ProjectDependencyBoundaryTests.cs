@@ -6,7 +6,8 @@ public sealed class ProjectDependencyBoundaryTests
 {
     private static readonly IReadOnlyDictionary<string, string[]> AllowedSourceProjectReferences = new Dictionary<string, string[]>(StringComparer.Ordinal)
     {
-        ["AtomUI.City.Build"] = ["AtomUI.City.Generators"],
+        ["AtomUI.City.Build"] = ["AtomUI.City.Build.Tasks", "AtomUI.City.Generators"],
+        ["AtomUI.City.Build.Tasks"] = [],
         ["AtomUI.City.Cli"] = ["AtomUI.City.Build", "AtomUI.City.Core", "AtomUI.City.PluginSystem", "AtomUI.City.Templates"],
         ["AtomUI.City.Core"] = [],
         ["AtomUI.City.Data"] = ["AtomUI.City.Core", "AtomUI.City.Security"],
@@ -160,6 +161,7 @@ public sealed class ProjectDependencyBoundaryTests
     private static bool IsRuntimeProject(string projectName)
     {
         return projectName is not "AtomUI.City.Build"
+            and not "AtomUI.City.Build.Tasks"
             and not "AtomUI.City.Cli"
             and not "AtomUI.City.Generators"
             and not "AtomUI.City.Templates"

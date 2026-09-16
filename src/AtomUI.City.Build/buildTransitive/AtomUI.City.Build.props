@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
+    <AtomUICityBuildIntegrationLoaded>true</AtomUICityBuildIntegrationLoaded>
     <AtomUICityOutputRoot Condition="'$(AtomUICityOutputRoot)' == ''">$(MSBuildProjectDirectory)/output</AtomUICityOutputRoot>
     <AtomUICityGenerateManifests Condition="'$(AtomUICityGenerateManifests)' == ''">true</AtomUICityGenerateManifests>
     <AtomUICityValidateManifests Condition="'$(AtomUICityValidateManifests)' == ''">true</AtomUICityValidateManifests>
@@ -8,6 +9,9 @@
     <AtomUICityStrictAot Condition="'$(AtomUICityStrictAot)' == ''">false</AtomUICityStrictAot>
     <AtomUICityPackagePlugin Condition="'$(AtomUICityPackagePlugin)' == ''">false</AtomUICityPackagePlugin>
     <AtomUICityPackageApplication Condition="'$(AtomUICityPackageApplication)' == ''">false</AtomUICityPackageApplication>
+    <AtomUICityApplicationId Condition="'$(AtomUICityApplicationId)' == ''">$(AssemblyName)</AtomUICityApplicationId>
+    <AtomUICityPluginApiVersion Condition="'$(AtomUICityPluginApiVersion)' == ''">1.0</AtomUICityPluginApiVersion>
+    <AtomUICityPluginProfile Condition="'$(AtomUICityPluginProfile)' == ''">$(AtomUICityPluginApiVersion)-stable</AtomUICityPluginProfile>
     <AtomUICityBuildDiagnosticsLevel Condition="'$(AtomUICityBuildDiagnosticsLevel)' == ''">Normal</AtomUICityBuildDiagnosticsLevel>
     <AtomUICityManifestIntermediateOutputPath Condition="'$(AtomUICityManifestIntermediateOutputPath)' == ''">$(IntermediateOutputPath)AtomUI.City/manifests/</AtomUICityManifestIntermediateOutputPath>
     <AtomUICityBuildDiagnosticsOutputPath Condition="'$(AtomUICityBuildDiagnosticsOutputPath)' == ''">$(IntermediateOutputPath)AtomUI.City/diagnostics/</AtomUICityBuildDiagnosticsOutputPath>
@@ -15,5 +19,13 @@
 
   <ItemGroup>
     <CompilerVisibleProperty Include="IsTestProject" />
+    <CompilerVisibleProperty Include="AtomUICitySourceGenerationMode" />
   </ItemGroup>
+
+  <PropertyGroup Condition="'$(AtomUICityStrictAot)' == 'true'">
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableAotAnalyzer>true</EnableAotAnalyzer>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
+  </PropertyGroup>
 </Project>

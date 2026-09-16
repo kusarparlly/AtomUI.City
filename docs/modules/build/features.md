@@ -14,6 +14,7 @@
 | AUC-BUILD-006 | Release Gates | 已实现并通过产品合同测试 | engineering/check-docs.sh, pack/test gates | EngineeringGateTests; PackagingReleaseGateTests |
 | AUC-BUILD-007 | Test Naming | 已实现并通过产品合同测试 | test project and test file naming convention | TestNamingConventionTests |
 | AUC-BUILD-008 | MSBuild Transitive Assets | 已实现并通过产品合同测试 | buildTransitive props/targets, analyzer package assets, BuildMsBuildContract | BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests |
+| AUC-BUILD-009 | Build Task Execution | 已实现并通过产品消费测试 | Build properties/items, AtomUI.City.Build.Tasks, plugin/application manifests | ManifestTaskTests; IncrementalGeneratorInfrastructureTests; AtomUI.City.Build.PackagingSmoke |
 
 ## Feature 硬门禁
 
@@ -144,3 +145,17 @@ Diagnostics: 失败必须指出缺失 package entry、缺失 analyzer path 或�
 Tests: `BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests`
 Required Assertions: 断言 BuildMsBuildContract、buildTransitive 文件、generator analyzer package entry、package validation 和 project inventory 空项目门禁。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+
+## AUC-BUILD-009 Build Task Execution
+
+Feature ID: `AUC-BUILD-009`
+Status: 已实现并通过 Tasks、Generator 与 NuGet-only 产品消费测试
+Goal: 让公开的 Build Property、Item 和 Target 具有真实、可验证的生产消费链，禁止静默空实现。
+Public Contract: `AtomUICitySourceGenerationMode`、`AtomUICityStrictAot`、插件和应用打包 Property/Item、package/application manifest v1。
+Runtime / Build Behavior: `AtomUI.City.Build` 负责编排；包内 `AtomUI.City.Build.Tasks` 负责确定性 JSON、路径校验、资产布局、Hash 和最终包验证；Generator 继续输出强类型 C# Catalog。
+Failure Behavior: 非法值、缺少必需 metadata、路径逃逸、重复声明、无效 manifest 或包布局必须以稳定 `AUCBLD` 诊断阻止构建。
+Threading / Cancellation: Task 不保存静态可变状态；MSBuild 取消终止当前构建；相同输入产生相同字节输出。
+Diagnostics: `AUCBLD0001/0002`、`AUCBLD0101/0102`、`AUCBLD0201/0202`、`AUCBLD0301`、`AUCBLD0401`。
+Tests: `ManifestTaskTests; IncrementalGeneratorInfrastructureTests; AtomUI.City.Build.PackagingSmoke`
+Required Assertions: 真实 build/publish/pack、九类 Item 消费、Strict/Compatible/Off、AOT、模板缺包门禁、最终应用不携带 Build/Tasks/Generator。
+Acceptance Criteria: 不存在只登记名称而无生产消费者的 Build Property、Item 或 Target。
