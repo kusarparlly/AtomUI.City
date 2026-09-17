@@ -153,7 +153,7 @@ public sealed class LocalizationService : ILocalizationService
     /// <summary>
     /// Gets state.
     /// </summary>
-    public CultureState State => _cultureState.Value;
+    private CultureState State => _cultureState.Value;
 
     /// <summary>
     /// Gets culture state.

@@ -10,7 +10,7 @@ public sealed class PluginTestRecord
     /// <summary>
     /// Initializes a new instance of the <c>PluginTestRecord</c> type.
     /// </summary>
-    public PluginTestRecord(string id, string version, string installPath, PluginTestState state)
+    internal PluginTestRecord(string id, string version, string installPath, PluginTestState state)
     {
         Id = id;
         Version = version;

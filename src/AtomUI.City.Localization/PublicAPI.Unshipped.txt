@@ -245,7 +245,6 @@ AtomUI.City.Localization.LocalizationService.LocalizationService(AtomUI.City.Loc
 AtomUI.City.Localization.LocalizationService.LocalizationService(System.Collections.Generic.IReadOnlyList<AtomUI.City.Localization.LanguagePackageDescriptor!>! descriptors, System.Collections.Generic.IEnumerable<AtomUI.City.Localization.ILanguagePackageProvider!>! providers, AtomUI.City.Localization.IPresentationLocalizationBridge? bridge = null, AtomUI.City.Localization.ILocalizationDiagnostics? diagnostics = null) -> void
 AtomUI.City.Localization.LocalizationService.RevokePackagesByContributionIdAsync(string! contributionId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<int>
 AtomUI.City.Localization.LocalizationService.SetCultureAsync(string! cultureName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Localization.LocalizationResult!>
-AtomUI.City.Localization.LocalizationService.State.get -> AtomUI.City.Localization.CultureState!
 AtomUI.City.Localization.LocalizationServiceCollectionExtensions
 AtomUI.City.Localization.LocalizedMessage
 AtomUI.City.Localization.LocalizedMessage.Culture.get -> System.Globalization.CultureInfo!

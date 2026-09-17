@@ -204,7 +204,7 @@ public sealed class LocalizationRegistrationTests
         Assert.True(plugin.IsDisposed);
         Assert.DoesNotContain(
             "Plugin.zh-CN",
-            ((LocalizationService)localization).State.LoadedPackageIds);
+            localization.CultureState.Value.LoadedPackageIds);
         Assert.Equal("Host Settings", (await localization.GetStringAsync("Settings.Title")).Value);
     }
 
@@ -234,11 +234,11 @@ public sealed class LocalizationRegistrationTests
 
         await localization.SetCultureAsync("zh-CN");
         Assert.Equal("Settings", (await localization.GetStringAsync("Settings.Title")).Value);
-        Assert.Equal(["Host.zh-CN", "Host.en-US"], service.State.LoadedPackageIds);
+        Assert.Equal(["Host.zh-CN", "Host.en-US"], service.CultureState.Value.LoadedPackageIds);
 
         Assert.Equal(2, registry.RevokeOwner("host"));
 
-        Assert.Empty(service.State.LoadedPackageIds);
+        Assert.Empty(service.CultureState.Value.LoadedPackageIds);
         Assert.True(zh.IsDisposed);
         Assert.True(en.IsDisposed);
     }

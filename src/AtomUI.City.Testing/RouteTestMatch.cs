@@ -50,7 +50,7 @@ public sealed class RouteTestMatch
     /// <summary>
     /// Executes the success operation.
     /// </summary>
-    public static RouteTestMatch Success(RouteTestDefinition route, IReadOnlyDictionary<string, string> parameters)
+    internal static RouteTestMatch Success(RouteTestDefinition route, IReadOnlyDictionary<string, string> parameters)
     {
         return new RouteTestMatch(true, route.Name, route.ViewModelType, parameters, null);
     }
@@ -58,7 +58,7 @@ public sealed class RouteTestMatch
     /// <summary>
     /// Executes the not found operation.
     /// </summary>
-    public static RouteTestMatch NotFound()
+    internal static RouteTestMatch NotFound()
     {
         return new RouteTestMatch(false, null, null, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), "CITY-ROUTE-NOT-FOUND");
     }

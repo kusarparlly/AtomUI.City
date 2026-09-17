@@ -19,7 +19,7 @@ public sealed class CultureStateTests
         await service.SetCultureAsync("zh-CN");
 
         var state = Assert.Single(published);
-        Assert.Same(service.State, state);
+        Assert.Same(service.CultureState.Value, state);
         Assert.Equal("zh-CN", service.CultureState.Value.CurrentCulture.Name);
         Assert.Equal(1, service.CultureState.Version);
     }
@@ -36,12 +36,12 @@ public sealed class CultureStateTests
         var service = new LocalizationService(options, []);
 
         Assert.Equal("en-US", service.CurrentCulture.Name);
-        Assert.Equal("en-US", service.State.CurrentUICulture.Name);
+        Assert.Equal("en-US", service.CultureState.Value.CurrentUICulture.Name);
         Assert.Equal(0, service.CultureRevision);
         Assert.Equal(
             ["ja-JP", "en", ""],
-            service.State.FallbackCultures.Select(culture => culture.Name).ToArray());
-        Assert.Empty(service.State.LoadedPackageIds);
+            service.CultureState.Value.FallbackCultures.Select(culture => culture.Name).ToArray());
+        Assert.Empty(service.CultureState.Value.LoadedPackageIds);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public sealed class CultureStateTests
         Assert.True(result.Succeeded);
         Assert.Equal(
             ["en-US", "zh-Hans", "zh", ""],
-            service.State.FallbackCultures.Select(culture => culture.Name).ToArray());
+            service.CultureState.Value.FallbackCultures.Select(culture => culture.Name).ToArray());
         Assert.Contains(
             diagnostics.Records,
             record => record.Code == LocalizationDiagnosticIds.CultureChanged
@@ -191,7 +191,7 @@ public sealed class CultureStateTests
         Assert.True(result.Succeeded);
         Assert.Equal(
             ["en-US", "fr-FR", "zh-Hans", "zh", ""],
-            service.State.FallbackCultures.Select(culture => culture.Name));
+            service.CultureState.Value.FallbackCultures.Select(culture => culture.Name));
     }
 
     [Fact]

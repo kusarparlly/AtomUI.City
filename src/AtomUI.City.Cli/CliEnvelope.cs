@@ -3,7 +3,7 @@ namespace AtomUI.City.Cli;
 /// <summary>
 /// Represents cli envelope.
 /// </summary>
-public sealed class CliEnvelope
+internal sealed class CliEnvelope
 {
     private CliEnvelope(
         string command,

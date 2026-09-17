@@ -3,7 +3,7 @@ namespace AtomUI.City.Cli;
 /// <summary>
 /// Represents dotnet invocation.
 /// </summary>
-public sealed class DotnetInvocation
+internal sealed class DotnetInvocation
 {
     private DotnetInvocation(IReadOnlyList<string> arguments)
         : this(arguments, Directory.GetCurrentDirectory(), ciMode: false)

@@ -116,20 +116,10 @@ AtomUI.City.Testing.PluginTestHostBuilder
 AtomUI.City.Testing.PluginTestHostBuilder.Build() -> AtomUI.City.Testing.PluginTestHost!
 AtomUI.City.Testing.PluginTestHostBuilder.PluginTestHostBuilder() -> void
 AtomUI.City.Testing.PluginTestHostBuilder.UsePlugin(string! id, string! version) -> AtomUI.City.Testing.PluginTestHostBuilder!
-AtomUI.City.Testing.PluginTestPackage
-AtomUI.City.Testing.PluginTestPackage.<Clone>$() -> AtomUI.City.Testing.PluginTestPackage!
-AtomUI.City.Testing.PluginTestPackage.Deconstruct(out string! Id, out string! Version) -> void
-AtomUI.City.Testing.PluginTestPackage.Equals(AtomUI.City.Testing.PluginTestPackage? other) -> bool
-AtomUI.City.Testing.PluginTestPackage.Id.get -> string!
-AtomUI.City.Testing.PluginTestPackage.Id.init -> void
-AtomUI.City.Testing.PluginTestPackage.PluginTestPackage(string! Id, string! Version) -> void
-AtomUI.City.Testing.PluginTestPackage.Version.get -> string!
-AtomUI.City.Testing.PluginTestPackage.Version.init -> void
 AtomUI.City.Testing.PluginTestRecord
 AtomUI.City.Testing.PluginTestRecord.Contributions.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
 AtomUI.City.Testing.PluginTestRecord.Id.get -> string!
 AtomUI.City.Testing.PluginTestRecord.InstallPath.get -> string!
-AtomUI.City.Testing.PluginTestRecord.PluginTestRecord(string! id, string! version, string! installPath, AtomUI.City.Testing.PluginTestState state) -> void
 AtomUI.City.Testing.PluginTestRecord.RevokedContributionCount.get -> int
 AtomUI.City.Testing.PluginTestRecord.State.get -> AtomUI.City.Testing.PluginTestState
 AtomUI.City.Testing.PluginTestRecord.Version.get -> string!
@@ -312,9 +302,6 @@ override AtomUI.City.Testing.GeneratedSource.ToString() -> string!
 override AtomUI.City.Testing.ModuleTestRecord.Equals(object? obj) -> bool
 override AtomUI.City.Testing.ModuleTestRecord.GetHashCode() -> int
 override AtomUI.City.Testing.ModuleTestRecord.ToString() -> string!
-override AtomUI.City.Testing.PluginTestPackage.Equals(object? obj) -> bool
-override AtomUI.City.Testing.PluginTestPackage.GetHashCode() -> int
-override AtomUI.City.Testing.PluginTestPackage.ToString() -> string!
 override AtomUI.City.Testing.RecordedDataRequest.Equals(object? obj) -> bool
 override AtomUI.City.Testing.RecordedDataRequest.GetHashCode() -> int
 override AtomUI.City.Testing.RecordedDataRequest.ToString() -> string!
@@ -345,14 +332,10 @@ static AtomUI.City.Testing.ModuleTestHost.CreateBuilder() -> AtomUI.City.Testing
 static AtomUI.City.Testing.ModuleTestRecord.operator !=(AtomUI.City.Testing.ModuleTestRecord? left, AtomUI.City.Testing.ModuleTestRecord? right) -> bool
 static AtomUI.City.Testing.ModuleTestRecord.operator ==(AtomUI.City.Testing.ModuleTestRecord? left, AtomUI.City.Testing.ModuleTestRecord? right) -> bool
 static AtomUI.City.Testing.PluginTestHost.CreateBuilder() -> AtomUI.City.Testing.PluginTestHostBuilder!
-static AtomUI.City.Testing.PluginTestPackage.operator !=(AtomUI.City.Testing.PluginTestPackage? left, AtomUI.City.Testing.PluginTestPackage? right) -> bool
-static AtomUI.City.Testing.PluginTestPackage.operator ==(AtomUI.City.Testing.PluginTestPackage? left, AtomUI.City.Testing.PluginTestPackage? right) -> bool
 static AtomUI.City.Testing.RecordedDataRequest.operator !=(AtomUI.City.Testing.RecordedDataRequest? left, AtomUI.City.Testing.RecordedDataRequest? right) -> bool
 static AtomUI.City.Testing.RecordedDataRequest.operator ==(AtomUI.City.Testing.RecordedDataRequest? left, AtomUI.City.Testing.RecordedDataRequest? right) -> bool
 static AtomUI.City.Testing.RouteTestDefinition.operator !=(AtomUI.City.Testing.RouteTestDefinition? left, AtomUI.City.Testing.RouteTestDefinition? right) -> bool
 static AtomUI.City.Testing.RouteTestDefinition.operator ==(AtomUI.City.Testing.RouteTestDefinition? left, AtomUI.City.Testing.RouteTestDefinition? right) -> bool
-static AtomUI.City.Testing.RouteTestMatch.NotFound() -> AtomUI.City.Testing.RouteTestMatch!
-static AtomUI.City.Testing.RouteTestMatch.Success(AtomUI.City.Testing.RouteTestDefinition! route, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! parameters) -> AtomUI.City.Testing.RouteTestMatch!
 static AtomUI.City.Testing.RoutingTestHost.CreateBuilder() -> AtomUI.City.Testing.RoutingTestHostBuilder!
 static AtomUI.City.Testing.ScriptedDataInvocation.operator !=(AtomUI.City.Testing.ScriptedDataInvocation? left, AtomUI.City.Testing.ScriptedDataInvocation? right) -> bool
 static AtomUI.City.Testing.ScriptedDataInvocation.operator ==(AtomUI.City.Testing.ScriptedDataInvocation? left, AtomUI.City.Testing.ScriptedDataInvocation? right) -> bool

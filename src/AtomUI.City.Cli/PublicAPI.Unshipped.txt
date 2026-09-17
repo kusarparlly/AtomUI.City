@@ -1,38 +1,5 @@
 #nullable enable
 AtomUI.City.Cli.CliApplication
-AtomUI.City.Cli.CliDiagnostic
-AtomUI.City.Cli.CliDiagnostic.<Clone>$() -> AtomUI.City.Cli.CliDiagnostic!
-AtomUI.City.Cli.CliDiagnostic.CliDiagnostic(string! Code, string! Message, string! Severity, string? SuggestedAction = null, string? DocumentationLink = null) -> void
-AtomUI.City.Cli.CliDiagnostic.Code.get -> string!
-AtomUI.City.Cli.CliDiagnostic.Code.init -> void
-AtomUI.City.Cli.CliDiagnostic.Deconstruct(out string! Code, out string! Message, out string! Severity, out string? SuggestedAction, out string? DocumentationLink) -> void
-AtomUI.City.Cli.CliDiagnostic.DocumentationLink.get -> string?
-AtomUI.City.Cli.CliDiagnostic.DocumentationLink.init -> void
-AtomUI.City.Cli.CliDiagnostic.Equals(AtomUI.City.Cli.CliDiagnostic? other) -> bool
-AtomUI.City.Cli.CliDiagnostic.Message.get -> string!
-AtomUI.City.Cli.CliDiagnostic.Message.init -> void
-AtomUI.City.Cli.CliDiagnostic.Position.get -> int?
-AtomUI.City.Cli.CliDiagnostic.Position.init -> void
-AtomUI.City.Cli.CliDiagnostic.Severity.get -> string!
-AtomUI.City.Cli.CliDiagnostic.Severity.init -> void
-AtomUI.City.Cli.CliDiagnostic.SuggestedAction.get -> string?
-AtomUI.City.Cli.CliDiagnostic.SuggestedAction.init -> void
-AtomUI.City.Cli.CliDiagnostic.Target.get -> string?
-AtomUI.City.Cli.CliDiagnostic.Target.init -> void
-AtomUI.City.Cli.CliEnvelope
-AtomUI.City.Cli.CliEnvelope.Artifacts.get -> System.Collections.Generic.IReadOnlyList<object?>!
-AtomUI.City.Cli.CliEnvelope.ChangedFiles.get -> System.Collections.Generic.IReadOnlyList<string!>!
-AtomUI.City.Cli.CliEnvelope.Command.get -> string!
-AtomUI.City.Cli.CliEnvelope.Data.get -> object!
-AtomUI.City.Cli.CliEnvelope.Diagnostics.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Cli.CliDiagnostic!>!
-AtomUI.City.Cli.CliEnvelope.DocumentationLinks.get -> System.Collections.Generic.IReadOnlyList<string!>!
-AtomUI.City.Cli.CliEnvelope.ExitCode.get -> int
-AtomUI.City.Cli.CliEnvelope.Retryable.get -> bool
-AtomUI.City.Cli.CliEnvelope.SchemaVersion.get -> string!
-AtomUI.City.Cli.CliEnvelope.Status.get -> string!
-AtomUI.City.Cli.CliEnvelope.Success.get -> bool
-AtomUI.City.Cli.CliEnvelope.SuggestedActions.get -> System.Collections.Generic.IReadOnlyList<string!>!
-AtomUI.City.Cli.CliEnvelope.SuggestedCommands.get -> System.Collections.Generic.IReadOnlyList<string!>!
 AtomUI.City.Cli.CliExecutionEnvironment
 AtomUI.City.Cli.CliExecutionEnvironment.CliExecutionEnvironment(string! workingDirectory, bool isCi = false, bool isNonInteractive = false, bool isStdinAvailable = true) -> void
 AtomUI.City.Cli.CliExecutionEnvironment.IsCi.get -> bool
@@ -40,21 +7,7 @@ AtomUI.City.Cli.CliExecutionEnvironment.IsNonInteractive.get -> bool
 AtomUI.City.Cli.CliExecutionEnvironment.IsStdinAvailable.get -> bool
 AtomUI.City.Cli.CliExecutionEnvironment.WorkingDirectory.get -> string!
 AtomUI.City.Cli.CliExitCodes
-AtomUI.City.Cli.DotnetInvocation
-AtomUI.City.Cli.DotnetInvocation.Arguments.get -> System.Collections.Generic.IReadOnlyList<string!>!
-AtomUI.City.Cli.DotnetInvocation.CiMode.get -> bool
-AtomUI.City.Cli.DotnetInvocation.Executable.get -> string!
-AtomUI.City.Cli.DotnetInvocation.WorkingDirectory.get -> string!
 const AtomUI.City.Cli.CliExitCodes.ArgumentError = 2 -> int
 const AtomUI.City.Cli.CliExitCodes.Failure = 1 -> int
 const AtomUI.City.Cli.CliExitCodes.Success = 0 -> int
-override AtomUI.City.Cli.CliDiagnostic.Equals(object? obj) -> bool
-override AtomUI.City.Cli.CliDiagnostic.GetHashCode() -> int
-override AtomUI.City.Cli.CliDiagnostic.ToString() -> string!
 static AtomUI.City.Cli.CliApplication.RunAsync(string![]! args, System.IO.TextWriter! output, System.IO.TextWriter! error, AtomUI.City.Cli.CliExecutionEnvironment? environment = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<int>
-static AtomUI.City.Cli.CliDiagnostic.Error(string! code, string! message, string? target = null, int? position = null) -> AtomUI.City.Cli.CliDiagnostic!
-static AtomUI.City.Cli.CliDiagnostic.operator !=(AtomUI.City.Cli.CliDiagnostic? left, AtomUI.City.Cli.CliDiagnostic? right) -> bool
-static AtomUI.City.Cli.CliDiagnostic.operator ==(AtomUI.City.Cli.CliDiagnostic? left, AtomUI.City.Cli.CliDiagnostic? right) -> bool
-static AtomUI.City.Cli.CliEnvelope.Failed(string! command, int exitCode, params AtomUI.City.Cli.CliDiagnostic![]! diagnostics) -> AtomUI.City.Cli.CliEnvelope!
-static AtomUI.City.Cli.CliEnvelope.FailedWithData(string! command, int exitCode, object? data, params AtomUI.City.Cli.CliDiagnostic![]! diagnostics) -> AtomUI.City.Cli.CliEnvelope!
-static AtomUI.City.Cli.CliEnvelope.Succeeded(string! command, object? data) -> AtomUI.City.Cli.CliEnvelope!

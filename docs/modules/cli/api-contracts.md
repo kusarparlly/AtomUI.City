@@ -35,11 +35,10 @@
 | Type | 分类 | Review 规则 |
 | --- | --- | --- |
 | `CliApplication` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `CliDiagnostic` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `CliEnvelope` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `CliExecutionEnvironment` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `CliExitCodes` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `DotnetInvocation` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+
+`CliEnvelope`、`CliDiagnostic` 和 `DotnetInvocation` 是 CLI 进程内部的 CLR 实现类型，不属于可引用的 .NET API。它们产生的 JSON schema、diagnostic 字段和 invocation 字段仍是进程边界上的兼容契约，必须继续遵守本文档与 `compatibility.md` 的变更规则。
 
 ## Nullability 和参数规则
 

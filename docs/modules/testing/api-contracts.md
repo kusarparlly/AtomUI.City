@@ -300,7 +300,7 @@
 | TestHostBuilder.Build | 构建测试 Host。 | services/options。 | TestHost。 | 配置非法返回失败或抛声明异常。 | 同步构建无 token。 | 每个 host 独立 service provider。 |
 | FakeUiDispatcher.RunQueuedWork | 手动推进 UI work。 | max items 可选。 | 执行数量或 result。 | work exception 记录到 dispatcher diagnostics。 | 取消 work 不执行。 | 队列 FIFO，测试可断言 pending count。 |
 | DeterministicScheduler.AdvanceBy | 推进虚拟时间。 | duration >= 0。 | 执行的 task 数。 | task 异常进入 scheduler diagnostics。 | 取消任务跳过或标记 cancelled。 | 同一 scheduler 单线程推进。 |
-| PluginTestHost.LoadPluginAsync | 加载测试插件。 | PluginTestPackage。 | PluginTestRecord。 | manifest/依赖/加载失败有 record。 | 必须观察 token。 | 同一 plugin id 重复加载按测试策略拒绝。 |
+| PluginTestHost.InstallAsync | 安装已由 builder 声明的测试插件。 | plugin id。 | PluginTestRecord。 | 未声明的 plugin id 或安装失败通过异常暴露。 | 必须观察 token。 | 同一 plugin id 的生命周期操作由测试串行驱动。 |
 | SourceGenerationTestCase.Run | 运行 generator 测试。 | source files、additional files、references。 | GeneratedSourceSnapshot 和 diagnostics。 | 编译失败保留 diagnostics。 | 测试 token 传递给 runner。 | 输出按 hint name 稳定排序。 |
 | AotCompatibilityCheck.Run | 检查 AOT 禁止模式。 | assembly/project metadata。 | diagnostic list。 | 发现反射扫描兜底等模式返回 diagnostic。 | 纯 CPU/文件读取可观察 token。 | 结果不可变。 |
 
@@ -954,7 +954,6 @@
 | `ModuleTestRecord` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `PluginTestHost` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `PluginTestHostBuilder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `PluginTestPackage` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `PluginTestRecord` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `PluginTestState` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `RouteTestDefinition` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |

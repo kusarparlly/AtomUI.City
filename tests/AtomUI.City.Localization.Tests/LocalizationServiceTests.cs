@@ -68,7 +68,7 @@ public sealed class LocalizationServiceTests
         Assert.True(text.IsFallback);
         Assert.Equal("en-US", text.Culture.Name);
         Assert.Equal(["zh-CN", "en-US"], provider.LoadedCultures);
-        Assert.Equal(["Host.zh-CN", "Host.en-US"], service.State.LoadedPackageIds);
+        Assert.Equal(["Host.zh-CN", "Host.en-US"], service.CultureState.Value.LoadedPackageIds);
         Assert.Equal(2, service.CultureRevision);
     }
 
@@ -101,7 +101,7 @@ public sealed class LocalizationServiceTests
 
         await service.SetCultureAsync("fr-FR");
 
-        Assert.Equal(["Host.fr-FR", "Host.en-US"], service.State.LoadedPackageIds);
+        Assert.Equal(["Host.fr-FR", "Host.en-US"], service.CultureState.Value.LoadedPackageIds);
     }
 
     [Fact]
@@ -615,7 +615,7 @@ public sealed class LocalizationServiceTests
         using var scope = service.ActivateScope(context);
 
         await service.SetCultureAsync("zh-CN");
-        var oldState = service.State;
+        var oldState = service.CultureState.Value;
         var beforeRevoke = await service.GetStringAsync("Settings.Title", context);
 
         var revokedCount = await service.RevokePackagesByContributionIdAsync("plugin.settings.localization");
@@ -628,7 +628,7 @@ public sealed class LocalizationServiceTests
         Assert.True(plugin.IsDisposed);
         Assert.Equal("Host Settings", afterRevoke.Value);
         Assert.DoesNotContain(
-            service.State.LoadedPackageIds,
+            service.CultureState.Value.LoadedPackageIds,
             packageId => packageId == "Plugin.zh-CN");
         Assert.Contains(oldState.LoadedPackageIds, packageId => packageId == "Plugin.zh-CN");
         Assert.Equal(2, service.CultureRevision);

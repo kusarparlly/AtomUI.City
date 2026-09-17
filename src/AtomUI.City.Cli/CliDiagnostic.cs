@@ -8,7 +8,7 @@ namespace AtomUI.City.Cli;
 /// <param name="Severity">The severity value.</param>
 /// <param name="SuggestedAction">The suggested action value.</param>
 /// <param name="DocumentationLink">The documentation link value.</param>
-public sealed record CliDiagnostic(
+internal sealed record CliDiagnostic(
     string Code,
     string Message,
     string Severity,
