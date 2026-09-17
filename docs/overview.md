@@ -21,6 +21,7 @@ AtomUI.City 采用文档先行研发规则。
 | `engineering/` | 仓库结构、构建系统、代码风格、版本、打包和发布流程。 |
 | `decisions/` | 架构决策记录，用于沉淀重要选择及其原因。 |
 | `guides/` | 面向使用者的框架使用指南。 |
+| `API/` | 面向开发者的公开 API 入口、示例、生命周期和兼容性说明。 |
 | `reference/` | API、包列表、术语表等查询型资料。 |
 
 当前优先维护：
@@ -36,5 +37,6 @@ AtomUI.City 采用文档先行研发规则。
 - [产品级 Vertical Slice 验收规格](engineering/product-vertical-slice.md)
 - [实现顺序治理规范](engineering/implementation-roadmap.md)
 - [运行时本地候选版验收记录](engineering/runtime-release-candidate.md)
+- [开发者 API 文档](API/README.md)
 - [模块文档索引](modules/overview.md)
 - [架构决策记录](decisions/overview.md)
