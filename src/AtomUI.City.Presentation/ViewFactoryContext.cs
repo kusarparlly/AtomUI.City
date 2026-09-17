@@ -8,7 +8,7 @@ public sealed class ViewFactoryContext
     /// <summary>
     /// Initializes a new instance of the <c>ViewFactoryContext</c> type.
     /// </summary>
-    public ViewFactoryContext(IServiceProvider services)
+    internal ViewFactoryContext(IServiceProvider services)
     {
         ArgumentNullException.ThrowIfNull(services);
 

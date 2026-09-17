@@ -409,7 +409,6 @@ AtomUI.City.Presentation.ViewBinder.ViewBinder(AtomUI.City.Presentation.VisualLi
 AtomUI.City.Presentation.ViewDescriptor
 AtomUI.City.Presentation.ViewDescriptor.ConstructorParameterTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
 AtomUI.City.Presentation.ViewDescriptor.ContributionId.get -> string?
-AtomUI.City.Presentation.ViewDescriptor.CreateView(AtomUI.City.Presentation.ViewFactoryContext! context) -> object!
 AtomUI.City.Presentation.ViewDescriptor.PluginId.get -> string?
 AtomUI.City.Presentation.ViewDescriptor.ViewDescriptor(System.Type! viewModelType, System.Type! viewType, string? viewKey, System.Func<AtomUI.City.Presentation.ViewFactoryContext!, object!>! viewFactory, string? pluginId = null, string? contributionId = null, System.Collections.Generic.IReadOnlyList<System.Type!>? constructorParameterTypes = null) -> void
 AtomUI.City.Presentation.ViewDescriptor.ViewKey.get -> string?
@@ -423,7 +422,6 @@ AtomUI.City.Presentation.ViewFactory.ViewFactory(AtomUI.City.Core.Threading.IUiD
 AtomUI.City.Presentation.ViewFactory.ViewFactory(AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, System.IServiceProvider! services, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
 AtomUI.City.Presentation.ViewFactoryContext
 AtomUI.City.Presentation.ViewFactoryContext.Services.get -> System.IServiceProvider!
-AtomUI.City.Presentation.ViewFactoryContext.ViewFactoryContext(System.IServiceProvider! services) -> void
 AtomUI.City.Presentation.ViewForAttribute
 AtomUI.City.Presentation.ViewForAttribute.ContributionId.get -> string?
 AtomUI.City.Presentation.ViewForAttribute.ContributionId.init -> void

@@ -70,7 +70,7 @@ internal static class Program
             var target = new ConsumerOutletTarget();
             await using var outlet = new RouteOutlet("primary", InlineUiDispatcher.Instance, target);
             var viewModel = new ConsumerViewModel();
-            var view = descriptor.CreateView(new ViewFactoryContext(provider));
+            var view = await provider.GetRequiredService<ViewFactory>().CreateAsync(descriptor);
             var commit = await outlet.CommitAsync(RouteOutletCommitPlan.Replace(
                 "primary",
                 BoundViewHandle.FromExisting(view, viewModel)));

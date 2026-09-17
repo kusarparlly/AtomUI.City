@@ -65,7 +65,7 @@ public sealed class ViewDescriptor
     /// <summary>
     /// Executes the create view operation.
     /// </summary>
-    public object CreateView(ViewFactoryContext context)
+    internal object CreateView(ViewFactoryContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
