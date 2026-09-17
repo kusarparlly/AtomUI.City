@@ -8,7 +8,7 @@ public abstract class StateDefinition
     /// <summary>
     /// Executes the state definition operation.
     /// </summary>
-    protected StateDefinition(
+    internal StateDefinition(
         string name,
         Type valueType,
         StateLifetime lifetime,
@@ -195,7 +195,7 @@ public sealed class StateDefinition<T> : StateDefinition
     /// <summary>
     /// Executes the create operation.
     /// </summary>
-    public static StateDefinition<T> Create(
+    internal static StateDefinition<T> Create(
         StateKey<T> key,
         T defaultValue,
         StateLifetime lifetime = StateLifetime.Application,

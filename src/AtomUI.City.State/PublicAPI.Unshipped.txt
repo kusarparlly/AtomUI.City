@@ -160,7 +160,6 @@ AtomUI.City.State.StateDefinition.OwnerModule.get -> string?
 AtomUI.City.State.StateDefinition.PluginId.get -> string?
 AtomUI.City.State.StateDefinition.SchemaVersion.get -> int
 AtomUI.City.State.StateDefinition.SnapshotPolicy.get -> AtomUI.City.State.StateSnapshotPolicy
-AtomUI.City.State.StateDefinition.StateDefinition(string! name, System.Type! valueType, AtomUI.City.State.StateLifetime lifetime, AtomUI.City.State.StateAccessPolicy access, AtomUI.City.State.StateSnapshotPolicy snapshotPolicy, int schemaVersion, string? ownerModule, string? pluginId, string? writeCapability) -> void
 AtomUI.City.State.StateDefinition.ValueType.get -> System.Type!
 AtomUI.City.State.StateDefinition.WriteCapability.get -> string?
 AtomUI.City.State.StateDefinition<T>
@@ -288,7 +287,6 @@ static AtomUI.City.State.StateCollectionChange<TKey, TItem>.operator ==(AtomUI.C
 static AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.operator !=(AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>? left, AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>? right) -> bool
 static AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>.operator ==(AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>? left, AtomUI.City.State.StateCollectionSnapshotEntry<TKey, TItem>? right) -> bool
 static AtomUI.City.State.StateDefinition.Create<T>(AtomUI.City.State.StateKey<T> key, T defaultValue, AtomUI.City.State.StateLifetime lifetime = AtomUI.City.State.StateLifetime.Application, AtomUI.City.State.StateAccessPolicy access = AtomUI.City.State.StateAccessPolicy.HostWrite, AtomUI.City.State.StateSnapshotPolicy snapshotPolicy = AtomUI.City.State.StateSnapshotPolicy.Transient, int schemaVersion = 1, string? ownerModule = null, string? pluginId = null, System.Collections.Generic.IEqualityComparer<T>? comparer = null, string? writeCapability = null) -> AtomUI.City.State.StateDefinition<T>!
-static AtomUI.City.State.StateDefinition<T>.Create(AtomUI.City.State.StateKey<T> key, T defaultValue, AtomUI.City.State.StateLifetime lifetime = AtomUI.City.State.StateLifetime.Application, AtomUI.City.State.StateAccessPolicy access = AtomUI.City.State.StateAccessPolicy.HostWrite, AtomUI.City.State.StateSnapshotPolicy snapshotPolicy = AtomUI.City.State.StateSnapshotPolicy.Transient, int schemaVersion = 1, string? ownerModule = null, string? pluginId = null, System.Collections.Generic.IEqualityComparer<T>? comparer = null, string? writeCapability = null) -> AtomUI.City.State.StateDefinition<T>!
 static AtomUI.City.State.StateKey<T>.operator !=(AtomUI.City.State.StateKey<T> left, AtomUI.City.State.StateKey<T> right) -> bool
 static AtomUI.City.State.StateKey<T>.operator ==(AtomUI.City.State.StateKey<T> left, AtomUI.City.State.StateKey<T> right) -> bool
 static AtomUI.City.State.StateServiceCollectionExtensions.AddState(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!

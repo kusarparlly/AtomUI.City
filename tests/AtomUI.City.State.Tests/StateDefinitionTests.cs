@@ -5,6 +5,25 @@ namespace AtomUI.City.State.Tests;
 public sealed class StateDefinitionTests
 {
     [Fact]
+    public void StateDefinitionConstructionHelpersAreNotPublicExtensionPoints()
+    {
+        Assert.Empty(typeof(StateDefinition).GetConstructors());
+        Assert.Null(typeof(StateDefinition<>).GetMethod(
+            "Create",
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static));
+
+        var constructor = Assert.Single(typeof(StateDefinition).GetConstructors(
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic));
+        var genericFactory = typeof(StateDefinition<>).GetMethod(
+            "Create",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+        Assert.True(constructor.IsAssembly);
+        Assert.NotNull(genericFactory);
+        Assert.True(genericFactory!.IsAssembly);
+    }
+
+    [Fact]
     public void StateDefinitionRejectsDefaultKey()
     {
         var exception = Assert.Throws<ArgumentException>(() =>
