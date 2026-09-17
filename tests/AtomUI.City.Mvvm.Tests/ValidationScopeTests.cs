@@ -5,6 +5,17 @@ namespace AtomUI.City.Mvvm.Tests;
 public sealed class ValidationScopeTests
 {
     [Fact]
+    public void ValidationChangedEventArgsCanOnlyBeCreatedByValidationScope()
+    {
+        Assert.Empty(typeof(ValidationChangedEventArgs).GetConstructors());
+
+        var constructor = Assert.Single(typeof(ValidationChangedEventArgs).GetConstructors(
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic));
+
+        Assert.True(constructor.IsAssembly);
+    }
+
+    [Fact]
     public void ValidationScopeStartsValidAndTracksInvalidEntries()
     {
         var scope = new ValidationScope();

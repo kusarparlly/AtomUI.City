@@ -8,7 +8,7 @@ public sealed class ValidationChangedEventArgs : EventArgs
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidationChangedEventArgs"/> type.
     /// </summary>
-    public ValidationChangedEventArgs(
+    internal ValidationChangedEventArgs(
         string key,
         ValidationStatus status,
         IReadOnlyList<string> errors,
