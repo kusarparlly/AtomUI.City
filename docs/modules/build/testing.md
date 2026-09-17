@@ -16,7 +16,7 @@
 | pack warning 必须失败。 | 必须有实现、测试或工程门禁证据，不能只断言流程成功。 |
 | 运行时包不得依赖 Testing 或 Roslyn。 | 必须有实现、测试或工程门禁证据，不能只断言流程成功。 |
 | generator 包输出到 `analyzers/dotnet/cs`。 | 必须有实现、测试或工程门禁证据，不能只断言流程成功。 |
-| Build 包必须包含 buildTransitive 资产和 generator analyzer。 | 必须有实现、测试和 package validation 门禁证据，不能只断言程序集可加载。 |
+| Build 包必须保持 asset-only，并包含 machine-readable contract、buildTransitive 资产和 generator analyzer。 | 必须拒绝 `lib/`，并精确比较 baseline 与真实 Property/Item/Target/default，不能只断言文件存在。 |
 | Source project 不能是空占位项目。 | 必须由 project inventory 测试和脚本拒绝只有 `.csproj` 的 source project。 |
 
 ## 测试矩阵
@@ -30,7 +30,8 @@
 | AUC-BUILD-005 | Build | SourceGeneratorProjectStructureTests | 断言 generator target、analyzer layout、runtime 不引用 generator。 | target 错误、analyzer 路径缺失、runtime 依赖失败。 | Implemented |
 | AUC-BUILD-006 | Build | EngineeringGateTests; PackagingReleaseGateTests | 断言 docs、format、pack、test gate 可本地执行。 | 任一 gate 失败阻止 release。 | Implemented |
 | AUC-BUILD-007 | Build | TestNamingConventionTests | 断言测试命名和模块对应关系。 | 测试项目命名偏离、模块缺少测试项目失败。 | Implemented |
-| AUC-BUILD-008 | Build | BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests | 断言 BuildMsBuildContract、buildTransitive 文件、generator analyzer package entry、package validation 和空项目门禁。 | 缺少 build asset、缺少 generator analyzer、包校验未覆盖 Build、source project 只有 `.csproj` 失败。 | Implemented |
+| AUC-BUILD-008 | Build | BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests | 精确断言 contract baseline、Property/Item/Target/default、asset-only nupkg、buildTransitive 文件、generator analyzer 和空项目门禁。 | baseline 漂移、出现 `lib/`、缺少 contract/build asset/analyzer、包校验未覆盖 Build、source project 只有 `.csproj` 失败。 | Implemented |
+| AUC-BUILD-009 | Build/Package/Consumer | ManifestTaskTests; IncrementalGeneratorInfrastructureTests; AtomUI.City.Build.PackagingSmoke | 真实执行 build/publish/pack，验证九类 Item、三种 generation mode、AOT、manifest 与最终应用依赖闭包。 | 非法 Property/Item、路径逃逸、重复声明、manifest/package layout 错误或 Build/Tasks/Generator 泄漏到最终应用失败。 | Implemented |
 
 ## 缺口处理
 

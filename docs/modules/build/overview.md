@@ -1,7 +1,7 @@
 # AtomUI.City.Build
 
 文档等级：Level 3
-成熟度：Partially Implemented
+成熟度：Implemented（Public Contract Preview）
 执行边界：MSBuild and repository engineering boundary
 程序集：`AtomUI.City.Build`
 源码：`src/AtomUI.City.Build`
@@ -66,6 +66,6 @@
 
 ## 当前成熟度状态
 
-Partially Implemented
+Implemented（Public Contract Preview）
 
-该状态表示模块已有实现基线，但还需要按产品级合同补齐实现和测试。单个功能点状态以 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。
+`AUC-BUILD-001` 到 `AUC-BUILD-009` 已有生产实现和对应门禁。Build 以纯构建资产包交付，不公开 CLR runtime API；Property、Item、Target、默认值、可见性和 package layout 由随包分发的 `AtomUI.City.Build.contract.json` 冻结。当前合同仍为 Preview，首次稳定发布前仍需完成最终 release-candidate review。

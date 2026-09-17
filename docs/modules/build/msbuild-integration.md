@@ -79,6 +79,7 @@ Build 通过 MSBuild 集成把框架约定接入标准 `dotnet build`、`dotnet 
 
 ```text
 buildTransitive/
+  AtomUI.City.Build.contract.json
   AtomUI.City.Build.props
   AtomUI.City.Build.targets
   AtomUI.City.Application.targets
@@ -93,8 +94,10 @@ tools/
 规则：
 
 - `buildTransitive` 用于应用和插件项目自动获得构建规则。
+- `AtomUI.City.Build.contract.json` 是 Property、Item、Target、默认值、可见性和 package asset 的机器可读 Preview baseline；测试必须与真实 MSBuild XML 精确比较。
 - Roslyn generator/analyzer 作为 analyzer asset 引入。
 - MSBuild task 不进入运行时包主链路。
+- Build 包不得包含 `lib/` 运行时程序集；它只分发 buildTransitive、analyzer 和 tools 资产。
 - `AtomUI.City.Build.Tasks` 是 tools-only internal contract，由 targets 自动加载；应用开发者不得直接引用。
 - 标准应用和插件只引用 `AtomUI.City.Build`，模板用 `PrivateAssets=all` 与 `IncludeAssets=build;buildTransitive;analyzers` 防止 Build 程序集进入应用运行时。
 

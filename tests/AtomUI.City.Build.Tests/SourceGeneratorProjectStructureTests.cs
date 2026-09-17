@@ -94,6 +94,7 @@ public sealed class SourceGeneratorProjectStructureTests
 
         Assert.True(File.Exists(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Build.props")));
         Assert.True(File.Exists(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Build.targets")));
+        Assert.True(File.Exists(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Build.contract.json")));
         Assert.True(File.Exists(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Application.targets")));
         Assert.True(File.Exists(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Plugin.targets")));
         Assert.True(File.Exists(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Core.Diagnostics.targets")));
@@ -137,6 +138,11 @@ public sealed class SourceGeneratorProjectStructureTests
                     item.Pack == "true");
         Assert.Contains(
             packedItems,
+            item => item.Include == "buildTransitive/AtomUI.City.Build.contract.json" &&
+                    item.PackagePath == "buildTransitive/" &&
+                    item.Pack == "true");
+        Assert.Contains(
+            packedItems,
             item => item.Include == "buildTransitive/AtomUI.City.Core.Diagnostics.targets" &&
                     item.PackagePath == "buildTransitive/" &&
                     item.Pack == "true");
@@ -166,6 +172,8 @@ public sealed class SourceGeneratorProjectStructureTests
         Assert.Contains("AtomUI.City.Build)", validatePackagesScript, StringComparison.Ordinal);
         Assert.Contains("buildTransitive/AtomUI.City.Build.props", validatePackagesScript, StringComparison.Ordinal);
         Assert.Contains("buildTransitive/AtomUI.City.Build.targets", validatePackagesScript, StringComparison.Ordinal);
+        Assert.Contains("buildTransitive/AtomUI.City.Build.contract.json", validatePackagesScript, StringComparison.Ordinal);
+        Assert.Contains("Build package must remain build-asset-only", validatePackagesScript, StringComparison.Ordinal);
         Assert.Contains("buildTransitive/AtomUI.City.Application.targets", validatePackagesScript, StringComparison.Ordinal);
         Assert.Contains("buildTransitive/AtomUI.City.Plugin.targets", validatePackagesScript, StringComparison.Ordinal);
         Assert.Contains("buildTransitive/AtomUI.City.Core.Diagnostics.targets", validatePackagesScript, StringComparison.Ordinal);

@@ -25,7 +25,7 @@ public sealed class PublicApiGovernanceTests
     ];
 
     [Fact]
-    public void EveryProductProjectHasANonEmptyPublicApiBaseline()
+    public void EveryProductProjectHasTheApplicableApiBaseline()
     {
         var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
         foreach (var productName in ProductNames)
@@ -36,14 +36,20 @@ public sealed class PublicApiGovernanceTests
 
             Assert.True(File.Exists(shipped), $"Missing API baseline: {shipped}");
             Assert.True(File.Exists(unshipped), $"Missing API baseline: {unshipped}");
-            Assert.True(
-                CountSignatures(shipped) + CountSignatures(unshipped) > 0,
-                $"Public API baseline is empty for AtomUI.City.{productName}.");
+            var signatureCount = CountSignatures(shipped) + CountSignatures(unshipped);
+            if (productName is "Build")
+            {
+                Assert.Equal(0, signatureCount);
+            }
+            else
+            {
+                Assert.True(signatureCount > 0, $"Public API baseline is empty for AtomUI.City.{productName}.");
+            }
         }
     }
 
     [Fact]
-    public void EveryProductProjectRequiresCompleteXmlDocumentation()
+    public void EveryPublicAssemblyProjectRequiresCompleteXmlDocumentation()
     {
         var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
         var commonPropsPath = Path.Combine(repositoryRoot, "build", "Common.props");
@@ -61,14 +67,17 @@ public sealed class PublicApiGovernanceTests
 
         Assert.Contains("<AtomUICityPublicApiDocumentationRequired Condition=", commonPropsText, StringComparison.Ordinal);
         Assert.Contains("$(WarningsAsErrors);CS1591", commonPropsText, StringComparison.Ordinal);
-        foreach (var productName in ProductNames)
+        foreach (var productName in ProductNames.Where(static name => name is not "Build"))
         {
             Assert.Contains($"'$(MSBuildProjectName)' == 'AtomUI.City.{productName}'", commonPropsText, StringComparison.Ordinal);
         }
 
+        Assert.DoesNotContain("'$(MSBuildProjectName)' == 'AtomUI.City.Build'", commonPropsText, StringComparison.Ordinal);
+
         Assert.Contains("for product_name in \"${product_names[@]}\"", gate, StringComparison.Ordinal);
         Assert.Contains("validate_build_artifacts", gate, StringComparison.Ordinal);
-        Assert.DoesNotContain("false\n", gate, StringComparison.Ordinal);
+        Assert.Contains("asset-only package contains a forbidden runtime lib asset", gate, StringComparison.Ordinal);
+        Assert.Contains("buildTransitive/AtomUI.City.Build.contract.json", gate, StringComparison.Ordinal);
     }
 
     [Fact]

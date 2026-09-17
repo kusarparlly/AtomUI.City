@@ -82,7 +82,7 @@
 - [x] AUC-BUILD-005 Source Generator Packaging。验收重点：generator target、analyzer layout、runtime 不引用 generator。
 - [x] AUC-BUILD-006 Release Gates。验收重点：docs、format、pack、test gate 可本地执行。
 - [x] AUC-BUILD-007 Test Naming。验收重点：测试命名和模块对应关系。
-- [x] AUC-BUILD-008 MSBuild Transitive Assets。验收重点：Build 包包含 buildTransitive props/targets、自动分发 Generators analyzer、公开 BuildMsBuildContract，project inventory 拒绝空 source project。
+- [x] AUC-BUILD-008 MSBuild Transitive Assets。验收重点：Build 保持无 `lib/` 的纯构建资产包，包含 machine-readable contract 与 buildTransitive props/targets，自动分发 Generators analyzer，并由精确 baseline 门禁拒绝 Property/Item/Target/default 漂移；project inventory 拒绝空 source project。
 
 ## Generators
 

@@ -1,7 +1,1 @@
 #nullable enable
-AtomUI.City.Build.BuildMsBuildContract
-static AtomUI.City.Build.BuildMsBuildContract.GetManifestOutputPath(string! intermediateOutputPath, string! manifestFileName) -> string!
-static AtomUI.City.Build.BuildMsBuildContract.Items.get -> System.Collections.Generic.IReadOnlyList<string!>!
-static AtomUI.City.Build.BuildMsBuildContract.PackageAssets.get -> System.Collections.Generic.IReadOnlyList<string!>!
-static AtomUI.City.Build.BuildMsBuildContract.Properties.get -> System.Collections.Generic.IReadOnlyList<string!>!
-static AtomUI.City.Build.BuildMsBuildContract.Targets.get -> System.Collections.Generic.IReadOnlyList<string!>!

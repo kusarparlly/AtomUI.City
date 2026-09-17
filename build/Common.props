@@ -19,7 +19,6 @@
       helpers are intentionally excluded from that public documentation contract.
     -->
     <AtomUICityPublicApiDocumentationRequired Condition="
-        '$(MSBuildProjectName)' == 'AtomUI.City.Build' Or
         '$(MSBuildProjectName)' == 'AtomUI.City.Cli' Or
         '$(MSBuildProjectName)' == 'AtomUI.City.Core' Or
         '$(MSBuildProjectName)' == 'AtomUI.City.Data' Or

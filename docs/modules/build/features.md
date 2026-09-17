@@ -13,7 +13,7 @@
 | AUC-BUILD-005 | Source Generator Packaging | 已实现并通过产品合同测试 | AtomUI.City.Generators package layout | SourceGeneratorProjectStructureTests |
 | AUC-BUILD-006 | Release Gates | 已实现并通过产品合同测试 | engineering/check-docs.sh, pack/test gates | EngineeringGateTests; PackagingReleaseGateTests |
 | AUC-BUILD-007 | Test Naming | 已实现并通过产品合同测试 | test project and test file naming convention | TestNamingConventionTests |
-| AUC-BUILD-008 | MSBuild Transitive Assets | 已实现并通过产品合同测试 | buildTransitive props/targets, analyzer package assets, BuildMsBuildContract | BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests |
+| AUC-BUILD-008 | MSBuild Transitive Assets | 已实现并通过产品合同测试 | buildTransitive props/targets、machine-readable contract、analyzer package assets | BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests |
 | AUC-BUILD-009 | Build Task Execution | 已实现并通过产品消费测试 | Build properties/items, AtomUI.City.Build.Tasks, plugin/application manifests | ManifestTaskTests; IncrementalGeneratorInfrastructureTests; AtomUI.City.Build.PackagingSmoke |
 
 ## Feature 硬门禁
@@ -137,13 +137,13 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 Feature ID: `AUC-BUILD-008`
 Status: 已实现并通过产品合同测试
 Goal: 保证 `AtomUI.City.Build` 不是空壳包，应用和插件引用后自动获得框架构建资产。
-Public Contract: buildTransitive props/targets, analyzer package assets, BuildMsBuildContract
-Runtime / Build Behavior: `AtomUI.City.Build` 包包含 `buildTransitive/AtomUI.City.Build.props`、`buildTransitive/AtomUI.City.Build.targets`、应用/插件/诊断 targets，并把 `AtomUI.City.Generators.dll` 分发到 `analyzers/dotnet/cs`。
-Failure Behavior: 缺少 build asset、generator analyzer、package entry 或 source project 只有 `.csproj` 时，测试和工程门禁失败。
+Public Contract: buildTransitive props/targets、`AtomUI.City.Build.contract.json`、analyzer package assets；没有 CLR public API
+Runtime / Build Behavior: `AtomUI.City.Build` 是纯构建资产包，包含 contract、Build/Application/Plugin/Diagnostics props/targets，并把 `AtomUI.City.Generators.dll` 分发到 `analyzers/dotnet/cs`；包内不得出现 `lib/`。
+Failure Behavior: baseline 与真实资产不一致、出现 runtime lib、缺少 build asset、generator analyzer、package entry 或 source project 只有 `.csproj` 时，测试和工程门禁失败。
 Threading / Cancellation: MSBuild 进程处理取消；inventory 和 package validation 只读扫描文件系统。
 Diagnostics: 失败必须指出缺失 package entry、缺失 analyzer path 或空 source project path。
 Tests: `BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests`
-Required Assertions: 断言 BuildMsBuildContract、buildTransitive 文件、generator analyzer package entry、package validation 和 project inventory 空项目门禁。
+Required Assertions: 精确断言 machine-readable contract 与全部 Property/Item/Target/default 一致，并断言 asset-only 包布局、buildTransitive 文件、generator analyzer package entry、package validation 和 project inventory 空项目门禁。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
 
 ## AUC-BUILD-009 Build Task Execution

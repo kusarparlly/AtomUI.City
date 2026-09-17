@@ -38,46 +38,48 @@ validate_build_artifacts() {
   local assembly_name="$2"
   local project="$3"
   local signature_count="$4"
-  local require_documented_members="${5:-true}"
+  local require_assembly_artifacts="${5:-true}"
   local xml_output_root="output/bin/$configuration/$assembly_name"
   local sourcelink_output_root="output/$assembly_name/obj/$configuration"
   local xml_document_count=0
   local xml_member_count=0
   local sourcelink_document_count=0
 
-  while IFS= read -r xml_document; do
-    current_member_count="$(grep -c '<member name=' "$xml_document" || true)"
-    if [[ "$require_documented_members" == true && "$current_member_count" -eq 0 ]]; then
-      printf '%s XML documentation has no API members: %s\n' "$product_name" "$xml_document" >&2
+  if [[ "$require_assembly_artifacts" == true ]]; then
+    while IFS= read -r xml_document; do
+      current_member_count="$(grep -c '<member name=' "$xml_document" || true)"
+      if [[ "$current_member_count" -eq 0 ]]; then
+        printf '%s XML documentation has no API members: %s\n' "$product_name" "$xml_document" >&2
+        exit 1
+      fi
+
+      xml_document_count=$((xml_document_count + 1))
+      xml_member_count=$((xml_member_count + current_member_count))
+    done < <(find "$xml_output_root" -name "$assembly_name.xml" -type f | sort)
+
+    if [[ "$xml_document_count" -eq 0 ]]; then
+      printf '%s XML documentation was not produced for %s.\n' "$product_name" "$configuration" >&2
       exit 1
     fi
 
-    xml_document_count=$((xml_document_count + 1))
-    xml_member_count=$((xml_member_count + current_member_count))
-  done < <(find "$xml_output_root" -name "$assembly_name.xml" -type f | sort)
+    while IFS= read -r sourcelink_document; do
+      if ! grep -q 'https://raw.githubusercontent.com/' "$sourcelink_document"; then
+        printf '%s SourceLink document does not contain a canonical GitHub raw URL: %s\n' \
+          "$product_name" \
+          "$sourcelink_document" >&2
+        exit 1
+      fi
 
-  if [[ "$xml_document_count" -eq 0 ]]; then
-    printf '%s XML documentation was not produced for %s.\n' "$product_name" "$configuration" >&2
-    exit 1
-  fi
+      sourcelink_document_count=$((sourcelink_document_count + 1))
+    done < <(find "$sourcelink_output_root" -mindepth 2 -name "$assembly_name.sourcelink.json" -type f | sort)
 
-  while IFS= read -r sourcelink_document; do
-    if ! grep -q 'https://raw.githubusercontent.com/' "$sourcelink_document"; then
-      printf '%s SourceLink document does not contain a canonical GitHub raw URL: %s\n' \
+    if [[ "$sourcelink_document_count" -ne "$xml_document_count" ]]; then
+      printf '%s SourceLink count (%s) does not match built target framework count (%s).\n' \
         "$product_name" \
-        "$sourcelink_document" >&2
+        "$sourcelink_document_count" \
+        "$xml_document_count" >&2
       exit 1
     fi
-
-    sourcelink_document_count=$((sourcelink_document_count + 1))
-  done < <(find "$sourcelink_output_root" -mindepth 2 -name "$assembly_name.sourcelink.json" -type f | sort)
-
-  if [[ "$sourcelink_document_count" -ne "$xml_document_count" ]]; then
-    printf '%s SourceLink count (%s) does not match built target framework count (%s).\n' \
-      "$product_name" \
-      "$sourcelink_document_count" \
-      "$xml_document_count" >&2
-    exit 1
   fi
 
   dotnet pack "$project" \
@@ -102,6 +104,23 @@ validate_build_artifacts() {
     exit 1
   fi
 
+  if [[ "$require_assembly_artifacts" != true ]]; then
+    package_entries="$(unzip -Z1 "$package_path")"
+    if grep -Eq '^lib/' <<< "$package_entries"; then
+      printf '%s asset-only package contains a forbidden runtime lib asset.\n' "$product_name" >&2
+      exit 1
+    fi
+    if ! grep -Fxq 'buildTransitive/AtomUI.City.Build.contract.json' <<< "$package_entries"; then
+      printf '%s asset-only package is missing its machine-readable contract baseline.\n' "$product_name" >&2
+      exit 1
+    fi
+
+    printf '%s build-asset API gate passed: %s CLR signatures and a validated machine-readable MSBuild contract.\n' \
+      "$product_name" \
+      "$signature_count"
+    return
+  fi
+
   printf '%s public API gate passed: %s frozen signatures, %s XML members and %s SourceLink document(s) across %s target framework(s).\n' \
     "$product_name" \
     "$signature_count" \
@@ -123,7 +142,7 @@ for product_name in "${product_names[@]}"; do
   done
 
   product_signature_count="$(cat "$product_shipped" "$product_unshipped" | grep -cEv '^[[:space:]]*(#|$)' || true)"
-  if [[ "$product_signature_count" -eq 0 ]]; then
+  if [[ "$product_signature_count" -eq 0 && "$product_name" != "Build" ]]; then
     printf '%s public API baseline is empty.\n' "$product_name" >&2
     exit 1
   fi
@@ -182,9 +201,18 @@ for product_name in "${product_names[@]}"; do
   product_unshipped="src/$assembly_name/PublicAPI.Unshipped.txt"
   product_signature_count="$(cat "$product_shipped" "$product_unshipped" | grep -cEv '^[[:space:]]*(#|$)' || true)"
 
-  validate_build_artifacts \
-    "$product_name" \
-    "$assembly_name" \
-    "$project" \
-    "$product_signature_count"
+  if [[ "$product_name" == "Build" ]]; then
+    validate_build_artifacts \
+      "$product_name" \
+      "$assembly_name" \
+      "$project" \
+      "$product_signature_count" \
+      false
+  else
+    validate_build_artifacts \
+      "$product_name" \
+      "$assembly_name" \
+      "$project" \
+      "$product_signature_count"
+  fi
 done

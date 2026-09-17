@@ -15,7 +15,9 @@
 
 ## API 兼容规则
 
-- public 类型、成员、枚举值、attribute 参数和扩展方法默认视为兼容性承诺。
+- Build 包不发布 CLR public API，也不得包含 `lib/` 资产；应用通过 `PrivateAssets=all` 与 `IncludeAssets=build;buildTransitive;analyzers` 消费构建能力。
+- `buildTransitive/AtomUI.City.Build.contract.json` 是 MSBuild Property、Item、Target、默认值、可见性和 package asset 的机器可读兼容性基线。
+- public MSBuild 名称、默认值、允许值、诊断码和 package path 默认视为兼容性承诺；infrastructure 名称不供开发者调用，但仍禁止无审阅漂移。
 - 删除、重命名、改变默认行为、异常类型、Result status 或诊断码语义属于 breaking change。
 - 新增 API 可以 minor 版本发布，但必须有文档、测试和迁移说明。
 - `AtomUI.City.Build.props` 必须把 `IsTestProject` 暴露给 Analyzer，确保 `AUCANL0001` 不影响测试项目的独立 DI 装配。
