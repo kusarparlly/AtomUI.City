@@ -6,7 +6,7 @@
 
 | Feature ID | 名称 | 状态 | Contract Boundary | 主测试 |
 | --- | --- | --- | --- | --- |
-| AUC-GENERATORS-001 | Incremental Infrastructure | 已实现并通过产品合同测试 | Public Tooling Entry: AtomUICityIncrementalGenerator; Internal: GeneratorFeature | IncrementalGeneratorInfrastructureTests |
+| AUC-GENERATORS-001 | Incremental Infrastructure | 已实现并通过产品合同测试 | Public Tooling Entry: AtomUICityIncrementalGenerator; Internal: GeneratorFeature; Generated public surface allowlist | IncrementalGeneratorInfrastructureTests; GeneratedSourceVisibilityTests |
 | AUC-GENERATORS-002 | Module Graph | 已实现并通过产品合同测试 | Internal: ModuleMetadataReader, ModuleDependencyGraphBuilder | ModuleDependencyGraphBuilderTests; ModuleMetadataReaderTests |
 | AUC-GENERATORS-003 | DI Manifest | 已实现并通过产品合同测试 | Internal: ServiceRegistrationMetadataReader, ServiceRegistrationManifestBuilder | ServiceRegistrationManifestBuilderTests; ServiceRegistrationMetadataReaderTests |
 | AUC-GENERATORS-004 | Route Manifest | 已实现并通过产品合同测试 | Internal: RouteMetadataReader, RouteManifestBuilder | RouteManifestBuilderTests; RouteMetadataReaderTests |
@@ -22,6 +22,7 @@
 | Generator target 为 `netstandard2.0` 并作为 analyzer 分发。 | 必须有实现、测试或工程门禁证据。 |
 | Generator 不引用 AtomUI.City 运行时包。 | 必须有实现、测试或工程门禁证据。 |
 | 输出确定性排序。 | 必须有实现、测试或工程门禁证据。 |
+| Generated source 不得产生未审阅的 `public` 类型或成员。 | 必须解析所有 SourceBuilder 的代表性输出并与精确白名单比较。 |
 | 诊断 id 稳定，不能复用。 | 必须有实现、测试或工程门禁证据。 |
 
 ## Feature 实现合同
@@ -38,12 +39,12 @@ Feature ID: `AUC-GENERATORS-001`
 Status: 已实现并通过产品合同测试
 Goal: 提供 Roslyn incremental generator 入口和 feature pipeline。
 Tooling Entry: AtomUICityIncrementalGenerator; Internal Contract: GeneratorFeature
-Runtime / Build Behavior: 按 feature 组合 syntax provider、metadata reader、builder 和 source output。
-Failure Behavior: 无关输入导致全量重算、hint name 不稳定、runtime dependency 出现必须失败。
+Runtime / Build Behavior: 按 feature 组合 syntax provider、metadata reader、builder 和 source output；generated public declaration 仅允许 API contract 已 review 的跨程序集或应用组合入口。
+Failure Behavior: 无关输入导致全量重算、hint name 不稳定、runtime dependency 或未审阅的 generated public declaration 出现必须失败。
 Threading / Cancellation: generator 由编译器取消；pipeline 不启动长时后台任务。
 Diagnostics: diagnostic 必须包含 feature name 和 source location。
-Tests: `IncrementalGeneratorInfrastructureTests`
-Required Assertions: 断言 incremental 输入隔离、hint name 稳定、无 runtime 依赖。
+Tests: `IncrementalGeneratorInfrastructureTests; GeneratedSourceVisibilityTests`
+Required Assertions: 断言 incremental 输入隔离、hint name 稳定、无 runtime 依赖，并精确比较六类 SourceBuilder 的 generated public declaration 白名单。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
 
 ## AUC-GENERATORS-002 Module Graph

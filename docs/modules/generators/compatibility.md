@@ -29,6 +29,7 @@
 - manifest、snapshot、generated output、CLI JSON、template variables 和 MSBuild properties 必须有版本或稳定字段说明。
 - reader 必须拒绝高于支持版本的不可理解格式，并输出稳定诊断。
 - 生成输出 hint name、type name 和 field name 改变属于兼容性风险。
+- Generated source 的公开面采用显式白名单；新增 `public` 类型或成员属于 API review 事件，helper、backing key 和单类型实现方法不得因生成便利升级为公开声明。
 
 ## 插件兼容
 

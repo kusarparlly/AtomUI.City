@@ -13,8 +13,24 @@
 | Tooling Entry | AtomUICityIncrementalGenerator, BuildServiceProviderUsageAnalyzer | Roslyn incremental generator 与 analyzer 激活入口。 | 必须能从 analyzer 包发现并实例化；不引用运行时包；不构成第三方扩展 SDK。 |
 | Metadata Readers | ModuleMetadataReader, ServiceRegistrationMetadataReader, RouteMetadataReader, PluginMetadataReader, LocalizationMetadataReader, PresentationViewMetadataReader | 从 syntax/semantic model 读取声明。 | reader 不做业务生成；非法声明输出 diagnostic metadata；`LocalizationMetadata.Diagnostics` 保存 attribute 读取阶段错误。 |
 | Manifest Builders | ModuleDependencyGraphBuilder, ServiceRegistrationManifestBuilder, RouteManifestBuilder, PluginManifestBuilder, LocalizationManifestBuilder, PresentationViewManifestBuilder | 校验 metadata 并生成 manifest result。 | result 不可变；排序确定；失败不生成不完整 success manifest。 |
-| Source Builders | LocalizationRegistrarSourceBuilder, PresentationViewRegistrarSourceBuilder | 生成 C# 注册代码。 | hint name 稳定；生成代码不依赖 runtime reflection；Localization registrar 通过单次 `RegisterRange` 原子注册 manifest。 |
+| Source Builders | ModuleRegistrarSourceBuilder, ServiceRegistrarSourceBuilder, DataClientRegistrarSourceBuilder, RouteSourceBuilder, LocalizationRegistrarSourceBuilder, PresentationViewRegistrarSourceBuilder | 生成 C# 注册和强类型入口代码。 | hint name 稳定；生成代码不依赖 runtime reflection；公开声明只能来自 reviewed visibility allowlist；Localization registrar 通过单次 `RegisterRange` 原子注册 manifest。 |
 | Diagnostics | GeneratorDiagnosticIds, GeneratorDiagnostics, GeneratorDiagnosticDefinition | 编译期诊断定义和创建。 | diagnostic id、severity、category 和 message args 稳定。 |
+
+## Generated Source 可见性合同
+
+生成器实现类型的 `internal` 不自动意味着生成结果也是内部实现。生成源码被编译进声明方程序集，因此每一项 `public` 生成声明都必须属于以下经过 review 的公开面；除此之外不得新增 `public` 类型或成员：
+
+| Generated surface | 可见性 | 原因 |
+| --- | --- | --- |
+| Module registrar 与 `Register` | `public` | 引用方程序集的 generated registrar 必须能够静态串联依赖程序集 registrar；应用代码不直接调用。 |
+| Service registrar 与 `Register` | `public` | 引用方程序集必须能够按 registrar type 聚合依赖程序集服务；应用代码不直接调用。 |
+| Data client registrar 与 `Register` | `public` | 应用或组合层通过 `RegisterGenerated<TRegistrar>` 显式装载声明程序集 descriptor。 |
+| 声明方 Route Map partial 类型和方法 | 保持用户声明的 `public` | Generator 只补齐用户定义的强类型 route API。 |
+| `GeneratedRoutingRouteManifest` | `public` | 应用或组合层显式取得 route descriptors/snapshot。 |
+| `GeneratedLocalizationManifest` 及其 manifest、key、registration 成员 | `public` | 应用与模块代码显式读取强类型 key/manifest 并注册 package。 |
+| `GeneratedPresentationViewRegistrar` 与 `RegisterViews` | `public` | 应用或组合层显式把声明程序集的 View 注册到目标 registry。 |
+
+生成源码中的 helper、backing key 和仅供单个生成类型使用的实现方法必须保持 `private`。Generator contract tests 必须解析各 SourceBuilder 的输出并对 `public` declaration 使用精确白名单；仅验证生成源码能够编译不足以阻止公开面意外扩大。
 
 ## Presentation View Metadata 合同
 
