@@ -120,7 +120,6 @@ AtomUI.City.Localization.LanguagePackageProviderKind.File = 2 -> AtomUI.City.Loc
 AtomUI.City.Localization.LanguagePackageProviderKind.InMemory = 0 -> AtomUI.City.Localization.LanguagePackageProviderKind
 AtomUI.City.Localization.LanguagePackageRegistration
 AtomUI.City.Localization.LanguagePackageRegistration.Descriptor.get -> AtomUI.City.Localization.LanguagePackageDescriptor!
-AtomUI.City.Localization.LanguagePackageRegistration.LanguagePackageRegistration(AtomUI.City.Localization.LanguagePackageDescriptor! descriptor, string! ownerId) -> void
 AtomUI.City.Localization.LanguagePackageRegistration.OwnerId.get -> string!
 AtomUI.City.Localization.LanguagePackageRegistry
 AtomUI.City.Localization.LanguagePackageRegistry.Descriptors.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Localization.LanguagePackageDescriptor!>!

@@ -8,7 +8,7 @@ public sealed class LanguagePackageRegistration
     /// <summary>
     /// Initializes a new instance of the <c>LanguagePackageRegistration</c> type.
     /// </summary>
-    public LanguagePackageRegistration(
+    internal LanguagePackageRegistration(
         LanguagePackageDescriptor descriptor,
         string ownerId)
     {

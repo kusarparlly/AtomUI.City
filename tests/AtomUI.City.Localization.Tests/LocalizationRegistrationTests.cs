@@ -6,6 +6,17 @@ namespace AtomUI.City.Localization.Tests;
 public sealed class LocalizationRegistrationTests
 {
     [Fact]
+    public void LanguagePackageRegistrationCanOnlyBeCreatedByTheRegistry()
+    {
+        Assert.Empty(typeof(LanguagePackageRegistration).GetConstructors());
+
+        var constructor = Assert.Single(typeof(LanguagePackageRegistration).GetConstructors(
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic));
+
+        Assert.True(constructor.IsAssembly);
+    }
+
+    [Fact]
     public void RegistryRejectsScopedDescriptorWithoutScopeId()
     {
         var registry = new LanguagePackageRegistry();
