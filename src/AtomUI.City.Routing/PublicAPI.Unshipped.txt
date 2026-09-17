@@ -400,8 +400,6 @@ static AtomUI.City.Routing.RouteGuardResult.Cancel(string? message = null) -> At
 static AtomUI.City.Routing.RouteGuardResult.Failed(string! code, string! message, System.Exception? exception = null) -> AtomUI.City.Routing.RouteGuardResult!
 static AtomUI.City.Routing.RouteGuardResult.Redirect(AtomUI.City.Routing.NavigationTarget! target) -> AtomUI.City.Routing.RouteGuardResult!
 static AtomUI.City.Routing.RouteGuardResult.Reject(string! code, string? message = null) -> AtomUI.City.Routing.RouteGuardResult!
-static AtomUI.City.Routing.RouteMatch.NotFound(string! path) -> AtomUI.City.Routing.RouteMatch!
-static AtomUI.City.Routing.RouteMatch.Success(AtomUI.City.Routing.RouteDescriptor! route, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! parameters) -> AtomUI.City.Routing.RouteMatch!
 static AtomUI.City.Routing.RouteMetadataDescriptor.Empty.get -> AtomUI.City.Routing.RouteMetadataDescriptor!
 static AtomUI.City.Routing.RouteReference.operator !=(AtomUI.City.Routing.RouteReference left, AtomUI.City.Routing.RouteReference right) -> bool
 static AtomUI.City.Routing.RouteReference.operator ==(AtomUI.City.Routing.RouteReference left, AtomUI.City.Routing.RouteReference right) -> bool

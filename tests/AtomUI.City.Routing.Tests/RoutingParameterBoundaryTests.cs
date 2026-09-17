@@ -21,16 +21,11 @@ public sealed class RoutingParameterBoundaryTests
     }
 
     [Fact]
-    public void RouteMatchParametersRejectExternalMutation()
+    public void RouteMatchParametersAreReadOnly()
     {
-        var parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["id"] = "42",
-        };
-        var match = RouteMatch.Success(Route("profile"), parameters);
+        var snapshot = RouteGraphSnapshot.Create([Route("profile")]);
+        var match = snapshot.Matcher.Match("profile/42");
         var exposedParameters = Assert.IsAssignableFrom<IDictionary<string, string>>(match.Parameters);
-
-        parameters["id"] = "99";
 
         Assert.Throws<NotSupportedException>(() => exposedParameters["id"] = "99");
         Assert.Equal("42", match.Parameters["id"]);

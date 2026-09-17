@@ -84,8 +84,9 @@ public sealed class RouteGraphAndMatcherTests
             ]);
         var matches = snapshot.Matcher.MatchAll("profile/42");
         var matchList = Assert.IsAssignableFrom<IList<RouteMatch>>(matches);
+        var replacement = snapshot.Matcher.Match("changed");
 
-        Assert.Throws<NotSupportedException>(() => matchList[0] = RouteMatch.NotFound("changed"));
+        Assert.Throws<NotSupportedException>(() => matchList[0] = replacement);
         Assert.Equal("profile", matches[0].Route.RouteId);
     }
 

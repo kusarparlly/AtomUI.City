@@ -45,7 +45,7 @@ public sealed class RouteMatch
     /// <summary>
     /// Executes the success operation.
     /// </summary>
-    public static RouteMatch Success(
+    internal static RouteMatch Success(
         RouteDescriptor route,
         IReadOnlyDictionary<string, string> parameters)
     {
@@ -58,7 +58,7 @@ public sealed class RouteMatch
     /// <summary>
     /// Executes the not found operation.
     /// </summary>
-    public static RouteMatch NotFound(string path)
+    internal static RouteMatch NotFound(string path)
     {
         return new RouteMatch(RouteMatchStatus.NotFound, null, RouteParameters.Empty(), path);
     }
