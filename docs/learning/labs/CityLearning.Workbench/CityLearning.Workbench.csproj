@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>$(AtomUICityDevelopTargetFramework)</TargetFramework>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <!-- The window is constructed by City DI, not by Avalonia's URI activator. -->
+    <NoWarn>$(NoWarn);AVLN3001</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../../src/AtomUI.City.Core/AtomUI.City.Core.csproj" />
+    <ProjectReference Include="../../../../src/AtomUI.City.Generators/AtomUI.City.Generators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="CityLearning.Workbench.Tests" />
+  </ItemGroup>
+</Project>

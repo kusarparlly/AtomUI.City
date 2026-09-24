@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="CityLearning.Workbench/CityLearning.Workbench.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="CityLearning.Workbench.Tests/CityLearning.Workbench.Tests.csproj" />
+  </Folder>
+</Solution>
