@@ -19,13 +19,14 @@ public sealed class ManifestTaskTests
             """
             <?xml version="1.0" encoding="utf-8"?>
             <root>
-              <data name="Shell.Count" xml:space="preserve"><value>共 {0} 项</value></data>
-              <data name="Shell.Title" xml:space="preserve"><value>文件箱</value></data>
+              <data name="Count" xml:space="preserve"><value>共 {0} 项</value></data>
+              <data name="Title" xml:space="preserve"><value>文件箱</value></data>
             </root>
             """);
         var item = new TaskItem(sourcePath);
         item.SetMetadata("Scope", "Host");
-        item.SetMetadata("CriticalKeys", "Shell.Title");
+        item.SetMetadata("KeyPrefix", "Shell.");
+        item.SetMetadata("CriticalKeys", "Title");
         var outputDirectory = directory.PathOf("obj", "localization");
         var task = new CompileResxToLocPackTask
         {

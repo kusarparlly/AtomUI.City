@@ -46,7 +46,7 @@ public sealed class CompileResxToLocPackTask : Microsoft.Build.Utilities.Task
             var generatedPackages = new List<ITaskItem>(inputs.Length);
             foreach (var input in inputs)
             {
-                var resources = ReadResources(input.SourcePath);
+                var resources = ReadResources(input.SourcePath, input.KeyPrefix);
                 var outputPath = Path.Combine(
                     outputDirectory,
                     $"resource.{CreateStableSuffix(input.ResourceBaseName)}.locpack.json");
@@ -143,15 +143,22 @@ public sealed class CompileResxToLocPackTask : Microsoft.Build.Utilities.Task
             scopeId = string.Join('.', scopeSegments).ToLowerInvariant();
         }
 
+        var keyPrefix = item.GetMetadata("KeyPrefix").Trim();
+        var criticalKeys = new HashSet<string>(
+            BuildTaskUtilities.SplitMetadata(item, "CriticalKeys")
+                .Select(key => ApplyKeyPrefix(keyPrefix, key)),
+            StringComparer.Ordinal);
+
         return new ResxInput(
             sourcePath,
             packageId,
             culture,
             resourceBaseName,
+            keyPrefix,
             scope,
             string.IsNullOrWhiteSpace(scopeId) ? null : scopeId,
             NullIfWhiteSpace(item.GetMetadata("Version")),
-            new HashSet<string>(BuildTaskUtilities.SplitMetadata(item, "CriticalKeys"), StringComparer.Ordinal));
+            criticalKeys);
     }
 
     private const string RootNamespacePlaceholder = "{RootNamespace}";
@@ -168,7 +175,7 @@ public sealed class CompileResxToLocPackTask : Microsoft.Build.Utilities.Task
         };
     }
 
-    private static SortedDictionary<string, string> ReadResources(string path)
+    private static SortedDictionary<string, string> ReadResources(string path, string keyPrefix)
     {
         var settings = new XmlReaderSettings
         {
@@ -205,9 +212,10 @@ public sealed class CompileResxToLocPackTask : Microsoft.Build.Utilities.Task
                 throw new InvalidDataException($"RESX resource '{key}' must contain a non-empty value.");
             }
 
-            if (!resources.TryAdd(key, valueElement.Value))
+            var projectedKey = ApplyKeyPrefix(keyPrefix, key);
+            if (!resources.TryAdd(projectedKey, valueElement.Value))
             {
-                throw new InvalidDataException($"RESX resource '{key}' is declared more than once.");
+                throw new InvalidDataException($"RESX resource '{projectedKey}' is declared more than once.");
             }
         }
 
@@ -310,11 +318,15 @@ public sealed class CompileResxToLocPackTask : Microsoft.Build.Utilities.Task
 
     private static string? NullIfWhiteSpace(string value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
+    private static string ApplyKeyPrefix(string keyPrefix, string key) =>
+        string.Concat(keyPrefix, key);
+
     private sealed record ResxInput(
         string SourcePath,
         string PackageId,
         CultureInfo Culture,
         string ResourceBaseName,
+        string KeyPrefix,
         string Scope,
         string? ScopeId,
         string? Version,

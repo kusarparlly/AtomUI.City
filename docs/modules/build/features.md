@@ -166,7 +166,7 @@ Acceptance Criteria: 不存在只登记名称而无生产消费者的 Build Prop
 Feature ID: `AUC-BUILD-010`
 Status: 已实现并通过 Tasks 与模板端到端消费测试
 Goal: 允许 .NET 应用继续维护标准 RESX，并在构建期确定性编译为 City assembly locpack。
-Public Contract: `AtomUICityCompileResx`、`AtomUICityLocalizationIntermediateOutputPath`、`AtomUICityResx`、`CompileAtomUICityResx`、`AUCBLD0501`。
+Public Contract: `AtomUICityCompileResx`、`AtomUICityLocalizationIntermediateOutputPath`、`AtomUICityResx`（含 `KeyPrefix` metadata）、`CompileAtomUICityResx`、`AUCBLD0501`。
 Runtime / Build Behavior: 默认发现 `Localization/<name>/<culture>/Resources.resx`，在 `AssignTargetPaths` 前生成 locpack JSON 与 `LocalizedResourceAttribute` source；原 RESX 不进入卫星程序集，生成文件写入 intermediate output，locpack 以稳定 logical name 嵌入主程序集。
 Failure Behavior: 非字符串/空资源、DTD、超限文件、非法 culture/scope、重复 identity/resource base name 或不符合约定的路径以 `AUCBLD0501` 阻止构建。
 Threading / Cancellation: Task 不保存静态可变状态；MSBuild 进程负责取消；同一输入产生相同 JSON、source 和 logical resource name。

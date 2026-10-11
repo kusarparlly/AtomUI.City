@@ -156,7 +156,7 @@ tools/
 | `AtomUICityContributionManifest` | 额外贡献清单。 |
 | `AtomUICityStaticPlugin` | 应用静态插件引用。 |
 | `AtomUICityResourcePack` | 资源包。 |
-| `AtomUICityResx` | RESX 编译输入；支持 `Culture`、`PackageId`、`ResourceBaseName`、`Scope`、`ScopeId`、`Version`、`CriticalKeys` metadata。 |
+| `AtomUICityResx` | RESX 编译输入；支持 `Culture`、`PackageId`、`ResourceBaseName`、`KeyPrefix`、`Scope`、`ScopeId`、`Version`、`CriticalKeys` metadata。`KeyPrefix` 会逐字加在每个 RESX key 之前，`CriticalKeys` 使用加前缀前的 key。 |
 
 ### 6. 推荐 Target
 

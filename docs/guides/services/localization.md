@@ -29,7 +29,7 @@ Localization/
 
 构建会把每个文件编译到 intermediate output，并将 locpack 嵌入主程序集；运行时不会读取或解析 RESX。默认 package id 为 `Shell.en-US`/`Shell.zh-CN`，logical resource name 为 `<RootNamespace>.Localization.Shell.<culture>.Resources.locpack.json`。应用仍声明对应的 `LanguagePackageAttribute`，而每个 RESX key 的 `LocalizedResourceAttribute` 由构建自动生成。
 
-可通过 `AtomUICityResx` metadata 覆盖 `Culture`、`PackageId`、`ResourceBaseName`、`Scope`、`ScopeId`、`Version` 和 `CriticalKeys`；设定 `AtomUICityCompileResx=false` 可关闭自动转换。
+可通过 `AtomUICityResx` metadata 覆盖 `Culture`、`PackageId`、`ResourceBaseName`、`KeyPrefix`、`Scope`、`ScopeId`、`Version` 和 `CriticalKeys`；`KeyPrefix="Shell."` 可把现有 RESX 中的 `Title` 投影为 City key `Shell.Title`，无需修改 RESX 本身。设定 `AtomUICityCompileResx=false` 可关闭自动转换。
 
 ## 切换并读取文本
 
