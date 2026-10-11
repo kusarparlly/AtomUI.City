@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Runtime.Loader;
 
 namespace AtomUI.City.Localization;
@@ -81,6 +82,15 @@ public sealed class LanguagePackageDescriptor
     /// Gets or sets resource base name.
     /// </summary>
     public string? ResourceBaseName { get; init; }
+
+    /// <summary>
+    /// Gets or sets the assembly that owns an embedded language package.
+    /// </summary>
+    /// <remarks>
+    /// Prefer this property over <see cref="Location"/> for statically referenced
+    /// assemblies so embedded packages continue to work in single-file applications.
+    /// </remarks>
+    public Assembly? SourceAssembly { get; init; }
 
     /// <summary>
     /// Gets or sets version.

@@ -105,7 +105,7 @@ internal static class LocalizationRegistrarSourceBuilder
             builder.Append("                    ScopeId = ").Append(ToStringLiteral(package.ScopeId)).AppendLine(",");
             builder.Append("                    LoadContext = global::System.Runtime.Loader.AssemblyLoadContext.GetLoadContext(typeof(")
                 .Append(generatedTypeName).AppendLine(").Assembly),");
-            builder.Append("                    Location = typeof(").Append(generatedTypeName).AppendLine(").Assembly.Location,");
+            builder.Append("                    SourceAssembly = typeof(").Append(generatedTypeName).AppendLine(").Assembly,");
             builder.Append("                    ResourceBaseName = ").Append(ToStringLiteral(package.ResourceBaseName)).AppendLine(",");
             builder.Append("                    FallbackCulture = ").Append(ToCultureExpression(package.FallbackCulture)).AppendLine(",");
             builder.Append("                    Version = ").Append(ToStringLiteral(package.Version)).AppendLine(",");

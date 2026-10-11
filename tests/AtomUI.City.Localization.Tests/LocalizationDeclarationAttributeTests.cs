@@ -80,7 +80,8 @@ public sealed class LocalizationDeclarationAttributeTests
         Assert.Equal(CultureInfo.GetCultureInfo("en-US"), descriptor.Culture);
         Assert.Equal(ResourceScope.Host, descriptor.Scope);
         Assert.Equal(LanguagePackageProviderKind.Assembly, descriptor.ProviderKind);
-        Assert.Equal(typeof(LocalizationDeclarationAttributeTests).Assembly.Location, descriptor.Location);
+        Assert.Same(typeof(LocalizationDeclarationAttributeTests).Assembly, descriptor.SourceAssembly);
+        Assert.Null(descriptor.Location);
         Assert.Equal("AtomUI.City.Localization.Tests.Fixtures.Host.en-US.locpack.json", descriptor.ResourceBaseName);
         Assert.Equal(CultureInfo.GetCultureInfo("en"), descriptor.FallbackCulture);
         Assert.Equal("1.0.0", descriptor.Version);

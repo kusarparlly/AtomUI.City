@@ -116,11 +116,11 @@ SalesModule.Localization.zh-CN.dll
 SalesModule.Localization.en-US.dll
 ```
 
-当前 provider 不做 satellite probing；调用方必须在 descriptor 中提供精确 assembly path 和 embedded locpack resource name。无论目录和命名如何，descriptor 必须说明：
+当前 provider 不做 satellite probing。静态引用或已经加载的语言包应在 descriptor 中提供 `SourceAssembly` 和 embedded locpack resource name；需要按路径动态加载的外部语言包则提供精确 assembly path。生成的 registrar 使用 `SourceAssembly`，因此自包含单文件应用不依赖 `Assembly.Location`。无论目录和命名如何，descriptor 必须说明：
 
 - Culture。
 - PackageId。
-- Assembly path。
+- Source assembly 或 Assembly path。
 - Resource base name。
 - ContributionId。
 - Version。
@@ -131,14 +131,13 @@ SalesModule.Localization.en-US.dll
 
 ```text
 Language package descriptor
--> resolve package path
--> load assembly in package load context
+-> use source assembly, or resolve package path and load it in package load context
 -> open embedded locpack stream
 -> validate and create immutable LanguagePackage
 -> cache by (culture, packageId)
 ```
 
-Host app 语言包可以加载到默认上下文或专用上下文。插件语言包 descriptor 必须保存插件的 collectible `AssemblyLoadContext`，并通过 owner/contribution 撤销先释放 package；ContributionLease 本身由 PluginSystem 管理。
+Host app 的静态 embedded 语言包直接引用 source assembly，兼容自包含单文件发布；外部语言包可以加载到默认上下文或专用上下文。插件语言包 descriptor 必须保存插件的 collectible `AssemblyLoadContext`，并通过 owner/contribution 撤销先释放 package；ContributionLease 本身由 PluginSystem 管理。
 
 ### 5. 卸载约束
 
@@ -200,6 +199,7 @@ Native AOT 模式使用 file-based locpack。
 测试必须覆盖：
 
 - assembly package 加载。
+- source assembly package 在没有文件路径时加载。
 - descriptor 指定 assembly/resource 解析。
 - file locpack 加载。
 - file locpack provider（Native AOT publish smoke 需由 Build/Release Gate 单独立项）。

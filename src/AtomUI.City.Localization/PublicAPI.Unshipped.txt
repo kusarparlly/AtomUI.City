@@ -108,6 +108,8 @@ AtomUI.City.Localization.LanguagePackageDescriptor.ResourceBaseName.init -> void
 AtomUI.City.Localization.LanguagePackageDescriptor.Scope.get -> AtomUI.City.Localization.ResourceScope
 AtomUI.City.Localization.LanguagePackageDescriptor.ScopeId.get -> string?
 AtomUI.City.Localization.LanguagePackageDescriptor.ScopeId.init -> void
+AtomUI.City.Localization.LanguagePackageDescriptor.SourceAssembly.get -> System.Reflection.Assembly?
+AtomUI.City.Localization.LanguagePackageDescriptor.SourceAssembly.init -> void
 AtomUI.City.Localization.LanguagePackageDescriptor.Version.get -> string?
 AtomUI.City.Localization.LanguagePackageDescriptor.Version.init -> void
 AtomUI.City.Localization.LanguagePackageLoadResult

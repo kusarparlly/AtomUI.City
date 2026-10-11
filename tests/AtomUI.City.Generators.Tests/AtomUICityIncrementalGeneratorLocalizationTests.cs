@@ -40,6 +40,8 @@ public sealed class AtomUICityIncrementalGeneratorLocalizationTests
         Assert.Contains("const string _class", source, StringComparison.Ordinal);
         Assert.Contains("ScopeId = @\"settings.module\"", source, StringComparison.Ordinal);
         Assert.Contains("AssemblyLoadContext.GetLoadContext", source, StringComparison.Ordinal);
+        Assert.Contains("SourceAssembly = typeof(GeneratedLocalizationManifest).Assembly", source, StringComparison.Ordinal);
+        Assert.DoesNotContain(".Assembly.Location", source, StringComparison.Ordinal);
         Assert.Contains("ContributionId = @\"settings.localization\"", source, StringComparison.Ordinal);
         Assert.Contains("CriticalResourceKeys = new string[] { @\"Settings.Title\" }", source, StringComparison.Ordinal);
         Assert.Contains("@\"en-US\"", source, StringComparison.Ordinal);

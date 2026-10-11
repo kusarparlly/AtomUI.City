@@ -340,6 +340,26 @@ public sealed class LanguagePackageProviderTests
     }
 
     [Fact]
+    public async Task AssemblyProviderLoadsEmbeddedLocPackFromSourceAssemblyWithoutLocation()
+    {
+        var descriptor = new LanguagePackageDescriptor(
+            "Host.en-US",
+            CultureInfo.GetCultureInfo("en-US"),
+            ResourceScope.Host)
+        {
+            ProviderKind = LanguagePackageProviderKind.Assembly,
+            SourceAssembly = typeof(LanguagePackageProviderTests).Assembly,
+            ResourceBaseName = "AtomUI.City.Localization.Tests.Fixtures.Host.en-US.locpack.json",
+        };
+
+        var result = await new AssemblyLanguagePackageProvider().LoadAsync(descriptor);
+
+        Assert.True(result.Succeeded);
+        Assert.True(result.Package!.TryGetString("Settings.Title", out var value));
+        Assert.Equal("Settings", value);
+    }
+
+    [Fact]
     public async Task AssemblyProviderLoadsUniqueResourceSuffix()
     {
         var descriptor = new LanguagePackageDescriptor(
