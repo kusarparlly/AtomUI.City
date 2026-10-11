@@ -9,6 +9,108 @@ namespace AtomUI.City.Build.Tasks.Tests;
 public sealed class ManifestTaskTests
 {
     [Fact]
+    public void ResxCompilerProducesDeterministicLocPackAndResourceAttributes()
+    {
+        using var directory = TemporaryDirectory.Create();
+        var sourcePath = directory.PathOf("Localization", "Shell", "zh-CN", "Resources.resx");
+        Directory.CreateDirectory(Path.GetDirectoryName(sourcePath)!);
+        File.WriteAllText(
+            sourcePath,
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <root>
+              <data name="Shell.Count" xml:space="preserve"><value>共 {0} 项</value></data>
+              <data name="Shell.Title" xml:space="preserve"><value>文件箱</value></data>
+            </root>
+            """);
+        var item = new TaskItem(sourcePath);
+        item.SetMetadata("Scope", "Host");
+        item.SetMetadata("CriticalKeys", "Shell.Title");
+        var outputDirectory = directory.PathOf("obj", "localization");
+        var task = new CompileResxToLocPackTask
+        {
+            Resources = [item],
+            ProjectDirectory = directory.RootPath,
+            RootNamespace = "Sample.App",
+            OutputDirectory = outputDirectory,
+        };
+
+        Assert.True(task.Execute());
+        var package = Assert.Single(task.GeneratedPackages);
+        var first = File.ReadAllText(package.ItemSpec);
+        Assert.True(task.Execute());
+        Assert.Equal(first, File.ReadAllText(Assert.Single(task.GeneratedPackages).ItemSpec));
+
+        using var document = JsonDocument.Parse(first);
+        Assert.Equal(1, document.RootElement.GetProperty("schemaVersion").GetInt32());
+        Assert.Equal("Shell.zh-CN", document.RootElement.GetProperty("packageId").GetString());
+        Assert.Equal("zh-CN", document.RootElement.GetProperty("culture").GetString());
+        Assert.Equal("文件箱", document.RootElement.GetProperty("resources").GetProperty("Shell.Title").GetString());
+        Assert.Equal("Sample.App.Localization.Shell.zh-CN.Resources.locpack.json", package.GetMetadata("LogicalName"));
+        Assert.Equal("false", package.GetMetadata("WithCulture"));
+        Assert.Equal("zh-CN", package.GetMetadata("LanguageCulture"));
+
+        var source = File.ReadAllText(task.GeneratedSource!.ItemSpec);
+        Assert.Contains("LocalizedResource(\"Shell.Title\", \"Shell.zh-CN\"", source, StringComparison.Ordinal);
+        Assert.Contains("Scope = ResourceScope.Host", source, StringComparison.Ordinal);
+        Assert.Contains("Critical = true", source, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ResxCompilerRejectsNonStringResourcesWithStableDiagnostic()
+    {
+        using var directory = TemporaryDirectory.Create();
+        var sourcePath = directory.PathOf("Localization", "Shell", "en-US", "Resources.resx");
+        Directory.CreateDirectory(Path.GetDirectoryName(sourcePath)!);
+        File.WriteAllText(
+            sourcePath,
+            """
+            <root>
+              <data name="Shell.Icon" type="System.Byte[]"><value>AQID</value></data>
+            </root>
+            """);
+        var buildEngine = new RecordingBuildEngine();
+        var task = new CompileResxToLocPackTask
+        {
+            BuildEngine = buildEngine,
+            Resources = [new TaskItem(sourcePath)],
+            ProjectDirectory = directory.RootPath,
+            RootNamespace = "Sample.App",
+            OutputDirectory = directory.PathOf("obj"),
+        };
+
+        Assert.False(task.Execute());
+        Assert.Contains(buildEngine.Errors, error => error.Code == "AUCBLD0501");
+        Assert.Empty(task.GeneratedPackages);
+    }
+
+    [Fact]
+    public void ResxCompilerRejectsDtdInput()
+    {
+        using var directory = TemporaryDirectory.Create();
+        var sourcePath = directory.PathOf("Localization", "Shell", "en-US", "Resources.resx");
+        Directory.CreateDirectory(Path.GetDirectoryName(sourcePath)!);
+        File.WriteAllText(
+            sourcePath,
+            """
+            <!DOCTYPE root [<!ENTITY value "unsafe">]>
+            <root><data name="Shell.Title"><value>&value;</value></data></root>
+            """);
+        var buildEngine = new RecordingBuildEngine();
+        var task = new CompileResxToLocPackTask
+        {
+            BuildEngine = buildEngine,
+            Resources = [new TaskItem(sourcePath)],
+            ProjectDirectory = directory.RootPath,
+            RootNamespace = "Sample.App",
+            OutputDirectory = directory.PathOf("obj"),
+        };
+
+        Assert.False(task.Execute());
+        Assert.Contains(buildEngine.Errors, error => error.Code == "AUCBLD0501");
+    }
+
+    [Fact]
     public void PluginManifestIsDeterministicAndSeparatesContracts()
     {
         using var directory = TemporaryDirectory.Create();
@@ -205,6 +307,7 @@ public sealed class ManifestTaskTests
     {
         private TemporaryDirectory(string path) => Root = path;
         private string Root { get; }
+        public string RootPath => Root;
 
         public static TemporaryDirectory Create()
         {

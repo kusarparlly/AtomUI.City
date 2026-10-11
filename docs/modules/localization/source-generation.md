@@ -47,6 +47,7 @@
 | AUC-LOCALIZATION-006 | Optional Application Refresh Hook | LocalizationServiceTests |
 | AUC-LOCALIZATION-007 | Plugin Package Revocation | LocalizationServiceTests |
 | AUC-LOCALIZATION-008 | Generated Localization Manifest | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationMetadataReaderTests; LocalizationManifestBuilderTests |
+| AUC-LOCALIZATION-009 | Build-time RESX Projection | ManifestTaskTests; GenerationTemplateRendererTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -127,15 +128,9 @@ Native AOT 模式：
 
 ### 6. Build 集成
 
-Build 模块后续负责：
+`AtomUI.City.Build` 已提供 RESX 投影：默认发现 `Localization/<name>/<culture>/Resources.resx`，在编译资源分流前生成 locpack JSON 与 `LocalizedResourceAttribute` source。应用仍需声明对应 `LanguagePackageAttribute`；Generator 随后生成 package registrar、culture/key manifest 和强类型 key。
 
-- 生成 language package assembly。
-- 生成 locpack。
-- 输出 manifest。
-- 校验资源完整性。
-- 复制 culture package 到 output。
-
-Localization 文档只定义 contract。
+RESX 是编辑/构建输入，不是运行时 provider。原 RESX 会从 `EmbeddedResource` 移除，避免生成 satellite resource assembly；locpack 以稳定 logical name 嵌入主程序集，运行时统一由 City provider/service 处理 culture、fallback、package 与 lookup。
 
 ### 7. 测试策略
 

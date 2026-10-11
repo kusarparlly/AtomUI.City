@@ -16,6 +16,21 @@ builder.ConfigureServices(services =>
 
 资源包可以来自生成清单、程序集或应用明确配置的文件来源。Native AOT 应优先使用生成清单，不做运行时无界程序集扫描。
 
+## 从 RESX 构建 locpack
+
+引用 `AtomUI.City.Build` 后，可以保留 .NET 常用的 RESX 编辑体验。按下列约定放置文件：
+
+```text
+Localization/
+  Shell/
+    en-US/Resources.resx
+    zh-CN/Resources.resx
+```
+
+构建会把每个文件编译到 intermediate output，并将 locpack 嵌入主程序集；运行时不会读取或解析 RESX。默认 package id 为 `Shell.en-US`/`Shell.zh-CN`，logical resource name 为 `<RootNamespace>.Localization.Shell.<culture>.Resources.locpack.json`。应用仍声明对应的 `LanguagePackageAttribute`，而每个 RESX key 的 `LocalizedResourceAttribute` 由构建自动生成。
+
+可通过 `AtomUICityResx` metadata 覆盖 `Culture`、`PackageId`、`ResourceBaseName`、`Scope`、`ScopeId`、`Version` 和 `CriticalKeys`；设定 `AtomUICityCompileResx=false` 可关闭自动转换。
+
 ## 切换并读取文本
 
 ```csharp

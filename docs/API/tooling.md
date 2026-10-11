@@ -11,6 +11,7 @@ Build 负责：
 - generated manifest 和 diagnostics 资产接入；
 - 项目、包与依赖边界检查；
 - 插件/应用打包相关 MSBuild contract；
+- 将约定目录中的 RESX 确定性编译为 Localization locpack 与 generated attribute source；
 - 公共 API、XML 文档、AOT 和发布门禁。
 
 只有文档列出的 MSBuild property、item、target 和输出文件名属于公共合同。

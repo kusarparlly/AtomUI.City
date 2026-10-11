@@ -15,6 +15,7 @@
 | AUC-BUILD-007 | Test Naming | 已实现并通过产品合同测试 | test project and test file naming convention | TestNamingConventionTests |
 | AUC-BUILD-008 | MSBuild Transitive Assets | 已实现并通过产品合同测试 | buildTransitive props/targets、machine-readable contract、analyzer package assets | BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests |
 | AUC-BUILD-009 | Build Task Execution | 已实现并通过产品消费测试 | Build properties/items, AtomUI.City.Build.Tasks, plugin/application manifests | ManifestTaskTests; IncrementalGeneratorInfrastructureTests; AtomUI.City.Build.PackagingSmoke |
+| AUC-BUILD-010 | RESX Language Package Compilation | 已实现并通过模板消费测试 | `AtomUICityCompileResx`、`AtomUICityResx`、`CompileAtomUICityResx` | ManifestTaskTests; GenerationTemplateRendererTests |
 
 ## Feature 硬门禁
 
@@ -159,3 +160,17 @@ Diagnostics: `AUCBLD0001/0002`、`AUCBLD0101/0102`、`AUCBLD0201/0202`、`AUCBLD
 Tests: `ManifestTaskTests; IncrementalGeneratorInfrastructureTests; AtomUI.City.Build.PackagingSmoke`
 Required Assertions: 真实 build/publish/pack、九类 Item 消费、Strict/Compatible/Off、AOT、模板缺包门禁、最终应用不携带 Build/Tasks/Generator。
 Acceptance Criteria: 不存在只登记名称而无生产消费者的 Build Property、Item 或 Target。
+
+## AUC-BUILD-010 RESX Language Package Compilation
+
+Feature ID: `AUC-BUILD-010`
+Status: 已实现并通过 Tasks 与模板端到端消费测试
+Goal: 允许 .NET 应用继续维护标准 RESX，并在构建期确定性编译为 City assembly locpack。
+Public Contract: `AtomUICityCompileResx`、`AtomUICityLocalizationIntermediateOutputPath`、`AtomUICityResx`、`CompileAtomUICityResx`、`AUCBLD0501`。
+Runtime / Build Behavior: 默认发现 `Localization/<name>/<culture>/Resources.resx`，在 `AssignTargetPaths` 前生成 locpack JSON 与 `LocalizedResourceAttribute` source；原 RESX 不进入卫星程序集，生成文件写入 intermediate output，locpack 以稳定 logical name 嵌入主程序集。
+Failure Behavior: 非字符串/空资源、DTD、超限文件、非法 culture/scope、重复 identity/resource base name 或不符合约定的路径以 `AUCBLD0501` 阻止构建。
+Threading / Cancellation: Task 不保存静态可变状态；MSBuild 进程负责取消；同一输入产生相同 JSON、source 和 logical resource name。
+Diagnostics: `AUCBLD0501`。
+Tests: `ManifestTaskTests; GenerationTemplateRendererTests`
+Required Assertions: 确定性输出、安全 XML 读取、非法资源拒绝、无卫星程序集残留，以及生成模板可由 `AssemblyLanguagePackageProvider` 加载。
+Acceptance Criteria: 应用运行时不读取 RESX、不执行转换，City 是 culture、fallback、package 与 lookup 的唯一运行时。

@@ -1,0 +1,27 @@
+<Project>
+  <UsingTask TaskName="AtomUI.City.Build.Tasks.CompileResxToLocPackTask"
+             AssemblyFile="$(AtomUICityBuildTasksAssembly)" />
+
+  <Target Name="CompileAtomUICityResx"
+          BeforeTargets="AssignTargetPaths"
+          Condition="'$(AtomUICityCompileResx)' == 'true' and '@(AtomUICityResx)' != ''">
+    <MakeDir Directories="$(AtomUICityLocalizationIntermediateOutputPath)" />
+    <CompileResxToLocPackTask Resources="@(AtomUICityResx)"
+                              ProjectDirectory="$(MSBuildProjectDirectory)"
+                              RootNamespace="$(RootNamespace)"
+                              OutputDirectory="$(AtomUICityLocalizationIntermediateOutputPath)">
+      <Output TaskParameter="GeneratedPackages" ItemName="AtomUICityGeneratedLanguagePackage" />
+      <Output TaskParameter="GeneratedSource" ItemName="AtomUICityGeneratedLocalizationSource" />
+    </CompileResxToLocPackTask>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="@(AtomUICityResx)" />
+      <EmbeddedResource Include="@(AtomUICityGeneratedLanguagePackage)"
+                        LogicalName="%(AtomUICityGeneratedLanguagePackage.LogicalName)"
+                        WithCulture="false" />
+      <Compile Include="@(AtomUICityGeneratedLocalizationSource)" />
+      <FileWrites Include="@(AtomUICityGeneratedLanguagePackage);@(AtomUICityGeneratedLocalizationSource)" />
+    </ItemGroup>
+  </Target>
+
+</Project>

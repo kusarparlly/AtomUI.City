@@ -13,6 +13,7 @@ public sealed partial class BuildAssemblyTests
         "AtomUI.City.Build.props",
         "AtomUI.City.Build.targets",
         "AtomUI.City.Core.Diagnostics.targets",
+        "AtomUI.City.Localization.targets",
         "AtomUI.City.Plugin.targets",
     ];
 

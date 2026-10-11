@@ -14,6 +14,7 @@
 | AUC-LOCALIZATION-006 | Optional Application Refresh Hook | Completed | IPresentationLocalizationBridge, LocalizedTextChangedEventArgs | LocalizationServiceTests |
 | AUC-LOCALIZATION-007 | Plugin Package Revocation | Completed | ILocalizationService, ResourceScope, LanguagePackageProviderKind | LocalizationServiceTests |
 | AUC-LOCALIZATION-008 | Generated Localization Manifest | Completed | LanguagePackageAttribute, LocalizedResourceAttribute, generated manifest | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationManifestBuilderTests |
+| AUC-LOCALIZATION-009 | Build-time RESX Projection | Completed | RESX convention projected through AtomUI.City.Build | ManifestTaskTests; GenerationTemplateRendererTests |
 
 ## Feature 硬门禁
 
@@ -143,3 +144,17 @@ Diagnostics: 使用 Generator 稳定诊断码并归类到 Localization feature�
 Tests: `AtomUICityIncrementalGeneratorLocalizationTests; LocalizationMetadataReaderTests; LocalizationManifestBuilderTests`
 Required Assertions: 断言主 Generator 确实输出可编译 source、原子注册入口、culture、key、scope id、contribution id 和 critical keys；空 attribute 参数与显式未知 enum 阻断生成。
 Acceptance Criteria: 生成输出可直接注册到 `LanguagePackageRegistry`，不依赖运行时程序集扫描。
+
+## AUC-LOCALIZATION-009 Build-time RESX Projection
+
+Feature ID: `AUC-LOCALIZATION-009`
+Status: Completed
+Goal: 让采用 .NET RESX 的应用在不引入第二套本地化运行时的前提下使用 City Localization。
+Public Contract: Build 模块的 `AtomUICityResx` 与 `CompileAtomUICityResx`；Localization 继续消费标准 `LanguagePackageAttribute`、`LocalizedResourceAttribute` 和 locpack schema v1。
+Runtime / Build Behavior: RESX 仅是编辑/构建输入；Build 生成 locpack 与 attribute source，Generator 生成 manifest，运行时只由 City provider/service 加载与切换。
+Failure Behavior: 转换失败由 `AUCBLD0501` 阻止构建；运行时保持既有 package load/fallback 失败语义。
+Threading / Cancellation: 转换是无静态状态的确定性 MSBuild 操作；运行时并发合同不变。
+Diagnostics: `AUCBLD0501` 归 Build，运行时继续使用 Localization diagnostics。
+Tests: `ManifestTaskTests; GenerationTemplateRendererTests`
+Required Assertions: 生成模板的 RESX 经 build 后可被 assembly provider 真实发现并加载，且 key manifest 与资源内容一致。
+Acceptance Criteria: 运行时不存在 ResourceManager、RESX 解析或双重 culture state。

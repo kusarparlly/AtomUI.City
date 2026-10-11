@@ -1,11 +1,12 @@
 <Project>
+  <PropertyGroup>
+    <AtomUICityBuildTasksAssembly Condition="'$(AtomUICityBuildTasksAssembly)' == ''">$(MSBuildThisFileDirectory)../tools/net10.0/AtomUI.City.Build.Tasks.dll</AtomUICityBuildTasksAssembly>
+  </PropertyGroup>
+
   <Import Project="$(MSBuildThisFileDirectory)AtomUI.City.Application.targets" Condition="Exists('$(MSBuildThisFileDirectory)AtomUI.City.Application.targets')" />
+  <Import Project="$(MSBuildThisFileDirectory)AtomUI.City.Localization.targets" Condition="Exists('$(MSBuildThisFileDirectory)AtomUI.City.Localization.targets')" />
   <Import Project="$(MSBuildThisFileDirectory)AtomUI.City.Plugin.targets" Condition="Exists('$(MSBuildThisFileDirectory)AtomUI.City.Plugin.targets')" />
   <Import Project="$(MSBuildThisFileDirectory)AtomUI.City.Core.Diagnostics.targets" Condition="Exists('$(MSBuildThisFileDirectory)AtomUI.City.Core.Diagnostics.targets')" />
-
-  <PropertyGroup>
-    <AtomUICityBuildTasksAssembly>$(MSBuildThisFileDirectory)../tools/net10.0/AtomUI.City.Build.Tasks.dll</AtomUICityBuildTasksAssembly>
-  </PropertyGroup>
 
   <UsingTask TaskName="AtomUI.City.Build.Tasks.GeneratePluginManifestTask" AssemblyFile="$(AtomUICityBuildTasksAssembly)" />
   <UsingTask TaskName="AtomUI.City.Build.Tasks.GenerateApplicationManifestTask" AssemblyFile="$(AtomUICityBuildTasksAssembly)" />
@@ -46,6 +47,6 @@
   </Target>
 
   <Target Name="CleanAtomUICityOutput" BeforeTargets="Clean">
-    <RemoveDir Directories="$(AtomUICityManifestIntermediateOutputPath);$(AtomUICityBuildDiagnosticsOutputPath)" />
+    <RemoveDir Directories="$(AtomUICityManifestIntermediateOutputPath);$(AtomUICityBuildDiagnosticsOutputPath);$(AtomUICityLocalizationIntermediateOutputPath)" />
   </Target>
 </Project>

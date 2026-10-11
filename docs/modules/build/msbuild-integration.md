@@ -43,6 +43,7 @@
 | AUC-BUILD-005 | Source Generator Packaging | SourceGeneratorProjectStructureTests |
 | AUC-BUILD-006 | Release Gates | PackagingReleaseGateTests; EngineeringGateTests |
 | AUC-BUILD-008 | MSBuild Transitive Assets | BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests |
+| AUC-BUILD-010 | RESX Language Package Compilation | ManifestTaskTests; GenerationTemplateRendererTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -84,6 +85,7 @@ buildTransitive/
   AtomUI.City.Build.targets
   AtomUI.City.Application.targets
   AtomUI.City.Plugin.targets
+  AtomUI.City.Localization.targets
   AtomUI.City.Core.Diagnostics.targets
 analyzers/
   dotnet/cs/AtomUI.City.Generators.dll
@@ -116,6 +118,8 @@ tools/
 | `AtomUICityPluginProfile` | 空 | 插件兼容 profile。 |
 | `AtomUICityBuildDiagnosticsLevel` | `Normal` | 诊断详细程度。 |
 | `AtomUICityApplicationId` | `AssemblyName` | application manifest 稳定身份。 |
+| `AtomUICityCompileResx` | `true` | 是否把约定目录中的 RESX 编译为 City locpack。 |
+| `AtomUICityLocalizationIntermediateOutputPath` | `$(IntermediateOutputPath)AtomUI.City/localization/` | 生成 locpack 与 attribute source 的中间目录。 |
 
 `application.manifest.json` v1 固定包含 `schemaVersion`、`appId`、`frameworkVersion`、`pluginApiVersion`、`pluginProfile`、`targetFramework`、`runtimeIdentifier`、`aotMode`、`staticPlugins`、`resourcePacks`；文件项包含规范相对路径与 SHA-256。
 
@@ -152,6 +156,7 @@ tools/
 | `AtomUICityContributionManifest` | 额外贡献清单。 |
 | `AtomUICityStaticPlugin` | 应用静态插件引用。 |
 | `AtomUICityResourcePack` | 资源包。 |
+| `AtomUICityResx` | RESX 编译输入；支持 `Culture`、`PackageId`、`ResourceBaseName`、`Scope`、`ScopeId`、`Version`、`CriticalKeys` metadata。 |
 
 ### 6. 推荐 Target
 
@@ -166,6 +171,7 @@ tools/
 | `ValidateAtomUICityAotCompatibility` | AOT/trimming 兼容检查。 |
 | `WriteAtomUICityBuildDiagnostics` | 写入构建诊断。 |
 | `CleanAtomUICityOutput` | 清理框架输出。 |
+| `CompileAtomUICityResx` | 在资源分流前把 RESX 编译为 embedded locpack 与 generated attribute source。 |
 
 ### 7. Target 顺序
 

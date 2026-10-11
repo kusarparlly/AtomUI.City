@@ -15,7 +15,14 @@
     <AtomUICityBuildDiagnosticsLevel Condition="'$(AtomUICityBuildDiagnosticsLevel)' == ''">Normal</AtomUICityBuildDiagnosticsLevel>
     <AtomUICityManifestIntermediateOutputPath Condition="'$(AtomUICityManifestIntermediateOutputPath)' == ''">$(IntermediateOutputPath)AtomUI.City/manifests/</AtomUICityManifestIntermediateOutputPath>
     <AtomUICityBuildDiagnosticsOutputPath Condition="'$(AtomUICityBuildDiagnosticsOutputPath)' == ''">$(IntermediateOutputPath)AtomUI.City/diagnostics/</AtomUICityBuildDiagnosticsOutputPath>
+    <AtomUICityCompileResx Condition="'$(AtomUICityCompileResx)' == ''">true</AtomUICityCompileResx>
+    <AtomUICityLocalizationIntermediateOutputPath Condition="'$(AtomUICityLocalizationIntermediateOutputPath)' == ''">$(IntermediateOutputPath)AtomUI.City/localization/</AtomUICityLocalizationIntermediateOutputPath>
   </PropertyGroup>
+
+  <ItemGroup Condition="'$(AtomUICityCompileResx)' == 'true'">
+    <AtomUICityResx Include="$(MSBuildProjectDirectory)/Localization/**/Resources.resx" />
+    <EmbeddedResource Remove="@(AtomUICityResx)" />
+  </ItemGroup>
 
   <ItemGroup>
     <CompilerVisibleProperty Include="IsTestProject" />

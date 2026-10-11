@@ -24,6 +24,7 @@
 | Pack target VerifyPackageMetadata | 校验 NuGet metadata。 | project properties。 | pack success/failure。 | license、repository、symbols、readme policy 不满足失败。 | MSBuild cancellation 由进程处理。 | 重复 pack 输出可覆盖同配置产物。 |
 | GenerateAtomUICityManifests | 收集 City manifest 输出。 | MSBuild properties/items。 | `@(AtomUICityGeneratedManifest)`。 | 非法配置由前置验证 target 以稳定诊断阻止构建。 | MSBuild 进程取消。 | 相同输入产生相同 Item 集合。 |
 | PublishAtomUICityApplication | 发布应用并生成 application manifest。 | application properties、static plugin 与 resource pack Items。 | 发布目录和版本化 manifest。 | 路径、重复 id 或资产错误以 `AUCBLD0401` 阻止发布。 | MSBuild 进程取消。 | 相同输入产生确定性 manifest。 |
+| CompileAtomUICityResx | 把约定目录中的 RESX 编译为 City locpack。 | `@(AtomUICityResx)`、project/root namespace、intermediate output。 | `@(AtomUICityGeneratedLanguagePackage)` 与 `@(AtomUICityGeneratedLocalizationSource)`。 | 无效 XML、非字符串/空资源、非法 metadata 或重复声明以 `AUCBLD0501` 阻止构建。 | MSBuild 进程取消。 | 相同输入产生相同 JSON、source 和 logical name；不生成 runtime conversion 状态。 |
 | DependencyBoundaryTests | 校验项目引用。 | 真实 src/tests project graph，排除模板 payload 项目。 | test pass/fail。 | runtime 引用 Testing/Roslyn test 包失败，允许依赖表与真实 source project 不一致失败。 | 测试进程 token。 | 读取项目文件无副作用。 |
 | EngineeringGateTests | 执行仓库规则检查。 | docs、format、scripts、package layout。 | test pass/fail。 | 任一规则失败阻止完成。 | 测试进程 token。 | 门禁结果确定性。 |
 
@@ -33,7 +34,7 @@
 | --- | --- | --- |
 | `AtomUI.City.Build.contract.json` | Machine-readable Preview contract | Property、Item、Target、默认值、public/infrastructure 分类或 package asset 的增删改必须先更新设计文档，并由精确一致性测试审阅。 |
 | `AtomUI.City.Build.props/targets` | Public MSBuild contract | 开发者可配置项和可显式调用 Target 属于兼容承诺；`infrastructure` 项只允许包内资产使用，但仍受 baseline 防漂移保护。 |
-| NuGet package layout | Build-only package contract | 不得包含 `lib/`；必须包含 contract、五个 buildTransitive 资产、Generator analyzer 和 Build.Tasks tool。 |
+| NuGet package layout | Build-only package contract | 不得包含 `lib/`；必须包含 contract、六个 buildTransitive 资产（含 Localization targets）、Generator analyzer 和 Build.Tasks tool。 |
 
 Build 模块当前没有 public CLR 类型。未来如果 IDE、CLI 或第三方工具需要编程式读取 Build 元数据，必须建立独立 Tooling Feature；不得通过恢复一个与真实 `.props/.targets` 重复维护的字符串目录解决。
 

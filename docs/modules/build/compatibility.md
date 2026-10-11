@@ -22,6 +22,7 @@
 - 新增 API 可以 minor 版本发布，但必须有文档、测试和迁移说明。
 - `AtomUI.City.Build.props` 必须把 `IsTestProject` 暴露给 Analyzer，确保 `AUCANL0001` 不影响测试项目的独立 DI 装配。
 - `AUCANL0001` 的 Root Provider 所有权约束覆盖 Microsoft Generic Host 构建/启动入口；生产 City 项目必须通过 City `ApplicationHost` 构建应用 Host。
+- RESX 投影的公开 MSBuild 名称、默认启用行为、目录约定、locpack schema v1、logical resource name 和 `AUCBLD0501` 语义属于 Preview Build contract；RESX 只作为构建输入，不成为运行时 provider。
 
 ## 1.0 Preview 动态发现属性撤回
 

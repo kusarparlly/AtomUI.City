@@ -98,6 +98,7 @@ public sealed class SourceGeneratorProjectStructureTests
         Assert.True(File.Exists(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Application.targets")));
         Assert.True(File.Exists(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Plugin.targets")));
         Assert.True(File.Exists(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Core.Diagnostics.targets")));
+        Assert.True(File.Exists(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Localization.targets")));
         Assert.False(File.Exists(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Diagnostics.targets")));
 
         var buildProps = XDocument.Load(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Build.props"));
@@ -111,6 +112,10 @@ public sealed class SourceGeneratorProjectStructureTests
             buildTargets.Descendants("Import"),
             import => import.Attribute("Project")?.Value ==
                       "$(MSBuildThisFileDirectory)AtomUI.City.Core.Diagnostics.targets");
+        Assert.Contains(
+            buildTargets.Descendants("Import"),
+            import => import.Attribute("Project")?.Value ==
+                      "$(MSBuildThisFileDirectory)AtomUI.City.Localization.targets");
         Assert.DoesNotContain(
             buildTargets.Descendants("Import"),
             import => import.Attribute("Project")?.Value ==
@@ -146,6 +151,11 @@ public sealed class SourceGeneratorProjectStructureTests
             item => item.Include == "buildTransitive/AtomUI.City.Core.Diagnostics.targets" &&
                     item.PackagePath == "buildTransitive/" &&
                     item.Pack == "true");
+        Assert.Contains(
+            packedItems,
+            item => item.Include == "buildTransitive/AtomUI.City.Localization.targets" &&
+                    item.PackagePath == "buildTransitive/" &&
+                    item.Pack == "true");
         Assert.DoesNotContain(
             packedItems,
             item => item.Include == "buildTransitive/AtomUI.City.Diagnostics.targets");
@@ -177,6 +187,7 @@ public sealed class SourceGeneratorProjectStructureTests
         Assert.Contains("buildTransitive/AtomUI.City.Application.targets", validatePackagesScript, StringComparison.Ordinal);
         Assert.Contains("buildTransitive/AtomUI.City.Plugin.targets", validatePackagesScript, StringComparison.Ordinal);
         Assert.Contains("buildTransitive/AtomUI.City.Core.Diagnostics.targets", validatePackagesScript, StringComparison.Ordinal);
+        Assert.Contains("buildTransitive/AtomUI.City.Localization.targets", validatePackagesScript, StringComparison.Ordinal);
         Assert.DoesNotContain("buildTransitive/AtomUI.City.Diagnostics.targets", validatePackagesScript, StringComparison.Ordinal);
         Assert.Contains("analyzers/dotnet/cs/AtomUI.City.Generators.dll", validatePackagesScript, StringComparison.Ordinal);
     }

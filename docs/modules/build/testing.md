@@ -32,6 +32,7 @@
 | AUC-BUILD-007 | Build | TestNamingConventionTests | 断言测试命名和模块对应关系。 | 测试项目命名偏离、模块缺少测试项目失败。 | Implemented |
 | AUC-BUILD-008 | Build | BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests | 精确断言 contract baseline、Property/Item/Target/default、asset-only nupkg、buildTransitive 文件、generator analyzer 和空项目门禁。 | baseline 漂移、出现 `lib/`、缺少 contract/build asset/analyzer、包校验未覆盖 Build、source project 只有 `.csproj` 失败。 | Implemented |
 | AUC-BUILD-009 | Build/Package/Consumer | ManifestTaskTests; IncrementalGeneratorInfrastructureTests; AtomUI.City.Build.PackagingSmoke | 真实执行 build/publish/pack，验证九类 Item、三种 generation mode、AOT、manifest 与最终应用依赖闭包。 | 非法 Property/Item、路径逃逸、重复声明、manifest/package layout 错误或 Build/Tasks/Generator 泄漏到最终应用失败。 | Implemented |
+| AUC-BUILD-010 | Build/TemplateSmoke | ManifestTaskTests; GenerationTemplateRendererTests | RESX 确定性转换、generated attribute source、main assembly embedded locpack 与 City provider 真实加载。 | 非字符串/空资源、DTD、超限、非法 metadata、重复声明或卫星程序集残留失败。 | Implemented |
 
 ## 缺口处理
 

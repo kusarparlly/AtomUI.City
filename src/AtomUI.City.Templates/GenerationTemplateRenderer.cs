@@ -648,7 +648,7 @@ public sealed class GenerationTemplateRenderer
                 var fallback = culture.Equals(fallbackCulture, StringComparison.OrdinalIgnoreCase)
                     ? string.Empty
                     : $", FallbackCulture = \"{fallbackCulture}\"";
-                return $"[assembly: LanguagePackage(\"{context.TypeName}.{culture}\", \"{culture}\", Scope = ResourceScope.Module, ScopeId = \"{context.StableId}\", ResourceBaseName = \"{context.Namespace}.{culture}.Resources\"{fallback})]";
+                return $"[assembly: LanguagePackage(\"{context.TypeName}.{culture}\", \"{culture}\", Scope = ResourceScope.Module, ScopeId = \"{context.StableId}\", ResourceBaseName = \"{context.Namespace}.{culture}.Resources.locpack.json\"{fallback})]";
             }));
         return $$"""
             using AtomUI.City.Localization;
@@ -733,6 +733,24 @@ public sealed class GenerationTemplateRenderer
                     Assert.All(
                         packages.Where(package => package.Culture != "{{options.Cultures[0]}}"),
                         package => Assert.Equal("{{options.Cultures[0]}}", package.FallbackCulture));
+                }
+
+                [Fact]
+                public async Task PrimaryCultureResxLoadsThroughCityAssemblyProvider()
+                {
+                    var provider = new AssemblyLanguagePackageProvider();
+                    var descriptor = provider
+                        .Discover(typeof({{context.Namespace}}.{{context.TypeName}}Localization).Assembly)
+                        .Single(package => package.PackageId == "{{context.TypeName}}.{{options.Cultures[0]}}");
+
+                    var result = await provider.LoadAsync(descriptor);
+
+                    Assert.True(
+                        result.Succeeded,
+                        $"{result.Error?.Message} Available resources: {string.Join(", ", typeof({{context.Namespace}}.{{context.TypeName}}Localization).Assembly.GetManifestResourceNames())}");
+                    Assert.NotNull(result.Package);
+                    Assert.True(result.Package.TryGetString({{context.Namespace}}.{{context.TypeName}}Keys.Title, out var title));
+                    Assert.Equal("{{context.TypeName}} ({{options.Cultures[0]}})", title);
                 }
             }
             """;

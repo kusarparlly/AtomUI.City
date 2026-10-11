@@ -29,6 +29,7 @@
 | AUC-LOCALIZATION-006 | Contract | LocalizationServiceTests | 断言可选 application bridge 调用、局部失败、批量刷新、提交后调用方取消仍完成全部刷新和不依赖 Avalonia 类型。 | application bridge 失败、target 局部失败、bridge 内触发调用方取消。 | Completed |
 | AUC-LOCALIZATION-007 | Contract / Concurrency | LocalizationServiceTests; LocalizationRegistrationTests | 断言撤销后不可 lookup、旧 snapshot 稳定、持有中的文本刷新、提交后调用方取消仍完成刷新、重复 revoke、fallback state 清理、load/revoke 竞态不复活 package，以及 bridge 回调重入快速失败。 | unload 与 lookup/culture switch 并发、mutation callback 重入、撤销提交后取消。 | Completed |
 | AUC-LOCALIZATION-008 | Generator / Build | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationMetadataReaderTests; LocalizationManifestBuilderTests | 断言 Generator 主入口输出可编译 registrar、原子 `RegisterRange`、规范化 culture/package identity、key、scope id、load context、contribution id、critical keys 和稳定顺序。 | 空 attribute 参数、显式未知 enum、invalid culture、missing/ambiguous package、duplicate identity/key、scope mismatch、缺少 ScopeId/resource base name、fallback cycle、无执行合同 resource kind。 | Completed |
+| AUC-LOCALIZATION-009 | Build / TemplateSmoke | ManifestTaskTests; GenerationTemplateRendererTests | RESX 生成 locpack 与 attribute source，模板 build 后由 assembly provider 加载真实资源。 | 非字符串/空资源、DTD、非法 metadata、重复 identity/resource base name、卫星程序集残留。 | Completed |
 
 ## 缺口处理
 

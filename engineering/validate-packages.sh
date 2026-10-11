@@ -132,6 +132,7 @@ while IFS= read -r project; do
       require_entry "$nupkg" "$entries" "buildTransitive/AtomUI.City.Plugin.targets"
       require_entry "$nupkg" "$entries" "tools/net10.0/AtomUI.City.Build.Tasks.dll"
       require_entry "$nupkg" "$entries" "buildTransitive/AtomUI.City.Core.Diagnostics.targets"
+      require_entry "$nupkg" "$entries" "buildTransitive/AtomUI.City.Localization.targets"
       require_entry "$nupkg" "$entries" "analyzers/dotnet/cs/AtomUI.City.Generators.dll"
       ;;
     AtomUI.City.Generators)

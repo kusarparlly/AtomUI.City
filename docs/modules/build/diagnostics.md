@@ -20,6 +20,7 @@
 | `AUCBLD0202` | MultiplePluginMainAssemblies | 插件包主程序集布局不唯一。 |
 | `AUCBLD0301` | DynamicPluginNotAotCompatible | Strict AOT 与动态插件配置冲突。 |
 | `AUCBLD0401` | InvalidApplicationPublishLayout | 应用发布布局或 application manifest 无效。 |
+| `AUCBLD0501` | ResxCompilationFailed | RESX 无法安全、完整地编译为 City locpack。 |
 
 ## 产品级必须诊断的失败
 

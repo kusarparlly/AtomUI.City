@@ -31,6 +31,7 @@
 - `ILocalizationService.CultureState` 的 City.State 只读发布、`CultureInfo`/集合深只读快照、fallback lazy load/缓存复用/撤销同步更新 LoadedPackageIds，以及 service Dispose/DisposeAsync 共享完成事务的取消与释放语义进入 1.0 兼容承诺。
 - `LocalizationErrorKind.PackageTooLarge` 和 `InvalidDescriptor` 的上述 provider 语义进入 1.0 兼容承诺。
 - `LocalizedResourceKind` 中六类 string-like kind 可生成；`Pluralization`、`ResourceObject`、`FlowDirection`、`CultureMetadata` 在获得独立 Feature/runtime contract 前由 Generator 拒绝。
+- Build-time RESX projection 只能生成现有 locpack schema v1 与既有 Localization attributes；运行时不得引入 ResourceManager、RESX parser 或第二份 culture state。
 - `LocalizationDiagnosticRecord` 的 operation/culture/resource/package/scope/provider/location/attempt/elapsed/revision/error/contribution 上下文字段和 AUCLOC001-010 code 语义进入 1.0 兼容承诺。
 
 ## 数据格式兼容

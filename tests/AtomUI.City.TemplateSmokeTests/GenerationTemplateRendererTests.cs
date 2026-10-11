@@ -375,6 +375,7 @@ public sealed class GenerationTemplateRendererTests
                 <ImplicitUsings>enable</ImplicitUsings>
                 <Nullable>enable</Nullable>
               </PropertyGroup>
+              <Import Project="{{Path.Combine(repositoryRoot, "src", "AtomUI.City.Build", "buildTransitive", "AtomUI.City.Build.props")}}" />
               <ItemGroup>
                 <PackageReference Include="Avalonia" Version="{{avaloniaVersion}}" />
                 <ProjectReference Include="{{Path.Combine(repositoryRoot, "src", "AtomUI.City.Core", "AtomUI.City.Core.csproj")}}" />
@@ -382,8 +383,13 @@ public sealed class GenerationTemplateRendererTests
                 <ProjectReference Include="{{Path.Combine(repositoryRoot, "src", "AtomUI.City.Routing", "AtomUI.City.Routing.csproj")}}" />
                 <ProjectReference Include="{{Path.Combine(repositoryRoot, "src", "AtomUI.City.Localization", "AtomUI.City.Localization.csproj")}}" />
                 <ProjectReference Include="{{Path.Combine(repositoryRoot, "src", "AtomUI.City.Presentation", "AtomUI.City.Presentation.csproj")}}" />
+                <ProjectReference Include="{{Path.Combine(repositoryRoot, "src", "AtomUI.City.Build.Tasks", "AtomUI.City.Build.Tasks.csproj")}}" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" SetTargetFramework="TargetFramework=net10.0" />
                 <Analyzer Include="{{Path.Combine(repositoryRoot, "output", "bin", "Release", "AtomUI.City.Generators", "netstandard2.0", "AtomUI.City.Generators.dll")}}" />
               </ItemGroup>
+              <PropertyGroup>
+                <AtomUICityBuildTasksAssembly>{{Path.Combine(repositoryRoot, "output", "bin", "Release", "AtomUI.City.Build.Tasks", "net10.0", "AtomUI.City.Build.Tasks.dll")}}</AtomUICityBuildTasksAssembly>
+              </PropertyGroup>
+              <Import Project="{{Path.Combine(repositoryRoot, "src", "AtomUI.City.Build", "buildTransitive", "AtomUI.City.Localization.targets")}}" />
             </Project>
             """);
         await File.WriteAllTextAsync(

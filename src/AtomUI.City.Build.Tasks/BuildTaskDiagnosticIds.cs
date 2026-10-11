@@ -10,4 +10,5 @@ internal static class BuildTaskDiagnosticIds
     public const string MultiplePluginMainAssemblies = "AUCBLD0202";
     public const string DynamicPluginNotAotCompatible = "AUCBLD0301";
     public const string InvalidApplicationPublishLayout = "AUCBLD0401";
+    public const string ResxCompilationFailed = "AUCBLD0501";
 }
