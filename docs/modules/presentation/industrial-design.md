@@ -92,7 +92,7 @@ caller token 在入队前可拒绝；入队后只取消调用者等待，不删�
 
 可拒绝关闭先运行所有当前 Entry 的 `ICanDeactivate`，然后最多运行一个 `IConfirmDeactivate`。同一 Window 同时存在多个 confirmation owner 时，不弹出任何确认 UI，拒绝关闭并记录 `AUCPRS043`；Presentation 不替开发者编排多层确认框。
 
-非 OS 原生 Closing 先取消，异步事务允许后标记 committed 并重新调用 `Window.Close`。OS shutdown 不阻止原生关闭，只做 best-effort 清理。硬杀进程、断电等没有 managed callback 的场景不在合同内。
+非 OS 原生 Closing 若已被更早的应用处理器取消，WindowSession 保持 Ready；否则先取消原生关闭，异步事务允许后标记 committed 并重新调用 `Window.Close`。OS shutdown 不阻止原生关闭，只做 best-effort 清理。硬杀进程、断电等没有 managed callback 的场景不在合同内。
 
 ## 9. Visual、Interaction 和 Validation
 

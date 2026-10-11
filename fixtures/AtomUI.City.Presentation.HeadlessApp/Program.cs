@@ -57,6 +57,9 @@ internal static class Program
     var dispatcher = provider.GetRequiredService<AtomUI.City.Core.Threading.IUiDispatcher>();
     runtime.Attach(new ClassicDesktopStyleApplicationLifetime(), hostScope);
 
+    await VerifyPreCancelledNativeCloseAsync(runtime);
+    Console.WriteLine("stage:pre-cancelled-close-complete");
+
     var confirmFixture = CreateWindowFixture(runtime, "confirm", outletCount: 2);
     var detachFixture = CreateWindowFixture(runtime, "detach-race", outletCount: 1);
     var stressFixture = CreateWindowFixture(runtime, "stress", outletCount: 1);
@@ -85,6 +88,26 @@ internal static class Program
     Ensure(runtime.State == PresentationRuntimeState.Stopped, "Runtime did not reach Stopped.");
     Ensure(runtime.Windows.Count == 0, "Stopped Runtime retained WindowSession instances.");
     Ensure(stressFixture.Session.State == WindowSessionState.Closed, "Runtime stop did not close the stress Window.");
+}
+
+    private static async Task VerifyPreCancelledNativeCloseAsync(IPresentationRuntime runtime)
+{
+    var window = new Window();
+    EventHandler<WindowClosingEventArgs> cancelClose = (_, args) => args.Cancel = true;
+    window.Closing += cancelClose;
+    var session = runtime.RegisterWindow(window, "pre-cancelled-close");
+    window.Show();
+
+    window.Close();
+
+    Ensure(session.State == WindowSessionState.Ready,
+        "WindowSession handled a native close already cancelled by the application.");
+    Ensure(runtime.Windows.Contains(session),
+        "A pre-cancelled native close removed the active WindowSession.");
+
+    window.Closing -= cancelClose;
+    Ensure(await session.CloseAsync(WindowCloseOrigin.Application),
+        "WindowSession failed to close after the application cancellation was removed.");
 }
 
     private static async Task VerifyDetachedOutletCleanupIsJoinedByWindowCloseAsync(

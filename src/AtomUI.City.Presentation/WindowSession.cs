@@ -470,6 +470,11 @@ public sealed class WindowSession : IAsyncDisposable
             _ => WindowCloseOrigin.User,
         };
 
+        if (args.Cancel && origin != WindowCloseOrigin.OperatingSystem)
+        {
+            return;
+        }
+
         if (origin == WindowCloseOrigin.OperatingSystem)
         {
             lock (_gate)

@@ -35,7 +35,7 @@ adapter owns plan
 
 ## Window 关闭
 
-用户或普通应用关闭：`Ready -> Closing -> Ready(rejected)` 或 `Ready -> Closing -> Closed`。Host/Dispose/OS 关闭不可拒绝。并发调用共享一个 transaction task；Window 消失后仍可继续清理，task 在清理完成后结束。
+用户或普通应用关闭：若更早注册的 Avalonia `Closing` 处理器已取消本次原生关闭，Session 保持 `Ready` 且不启动关闭事务；否则进入 `Ready -> Closing -> Ready(rejected)` 或 `Ready -> Closing -> Closed`。Host/Dispose/OS 关闭不可拒绝。并发调用共享一个 transaction task；Window 消失后仍可继续清理，task 在清理完成后结束。
 
 ## Host Stop
 
