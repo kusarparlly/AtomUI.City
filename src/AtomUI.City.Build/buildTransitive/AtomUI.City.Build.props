@@ -16,7 +16,7 @@
     <AtomUICityManifestIntermediateOutputPath Condition="'$(AtomUICityManifestIntermediateOutputPath)' == ''">$(IntermediateOutputPath)AtomUI.City/manifests/</AtomUICityManifestIntermediateOutputPath>
     <AtomUICityBuildDiagnosticsOutputPath Condition="'$(AtomUICityBuildDiagnosticsOutputPath)' == ''">$(IntermediateOutputPath)AtomUI.City/diagnostics/</AtomUICityBuildDiagnosticsOutputPath>
     <AtomUICityCompileResx Condition="'$(AtomUICityCompileResx)' == ''">true</AtomUICityCompileResx>
-    <AtomUICityLocalizationIntermediateOutputPath Condition="'$(AtomUICityLocalizationIntermediateOutputPath)' == ''">$(IntermediateOutputPath)AtomUI.City/localization/</AtomUICityLocalizationIntermediateOutputPath>
+    <AtomUICityLocalizationIntermediateOutputPath Condition="'$(AtomUICityLocalizationIntermediateOutputPath)' == ''">$(MSBuildProjectExtensionsPath)AtomUI.City/localization/$(Configuration)/$(TargetFramework)/</AtomUICityLocalizationIntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(AtomUICityCompileResx)' == 'true'">

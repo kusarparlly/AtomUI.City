@@ -119,7 +119,7 @@ tools/
 | `AtomUICityBuildDiagnosticsLevel` | `Normal` | 诊断详细程度。 |
 | `AtomUICityApplicationId` | `AssemblyName` | application manifest 稳定身份。 |
 | `AtomUICityCompileResx` | `true` | 是否把约定目录中的 RESX 编译为 City locpack。 |
-| `AtomUICityLocalizationIntermediateOutputPath` | `$(IntermediateOutputPath)AtomUI.City/localization/` | 生成 locpack 与 attribute source 的中间目录。 |
+| `AtomUICityLocalizationIntermediateOutputPath` | `$(MSBuildProjectExtensionsPath)AtomUI.City/localization/$(Configuration)/$(TargetFramework)/` | 生成 locpack 与 attribute source 的配置/目标框架隔离中间目录。 |
 
 `application.manifest.json` v1 固定包含 `schemaVersion`、`appId`、`frameworkVersion`、`pluginApiVersion`、`pluginProfile`、`targetFramework`、`runtimeIdentifier`、`aotMode`、`staticPlugins`、`resourcePacks`；文件项包含规范相对路径与 SHA-256。
 

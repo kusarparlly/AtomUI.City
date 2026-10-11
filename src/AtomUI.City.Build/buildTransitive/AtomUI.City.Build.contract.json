@@ -15,7 +15,7 @@
     { "name": "AtomUICityFrameworkVersion", "visibility": "infrastructure", "default": null },
     { "name": "AtomUICityGenerateManifests", "visibility": "public", "default": "true" },
     { "name": "AtomUICityManifestIntermediateOutputPath", "visibility": "public", "default": "$(IntermediateOutputPath)AtomUI.City/manifests/" },
-    { "name": "AtomUICityLocalizationIntermediateOutputPath", "visibility": "public", "default": "$(IntermediateOutputPath)AtomUI.City/localization/" },
+    { "name": "AtomUICityLocalizationIntermediateOutputPath", "visibility": "public", "default": "$(MSBuildProjectExtensionsPath)AtomUI.City/localization/$(Configuration)/$(TargetFramework)/" },
     { "name": "AtomUICityMaxHostVersion", "visibility": "public", "default": null },
     { "name": "AtomUICityMinHostVersion", "visibility": "public", "default": null },
     { "name": "AtomUICityOutputRoot", "visibility": "public", "default": "$(MSBuildProjectDirectory)/output" },
