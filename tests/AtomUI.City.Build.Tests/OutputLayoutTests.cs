@@ -72,6 +72,19 @@ public sealed class OutputLayoutTests
     }
 
     [Fact]
+    public void DirectoryBuildPropsPreservesConsumerSolutionConfiguration()
+    {
+        var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
+        var directoryBuildProps = XDocument.Load(Path.Combine(repositoryRoot, "Directory.Build.props"));
+        var value = directoryBuildProps
+            .Descendants("ShouldUnsetParentConfigurationAndPlatform")
+            .Single()
+            .Value;
+
+        Assert.Equal("false", value);
+    }
+
+    [Fact]
     public void EngineeringScriptsWriteLogsAndTestResultsUnderRepositoryOutput()
     {
         var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
