@@ -38,6 +38,7 @@
 
 Feature ID: `AUC-CORE-001`
 Status: Verified
+Default ServiceProvider 配置：应用可以通过 `UseDefaultServiceProvider` 注册有序的 `ServiceProviderOptions` 回调。回调随 Builder 一起冻结，并在 `HostApplicationBuilder.Build` 前应用到由 Generic Host 持有的唯一 `DefaultServiceProviderFactory`；未使用该 API 时保持 Generic Host 默认行为。
 Goal: 构建 Host、冻结注册入口、创建不可变应用实例描述符。
 Public Contract: ApplicationHostBuilder, ApplicationHostOptions, IApplicationHostBuilder, IApplicationContext
 Runtime / Build Behavior: 验证应用身份、版本和路径，构建 Host，递归冻结所有通过 Builder 逃逸的 Configuration mutation handle，并在 Build 阶段一次性创建 IApplicationContext。

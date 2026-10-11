@@ -79,6 +79,8 @@ internal sealed class ApplicationHostBuilder : IApplicationHostBuilder
         _built = true;
         var moduleRegistrations = ModuleRegistrationStore.FreezeAndSnapshot(this);
         var lifecycleConfigurations = LifecycleConfigurationStore.FreezeAndSnapshot(this);
+        var serviceProviderConfigurations =
+            DefaultServiceProviderConfigurationStore.FreezeAndSnapshot(this);
         ModuleRegistry? moduleRegistry = null;
         IHost? genericHost = null;
         IHostDiagnostics? runtimeDiagnostics = null;
@@ -126,6 +128,9 @@ internal sealed class ApplicationHostBuilder : IApplicationHostBuilder
 
             buildStage = "UserServices";
             ApplyUserServiceConfigurations();
+
+            buildStage = "ServiceProviderOptions";
+            ConfigureDefaultServiceProvider(serviceProviderConfigurations);
 
             buildStage = "GenericHost";
             genericHost = _builder.Build();
@@ -276,6 +281,25 @@ internal sealed class ApplicationHostBuilder : IApplicationHostBuilder
         {
             _applyingUserServices = false;
         }
+    }
+
+    private void ConfigureDefaultServiceProvider(
+        IReadOnlyList<Action<ServiceProviderOptions>> configurations)
+    {
+        if (configurations.Count == 0)
+        {
+            return;
+        }
+
+        var options = new ServiceProviderOptions();
+        foreach (var configure in configurations)
+        {
+            configure(options);
+        }
+
+        _builder.ConfigureContainer(
+            new DefaultServiceProviderFactory(options),
+            static _ => { });
     }
 
     private ApplicationContext CreateApplicationContext(ApplicationHostOptions hostOptions)

@@ -1,5 +1,9 @@
 # AtomUI.City.Core Compatibility
 
+## 默认 ServiceProvider 配置
+
+`UseDefaultServiceProvider(Action<ServiceProviderOptions>)` 是新增的 Preview API。它配置由 Generic Host 持有的唯一 Microsoft DI Provider，不暴露可变 Root ServiceCollection，也不创建临时 Provider。未调用该 API 的应用继续使用现有 Generic Host 默认行为。修改回调顺序、Builder 冻结行为、官方 `ServiceProviderOptions` 参数类型或单 Provider 所有权规则属于 breaking change。
+
 ## 兼容性范围
 
 本模块兼容面包括 public API、options、attribute、diagnostics code、manifest/schema、generated output、MSBuild property、CLI envelope、template layout、snapshot 或 plugin contract 中实际适用的部分。

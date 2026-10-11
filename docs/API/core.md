@@ -10,6 +10,7 @@
 | --- | --- | --- |
 | `ApplicationHost.CreateBuilder` | 创建 Host builder | 配置阶段不保证并发写安全 |
 | `IApplicationHostBuilder` | 配置 Host、服务和模块 | `Build()` 后所有配置入口冻结 |
+| `UseDefaultServiceProvider` | 配置最终默认 Microsoft DI Provider | 使用官方 `ServiceProviderOptions`；不创建临时 Provider |
 | `IApplicationHost` | 启动、停止和访问服务 | Start/Stop/Dispose 共享受控生命周期 |
 | `ApplicationHostOptions` | 应用标识、名称等 Host 配置 | Build 前设置，之后作为快照读取 |
 | `IApplicationContext` | 应用实例、环境和目录信息 | Host 创建的只读上下文 |

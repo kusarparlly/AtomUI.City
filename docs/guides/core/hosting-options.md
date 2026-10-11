@@ -54,6 +54,19 @@ builder.ConfigureHost(options =>
 | `UseModule<T>()` | 显式声明应用模块 | 模块系统（见《创建模块》） |
 | `ConfigureLifecycle(...)` | 配置生命周期管线 | 生命周期 |
 | `GetBuildDiagnostics()` | 取回构建期诊断 | 诊断（见《诊断》） |
+| `UseDefaultServiceProvider(...)` | 配置最终 Microsoft DI 容器的 `ServiceProviderOptions` | Host / DI |
+
+需要在所有环境中执行启动期 DI 校验时，可显式配置：
+
+```csharp
+builder.UseDefaultServiceProvider(options =>
+{
+    options.ValidateOnBuild = true;
+    options.ValidateScopes = true;
+});
+```
+
+该扩展只配置 Generic Host 最终拥有的唯一 Provider，不会调用 `BuildServiceProvider` 创建临时容器。未调用时继续使用 Generic Host 的默认策略。
 
 > 目前**没有**公开的 `ConfigureOptions` / `ConfigureConfiguration` 扩展方法。配置 Options 的推荐方式是直接在 `ConfigureServices` 里调用 `services.Configure<T>(...)`（见《配置》）。
 

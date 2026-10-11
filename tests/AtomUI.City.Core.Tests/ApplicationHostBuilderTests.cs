@@ -50,6 +50,129 @@ public sealed class ApplicationHostBuilderTests
     }
 
     [Fact]
+    public void UseDefaultServiceProviderRejectsNullArguments()
+    {
+        var builder = ApplicationHostTestBuilder.Create();
+
+        Assert.Throws<ArgumentNullException>(() =>
+            ApplicationHostBuilderServiceProviderExtensions.UseDefaultServiceProvider(
+                null!,
+                static _ => { }));
+        Assert.Throws<ArgumentNullException>(() =>
+            builder.UseDefaultServiceProvider(null!));
+    }
+
+    [Fact]
+    public async Task UseDefaultServiceProviderAppliesCallbacksInRegistrationOrder()
+    {
+        var calls = new List<string>();
+        var builder = ApplicationHostTestBuilder.Create();
+
+        var returned = builder.UseDefaultServiceProvider(options =>
+        {
+            calls.Add("first");
+            options.ValidateOnBuild = true;
+        });
+        builder.UseDefaultServiceProvider(options =>
+        {
+            Assert.True(options.ValidateOnBuild);
+            calls.Add("second");
+            options.ValidateScopes = true;
+        });
+
+        Assert.Same(builder, returned);
+        Assert.Empty(calls);
+
+        await using var host = builder.Build();
+
+        Assert.Equal(["first", "second"], calls);
+    }
+
+    [Fact]
+    public void UseDefaultServiceProviderValidateOnBuildRejectsMissingDependency()
+    {
+        var builder = ApplicationHostTestBuilder.Create();
+        builder.ConfigureServices(services => services.AddSingleton<MissingDependencyService>());
+        builder.UseDefaultServiceProvider(options => options.ValidateOnBuild = true);
+
+        var failure = Assert.Throws<AggregateException>(() => builder.Build());
+
+        Assert.Contains("Unable to resolve service", failure.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void UseDefaultServiceProviderValidateScopesRejectsSingletonCapturingScopedService()
+    {
+        var builder = ApplicationHostTestBuilder.Create();
+        builder.ConfigureServices(services =>
+        {
+            services.AddScoped<ScopedDependency>();
+            services.AddSingleton<SingletonCapturingScopedService>();
+        });
+        builder.UseDefaultServiceProvider(options =>
+        {
+            options.ValidateOnBuild = true;
+            options.ValidateScopes = true;
+        });
+
+        var failure = Assert.Throws<AggregateException>(() => builder.Build());
+
+        Assert.Contains("Cannot consume scoped service", failure.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task DefaultServiceProviderBehaviorIsUnchangedWhenExtensionIsUnused()
+    {
+        var builder = ApplicationHostTestBuilder.Create(["--environment=Production"]);
+        builder.ConfigureServices(services => services.AddSingleton<MissingDependencyService>());
+
+        await using var host = builder.Build();
+
+        Assert.Throws<InvalidOperationException>(() =>
+            host.Services.GetRequiredService<MissingDependencyService>());
+    }
+
+    [Fact]
+    public async Task UseDefaultServiceProviderCreatesAndDisposesOneRootSingleton()
+    {
+        RootSingletonProbe.Reset();
+        var builder = ApplicationHostTestBuilder.Create();
+        builder.ConfigureServices(services => services.AddSingleton<RootSingletonProbe>());
+        builder.UseDefaultServiceProvider(options => options.ValidateOnBuild = true);
+
+        await using (var host = builder.Build())
+        {
+            var first = host.Services.GetRequiredService<RootSingletonProbe>();
+            var second = host.Services.GetRequiredService<RootSingletonProbe>();
+
+            Assert.Same(first, second);
+            Assert.Equal(1, RootSingletonProbe.CreatedCount);
+            Assert.Equal(0, RootSingletonProbe.DisposeCount);
+        }
+
+        Assert.Equal(1, RootSingletonProbe.CreatedCount);
+        Assert.Equal(1, RootSingletonProbe.DisposeCount);
+    }
+
+    [Fact]
+    public void DefaultServiceProviderConfigurationFailureIsDiagnosedAndFreezesBuilder()
+    {
+        var builder = ApplicationHostTestBuilder.Create();
+        var diagnostics = builder.GetBuildDiagnostics();
+        builder.UseDefaultServiceProvider(_ =>
+            throw new InvalidOperationException("service provider configuration failed"));
+
+        var failure = Assert.Throws<InvalidOperationException>(() => builder.Build());
+
+        Assert.Equal("service provider configuration failed", failure.Message);
+        Assert.Throws<InvalidOperationException>(() =>
+            builder.UseDefaultServiceProvider(static _ => { }));
+        Assert.Contains(diagnostics.Records, record =>
+            record.Code == HostDiagnosticIds.HostBuildFailed &&
+            record.Context["stage"] == "ServiceProviderOptions");
+    }
+
+    [Fact]
     public async Task ConfigureServicesRunsAfterAllModuleServiceStagesInRegistrationOrder()
     {
         ServiceOrderingModule.Reset();
@@ -588,6 +711,46 @@ public sealed class ApplicationHostBuilderTests
     private sealed class TestService;
 
     private sealed class LateService;
+
+    private interface IMissingDependency;
+
+    private sealed class MissingDependencyService(IMissingDependency dependency)
+    {
+        public IMissingDependency Dependency { get; } = dependency;
+    }
+
+    private sealed class ScopedDependency;
+
+    private sealed class SingletonCapturingScopedService(ScopedDependency dependency)
+    {
+        public ScopedDependency Dependency { get; } = dependency;
+    }
+
+    private sealed class RootSingletonProbe : IDisposable
+    {
+        private static int _createdCount;
+        private static int _disposeCount;
+
+        public RootSingletonProbe()
+        {
+            Interlocked.Increment(ref _createdCount);
+        }
+
+        public static int CreatedCount => Volatile.Read(ref _createdCount);
+
+        public static int DisposeCount => Volatile.Read(ref _disposeCount);
+
+        public static void Reset()
+        {
+            Volatile.Write(ref _createdCount, 0);
+            Volatile.Write(ref _disposeCount, 0);
+        }
+
+        public void Dispose()
+        {
+            Interlocked.Increment(ref _disposeCount);
+        }
+    }
 
     private sealed class ModuleOrderedService : IOrderedService;
 

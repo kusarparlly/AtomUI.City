@@ -1,1 +1,3 @@
 #nullable enable
+static AtomUI.City.Core.Hosting.ApplicationHostBuilderServiceProviderExtensions.UseDefaultServiceProvider(this AtomUI.City.Core.Hosting.IApplicationHostBuilder! builder, System.Action<Microsoft.Extensions.DependencyInjection.ServiceProviderOptions!>! configure) -> AtomUI.City.Core.Hosting.IApplicationHostBuilder!
+AtomUI.City.Core.Hosting.ApplicationHostBuilderServiceProviderExtensions

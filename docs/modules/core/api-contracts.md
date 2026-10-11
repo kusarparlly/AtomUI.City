@@ -764,6 +764,24 @@ Diagnostics: Build 失败诊断包含 options 校验上下文。
 Tests: ApplicationHostBuilderTests; ApplicationHostOptionsTests。
 ```
 
+### `ApplicationHostBuilderServiceProviderExtensions.UseDefaultServiceProvider`
+
+```text
+Method: ApplicationHostBuilderServiceProviderExtensions.UseDefaultServiceProvider
+Feature: AUC-CORE-001
+Purpose: 配置 Generic Host 最终创建的默认 Microsoft DI ServiceProvider。
+Parameters: builder 和 configure 均不得为 null；configure 接收 Microsoft.Extensions.DependencyInjection.ServiceProviderOptions。
+Return: 当前 IApplicationHostBuilder。
+Nullability: null builder 或 configure 抛 ArgumentNullException。
+Cancellation: 无；配置回调必须同步、短执行且不执行 IO。
+Exceptions or Result: 配置回调异常在 Build 的 ServiceProviderOptions 阶段原样传播；Build 开始后再次调用抛 InvalidOperationException。
+Idempotency: 每次调用追加回调，不去重；所有回调按注册顺序作用于同一个 ServiceProviderOptions。
+Concurrency: 配置阶段不保证并发写安全；Build 串行冻结并应用快照。
+Side Effects: 仅在至少注册一个回调时，以 DefaultServiceProviderFactory 配置内部 HostApplicationBuilder；不直接调用 BuildServiceProvider，不创建临时或第二个 Root Provider。未调用时保持 Generic Host 默认行为。
+Diagnostics: 配置或容器构建失败沿用 HostBuildFailed，stage 为 ServiceProviderOptions 或 GenericHost。
+Tests: ApplicationHostBuilderTests。
+```
+
 ### `ApplicationHostBuilder.Build`
 
 ```text
@@ -978,6 +996,7 @@ Tests: ApplicationHostModuleLifecycleTests。
 | `LifecycleStageArea` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `LifecycleStages` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `ApplicationHostBuilderModularityExtensions` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `ApplicationHostBuilderServiceProviderExtensions` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `ApplicationModuleAttribute` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `GeneratedModuleManifestAttribute` | generated contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `IModuleRegistrar` | generated contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
