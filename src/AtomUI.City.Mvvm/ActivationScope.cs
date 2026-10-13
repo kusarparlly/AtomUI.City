@@ -308,24 +308,27 @@ public sealed class ActivationScope : IActivationScope
         TrackedTask trackedTask,
         Func<CancellationToken, Task> taskFactory)
     {
+        Exception? failure = null;
+        var canceled = false;
+        var cancellationToken = trackedTask.Cancellation.Token;
+
         try
         {
-            var task = taskFactory(trackedTask.Cancellation.Token)
+            var task = taskFactory(cancellationToken)
                 ?? throw new InvalidOperationException(
                     $"Activation task factory '{trackedTask.Name}' returned null.");
 
             await task.ConfigureAwait(false);
-            trackedTask.Completion.TrySetResult();
         }
         catch (OperationCanceledException)
             when (trackedTask.Cancellation.IsCancellationRequested)
         {
-            trackedTask.Completion.TrySetCanceled(trackedTask.Cancellation.Token);
+            canceled = true;
         }
         catch (Exception exception)
         {
             WriteTaskFailedDiagnostic(trackedTask, exception);
-            trackedTask.Completion.TrySetException(exception);
+            failure = exception;
         }
         finally
         {
@@ -339,6 +342,19 @@ public sealed class ActivationScope : IActivationScope
             }
 
             trackedTask.Cancellation.Dispose();
+        }
+
+        if (failure is not null)
+        {
+            trackedTask.Completion.TrySetException(failure);
+        }
+        else if (canceled)
+        {
+            trackedTask.Completion.TrySetCanceled(cancellationToken);
+        }
+        else
+        {
+            trackedTask.Completion.TrySetResult();
         }
     }
 

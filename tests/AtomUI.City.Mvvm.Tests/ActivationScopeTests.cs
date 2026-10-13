@@ -125,6 +125,26 @@ public sealed class ActivationScopeTests
     }
 
     [Fact]
+    public async Task AwaitedTaskCompletionAlwaysPublishesAfterRegistryCleanup()
+    {
+        await using var scope = new ActivationScope();
+
+        for (var iteration = 0; iteration < 256; iteration++)
+        {
+            var release = new TaskCompletionSource(
+                TaskCreationOptions.RunContinuationsAsynchronously);
+            var task = scope.StartUniqueAsync(
+                "refresh",
+                cancellationToken => release.Task.WaitAsync(cancellationToken));
+
+            release.SetResult();
+            await task;
+
+            Assert.Equal(0, scope.ActiveTaskCount);
+        }
+    }
+
+    [Fact]
     public async Task DisposeAsyncClosesAdmissionCancelsAndDrainsTasksBeforeResources()
     {
         var calls = new List<string>();
