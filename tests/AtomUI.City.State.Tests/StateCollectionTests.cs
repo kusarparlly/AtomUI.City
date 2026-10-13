@@ -5,6 +5,31 @@ namespace AtomUI.City.State.Tests;
 public sealed class StateCollectionTests
 {
     [Fact]
+    public void ObserveEmitsCurrentSnapshotBeforeCollectionChanges()
+    {
+        var collection = new StateCollection<string, int>();
+        collection.AddOrUpdate("existing", 1);
+        var observations = new List<StateCollectionObservation<string, int>>();
+
+        using var subscription = collection.Observe(observations.Add);
+        collection.AddOrUpdate("next", 2);
+
+        Assert.Equal(2, observations.Count);
+        var initial = observations[0];
+        Assert.True(initial.IsInitial);
+        Assert.NotNull(initial.Snapshot);
+        Assert.Equal(1, initial.Snapshot.CollectionVersion);
+        Assert.Equal("existing", Assert.Single(initial.Snapshot.Items).Key);
+        Assert.Empty(initial.Changes);
+
+        var change = observations[1];
+        Assert.False(change.IsInitial);
+        Assert.Null(change.Snapshot);
+        Assert.Equal(2, change.Version);
+        Assert.Equal("next", Assert.Single(change.Changes).Key);
+    }
+
+    [Fact]
     public void AddOrUpdateAddsAndUpdatesItemsWithStableChangeRecords()
     {
         var collection = new StateCollection<string, int>();

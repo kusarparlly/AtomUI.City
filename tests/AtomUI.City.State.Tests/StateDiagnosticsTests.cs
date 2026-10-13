@@ -302,6 +302,30 @@ public sealed class StateDiagnosticsTests
         {
             return _subscription;
         }
+
+        public IStateSubscription Observe(Action<StateChangedEventArgs<int>> handler)
+        {
+            return _subscription;
+        }
+
+        public IStateSubscription Observe(
+            Action<StateChangedEventArgs<int>> handler,
+            StateSubscriptionOptions options)
+        {
+            return _subscription;
+        }
+
+        IStateSubscription IReadOnlyState.Observe(Action<StateChangedEventArgs> handler)
+        {
+            return _subscription;
+        }
+
+        IStateSubscription IReadOnlyState.Observe(
+            Action<StateChangedEventArgs> handler,
+            StateSubscriptionOptions options)
+        {
+            return _subscription;
+        }
     }
 
     private sealed class TestSubscription : IStateSubscription

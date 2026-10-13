@@ -6,6 +6,52 @@ namespace AtomUI.City.State.Tests;
 public sealed class WritableStateTests
 {
     [Fact]
+    public void ObserveEmitsCurrentValueOnceBeforeSubsequentChanges()
+    {
+        var state = new WritableState<int>(4);
+        var notifications = new List<StateChangedEventArgs<int>>();
+
+        using var subscription = state.Observe(notifications.Add);
+        state.SetValue(5);
+
+        Assert.Collection(
+            notifications,
+            initial =>
+            {
+                Assert.True(initial.IsInitial);
+                Assert.Equal(4, initial.OldValue);
+                Assert.Equal(4, initial.NewValue);
+                Assert.Equal(0, initial.Version);
+            },
+            change =>
+            {
+                Assert.False(change.IsInitial);
+                Assert.Equal(4, change.OldValue);
+                Assert.Equal(5, change.NewValue);
+                Assert.Equal(1, change.Version);
+            });
+    }
+
+    [Fact]
+    public void ObserveInitialHandlerRunsOutsideStateLock()
+    {
+        var state = new WritableState<int>(0);
+        var notifications = new List<long>();
+
+        using var subscription = state.Observe(args =>
+        {
+            notifications.Add(args.Version);
+            if (args.IsInitial)
+            {
+                state.SetValue(1);
+            }
+        });
+
+        Assert.Equal([0, 1], notifications);
+        Assert.Equal(1, state.Value);
+    }
+
+    [Fact]
     public void ChangedRunsSynchronouslyBeforeManagedSubscriptions()
     {
         var state = new WritableState<int>(0);
@@ -120,6 +166,7 @@ public sealed class WritableStateTests
         Assert.Throws<ObjectDisposedException>(() => state.Set(4));
         Assert.Throws<ObjectDisposedException>(() => state.Update(value => value + 1));
         Assert.Throws<ObjectDisposedException>(() => state.OnChange(_ => { }));
+        Assert.Throws<ObjectDisposedException>(() => state.Observe(_ => { }));
     }
 
     [Fact]

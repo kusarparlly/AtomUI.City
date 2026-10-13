@@ -16,4 +16,19 @@ public interface IApplicationState
     IStateSubscription OnChange<T>(
         StateKey<T> key,
         Action<StateChangedEventArgs<T>> handler);
+
+    /// <summary>
+    /// Atomically observes the current value and all subsequent changes.
+    /// </summary>
+    IStateSubscription Observe<T>(
+        StateKey<T> key,
+        Action<StateChangedEventArgs<T>> handler);
+
+    /// <summary>
+    /// Atomically observes the current value and all subsequent changes.
+    /// </summary>
+    IStateSubscription Observe<T>(
+        StateKey<T> key,
+        Action<StateChangedEventArgs<T>> handler,
+        StateSubscriptionOptions options);
 }

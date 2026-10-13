@@ -302,3 +302,29 @@ static AtomUI.City.State.StateSubscriptionOptions.Queued(int maxPendingNotificat
 static AtomUI.City.State.StateWriteAuthority.Module(string! moduleName, System.Collections.Generic.IEnumerable<string!>? capabilities = null) -> AtomUI.City.State.StateWriteAuthority!
 static AtomUI.City.State.StateWriteAuthority.Plugin(string! pluginId, System.Collections.Generic.IEnumerable<string!>? capabilities = null) -> AtomUI.City.State.StateWriteAuthority!
 ~override AtomUI.City.State.StateKey<T>.Equals(object obj) -> bool
+AtomUI.City.State.IApplicationState.Observe<T>(AtomUI.City.State.StateKey<T> key, System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IApplicationState.Observe<T>(AtomUI.City.State.StateKey<T> key, System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IApplicationStateWriterFactory
+AtomUI.City.State.IApplicationStateWriterFactory.CreateWriter(AtomUI.City.State.StateWriteAuthority! authority) -> AtomUI.City.State.IApplicationStateWriter!
+AtomUI.City.State.IReadOnlyState.Observe(System.Action<AtomUI.City.State.StateChangedEventArgs!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IReadOnlyState.Observe(System.Action<AtomUI.City.State.StateChangedEventArgs!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IReadOnlyState<T>.Observe(System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IReadOnlyState<T>.Observe(System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IStateCollection<TKey, TItem>.Observe(System.Action<AtomUI.City.State.StateCollectionObservation<TKey, TItem>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.IStateCollection<TKey, TItem>.Observe(System.Action<AtomUI.City.State.StateCollectionObservation<TKey, TItem>!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.ApplicationStateRegistry.Observe<T>(AtomUI.City.State.StateKey<T> key, System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.ApplicationStateRegistry.Observe<T>(AtomUI.City.State.StateKey<T> key, System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.ComputedState<T>.Observe(System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.ComputedState<T>.Observe(System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.StateChangedEventArgs.IsInitial.get -> bool
+AtomUI.City.State.StateChangedEventArgs.StateChangedEventArgs(object? oldValue, object? newValue, long version, bool isInitial) -> void
+AtomUI.City.State.StateChangedEventArgs<T>.StateChangedEventArgs(T oldValue, T newValue, long version, bool isInitial) -> void
+AtomUI.City.State.StateCollection<TKey, TItem>.Observe(System.Action<AtomUI.City.State.StateCollectionObservation<TKey, TItem>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.StateCollection<TKey, TItem>.Observe(System.Action<AtomUI.City.State.StateCollectionObservation<TKey, TItem>!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.StateCollectionObservation<TKey, TItem>
+AtomUI.City.State.StateCollectionObservation<TKey, TItem>.Changes.get -> System.Collections.Generic.IReadOnlyList<AtomUI.City.State.StateCollectionChange<TKey, TItem>!>!
+AtomUI.City.State.StateCollectionObservation<TKey, TItem>.IsInitial.get -> bool
+AtomUI.City.State.StateCollectionObservation<TKey, TItem>.Snapshot.get -> AtomUI.City.State.StateCollectionSnapshot<TKey, TItem>?
+AtomUI.City.State.StateCollectionObservation<TKey, TItem>.Version.get -> long
+AtomUI.City.State.WritableState<T>.Observe(System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler) -> AtomUI.City.State.IStateSubscription!
+AtomUI.City.State.WritableState<T>.Observe(System.Action<AtomUI.City.State.StateChangedEventArgs<T>!>! handler, AtomUI.City.State.StateSubscriptionOptions! options) -> AtomUI.City.State.IStateSubscription!

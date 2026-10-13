@@ -148,6 +148,57 @@ public sealed class ComputedState<T> : IComputedState<T>, IDisposable
         }
     }
 
+    /// <summary>
+    /// Atomically observes the current value and all subsequent changes.
+    /// </summary>
+    public IStateSubscription Observe(Action<StateChangedEventArgs<T>> handler)
+    {
+        return Observe(handler, StateSubscriptionOptions.Immediate);
+    }
+
+    /// <summary>
+    /// Atomically observes the current value and all subsequent changes.
+    /// </summary>
+    public IStateSubscription Observe(
+        Action<StateChangedEventArgs<T>> handler,
+        StateSubscriptionOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(options);
+
+        while (true)
+        {
+            _ = EnsureValue();
+
+            StateSubscription subscription;
+
+            lock (_syncRoot)
+            {
+                ThrowIfDisposed();
+
+                if (_isDirty)
+                {
+                    continue;
+                }
+
+                subscription = new StateSubscription(
+                    args => handler((StateChangedEventArgs<T>)args),
+                    options,
+                    _diagnostics,
+                    startInactive: true);
+                subscription.Notify(new StateChangedEventArgs<T>(
+                    _value!,
+                    _value!,
+                    _version,
+                    isInitial: true));
+                _subscriptions.Add(subscription);
+            }
+
+            subscription.Activate();
+            return new RemovingStateSubscription(this, subscription);
+        }
+    }
+
     IStateSubscription IReadOnlyState.OnChange(Action<StateChangedEventArgs> handler)
     {
         ArgumentNullException.ThrowIfNull(handler);
@@ -162,6 +213,22 @@ public sealed class ComputedState<T> : IComputedState<T>, IDisposable
         ArgumentNullException.ThrowIfNull(handler);
 
         return OnChange(args => handler(args), options);
+    }
+
+    IStateSubscription IReadOnlyState.Observe(Action<StateChangedEventArgs> handler)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        return Observe(args => handler(args));
+    }
+
+    IStateSubscription IReadOnlyState.Observe(
+        Action<StateChangedEventArgs> handler,
+        StateSubscriptionOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        return Observe(args => handler(args), options);
     }
 
     /// <summary>

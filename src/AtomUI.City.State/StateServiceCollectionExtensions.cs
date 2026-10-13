@@ -26,6 +26,8 @@ public static class StateServiceCollectionExtensions
             provider => (IApplicationState)provider.GetRequiredService<IStateRegistry>());
         services.TryAddSingleton<IApplicationStateWriter>(
             provider => (IApplicationStateWriter)provider.GetRequiredService<IStateRegistry>());
+        services.TryAddSingleton<IApplicationStateWriterFactory>(
+            provider => (IApplicationStateWriterFactory)provider.GetRequiredService<IStateRegistry>());
 
         return services;
     }

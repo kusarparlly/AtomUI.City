@@ -1,10 +1,50 @@
 using AtomUI.City.Core.Diagnostics;
 using AtomUI.City.State;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AtomUI.City.State.Tests;
 
 public sealed class ApplicationStateTests
 {
+    [Fact]
+    public void AddStateRegistersAuthorityBoundWriterFactory()
+    {
+        var services = new ServiceCollection();
+        services.AddState();
+        using var provider = services.BuildServiceProvider();
+        var registry = provider.GetRequiredService<IStateRegistry>();
+        var factory = provider.GetRequiredService<IApplicationStateWriterFactory>();
+        var key = new StateKey<int>("AtomUI.City.Tests.FactoryOwner");
+        registry.Add(StateDefinition.Create(
+            key,
+            1,
+            access: StateAccessPolicy.OwnerWrite,
+            ownerModule: "Boxer.Documents"));
+
+        var owner = factory.CreateWriter(StateWriteAuthority.Module("Boxer.Documents"));
+        var other = factory.CreateWriter(StateWriteAuthority.Module("Boxer.Settings"));
+
+        Assert.True(owner.Set(key, 2));
+        Assert.Throws<StateAccessDeniedException>(() => other.Set(key, 3));
+    }
+
+    [Fact]
+    public void ApplicationStateObserveEmitsCurrentValueThenChanges()
+    {
+        var key = new StateKey<int>("AtomUI.City.Tests.Observe");
+        var registry = new ApplicationStateRegistry();
+        registry.Add(StateDefinition.Create(key, 1));
+        var notifications = new List<StateChangedEventArgs<int>>();
+
+        using var subscription = registry.Observe(key, notifications.Add);
+        registry.Set(key, 2);
+
+        Assert.Equal(2, notifications.Count);
+        Assert.True(notifications[0].IsInitial);
+        Assert.False(notifications[1].IsInitial);
+        Assert.Equal([0L, 1L], notifications.Select(notification => notification.Version));
+    }
+
     [Fact]
     public void RegistryReadsRegisteredApplicationStateByKey()
     {

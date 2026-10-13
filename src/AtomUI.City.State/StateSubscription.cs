@@ -8,20 +8,24 @@ internal sealed class StateSubscription : IStateSubscription
     private readonly Action<StateChangedEventArgs> _handler;
     private readonly IHostDiagnostics? _diagnostics;
     private readonly StateSubscriptionOptions _options;
-    private readonly Queue<StateChangedEventArgs> _queuedNotifications = [];
+    private readonly Queue<StateChangedEventArgs> _activationNotifications = [];
+    private readonly LinkedList<StateChangedEventArgs> _queuedNotifications = [];
     private readonly object _queueSyncRoot = new();
     private readonly object _executionSyncRoot = new();
     private int _disposed;
+    private int _activationState;
     private bool _isProcessingQueue;
 
     public StateSubscription(
         Action<StateChangedEventArgs> handler,
         StateSubscriptionOptions options,
-        IHostDiagnostics? diagnostics = null)
+        IHostDiagnostics? diagnostics = null,
+        bool startInactive = false)
     {
         _handler = handler;
         _options = options;
         _diagnostics = diagnostics;
+        _activationState = startInactive ? 0 : 2;
     }
 
     public void Notify(StateChangedEventArgs args)
@@ -31,6 +35,58 @@ internal sealed class StateSubscription : IStateSubscription
             return;
         }
 
+        lock (_queueSyncRoot)
+        {
+            if (Volatile.Read(ref _disposed) != 0)
+            {
+                return;
+            }
+
+            if (_activationState != 2)
+            {
+                _activationNotifications.Enqueue(args);
+                return;
+            }
+        }
+
+        NotifyActivated(args);
+    }
+
+    public void Activate()
+    {
+        while (true)
+        {
+            StateChangedEventArgs[] pending;
+
+            lock (_queueSyncRoot)
+            {
+                if (Volatile.Read(ref _disposed) != 0)
+                {
+                    _activationNotifications.Clear();
+                    return;
+                }
+
+                _activationState = 1;
+
+                if (_activationNotifications.Count == 0)
+                {
+                    _activationState = 2;
+                    return;
+                }
+
+                pending = _activationNotifications.ToArray();
+                _activationNotifications.Clear();
+            }
+
+            foreach (var args in pending)
+            {
+                NotifyActivated(args);
+            }
+        }
+    }
+
+    private void NotifyActivated(StateChangedEventArgs args)
+    {
         try
         {
             switch (_options.DispatchPolicy)
@@ -60,6 +116,7 @@ internal sealed class StateSubscription : IStateSubscription
 
         lock (_queueSyncRoot)
         {
+            _activationNotifications.Clear();
             _queuedNotifications.Clear();
             _isProcessingQueue = false;
         }
@@ -73,6 +130,7 @@ internal sealed class StateSubscription : IStateSubscription
     {
         var shouldStartProcessing = false;
         var queueOverflowed = false;
+        var dropIncoming = false;
 
         lock (_queueSyncRoot)
         {
@@ -83,11 +141,29 @@ internal sealed class StateSubscription : IStateSubscription
 
             if (_queuedNotifications.Count == _options.MaxPendingNotifications)
             {
-                _queuedNotifications.Dequeue();
+                if (_queuedNotifications.First!.Value.IsInitial)
+                {
+                    if (_queuedNotifications.Count == 1)
+                    {
+                        dropIncoming = true;
+                    }
+                    else
+                    {
+                        _queuedNotifications.Remove(_queuedNotifications.First.Next!);
+                    }
+                }
+                else
+                {
+                    _queuedNotifications.RemoveFirst();
+                }
+
                 queueOverflowed = true;
             }
 
-            _queuedNotifications.Enqueue(args);
+            if (!dropIncoming)
+            {
+                _queuedNotifications.AddLast(args);
+            }
 
             if (!_isProcessingQueue)
             {
@@ -128,7 +204,8 @@ internal sealed class StateSubscription : IStateSubscription
                     return;
                 }
 
-                args = _queuedNotifications.Dequeue();
+                args = _queuedNotifications.First!.Value;
+                _queuedNotifications.RemoveFirst();
             }
 
             if (_options.DispatchPolicy == StateDispatchPolicy.Dispatcher)

@@ -6,6 +6,23 @@ namespace AtomUI.City.State.Tests;
 public sealed class ComputedStateTests
 {
     [Fact]
+    public void ObserveEmitsComputedCurrentValueBeforeDependencyChanges()
+    {
+        var source = new WritableState<int>(2);
+        using var computed = new ComputedState<int>(() => source.Value * 2, source);
+        var notifications = new List<StateChangedEventArgs<int>>();
+
+        using var subscription = computed.Observe(notifications.Add);
+        source.SetValue(3);
+
+        Assert.Equal(2, notifications.Count);
+        Assert.True(notifications[0].IsInitial);
+        Assert.Equal(4, notifications[0].NewValue);
+        Assert.False(notifications[1].IsInitial);
+        Assert.Equal(6, notifications[1].NewValue);
+    }
+
+    [Fact]
     public void ComputedStateCachesValueUntilDependencyChanges()
     {
         var source = new WritableState<int>(1);
@@ -212,7 +229,7 @@ public sealed class ComputedStateTests
     }
 
     [Fact]
-    public async Task ComputedStateDiscardsResultInvalidatedWhileComputeIsRunning()
+    public async Task ComputedStatePublishesConcurrentDependencyUpdatesInCommitOrder()
     {
         var source = new WritableState<int>(1);
         using var staleComputeEntered = new ManualResetEventSlim(false);
@@ -238,7 +255,7 @@ public sealed class ComputedStateTests
         await staleWrite.WaitAsync(TimeSpan.FromSeconds(5));
 
         Assert.Equal(3, computed.Value);
-        Assert.Equal([3], changes);
+        Assert.Equal([2, 3], changes);
     }
 
     [Fact]
@@ -305,6 +322,34 @@ public sealed class ComputedStateTests
         }
 
         IStateSubscription IReadOnlyState.OnChange(
+            Action<StateChangedEventArgs> handler,
+            StateSubscriptionOptions options)
+        {
+            SubscriptionCount++;
+            return _subscription;
+        }
+
+        public IStateSubscription Observe(Action<StateChangedEventArgs<int>> handler)
+        {
+            SubscriptionCount++;
+            return _subscription;
+        }
+
+        public IStateSubscription Observe(
+            Action<StateChangedEventArgs<int>> handler,
+            StateSubscriptionOptions options)
+        {
+            SubscriptionCount++;
+            return _subscription;
+        }
+
+        IStateSubscription IReadOnlyState.Observe(Action<StateChangedEventArgs> handler)
+        {
+            SubscriptionCount++;
+            return _subscription;
+        }
+
+        IStateSubscription IReadOnlyState.Observe(
             Action<StateChangedEventArgs> handler,
             StateSubscriptionOptions options)
         {

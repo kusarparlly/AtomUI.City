@@ -31,6 +31,18 @@ public interface IReadOnlyState
     IStateSubscription OnChange(
         Action<StateChangedEventArgs> handler,
         StateSubscriptionOptions options);
+
+    /// <summary>
+    /// Atomically observes the current value and all subsequent changes.
+    /// </summary>
+    IStateSubscription Observe(Action<StateChangedEventArgs> handler);
+
+    /// <summary>
+    /// Atomically observes the current value and all subsequent changes.
+    /// </summary>
+    IStateSubscription Observe(
+        Action<StateChangedEventArgs> handler,
+        StateSubscriptionOptions options);
 }
 
 /// <summary>
@@ -52,6 +64,18 @@ public interface IReadOnlyState<T> : IReadOnlyState, IStateValue<T>
     /// Executes the on change operation.
     /// </summary>
     IStateSubscription OnChange(
+        Action<StateChangedEventArgs<T>> handler,
+        StateSubscriptionOptions options);
+
+    /// <summary>
+    /// Atomically observes the current value and all subsequent changes.
+    /// </summary>
+    IStateSubscription Observe(Action<StateChangedEventArgs<T>> handler);
+
+    /// <summary>
+    /// Atomically observes the current value and all subsequent changes.
+    /// </summary>
+    IStateSubscription Observe(
         Action<StateChangedEventArgs<T>> handler,
         StateSubscriptionOptions options);
 }

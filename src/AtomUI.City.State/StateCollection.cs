@@ -13,8 +13,10 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
     private readonly Dictionary<TKey, CollectionItem> _items;
     private readonly IEqualityComparer<TItem> _itemComparer;
     private readonly List<StateSubscription> _subscriptions = [];
+    private readonly Queue<NotificationWorkItem> _pendingNotifications = [];
     private readonly object _syncRoot = new();
     private bool _disposed;
+    private bool _notificationWorkerActive;
     private long _version;
 
     /// <summary>
@@ -115,8 +117,7 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
     {
         ArgumentNullException.ThrowIfNull(snapshot);
 
-        StateCollectionChangedEventArgs<TKey, TItem> args;
-        StateSubscription[] subscriptions;
+        var shouldProcessNotifications = false;
 
         lock (_syncRoot)
         {
@@ -184,11 +185,15 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
 
             _version = snapshot.CollectionVersion;
 
-            args = new StateCollectionChangedEventArgs<TKey, TItem>(changes);
-            subscriptions = _subscriptions.ToArray();
+            var args = new StateCollectionChangedEventArgs<TKey, TItem>(changes);
+            _pendingNotifications.Enqueue(new NotificationWorkItem(args, _subscriptions.ToArray()));
+            shouldProcessNotifications = StartNotificationWorker();
         }
 
-        Notify(args, subscriptions);
+        if (shouldProcessNotifications)
+        {
+            ProcessNotifications();
+        }
 
         return true;
     }
@@ -200,8 +205,7 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
     {
         ArgumentNullException.ThrowIfNull(key);
 
-        StateCollectionChangedEventArgs<TKey, TItem> args;
-        StateSubscription[] subscriptions;
+        var shouldProcessNotifications = false;
 
         lock (_syncRoot)
         {
@@ -244,11 +248,15 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
                     ItemVersion: 1);
             }
 
-            args = new StateCollectionChangedEventArgs<TKey, TItem>(change);
-            subscriptions = _subscriptions.ToArray();
+            var args = new StateCollectionChangedEventArgs<TKey, TItem>(change);
+            _pendingNotifications.Enqueue(new NotificationWorkItem(args, _subscriptions.ToArray()));
+            shouldProcessNotifications = StartNotificationWorker();
         }
 
-        Notify(args, subscriptions);
+        if (shouldProcessNotifications)
+        {
+            ProcessNotifications();
+        }
 
         return true;
     }
@@ -260,8 +268,7 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
     {
         ArgumentNullException.ThrowIfNull(items);
 
-        StateCollectionChangedEventArgs<TKey, TItem> args;
-        StateSubscription[] subscriptions;
+        var shouldProcessNotifications = false;
 
         lock (_syncRoot)
         {
@@ -337,11 +344,15 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
                 _items.Add(item.Key, item.Value);
             }
 
-            args = new StateCollectionChangedEventArgs<TKey, TItem>(changes);
-            subscriptions = _subscriptions.ToArray();
+            var args = new StateCollectionChangedEventArgs<TKey, TItem>(changes);
+            _pendingNotifications.Enqueue(new NotificationWorkItem(args, _subscriptions.ToArray()));
+            shouldProcessNotifications = StartNotificationWorker();
         }
 
-        Notify(args, subscriptions);
+        if (shouldProcessNotifications)
+        {
+            ProcessNotifications();
+        }
 
         return true;
     }
@@ -353,8 +364,7 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
     {
         ArgumentNullException.ThrowIfNull(key);
 
-        StateCollectionChangedEventArgs<TKey, TItem> args;
-        StateSubscription[] subscriptions;
+        var shouldProcessNotifications = false;
 
         lock (_syncRoot)
         {
@@ -378,11 +388,15 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
                 _version,
                 itemVersion);
 
-            args = new StateCollectionChangedEventArgs<TKey, TItem>(change);
-            subscriptions = _subscriptions.ToArray();
+            var args = new StateCollectionChangedEventArgs<TKey, TItem>(change);
+            _pendingNotifications.Enqueue(new NotificationWorkItem(args, _subscriptions.ToArray()));
+            shouldProcessNotifications = StartNotificationWorker();
         }
 
-        Notify(args, subscriptions);
+        if (shouldProcessNotifications)
+        {
+            ProcessNotifications();
+        }
 
         return true;
     }
@@ -392,8 +406,7 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
     /// </summary>
     public bool Clear()
     {
-        StateCollectionChangedEventArgs<TKey, TItem> args;
-        StateSubscription[] subscriptions;
+        var shouldProcessNotifications = false;
 
         lock (_syncRoot)
         {
@@ -417,11 +430,15 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
                     item.Value.Version + 1))
                 .ToArray();
             _items.Clear();
-            args = new StateCollectionChangedEventArgs<TKey, TItem>(changes);
-            subscriptions = _subscriptions.ToArray();
+            var args = new StateCollectionChangedEventArgs<TKey, TItem>(changes);
+            _pendingNotifications.Enqueue(new NotificationWorkItem(args, _subscriptions.ToArray()));
+            shouldProcessNotifications = StartNotificationWorker();
         }
 
-        Notify(args, subscriptions);
+        if (shouldProcessNotifications)
+        {
+            ProcessNotifications();
+        }
 
         return true;
     }
@@ -443,6 +460,8 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
             _disposed = true;
             subscriptions = _subscriptions.ToArray();
             _subscriptions.Clear();
+            _pendingNotifications.Clear();
+            _notificationWorkerActive = false;
         }
 
         foreach (var subscription in subscriptions)
@@ -484,6 +503,58 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         return new RemovingStateSubscription(this, subscription);
     }
 
+    /// <summary>
+    /// Atomically observes the current snapshot and all subsequent changes.
+    /// </summary>
+    public IStateSubscription Observe(Action<StateCollectionObservation<TKey, TItem>> handler)
+    {
+        return Observe(handler, StateSubscriptionOptions.Immediate);
+    }
+
+    /// <summary>
+    /// Atomically observes the current snapshot and all subsequent changes.
+    /// </summary>
+    public IStateSubscription Observe(
+        Action<StateCollectionObservation<TKey, TItem>> handler,
+        StateSubscriptionOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(options);
+
+        var subscription = new StateSubscription(
+            args =>
+            {
+                if (args.IsInitial)
+                {
+                    handler(StateCollectionObservation<TKey, TItem>.Initial(
+                        (StateCollectionSnapshot<TKey, TItem>)args.NewValue!));
+                    return;
+                }
+
+                handler(StateCollectionObservation<TKey, TItem>.Changed(
+                    (StateCollectionChangedEventArgs<TKey, TItem>)args));
+            },
+            options,
+            _diagnostics,
+            startInactive: true);
+
+        lock (_syncRoot)
+        {
+            ThrowIfDisposed();
+
+            var snapshot = CreateSnapshotUnderLock();
+            subscription.Notify(new StateChangedEventArgs(
+                oldValue: null,
+                snapshot,
+                snapshot.CollectionVersion,
+                isInitial: true));
+            _subscriptions.Add(subscription);
+        }
+
+        subscription.Activate();
+        return new RemovingStateSubscription(this, subscription);
+    }
+
     private void Notify(
         StateCollectionChangedEventArgs<TKey, TItem> args,
         StateSubscription[] subscriptions)
@@ -494,6 +565,50 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
         {
             subscription.Notify(args);
         }
+    }
+
+    private bool StartNotificationWorker()
+    {
+        if (_notificationWorkerActive)
+        {
+            return false;
+        }
+
+        _notificationWorkerActive = true;
+        return true;
+    }
+
+    private void ProcessNotifications()
+    {
+        while (true)
+        {
+            NotificationWorkItem workItem;
+
+            lock (_syncRoot)
+            {
+                if (_disposed || _pendingNotifications.Count == 0)
+                {
+                    _notificationWorkerActive = false;
+                    return;
+                }
+
+                workItem = _pendingNotifications.Dequeue();
+            }
+
+            Notify(workItem.Args, workItem.Subscriptions);
+        }
+    }
+
+    private StateCollectionSnapshot<TKey, TItem> CreateSnapshotUnderLock()
+    {
+        var items = _items
+            .Select(item => new StateCollectionSnapshotEntry<TKey, TItem>(
+                item.Key,
+                item.Value.Value,
+                item.Value.Version))
+            .ToArray();
+
+        return new StateCollectionSnapshot<TKey, TItem>(_version, items);
     }
 
     private void NotifyChangedEvent(StateCollectionChangedEventArgs<TKey, TItem> args)
@@ -571,4 +686,8 @@ public sealed class StateCollection<TKey, TItem> : IStateCollection<TKey, TItem>
             _collection.Remove(_subscription);
         }
     }
+
+    private sealed record NotificationWorkItem(
+        StateCollectionChangedEventArgs<TKey, TItem> Args,
+        StateSubscription[] Subscriptions);
 }

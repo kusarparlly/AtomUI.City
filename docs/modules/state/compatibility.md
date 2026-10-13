@@ -42,6 +42,7 @@
 - `StateChangedEventArgs.IsInitial` 对既有变更通知恒为 `false`。
 - `IApplicationStateWriterFactory` 是新增 DI 服务；现有 `IApplicationStateWriter` Host writer 注册暂时保留，避免 Preview 使用者无迁移窗口。
 - 并发情况下通知顺序收紧为按提交版本 FIFO；单线程 Immediate 行为保持同步投递。
+- `IReadOnlyState` 与 `IStateCollection` 仍处于 Preview；自行实现这些接口的源码消费者需要补充 `Observe(...)` 成员后重新编译。
 
 ## 数据格式兼容
 

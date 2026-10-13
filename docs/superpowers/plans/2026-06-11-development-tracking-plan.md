@@ -154,7 +154,7 @@
 - [x] AUC-STATE-006 Collection State。验收重点：change kind、item/collection version、重复 key 合并、restore 版本纪律、快照不可变和 dispose 合同。
 - [x] AUC-STATE-007 Diagnostics。验收重点：AUCSTA001-011。
 - [x] AUC-STATE-008 Threading。验收重点：不隐式 UI、延迟通知串行 FIFO、有界队列与溢出诊断。
-- [ ] AUC-STATE-009 Atomic Observation。验收重点：当前快照与订阅原子建立、初始通知恰好一次、并发版本顺序、锁外回调、集合观察与模块 Writer 工厂。
+- [x] AUC-STATE-009 Atomic Observation。验收重点：当前快照与订阅原子建立、初始通知恰好一次、并发版本顺序、锁外回调、集合观察与模块 Writer 工厂。证据：State 154/154、Public API governance 4/4、Release 全解决方案 0 warning/0 error。
 
 ## EventBus
 

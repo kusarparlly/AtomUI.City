@@ -30,7 +30,7 @@
 | AUC-STATE-006 | Unit | StateCollectionTests | 断言 change kind、item version、collection version、重复 key 合并、仅快照版本差异不回退、快照不可变和 dispose 合同。 | 重复 key、missing key、clear、disposed collection、null key、未知 change kind、负 version。 | Completed |
 | AUC-STATE-007 | Unit | StateDiagnosticsTests; StateThreadingTests | 断言 AUCSTA001-011、唯一性、格式、severity 和定位 context。 | handler、queue overflow、update、restore、dispose、access failure、diagnostics collector 缺失。 | Completed |
 | AUC-STATE-008 | Unit | StateThreadingTests | 断言不隐式 UI、并发写、锁外通知、dispatcher unavailable diagnostics、延迟策略有界串行 FIFO。 | 并发写、调度器不可用、队列溢出、未完成 dispatcher operation、延迟回调释放。 | Completed |
-| AUC-STATE-009 | Unit / Contract / Concurrency | WritableStateTests; ComputedStateTests; ApplicationStateTests; StateCollectionTests; StateThreadingTests | 断言初始快照恰好一次、注册边界不漏更新、版本顺序、锁外回调、集合快照、Dispose 竞态和模块 Writer 工厂。 | 并发注册/写入、pending initial dispose、容量 1 队列、OwnerWrite authority。 | Planned |
+| AUC-STATE-009 | Unit / Contract / Concurrency | WritableStateTests; ComputedStateTests; ApplicationStateTests; StateCollectionTests; StateThreadingTests | 断言初始快照恰好一次、注册边界不漏更新、版本顺序、锁外回调、集合快照、Dispose 竞态和模块 Writer 工厂。 | 并发注册/写入、pending initial dispose、容量 1 队列、OwnerWrite authority。 | Completed（State 154/154；Public API 4/4） |
 
 ## 缺口处理
 

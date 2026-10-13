@@ -8,6 +8,7 @@ namespace AtomUI.City.State;
 public sealed class ApplicationStateRegistry :
     IApplicationState,
     IApplicationStateWriter,
+    IApplicationStateWriterFactory,
     IStateRegistry
 {
     private readonly IHostDiagnostics? _diagnostics;
@@ -98,6 +99,32 @@ public sealed class ApplicationStateRegistry :
         ArgumentNullException.ThrowIfNull(handler);
 
         return Get(key).OnChange(handler);
+    }
+
+    /// <summary>
+    /// Atomically observes the current value and all subsequent changes.
+    /// </summary>
+    public IStateSubscription Observe<T>(
+        StateKey<T> key,
+        Action<StateChangedEventArgs<T>> handler)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        return Get(key).Observe(handler);
+    }
+
+    /// <summary>
+    /// Atomically observes the current value and all subsequent changes.
+    /// </summary>
+    public IStateSubscription Observe<T>(
+        StateKey<T> key,
+        Action<StateChangedEventArgs<T>> handler,
+        StateSubscriptionOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+        ArgumentNullException.ThrowIfNull(options);
+
+        return Get(key).Observe(handler, options);
     }
 
     /// <summary>

@@ -30,6 +30,32 @@ public sealed class StateThreadingTests
     }
 
     [Fact]
+    public async Task ObserveDoesNotLoseOrReorderConcurrentUpdates()
+    {
+        var state = new WritableState<int>(0);
+        var versions = new List<long>();
+        var syncRoot = new object();
+        using var subscription = state.Observe(args =>
+        {
+            lock (syncRoot)
+            {
+                versions.Add(args.Version);
+            }
+        });
+
+        var updates = Enumerable.Range(0, 100)
+            .Select(_ => Task.Run(() => state.Update(value => value + 1)))
+            .ToArray();
+
+        await Task.WhenAll(updates);
+
+        lock (syncRoot)
+        {
+            Assert.Equal(Enumerable.Range(0, 101).Select(value => (long)value), versions);
+        }
+    }
+
+    [Fact]
     public void ChangeNotificationsRunOutsideMutationLock()
     {
         var state = new WritableState<int>(0);
@@ -131,6 +157,23 @@ public sealed class StateThreadingTests
         dispatcher.RunPending();
 
         Assert.Equal(0, observed);
+    }
+
+    [Fact]
+    public void DisposedDispatcherObservationSkipsPendingInitialCallback()
+    {
+        var dispatcher = new DeferredDispatcher();
+        var state = new WritableState<int>(7);
+        var notifications = 0;
+
+        var subscription = state.Observe(
+            _ => notifications++,
+            StateSubscriptionOptions.Dispatcher(dispatcher));
+
+        subscription.Dispose();
+        dispatcher.RunPending();
+
+        Assert.Equal(0, notifications);
     }
 
     [Fact]

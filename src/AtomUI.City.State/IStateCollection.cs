@@ -62,4 +62,16 @@ public interface IStateCollection<TKey, TItem> : IDisposable
     IStateSubscription OnChange(
         Action<StateCollectionChangedEventArgs<TKey, TItem>> handler,
         StateSubscriptionOptions options);
+
+    /// <summary>
+    /// Atomically observes the current snapshot and all subsequent changes.
+    /// </summary>
+    IStateSubscription Observe(Action<StateCollectionObservation<TKey, TItem>> handler);
+
+    /// <summary>
+    /// Atomically observes the current snapshot and all subsequent changes.
+    /// </summary>
+    IStateSubscription Observe(
+        Action<StateCollectionObservation<TKey, TItem>> handler,
+        StateSubscriptionOptions options);
 }

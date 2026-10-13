@@ -71,4 +71,4 @@ AtomUI.City.State 作为 Host 服务或模块贡献接入 Core 生命周期，�
 
 Verified
 
-State 的 AUC-STATE-001 至 AUC-STATE-008 已完成实现和合同测试；AUC-STATE-009 正在补齐原子观察和模块 Writer 工厂。单个功能点状态以 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准；后续 public contract 变化仍须通过兼容性与测试门禁。
+State 的 AUC-STATE-001 至 AUC-STATE-009 已完成实现和合同测试。单个功能点状态以 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准；后续 public contract 变化仍须通过兼容性与测试门禁。
