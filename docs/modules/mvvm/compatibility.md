@@ -23,6 +23,13 @@
 - `InteractionContext` 的 request id、request type、activation scope id、handler type，以及 Interaction 取消后不提交 handler result 的行为进入 1.0 兼容承诺。
 - `ValidationScope.SetMessages`、`ValidationChanged`、`ValidationChangedEventArgs`、message 去重和 Dispose 后 mutation 拒绝进入 1.0 兼容承诺。
 
+## 已批准的 Preview 迁移
+
+- `OperationResult` 将在 `AUC-MVVM-008` 中重命名为 `OperationExecutionResult`，明确它是命令/operation 运行快照，不是领域业务结果。实现提交必须同时更新 public API baseline、示例和迁移说明。
+- `CommandFactory.CreateAsync` 的固定 `IActivationScope?` 捕获不再作为 ViewModel 默认合同；新的 activation owner 入口每次执行解析当前 Scope。显式固定 Scope 只保留为标注清晰的低级一次性入口。
+- 旧的“异步命令异常只记录 Failed 且不向 awaited caller 抛出”行为将由 `AUC-MVVM-010` 替换。调用方必须迁移为 await/catch，UI `ICommand` 路径必须提供应用异常 handler。
+- 上述能力完成前保持 Planned，不得把文档目标误认为当前二进制兼容面。
+
 ## 数据格式兼容
 
 - manifest、snapshot、generated output、CLI JSON、template variables 和 MSBuild properties 必须有版本或稳定字段说明。

@@ -63,3 +63,13 @@
 ## 演进规则
 
 `AUCPRS001-017`、`AUCPRS020-043` 是 1.0 active 集合；018/019 永久 reserved。新增 code 必须同步源码、Feature、API card、compatibility 和断言测试。
+
+## 已批准但待实现的 ViewModel Composition 诊断
+
+| Reserved Code | Name | 必需上下文 |
+| --- | --- | --- |
+| `AUCPRS044` | ViewModelCompositionAttached | `ownerId`, `compositionId`, `parentId`, `viewModelType`, `role` |
+| `AUCPRS045` | ViewModelCompositionRejected | `ownerId`, `compositionId`, `parentId`, `viewModelType`, `reason` |
+| `AUCPRS046` | ViewModelCompositionCleanupFailed | `ownerId`, `compositionId`, `viewModelType`, `stage`, `exceptionType` |
+
+这些编号由 `AUC-PRESENTATION-017` 保留，源码和断言测试落地前不属于 active 集合。

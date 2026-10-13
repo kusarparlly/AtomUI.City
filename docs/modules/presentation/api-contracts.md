@@ -6,6 +6,19 @@
 
 本文记录 1.0 public API 的用途、前置条件、所有权、失败、取消、并发和释放语义。源码新增 public 类型时必须同步更新本文。
 
+## 已批准、待实现的 ViewModel Composition API
+
+`AUC-PRESENTATION-017` 将增加显式 composition service 和异步 ownership lease：
+
+- 调用方按 Runtime/Window owner identity attach 一个逻辑 Root，并显式在 parent lease 下 attach Child。
+- Root/Child 是角色而非基类；MVVM public API 不增加 Presentation 角色。
+- 每次 attach 返回唯一 `IAsyncDisposable` lease；child 拥有独立、链接父取消的 ActivationScope。
+- 重复 owned instance、重复 identity、跨 owner parent、终态 owner 和 lease dispose 后 mutation 稳定拒绝。
+- RouteOutlet `PresentationEntry` 不自动加入 composition tree。
+- Window close/Runtime stop 接管遗留 Root lease，按 leaf-to-root 完整清理并聚合失败。
+
+public 类型最终命名需要在实现提交的 API review 中冻结，行为不能弱化为同步 Dispose、反射发现或全局 Root 单例。完整合同见 [viewmodel-composition.md](viewmodel-composition.md)。
+
 ## 注册与 Runtime
 
 | API | 合同 |
@@ -108,3 +121,5 @@ Outlet 失败语义：
 ## 通用规则
 
 必填引用使用 `ArgumentNullException`，空 identity 使用 `ArgumentException`，未知 enum 使用 `ArgumentOutOfRangeException`。终态 mutating API 返回稳定 Result/PresentationException/ObjectDisposedException。取消不得包装成普通失败，除非 API 的 Result 模型明确使用 Canceled 状态。
+
+Composition API 实现时必须同步加入 Public 类型族、PublicAPI baseline、诊断和 compatibility；Feature 完成前不得把本节目标当作当前二进制能力。

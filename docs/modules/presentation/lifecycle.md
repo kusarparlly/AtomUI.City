@@ -41,6 +41,10 @@ adapter owns plan
 
 Runtime 先进入 Stopping 并拒绝新 Window；已经接受的 Outlet/Interaction 及释放路径仍可使用 dispatcher。所有 WindowSession 都要尝试关闭，单个失败不阻断其他窗口；最后停止 PresentationScope。失败聚合后 Runtime 进入 Faulted，否则进入 Stopped。
 
+## 逻辑 Root/Child（Planned）
+
+`AUC-PRESENTATION-017` 落地后，Window/Runtime owner 在关闭时先拒绝新的 Root/Child attach，再按 leaf-to-root 结束 composition tree。每个 child 先关闭 Scope 准入、取消并 drain 任务、停用、释放自己的 lease；siblings 的失败互相隔离，最终聚合到 owner。RouteOutlet Entry 继续走独立关闭事务，不被隐式挂入 composition tree。完整状态机见 [viewmodel-composition.md](viewmodel-composition.md)。
+
 ## 插件撤销
 
 先阻止新 contribution，再关闭 active view，随后撤销 interaction、view descriptor、resource dictionary 和 resource lease。单项资源失败被收集，不跳过其余资源；仍有 active view 时拒绝插件卸载。

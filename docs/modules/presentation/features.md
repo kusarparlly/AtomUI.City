@@ -22,6 +22,7 @@
 | AUC-PRESENTATION-014 | Hierarchical Fault Model | Release Verified | failure injection and diagnostics tests |
 | AUC-PRESENTATION-015 | Bounded Backpressure and Candidate Ownership | Release Verified | PresentationIndustrialContractTests |
 | AUC-PRESENTATION-016 | Deterministic Window Close Origins and Confirmation | Release Verified | unit close-origin tests, headless fixture, Windows desktop process test |
+| AUC-PRESENTATION-017 | Logical Root and Owned Child ViewModels | Planned | composition unit/contract tests, Window/Runtime lifecycle tests |
 
 ## Feature 合同摘要
 
@@ -60,6 +61,10 @@ resource/view/handler 带 owner 和 revoke；active view 优先清理，局部�
 ### 013 Retired
 
 Presentation 主包不再引用 Localization，不提供 culture revision、文案 binding 或 language package 处理。该编号永久保留，不得重用。
+
+### 017 ViewModel composition
+
+MVVM 保持无 Root/Child 角色；Presentation 显式把逻辑 Root 附着到 Runtime/Window owner，并以异步 lease 建立 owned Child。Child 使用独立且链接父取消的 ActivationScope，释放 leaf-to-root；不反射扫描、不引入 Root/Child 基类、不把 RouteOutlet Entry 自动纳入组合树。完整合同见 [viewmodel-composition.md](viewmodel-composition.md)。
 
 ## 治理门禁
 

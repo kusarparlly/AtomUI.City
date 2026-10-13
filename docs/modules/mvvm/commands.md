@@ -1,5 +1,7 @@
 # AtomUI.City.Mvvm Commands 合同
 
+> `AUC-MVVM-008` 至 `010` 已批准泛型参数、业务 CanExecute、并发策略、动态 ActivationScope 和异常交付新合同；实现目标见 [structured-concurrency-and-commands-v2.md](structured-concurrency-and-commands-v2.md)。本文其余段落描述当前已实现基线，不能用旧行为覆盖已接受的迁移决定。
+
 ## 适用范围
 
 本专题属于 `AtomUI.City.Mvvm` 模块文档体系，必须与 [overview.md](overview.md)、[features.md](features.md)、[api-contracts.md](api-contracts.md)、[testing.md](testing.md) 保持一致。它只细化 `Commands` 相关实现决策，不重新定义模块边界。

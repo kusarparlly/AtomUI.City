@@ -6,6 +6,8 @@
 City Host / Application DI
   -> PresentationRuntime (PresentationScope)
     -> WindowSession (WindowScope)
+      -> logical Root composition lease
+        -> owned Child composition lease(s)
       -> named RouteOutlet
         -> PresentationEntry
           -> ViewModelLease + BoundViewHandle + ActivationScope + visual subscription
@@ -22,6 +24,8 @@ Routing-Presentation adapter 是调用编排者，Router snapshot 是导航真�
 - final commit 前可以恢复旧 physical content；final commit 后不得回滚 Router 或新 Entry。
 - Bind/Unbind 不伪造 VisualTree 事件；回执必须来自真实 Avalonia 事件并匹配 identity。
 - Presentation 不含文案、多语言、语言包或 Localization 状态机。
+- MVVM 不感知 Root/Child；Presentation 只通过显式 lease 建立逻辑组合，不反射对象图或 visual tree。
+- Child 使用独立 ActivationScope 并链接父取消；RouteOutlet Entry 与 composition tree 相互隔离。
 
 ## 所有权表
 
@@ -35,6 +39,8 @@ Routing-Presentation adapter 是调用编排者，Router snapshot 是导航真�
 | BoundViewHandle | ViewBinder/application adapter | PresentationEntry | Entry dispose on UI dispatcher |
 | modal request | caller | per-Window lane after admission | handled/canceled/failed |
 | plugin contribution | plugin adapter | plugin/contribution lease | revoke/unload |
+| logical Root ViewModel | application/composition service | Runtime 或 Window composition owner | lease dispose/Window close/Runtime stop |
+| owned Child ViewModel | application/composition service | parent composition lease | child lease/parent stop |
 
 ## 故障域
 
@@ -50,6 +56,8 @@ Routing-Presentation adapter 是调用编排者，Router snapshot 是导航真�
 ## 扩展点
 
 公开扩展点只有 DI extension、`PresentationModule`、View attribute/generated registrar、View/Interaction/resource registration、Outlet target 和 failure presenter。新增扩展点必须同时更新 Feature、API card、诊断、测试与兼容性文档。
+
+`AUC-PRESENTATION-017` 完成后，显式 ViewModel composition service/lease 加入上述扩展点；它不允许第三方替换 ownership 状态机。
 
 ## AOT
 

@@ -1,7 +1,7 @@
 # AtomUI.City.Mvvm
 
 文档等级：Level 3
-成熟度：Verified
+成熟度：Verified baseline / Approved expansion pending
 执行边界：ViewModel programming model
 程序集：`AtomUI.City.Mvvm`
 源码：`src/AtomUI.City.Mvvm`
@@ -64,12 +64,13 @@ AtomUI.City.Mvvm 作为 Host 服务或模块贡献接入 Core 生命周期，必
 | [integration.md](integration.md) | 跨模块依赖方向、生命周期、线程和失败行为。 |
 | [activation.md](activation.md) | Activation 设计：激活模型、ActivationScope、State/EventBus 订阅绑定。 |
 | [commands.md](commands.md) | Command 设计：OperationScope、执行状态、取消策略、组合命令。 |
+| [structured-concurrency-and-commands-v2.md](structured-concurrency-and-commands-v2.md) | 已批准的 ActivationScope 结构化任务和 Command V2 实施合同。 |
 | [interactions.md](interactions.md) | Interaction 设计：请求模型、handler 生命周期、结果模型。 |
 | [validation.md](validation.md) | Validation 设计：ValidationScope、结果模型、Command 联动。 |
 | [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) | Feature 到现有基线、缺口、必补测试和实现工作的追踪。 |
 
 ## 当前成熟度状态
 
-Verified
+Verified baseline / Approved expansion pending
 
-该状态表示模块已按产品级合同完成实现、测试与文档对齐（含并发加固与诊断体系 AUCMVVM001-008）。单个功能点状态以 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。
+`AUC-MVVM-001` 至 `006` 维持既有 Verified 基线；`AUC-MVVM-007` 至 `010` 已批准设计但尚未实现，不能报告为 Completed。单个功能点状态以 [features.md](features.md) 和 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。

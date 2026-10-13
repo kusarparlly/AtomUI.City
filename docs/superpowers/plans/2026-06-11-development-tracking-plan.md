@@ -4,12 +4,12 @@
 
 ## 当前结论
 
-- 1.0 总包发布状态：已具备发布条件；全部 1.0 Feature 和最终门禁均完成，尚未执行远端 NuGet 发布。
-- 运行时本地候选状态：Build、Core、EventBus、State、MVVM、Routing、Data、Localization、Security、Presentation 共 10 个包已通过隔离本地 NuGet consumer；尚未执行远端 NuGet 发布。
-- 全局进度：144/144。
-- 模块 Feature 合同：134/134。
+- 1.0 总包发布状态：扩展后的 1.0 Feature 集合尚未完成；MVVM 结构化任务/Command V2 和 Presentation ViewModel Composition 完成前不得发布新候选。
+- 运行时本地候选状态：既有 Build、Core、EventBus、State、MVVM、Routing、Data、Localization、Security、Presentation 候选曾通过隔离本地 NuGet consumer；该证据不覆盖 2026-10-13 新增的 5 个 Planned Feature。
+- 全局进度：152/157。
+- 模块 Feature 合同：142/147。
 - 最终发布门禁：10/10。
-- 最近校准日期：2026-09-13。
+- 最近校准日期：2026-10-13。
 
 ## 统计规则
 
@@ -39,8 +39,8 @@
 | Build | 8 | 0 | 8 | 已完成 |
 | Generators | 8 | 0 | 8 | 已完成 |
 | Routing | 12 | 0 | 12 | 已完成 |
-| Presentation | 8 | 0 | 8 | 已完成 |
-| MVVM | 6 | 0 | 6 | 已完成 |
+| Presentation | 16 | 1 | 17 | 进行中 |
+| MVVM | 6 | 4 | 10 | 进行中 |
 | State | 8 | 0 | 8 | 已完成 |
 | EventBus | 6 | 0 | 6 | 已完成 |
 | PluginSystem | 8 | 0 | 8 | 已完成 |
@@ -120,6 +120,15 @@
 - [x] AUC-PRESENTATION-006 Interaction and Validation Bridge。验收重点：handler 注册撤销、无 handler、验证消息变化、控件释放和取消。
 - [x] AUC-PRESENTATION-007 Localization and Resource Bridge。验收重点：culture 切换、fallback、resource revoke、插件资源卸载和局部失败隔离。
 - [x] AUC-PRESENTATION-008 Plugin UI Unload Coordination。验收重点：active view lease、卸载撤销、拒绝卸载、资源释放和重复 unload。
+- [x] AUC-PRESENTATION-009 Runtime and Window Sessions。验收重点：Attach、Show 前注册、WindowScope、Host stop 和真实窗口生命周期。
+- [x] AUC-PRESENTATION-010 ViewModel Acquisition and Entry Ownership。验收重点：精确复用、DI scope、显式/generated factory 和 async lease。
+- [x] AUC-PRESENTATION-011 Scoped Modal Interaction Resolution。验收重点：分层 handler、Window FIFO、跨 Window 并行、取消和撤销。
+- [x] AUC-PRESENTATION-012 Layered View Overrides。验收重点：owner override/revoke、恢复、精确 key 和 generator 确定性。
+- [x] AUC-PRESENTATION-013 Presentation Localization Revision Convergence（Retired Before 1.0）。验收重点：编号保留，Localization 能力退出 Presentation 主包。
+- [x] AUC-PRESENTATION-014 Hierarchical Fault Model。验收重点：Operation/Outlet/Window/Runtime 故障域、失败注入和诊断。
+- [x] AUC-PRESENTATION-015 Bounded Backpressure and Candidate Ownership。验收重点：有界 FIFO、满载拒绝、single owner 和竞态回收。
+- [x] AUC-PRESENTATION-016 Deterministic Window Close Origins and Confirmation。验收重点：三类 close origin、唯一 confirmation、并发事务和真实平台证明。
+- [ ] AUC-PRESENTATION-017 Logical Root and Owned Child ViewModels。验收重点：显式 Root/Child lease、独立链接 Scope、leaf-to-root、部分失败继续和 Outlet 隔离。
 
 ## MVVM
 
@@ -129,6 +138,10 @@
 - [x] AUC-MVVM-004 Interaction Requests。验收重点：有 handler、无 handler、异常、取消、泛型 result 和 handler scope 释放。
 - [x] AUC-MVVM-005 Validation Model。验收重点：消息增删、状态聚合、重复处理、释放和 Presentation binding 输入。
 - [x] AUC-MVVM-006 Operation and Cancellation Scope。验收重点：状态转换、取消顺序、重复终态、耗时字段和资源释放。
+- [ ] AUC-MVVM-007 Activation-scoped Structured Tasks。验收重点：Start/Unique、准入关闭、取消 drain、Dispose 竞态、超时诊断和回收。
+- [ ] AUC-MVVM-008 Typed Commands and CanExecute。验收重点：泛型参数、业务 predicate、通知、取消和 OperationExecutionResult API。
+- [ ] AUC-MVVM-009 Command Concurrency and Activation Ownership。验收重点：Reject/Allow/RejectByKey、原子准入、活动计数、Scope A/B 和 inactive rejection。
+- [ ] AUC-MVVM-010 Command Exception Delivery。验收重点：await 原异常、ICommand handler 恰好一次、取消排除、handler 失败和无磁盘副作用。
 
 ## State
 

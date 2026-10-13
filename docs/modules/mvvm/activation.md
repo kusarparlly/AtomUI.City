@@ -1,5 +1,7 @@
 # AtomUI.City.Mvvm Activation 合同
 
+> `AUC-MVVM-007` 已批准把 ActivationScope 扩展为结构化任务 owner；实现合同见 [structured-concurrency-and-commands-v2.md](structured-concurrency-and-commands-v2.md)。本文其余段落描述当前已实现基线，二者冲突时以已批准 Feature 合同作为下一实施目标。
+
 ## 适用范围
 
 本专题属于 `AtomUI.City.Mvvm` 模块文档体系，必须与 [overview.md](overview.md)、[features.md](features.md)、[api-contracts.md](api-contracts.md)、[testing.md](testing.md) 保持一致。它只细化 `Activation` 相关实现决策，不重新定义模块边界。

@@ -6,6 +6,22 @@
 
 本模块当前全部 public 类型和成员均为 `Preview`。`PublicAPI.Unshipped.txt` 只冻结待审签名，不表示 `Stable`；升为稳定 API 必须逐项补齐 API Card、兼容规则和测试证据。
 
+## 已批准、待实现的 API 变更
+
+以下 contract 由 [ADR 0010](../../decisions/0010-activation-scoped-structured-concurrency.md) 批准，当前仍是 Planned，不得误报为现有源码能力：
+
+| API | 目标合同 |
+| --- | --- |
+| `IActivationScope.StartAsync` | 先注册再调用用户委托；返回原始 completion；Scope 关闭时取消并 drain。 |
+| `IActivationScope.StartUniqueAsync` | 同 Scope 同 key 单飞，重复准入稳定拒绝，终态释放 key。 |
+| activation owner contract | 每次命令执行读取当前 Scope；inactive/disposing/disposed 稳定拒绝。 |
+| `CommandFactory.Create<T>` / `CreateAsync<T>` | CommunityToolkit 泛型 command、同步业务 CanExecute、operation token。 |
+| command concurrency policy | `Reject`（默认）、`Allow`、`RejectByKey`；执行入口原子准入。 |
+| `ICommandExceptionHandler` | `ICommand.Execute` 失败时接收原异常恰好一次；取消排除；handler 失败独立诊断。 |
+| `OperationExecutionResult` | 替换框架 `OperationResult` 名称，只描述执行运行时，不表示领域结果。 |
+
+完整准入、生命周期、失败和测试合同见 [structured-concurrency-and-commands-v2.md](structured-concurrency-and-commands-v2.md)。
+
 ## API Family 合同
 
 | API Family | 关键类型 | 职责 | 硬性行为 |
@@ -88,3 +104,5 @@
 ## Public API Review 门禁
 
 以下改动必须先更新文档并 review：新增 public 类型或成员；修改异常、Result status、诊断码、默认 options、manifest/schema、generated output、MSBuild property、CLI JSON envelope 或模板变量。
+
+`AUC-MVVM-007` 至 `010` 实现时还必须证明：同步 Dispose 不等待异步任务；所有用户回调在锁外；泛型/非泛型命令语义一致；`OperationResult` 重命名已同步 API baseline 和迁移说明。

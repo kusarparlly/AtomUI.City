@@ -42,7 +42,8 @@ City Host 使用 `UseModule<PresentationModule>()`；独立 DI/测试使用 `Add
 | [compatibility.md](compatibility.md) | 1.0 兼容承诺 |
 | [state-and-localization.md](state-and-localization.md) | State/Localization 边界 |
 | [resources-and-plugins.md](resources-and-plugins.md) | owner-bound UI contribution |
+| [viewmodel-composition.md](viewmodel-composition.md) | 已批准的逻辑 Root/Owned Child ViewModel 组合合同 |
 
 ## 成熟度
 
-Windows 1.0 能力已完成 Release Verified：unit、Headless 10,000 操作压力、真实 desktop smoke、批准性能 baseline、公开 API 冻结、SourceLink、strict package validation 和隔离 NuGet consumer 均已通过。Linux/macOS 仍是 build-only experimental，不属于本次平台发布证明。
+`AUC-PRESENTATION-001` 至 `016` 的 Windows 基线已完成 Release Verified；`AUC-PRESENTATION-017` 已批准设计但尚未实现，因此扩展后的 1.0 Feature 集合不能报告为全部完成。Linux/macOS 仍是 build-only experimental，不属于平台发布证明。

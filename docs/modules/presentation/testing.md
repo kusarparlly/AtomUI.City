@@ -21,6 +21,7 @@ CLI 或纯 mock 不能代替第 3 和第 5 层。
 | 006/011 | scope resolution、modal FIFO、跨 Window 并行、capacity、cancel/revoke、optional validation | Interaction/Validation tests |
 | 007/008 | owner revoke、覆盖恢复、active view、字典 UI revoke、局部失败继续 | Resource/Plugin tests |
 | 009/016 | Attach、Show 前注册、named outlet、三类 close、唯一 confirmation、close/stop race | Runtime tests, headless/desktop fixture |
+| 017 | Root/Child 显式 attach、独立链接 Scope、leaf-to-root、部分失败、close/stop race、Outlet 隔离 | ViewModelCompositionTests, Runtime/Window lifecycle tests |
 
 ## 可执行命令
 
