@@ -9,10 +9,10 @@ AtomUI.City.Mvvm 作为 Host 服务或模块贡献接入 Core 生命周期，必
 ## 模块特有状态机
 
 - ViewModel: Constructed -> Activating -> Active -> Deactivating -> Deactivated -> Disposed
-- Command: Idle -> Running -> Completed 或 Failed 或 Canceled 或 Rejected 或 Rejected
+- Command: Idle -> Running -> Completed、Failed、Canceled 或 Rejected
 - OperationScope: Running -> Completed、Failed、Canceled 或 Rejected；首次终态胜出，Dispose 后保持只读结果。
-- ActivationScope task supervisor（Planned）：Open -> Closing -> Cancelling -> Draining -> DisposingResources -> Disposed/DisposedWithFailures。
-- Activation-bound Command（Planned）：Idle -> Admitted -> Running -> Completed/Failed/Canceled/Rejected；Allow 策略允许多个独立 operation 同时处于 Running。
+- ActivationScope task supervisor（Implemented / Release Validation Pending）：Open -> Closing -> Cancelling -> Draining -> DisposingResources -> Disposed/DisposedWithFailures。
+- Activation-bound Command（Implemented / Release Validation Pending）：Idle -> Admitted -> Running -> Completed/Failed/Canceled/Rejected；Allow 策略允许多个独立 operation 同时处于 Running。
 
 ## 生命周期流程
 
@@ -20,8 +20,8 @@ AtomUI.City.Mvvm 作为 Host 服务或模块贡献接入 Core 生命周期，必
 - ActivationScope 调用 IActivatable。
 - CommandFactory 创建 command。
 - Interaction 由 handler 返回结果。
-- `AUC-MVVM-007` 落地后，激活域后台工作必须通过 Scope 准入；停用按“关闭准入、取消、drain、释放资源”执行。
-- `AUC-MVVM-009` 落地后，Command 在每次调用时绑定当前 Scope，不保留上一次激活的 Scope 引用。
+- `AUC-MVVM-007` 已提供激活域后台工作准入；停用按“关闭准入、取消、drain、释放资源”执行。
+- `AUC-MVVM-009` 已要求 owner-bound Command 在每次调用时解析当前 Scope，不保留上一次激活的 Scope 引用。
 
 ## Host Shutdown / 执行结束行为
 
@@ -39,8 +39,8 @@ AtomUI.City.Mvvm 作为 Host 服务或模块贡献接入 Core 生命周期，必
 ## 异常中断行为
 
 - CanDeactivate 拒绝：导航或关闭中止。
-- Command 抛异常：记录 `OperationExecutionResult` Failed；awaited 调用重抛原异常，`ICommand.Execute` 交给应用 handler；取消不进入 handler。该行为随 `AUC-MVVM-010` 落地。
-- Interaction 无 handler：返回 Failed。
+- Command 抛异常：记录 `OperationExecutionResult` Failed；awaited 调用重抛原异常，`ICommand.Execute` 交给应用 handler；取消不进入 handler。该行为由已实现的 `AUC-MVVM-010` 定义，仍待完整发布验证。
+- Interaction 无 handler：返回 `NotHandled`；handler 抛异常才返回 `Failed`。
 
 ## 生命周期测试要求
 

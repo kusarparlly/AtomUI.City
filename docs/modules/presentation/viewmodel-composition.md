@@ -70,16 +70,26 @@ Created
 - 不把 route ViewModel 自动变成 Window Root 的 child。
 - 不替应用决定哪个 Root 是“主”Root。
 
-## 测试矩阵
+## 当前测试证据
 
 - Root 正常 attach/activate/dispose；重复 identity、重复 instance 和终态 owner 拒绝。
-- Child 独立 Scope、父取消链接、任务 drain、nested child 和 leaf-to-root 顺序。
-- child activation/cleanup 部分失败仍清理 siblings 和 parent，并聚合诊断。
-- caller 取消、Window close、Runtime stop 和显式 lease dispose 竞态共享关闭事务。
-- RouteOutlet Entry 与 composition tree 相互隔离。
+- Root/Child 使用独立且链接取消的 Scope，并按 child-before-parent 顺序释放。
+- child cleanup 部分失败仍清理 sibling 和 parent，并聚合异常及诊断。
+- owner cancellation、activation in progress 与显式 lease dispose 的清理路径。
 - Borrowed/owned ViewModel 的最终 Dispose 行为符合 lease ownership。
+
+## Release Validation Pending
+
+以下项目是完成发布验证前必须补齐的证据，不能因代码已经存在而视为已验证：
+
+- nested child/grandchild 的完整 leaf-to-root 顺序，以及多层 child task drain。
+- child activation 失败后对 sibling、parent 和候选 lease 的完整回滚。
+- caller cancellation、Window close、Runtime stop 与显式 lease dispose 的系统性竞态矩阵。
+- RouteOutlet Entry 与 composition tree 在生命周期、取消和清理失败下的隔离。
+- 同一 Borrowed ViewModel 跨 composition owner 并发 attach 的稳定拒绝或明确的多会话合同。
+- throwing diagnostics 不得改变 attach/cleanup 结果、遗失 registry 项或使共享关闭 Task 永久挂起。
 
 ## 完成标准
 
 - Feature、API、Architecture、Lifecycle、Diagnostics、Testing、Compatibility 和 PublicAPI baseline 同步。
-- Unit/contract、失败注入、Window close/Runtime stop 集成测试通过后，Feature 状态才可提升。
+- Unit/contract、上述失败注入、Window close/Runtime stop 集成测试和发布门禁通过后，Feature 状态才可提升为 `Release Verified`。

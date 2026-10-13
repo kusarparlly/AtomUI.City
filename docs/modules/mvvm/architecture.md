@@ -40,7 +40,7 @@ AtomUI.City.Mvvm 的架构目标是把模块职责变成可实现、可测试、
 - DeactivationGuard 异常：返回 Failed result，不让业务异常泄漏到 UI。
 - Command 抛异常：OperationExecutionResult Failed；直接 await 重抛原异常，UI ICommand 路径提交应用 handler。
 - Command 并发冲突：OperationExecutionResult Rejected，当前执行不被取消。
-- Interaction 无 handler：返回 Failed。
+- Interaction 无 handler：返回 `NotHandled`；handler 抛异常返回 `Failed`。
 
 ## 性能和资源边界
 

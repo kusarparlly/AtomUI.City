@@ -132,4 +132,4 @@ Open
 ## 完成标准
 
 - 四个 Feature 的源码、测试、API baseline 和模块文档在同一变更中完成。
-- 全量 MVVM 测试、solution build/test 和文档门禁通过后，Feature 状态才可由 Planned 改为 Completed。
+- 全量 MVVM 测试、失败注入、solution build/test 和文档门禁通过后，Feature 状态才可由 `Implemented / Release Validation Pending` 提升为 `Completed`；对应发布文档只有在全部发布门禁通过后才能标记 `Release Verified`。

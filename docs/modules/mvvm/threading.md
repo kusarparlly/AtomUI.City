@@ -11,7 +11,7 @@
 
 ## 并发冲突策略
 
-- Interaction 无 handler：返回 Failed。
+- Interaction 无 handler：返回 `NotHandled`；handler 抛异常返回 `Failed`。
 - Command 默认 `Reject`；可显式选择 `Allow` 或 `RejectByKey`。`CanExecute` 不是准入锁，执行入口必须原子校验。
 - `RejectByKey` 同 key 单飞、不同 key 可并行；key registry 在成功、取消和失败后都必须释放。
 

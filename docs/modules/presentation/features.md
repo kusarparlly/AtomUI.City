@@ -22,7 +22,7 @@
 | AUC-PRESENTATION-014 | Hierarchical Fault Model | Release Verified | failure injection and diagnostics tests |
 | AUC-PRESENTATION-015 | Bounded Backpressure and Candidate Ownership | Release Verified | PresentationIndustrialContractTests |
 | AUC-PRESENTATION-016 | Deterministic Window Close Origins and Confirmation | Release Verified | unit close-origin tests, headless fixture, Windows desktop process test |
-| AUC-PRESENTATION-017 | Logical Root and Owned Child ViewModels | Implemented | composition unit/contract tests, Window/Runtime lifecycle tests |
+| AUC-PRESENTATION-017 | Logical Root and Owned Child ViewModels | Implemented / Release Validation Pending | ViewModelCompositionTests; PresentationRuntimeTests；剩余证据见 viewmodel-composition.md |
 
 ## Feature 合同摘要
 
