@@ -125,6 +125,29 @@ public sealed class ViewModelBaseTests
     }
 
     [Fact]
+    public async Task ActivationStateChangedPublishesEachLifecycleTransition()
+    {
+        var scope = new ActivationScope();
+        var viewModel = new TestViewModel();
+        var states = new List<ActivationState>();
+        viewModel.ActivationStateChanged += (_, _) => states.Add(viewModel.ActivationState);
+
+        await viewModel.ActivateAsync(scope);
+        await viewModel.DeactivateAsync();
+        await viewModel.DisposeAsync();
+
+        Assert.Equal(
+            [
+                ActivationState.Activating,
+                ActivationState.Active,
+                ActivationState.Deactivating,
+                ActivationState.Deactivated,
+                ActivationState.Disposed,
+            ],
+            states);
+    }
+
+    [Fact]
     public async Task ActivateAsyncDisposesScopeAndDoesNotEnterActiveWhenActivationFails()
     {
         using var scope = new ActivationScope();

@@ -6,6 +6,11 @@ namespace AtomUI.City.Mvvm;
 public interface IActivationScopeOwner
 {
     /// <summary>
+    /// Occurs when the current activation state or scope changes.
+    /// </summary>
+    event EventHandler? ActivationStateChanged;
+
+    /// <summary>
     /// Gets the current activation state.
     /// </summary>
     ActivationState ActivationState { get; }

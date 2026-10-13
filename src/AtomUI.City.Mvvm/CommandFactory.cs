@@ -253,6 +253,8 @@ public static class CommandFactory
 
         public ICommandExceptionHandler? ExceptionHandler => _exceptionHandler;
 
+        public IActivationScopeOwner? ActivationOwner => _activationOwner;
+
         public bool CanExecute(T? parameter)
         {
             if (!TryResolveActivationScope(out _))
@@ -474,6 +476,10 @@ public static class CommandFactory
         public TrackedAsyncRelayCommand(AsyncCommandRuntime<T> runtime)
         {
             _runtime = runtime;
+            if (_runtime.ActivationOwner is not null)
+            {
+                _runtime.ActivationOwner.ActivationStateChanged += HandleActivationStateChanged;
+            }
         }
 
         public event EventHandler? CanExecuteChanged;
@@ -607,6 +613,11 @@ public static class CommandFactory
             OnPropertyChanged(nameof(CanBeCanceled));
             OnPropertyChanged(nameof(IsCancellationRequested));
             OnPropertyChanged(nameof(IsRunning));
+        }
+
+        private void HandleActivationStateChanged(object? sender, EventArgs args)
+        {
+            NotifyCanExecuteChanged();
         }
 
         private void OnPropertyChanged(string propertyName)

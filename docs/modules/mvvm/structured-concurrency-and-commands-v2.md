@@ -62,6 +62,7 @@ Open
 - 参数类型转换遵循 CommunityToolkit command 合同；City 不做字符串到业务类型的反射转换。
 - 业务 `CanExecute` 是同步纯判断。需要异步授权时，应用先更新可观察状态，再调用 `NotifyCanExecuteChanged`。
 - City 负责 activation、执行计数、取消和并发变化产生的通知；开发者负责业务属性依赖，可使用 `[NotifyCanExecuteChangedFor]`。
+- `IActivationScopeOwner.ActivationStateChanged` 是 activation 导致 `CanExecuteChanged` 的显式通知边界；owner-bound command 订阅该事件，因此同一命令从未激活、Scope A、停用到 Scope B 时无需由应用手工刷新生命周期可执行状态。
 
 ### 结果命名
 

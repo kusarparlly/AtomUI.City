@@ -29,7 +29,7 @@
 | AUC-MVVM-006 | Contract | CommandTests | 断言状态转换、取消顺序、重复终态、耗时字段和资源释放。 | 重复 Complete/Fail/Cancel、外部取消、Dispose 后 mutation。 | Completed |
 | AUC-MVVM-007 | Unit/Concurrency | ActivationScopeTests | 断言任务准入、唯一 key、活动统计、关闭、取消、drain、释放顺序和回收。 | 重复 key、关闭竞态、同步/异步异常、不合作任务超时。 | Completed |
 | AUC-MVVM-008 | Contract | CommandTests; Public API tests | 断言泛型参数、业务 CanExecute、通知和 OperationExecutionResult。 | null/非法参数、predicate 异常、API rename 漂移。 | Completed |
-| AUC-MVVM-009 | Unit/Concurrency | CommandTests; ViewModelBaseTests | 断言 Reject/Allow/RejectByKey、活动计数、原子准入、Scope A/B。 | 同 key race、inactive、deactivating、Scope dispose race。 | Completed |
+| AUC-MVVM-009 | Unit/Concurrency | CommandTests; ViewModelBaseTests | 断言 Reject/Allow/RejectByKey、活动计数、原子准入、Scope A/B 及 activation 导致的 CanExecuteChanged。 | 同 key race、inactive、deactivating、Scope dispose race。 | Completed |
 | AUC-MVVM-010 | Contract/Failure injection | CommandTests | 断言 await 原异常、ICommand handler 恰好一次、取消排除和无磁盘副作用。 | handler 异常、重复观察、fire-and-forget UI path。 | Completed |
 
 ## 缺口处理

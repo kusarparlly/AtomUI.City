@@ -16,6 +16,7 @@
 | `IActivationScope.StartUniqueAsync` | 同 Scope 同 key 单飞，重复准入稳定拒绝，终态释放 key。 |
 | activation owner contract | 每次命令执行读取当前 Scope；inactive/disposing/disposed 稳定拒绝。 |
 | `CommandFactory.Create<T>` / `CreateAsync<T>` | CommunityToolkit 泛型 command、同步业务 CanExecute、operation token。 |
+| `IActivationScopeOwner.ActivationStateChanged` | 当前 activation state 或 current scope 变化通知；owner-bound command 用它刷新 `CanExecute`。 |
 | command concurrency policy | `Reject`（默认）、`Allow`、`RejectByKey`；执行入口原子准入。 |
 | `ICommandExceptionHandler` | `ICommand.Execute` 失败时接收原异常恰好一次；取消排除；handler 失败独立诊断。 |
 | `OperationExecutionResult` | 替换框架 `OperationResult` 名称，只描述执行运行时，不表示领域结果。 |

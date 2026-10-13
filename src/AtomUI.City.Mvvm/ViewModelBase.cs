@@ -40,14 +40,10 @@ public abstract class ViewModelBase :
             }
         }
 
-        private set
-        {
-            lock (_stateSyncRoot)
-            {
-                _activationState = value;
-            }
-        }
     }
+
+    /// <inheritdoc />
+    public event EventHandler? ActivationStateChanged;
 
     /// <summary>
     /// Gets a value indicating whether is active.
@@ -126,9 +122,10 @@ public abstract class ViewModelBase :
                     $"ViewModel activation is already in progress ({ActivationState}).");
             }
 
-            ActivationState = ActivationState.Activating;
+            _activationState = ActivationState.Activating;
             ActivationContext = context;
         }
+        OnActivationStateChanged();
 
         try
         {
@@ -143,8 +140,9 @@ public abstract class ViewModelBase :
             {
                 ThrowIfDisposed();
                 context.Scope.CancellationToken.ThrowIfCancellationRequested();
-                ActivationState = ActivationState.Active;
+                _activationState = ActivationState.Active;
             }
+            OnActivationStateChanged();
         }
         catch (OperationCanceledException exception)
         {
@@ -191,8 +189,9 @@ public abstract class ViewModelBase :
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            ActivationState = ActivationState.Deactivating;
+            _activationState = ActivationState.Deactivating;
         }
+        OnActivationStateChanged();
 
         try
         {
@@ -215,13 +214,20 @@ public abstract class ViewModelBase :
             }
             finally
             {
+                var stateChanged = false;
                 lock (_stateSyncRoot)
                 {
                     ActivationContext = null;
                     if (!_disposed)
                     {
-                        ActivationState = ActivationState.Deactivated;
+                        _activationState = ActivationState.Deactivated;
+                        stateChanged = true;
                     }
+                }
+
+                if (stateChanged)
+                {
+                    OnActivationStateChanged();
                 }
             }
         }
@@ -244,8 +250,9 @@ public abstract class ViewModelBase :
             _disposed = true;
             scope = ActivationContext?.Scope;
             ActivationContext = null;
-            ActivationState = ActivationState.Disposed;
+            _activationState = ActivationState.Disposed;
         }
+        OnActivationStateChanged();
 
         try
         {
@@ -275,8 +282,9 @@ public abstract class ViewModelBase :
             _disposed = true;
             scope = ActivationContext?.Scope;
             ActivationContext = null;
-            ActivationState = ActivationState.Disposed;
+            _activationState = ActivationState.Disposed;
         }
+        OnActivationStateChanged();
 
         try
         {
@@ -426,14 +434,26 @@ public abstract class ViewModelBase :
                 cleanupException);
         }
 
+        var stateChanged = false;
         lock (_stateSyncRoot)
         {
             if (!_disposed)
             {
                 ActivationContext = null;
-                ActivationState = ActivationState.Deactivated;
+                _activationState = ActivationState.Deactivated;
+                stateChanged = true;
             }
         }
+
+        if (stateChanged)
+        {
+            OnActivationStateChanged();
+        }
+    }
+
+    private void OnActivationStateChanged()
+    {
+        ActivationStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void WriteActivationScopeCleanupFailedDiagnostic(

@@ -337,6 +337,27 @@ public sealed class CommandTests
     }
 
     [Fact]
+    public async Task OwnerBoundCommandNotifiesCanExecuteWhenActivationChanges()
+    {
+        var owner = new SaveViewModel();
+        var command = CommandFactory.CreateAsync(
+            _ => Task.CompletedTask,
+            canExecute: null,
+            activationOwner: owner);
+        var notifications = 0;
+        command.CanExecuteChanged += (_, _) => notifications++;
+
+        var scope = new ActivationScope();
+        await owner.ActivateAsync(scope);
+        Assert.True(command.CanExecute(null));
+
+        await owner.DeactivateAsync();
+        Assert.False(command.CanExecute(null));
+        Assert.Equal(4, notifications);
+        await owner.DisposeAsync();
+    }
+
+    [Fact]
     public async Task InactiveOwnerRejectionWritesStructuredDiagnostic()
     {
         var diagnostics = new InMemoryHostDiagnostics();
@@ -659,6 +680,12 @@ public sealed class CommandTests
         public bool IsActive => true;
 
         public IActivationScope? CurrentActivationScope { get; }
+
+        public event EventHandler? ActivationStateChanged
+        {
+            add { }
+            remove { }
+        }
     }
 
     public sealed class SaveViewModel : ViewModelBase;

@@ -29,6 +29,7 @@
 - `CommandFactory.CreateAsync` 的固定 `IActivationScope?` 捕获不再作为 ViewModel 默认合同；新的 activation owner 入口每次执行解析当前 Scope。显式固定 Scope 只保留为标注清晰的低级一次性入口。
 - 旧的“异步命令异常只记录 Failed 且不向 awaited caller 抛出”行为已由 `AUC-MVVM-010` 替换。调用方必须迁移为 await/catch，UI `ICommand` 路径必须提供应用异常 handler。
 - `IActivationScope.StartAsync/StartUniqueAsync`、三种命令并发策略和 activation owner 合同已进入 Preview 二进制兼容面。
+- `IActivationScopeOwner.ActivationStateChanged` 已进入 Preview 二进制兼容面；自定义 owner 必须在 state 或 current scope 变化后发布通知，以保证 owner-bound command 的 `CanExecute` 可观察。
 
 ## 数据格式兼容
 

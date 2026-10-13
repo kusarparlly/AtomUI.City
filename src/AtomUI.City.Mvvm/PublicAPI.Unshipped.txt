@@ -97,6 +97,7 @@ AtomUI.City.Mvvm.IActivationScope.IsDisposed.get -> bool
 AtomUI.City.Mvvm.IActivationScope.StartAsync(string! taskName, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! taskFactory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 AtomUI.City.Mvvm.IActivationScope.StartUniqueAsync(string! taskKey, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! taskFactory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 AtomUI.City.Mvvm.IActivationScopeOwner
+AtomUI.City.Mvvm.IActivationScopeOwner.ActivationStateChanged -> System.EventHandler?
 AtomUI.City.Mvvm.IActivationScopeOwner.ActivationState.get -> AtomUI.City.Mvvm.ActivationState
 AtomUI.City.Mvvm.IActivationScopeOwner.CurrentActivationScope.get -> AtomUI.City.Mvvm.IActivationScope?
 AtomUI.City.Mvvm.IActivationScopeOwner.IsActive.get -> bool
@@ -193,6 +194,7 @@ AtomUI.City.Mvvm.ValidationStatus.Invalid = 1 -> AtomUI.City.Mvvm.ValidationStat
 AtomUI.City.Mvvm.ValidationStatus.Pending = 2 -> AtomUI.City.Mvvm.ValidationStatus
 AtomUI.City.Mvvm.ValidationStatus.Valid = 0 -> AtomUI.City.Mvvm.ValidationStatus
 AtomUI.City.Mvvm.ViewModelBase
+AtomUI.City.Mvvm.ViewModelBase.ActivationStateChanged -> System.EventHandler?
 AtomUI.City.Mvvm.ViewModelBase.ActivateAsync(AtomUI.City.Mvvm.ActivationContext! context) -> System.Threading.Tasks.ValueTask
 AtomUI.City.Mvvm.ViewModelBase.ActivateAsync(AtomUI.City.Mvvm.ActivationContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 AtomUI.City.Mvvm.ViewModelBase.ActivateAsync(AtomUI.City.Mvvm.IActivationScope! scope) -> System.Threading.Tasks.ValueTask
