@@ -52,6 +52,27 @@
 - 不出现业务领域假设。
 - 不引入 `AtomUI.City.Presentation` 等禁止依赖。
 
+## 原子观察合同（AUC-STATE-009）
+
+`OnChange(...)` 继续只表示“从订阅建立后接收变化”，保持兼容。需要同步建立页面或服务投影的消费者必须使用 `Observe(...)`：
+
+```text
+state.Observe(handler)
+  -> 在 state 锁内捕获当前值与版本
+  -> 在同一锁内注册 inactive subscription
+  -> 离开 state 锁
+  -> 先投递 IsInitial=true 的当前快照
+  -> 再按版本顺序投递后续变化
+```
+
+- 初始通知恰好一次，`OldValue` 与 `NewValue` 都是注册点的当前值，`Version` 是同一注册点版本。
+- `IsInitial=false` 表示正常变化，保留原有 old/new/version 语义。
+- 集合观察的初始通知通过不可变 `StateCollectionSnapshot` 表达，后续通知通过 change list 表达。
+- inactive/activating barrier 必须保证并发写入只能排在初始通知之后；不得在注册与首次投递之间产生漏失窗口。
+- handler、Dispatcher 和用户代码均在 state 锁外执行。
+- 观察句柄释放必须幂等；若在首次派发前释放，初始通知和所有排队变化都必须被抑制。
+- 有界队列溢出策略可以丢弃普通历史变化并写入 `AUCSTA011`，但不得丢弃尚未投递的初始通知。
+
 ## 既有细化设计内容
 
 以下内容保留上一轮设计中的专题细节。后续修改必须与本页上方合同、Feature ID、API 行为、诊断和测试矩阵保持一致。

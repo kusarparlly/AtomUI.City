@@ -12,10 +12,13 @@
 | --- | --- | --- | --- |
 | Application State | IApplicationState, IApplicationStateWriter, StateWriteAuthority | 全局共享状态。 | 读写分离，writer 按 Host、Module、Plugin 身份和 capability 授权。Host authority 仅由框架内部铸造（internal），公开面仅提供 Module/Plugin 自声明凭据。 |
 | State Values | IWritableState<T>, IReadOnlyState<T> | 单值状态。 | 原子提交后通知。 |
+| Atomic Observation | IReadOnlyState.Observe, IApplicationState.Observe, IStateCollection.Observe, StateChangedEventArgs.IsInitial | 当前快照和后续更新的一体化观察。 | 注册点原子、初始通知恰好一次、后续更新按版本 FIFO、回调锁外执行。 |
 | Computed | IComputedState<T> | 派生状态。 | 依赖变更触发重算。 |
 | Snapshot | StateSnapshot | 状态快照。 | 不可变。 |
 | Collection State | IStateCollection<TKey, TItem>, StateCollection<TKey, TItem> | keyed collection state。 | 变更记录、item version、collection snapshot 和 dispose 生命周期稳定。 |
 | Diagnostics | StateDiagnosticIds | 状态错误诊断。 | AUCSTA001-011 稳定，诊断记录必须包含可定位 context。 |
+
+`IApplicationStateWriterFactory.CreateWriter(StateWriteAuthority)` 是模块所有者获取受权 writer 的唯一 DI 工厂入口。工厂返回值固定持有传入 authority；registry 在每次写入时继续执行 access policy 校验。
 
 ## 关键方法合同
 

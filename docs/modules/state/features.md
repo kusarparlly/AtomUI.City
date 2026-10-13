@@ -14,6 +14,7 @@
 | AUC-STATE-006 | Collection State | Completed | StateCollection<TKey,TItem> | StateCollectionTests |
 | AUC-STATE-007 | Diagnostics | Completed | StateDiagnosticIds | StateDiagnosticsTests |
 | AUC-STATE-008 | Threading | Completed | StateDispatchPolicy | StateThreadingTests |
+| AUC-STATE-009 | Atomic Observation | Planned | IReadOnlyState.Observe, IApplicationState.Observe, IStateCollection.Observe, IApplicationStateWriterFactory | WritableStateTests; ComputedStateTests; ApplicationStateTests; StateCollectionTests; StateThreadingTests |
 
 ## Feature 硬门禁
 
@@ -137,3 +138,17 @@ Diagnostics: 现有诊断码见 [diagnostics.md](diagnostics.md)；产品级缺�
 Tests: `StateThreadingTests`。
 Required Assertions: 断言不隐式 UI、并发写、锁外通知、dispatcher unavailable diagnostics、Dispatcher/Background 不阻塞和 Queued 顺序。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+
+## AUC-STATE-009 Atomic Observation
+
+Feature ID: `AUC-STATE-009`
+Status: Planned
+Goal: 把“读取当前快照”和“订阅后续变化”收敛为单个原子观察操作，消除两步调用之间漏失更新的窗口；同时为模块所有者提供可通过 DI 获取的受权 Writer 工厂。
+Public Contract: `IReadOnlyState.Observe`、`IApplicationState.Observe`、`IStateCollection.Observe`、`StateChangedEventArgs.IsInitial`、`StateCollectionObservation<TKey,TItem>`、`IApplicationStateWriterFactory`。
+Runtime / Build Behavior: 在同一状态同步边界内捕获当前值/版本并注册尚未激活的订阅；离开状态锁后先投递一次 `IsInitial=true` 的当前快照，再按提交版本顺序投递后续变化。模块通过 `IApplicationStateWriterFactory.CreateWriter(StateWriteAuthority.Module(...))` 获取 OwnerWrite writer。
+Failure Behavior: null handler/options/authority 使用标准参数异常；disposed state 拒绝新观察；Dispose 在初始通知尚未派发时也必须抑制回调；授权失败沿用 `StateAccessDeniedException` 和既有 diagnostics。
+Threading / Cancellation: 用户 handler 不得在 state 内部锁中执行；并发提交按版本顺序串行发布；Dispatcher、Queued、Background 延续有界队列策略，但初始快照不得因队列溢出而被丢弃。
+Diagnostics: 沿用 `AUCSTA002`、`AUCSTA004`、`AUCSTA011`，不新增业务诊断码。
+Tests: `WritableStateTests; ComputedStateTests; ApplicationStateTests; StateCollectionTests; StateThreadingTests`。
+Required Assertions: 初始快照恰好一次、初始版本与注册点一致、注册竞态不漏失更新、并发更新不倒序、回调在锁外、Dispose 抑制 pending initial、集合先快照后变化、DI writer factory 保持 OwnerWrite 隔离。
+Acceptance Criteria: 上述合同、public API baseline、net8.0/net10.0 构建和 State 全量测试全部通过后转为 Completed。

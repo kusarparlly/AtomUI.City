@@ -52,6 +52,17 @@
 - 不出现业务领域假设。
 - 不引入 `AtomUI.City.Presentation` 等禁止依赖。
 
+## 模块 Writer 工厂（AUC-STATE-002 / AUC-STATE-009）
+
+`AddState()` 必须注册 `IApplicationStateWriterFactory`。模块不得从 DI 直接取得 Host writer 来绕过 OwnerWrite；标准用法是：
+
+```csharp
+var writer = writerFactory.CreateWriter(
+    StateWriteAuthority.Module("Sample.Module"));
+```
+
+返回的 writer 固定持有该 authority，并在每次 `GetWritable`、`Set`、`Update` 时由 registry 校验 `StateDefinition.OwnerModule` 或 capability。工厂不缓存业务状态、不扩大 authority，也不改变 `IApplicationState` 的只读消费合同。
+
 ## 既有细化设计内容
 
 以下内容保留上一轮设计中的专题细节。后续修改必须与本页上方合同、Feature ID、API 行为、诊断和测试矩阵保持一致。
