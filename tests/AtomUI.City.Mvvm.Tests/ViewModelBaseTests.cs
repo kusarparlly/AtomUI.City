@@ -169,6 +169,29 @@ public sealed class ViewModelBaseTests
     }
 
     [Fact]
+    public async Task RepeatedActivateOnActiveViewModelRemainsIdempotentWithCanceledCallerToken()
+    {
+        var activeScope = new ActivationScope();
+        var unusedScope = new ActivationScope();
+        using var cancellation = new CancellationTokenSource();
+        var viewModel = new TestViewModel();
+        await viewModel.ActivateAsync(new ActivationContext(activeScope));
+        await cancellation.CancelAsync();
+
+        await viewModel.ActivateAsync(
+            new ActivationContext(unusedScope),
+            cancellation.Token);
+
+        Assert.True(viewModel.IsActive);
+        Assert.Same(activeScope, viewModel.CurrentActivationScope);
+        Assert.False(activeScope.IsDisposed);
+        Assert.False(unusedScope.IsDisposed);
+
+        unusedScope.Dispose();
+        await viewModel.DisposeAsync();
+    }
+
+    [Fact]
     public async Task DeactivateAsyncWithCanceledTokenKeepsActiveScope()
     {
         using var scope = new ActivationScope();
@@ -201,6 +224,47 @@ public sealed class ViewModelBaseTests
         await viewModel.DeactivateAsync();
 
         Assert.True(binding.IsDisposed);
+    }
+
+    [Fact]
+    public async Task DeactivateAsyncCancelsAndDrainsActivationTasks()
+    {
+        var scope = new ActivationScope();
+        var viewModel = new TestViewModel();
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var stopped = false;
+
+        await viewModel.ActivateAsync(new ActivationContext(scope));
+        var task = scope.StartAsync(
+            "page-loop",
+            async cancellationToken =>
+            {
+                started.SetResult();
+                try
+                {
+                    await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+                }
+                finally
+                {
+                    stopped = true;
+                }
+            });
+
+        await started.Task;
+        await viewModel.DeactivateAsync();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => task);
+        Assert.True(stopped);
+        Assert.True(scope.IsDisposed);
+        Assert.Equal(ActivationState.Deactivated, viewModel.ActivationState);
+    }
+
+    [Fact]
+    public void ViewModelBaseImplementsActivationScopeOwner()
+    {
+        var viewModel = new TestViewModel();
+
+        Assert.IsAssignableFrom<IActivationScopeOwner>(viewModel);
     }
 
     [Fact]

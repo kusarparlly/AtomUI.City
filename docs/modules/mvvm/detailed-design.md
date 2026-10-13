@@ -183,7 +183,7 @@ Mvvm 在其上补充框架行为：
 - 每次 async command 执行创建 OperationScope。
 - OperationScope 提供 cancellation token。
 - OperationScope 持有 Running 或终态 status、result、error 和 elapsed。
-- OperationScope 的 Complete、Cancel、Fail、Reject 首次终态胜出，重复终态返回同一个 OperationResult。
+- OperationScope 的 Complete、Cancel、Fail、Reject 首次终态胜出，重复终态返回同一个 OperationExecutionResult。
 - OperationScope 取消必须先提交 Canceled 状态，再通知 cancellation token callback。
 - OperationScope Dispose 取消未完成 operation，并在释放后拒绝 mutating API。
 - Command 错误进入 ErrorPolicy。

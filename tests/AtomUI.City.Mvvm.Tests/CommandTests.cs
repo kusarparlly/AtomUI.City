@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using AtomUI.City.Core.Diagnostics;
 using AtomUI.City.Mvvm;
 using CommunityToolkit.Mvvm.Input;
 
@@ -20,7 +21,7 @@ public sealed class CommandTests
     }
 
     [Fact]
-    public void SyncCommandCapturesFailureWithoutThrowing()
+    public void SyncCommandRecordsFailureAndRethrowsOriginalException()
     {
         var exception = new InvalidOperationException("boom");
         var state = new CommandExecutionState("save", typeof(SaveViewModel));
@@ -28,8 +29,9 @@ public sealed class CommandTests
             () => throw exception,
             state: state);
 
-        command.Execute(null);
+        var thrown = Assert.Throws<InvalidOperationException>(() => command.Execute(null));
 
+        Assert.Same(exception, thrown);
         Assert.False(state.IsExecuting);
         Assert.Equal(OperationStatus.Failed, state.LastResult?.Status);
         Assert.Same(exception, state.LastError);
@@ -165,15 +167,18 @@ public sealed class CommandTests
     }
 
     [Fact]
-    public async Task AsyncCommandCapturesFailureWithoutThrowing()
+    public async Task AsyncCommandRecordsFailureAndRethrowsOriginalException()
     {
+        var exception = new InvalidOperationException("boom");
         var state = new CommandExecutionState();
         var command = CommandFactory.CreateAsync(
-            _ => throw new InvalidOperationException("boom"),
+            _ => throw exception,
             state);
 
-        await command.ExecuteAsync(null);
+        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            command.ExecuteAsync(null));
 
+        Assert.Same(exception, thrown);
         Assert.False(state.IsExecuting);
         Assert.Equal(OperationStatus.Failed, state.LastResult?.Status);
         Assert.IsType<InvalidOperationException>(state.LastError);
@@ -198,10 +203,271 @@ public sealed class CommandTests
         await started.Task;
 
         await scope.DisposeAsync();
-        await execution;
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => execution);
 
         Assert.Equal(OperationStatus.Canceled, state.LastResult?.Status);
         Assert.Null(state.LastError);
+    }
+
+    [Fact]
+    public async Task TypedAsyncCommandPassesParameterAndUsesBusinessCanExecute()
+    {
+        var enabled = false;
+        var observed = 0;
+        var command = CommandFactory.CreateAsync<int>(
+            (value, _) =>
+            {
+                observed = value;
+                return Task.CompletedTask;
+            },
+            value => enabled && value > 0);
+
+        Assert.False(command.CanExecute(42));
+
+        enabled = true;
+        command.NotifyCanExecuteChanged();
+
+        Assert.True(command.CanExecute(42));
+        await command.ExecuteAsync(42);
+        Assert.Equal(42, observed);
+    }
+
+    [Fact]
+    public async Task RejectByKeyRejectsSameKeyAndAllowsDifferentKeys()
+    {
+        var state = new CommandExecutionState("row-action", typeof(SaveViewModel));
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var executions = 0;
+        var command = CommandFactory.CreateAsync<int>(
+            async (_, cancellationToken) =>
+            {
+                if (Interlocked.Increment(ref executions) == 2)
+                {
+                    started.SetResult();
+                }
+
+                await release.Task.WaitAsync(cancellationToken);
+            },
+            state: state,
+            concurrencyPolicy: CommandConcurrencyPolicy.RejectByKey,
+            concurrencyKeySelector: value => value);
+
+        var first = command.ExecuteAsync(1);
+        var duplicate = command.ExecuteAsync(1);
+        var secondKey = command.ExecuteAsync(2);
+
+        await duplicate;
+        await started.Task;
+
+        Assert.Equal(2, executions);
+        Assert.Equal(2, state.ActiveExecutionCount);
+        Assert.Equal(1, state.RejectedExecutionCount);
+
+        release.SetResult();
+        await Task.WhenAll(first, secondKey);
+
+        Assert.False(state.IsExecuting);
+        Assert.Equal(0, state.ActiveExecutionCount);
+    }
+
+    [Fact]
+    public async Task AllowPolicyTracksConcurrentExecutions()
+    {
+        var state = new CommandExecutionState("parallel", typeof(SaveViewModel));
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var executions = 0;
+        var command = CommandFactory.CreateAsync<int>(
+            async (_, cancellationToken) =>
+            {
+                if (Interlocked.Increment(ref executions) == 2)
+                {
+                    started.SetResult();
+                }
+
+                await release.Task.WaitAsync(cancellationToken);
+            },
+            state: state,
+            concurrencyPolicy: CommandConcurrencyPolicy.Allow);
+
+        var first = command.ExecuteAsync(1);
+        var second = command.ExecuteAsync(1);
+        await started.Task;
+
+        Assert.Equal(2, state.ActiveExecutionCount);
+
+        release.SetResult();
+        await Task.WhenAll(first, second);
+
+        Assert.Equal(0, state.ActiveExecutionCount);
+    }
+
+    [Fact]
+    public async Task OwnerBoundCommandRejectsInactiveAndUsesCurrentScopeAfterReactivation()
+    {
+        var owner = new SaveViewModel();
+        var state = new CommandExecutionState("refresh", typeof(SaveViewModel));
+        var command = CommandFactory.CreateAsync(
+            _ => Task.CompletedTask,
+            canExecute: null,
+            state: state,
+            activationOwner: owner);
+
+        Assert.False(command.CanExecute(null));
+        await command.ExecuteAsync(null);
+        Assert.Equal(1, state.RejectedExecutionCount);
+
+        var scopeA = new ActivationScope();
+        await owner.ActivateAsync(scopeA);
+        Assert.True(command.CanExecute(null));
+        await command.ExecuteAsync(null);
+        Assert.True(scopeA.ActiveTaskCount == 0);
+
+        await owner.DeactivateAsync();
+        Assert.False(command.CanExecute(null));
+
+        var scopeB = new ActivationScope();
+        await owner.ActivateAsync(scopeB);
+        await command.ExecuteAsync(null);
+
+        Assert.True(scopeA.IsDisposed);
+        Assert.True(scopeB.ActiveTaskCount == 0);
+        await owner.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task InactiveOwnerRejectionWritesStructuredDiagnostic()
+    {
+        var diagnostics = new InMemoryHostDiagnostics();
+        var owner = new SaveViewModel();
+        var command = CommandFactory.CreateAsync(
+            _ => Task.CompletedTask,
+            canExecute: null,
+            state: new CommandExecutionState("refresh", typeof(SaveViewModel)),
+            activationOwner: owner,
+            diagnostics: diagnostics);
+
+        await command.ExecuteAsync(null);
+
+        Assert.Contains(
+            diagnostics.Records,
+            record =>
+                record.Code == MvvmDiagnosticIds.CommandInactive
+                && record.Context?["commandName"] == "refresh"
+                && record.Context["activationState"] == ActivationState.Constructed.ToString());
+    }
+
+    [Fact]
+    public async Task ScopeClosingDoesNotMisclassifyBusinessInvalidOperationException()
+    {
+        var scope = new ActivationScope();
+        var owner = new TestActivationOwner(scope);
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var expected = new InvalidOperationException("business-failure-during-shutdown");
+        var command = CommandFactory.CreateAsync(
+            async cancellationToken =>
+            {
+                started.TrySetResult();
+                try
+                {
+                    await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw expected;
+                }
+            },
+            canExecute: null,
+            activationOwner: owner);
+
+        var execution = command.ExecuteAsync(null);
+        await started.Task;
+        var disposal = scope.DisposeAsync().AsTask();
+
+        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => execution);
+        Assert.Same(expected, thrown);
+        await Assert.ThrowsAsync<AggregateException>(() => disposal);
+    }
+
+    [Fact]
+    public async Task ICommandExecuteDeliversOriginalExceptionToHandlerExactlyOnce()
+    {
+        var exception = new InvalidOperationException("boom");
+        var handler = new RecordingExceptionHandler();
+        var command = CommandFactory.CreateAsync(
+            _ => throw exception,
+            canExecute: null,
+            exceptionHandler: handler);
+
+        ((System.Windows.Input.ICommand)command).Execute(null);
+
+        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            command.ExecutionTask!);
+        Assert.Same(exception, thrown);
+        Assert.Single(handler.Contexts);
+        Assert.Same(exception, handler.Contexts[0].Exception);
+    }
+
+    [Fact]
+    public async Task FailedICommandExecuteRequiresApplicationExceptionHandler()
+    {
+        var original = new InvalidOperationException("boom");
+        var command = CommandFactory.CreateAsync(_ => throw original);
+
+        ((System.Windows.Input.ICommand)command).Execute(null);
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            command.ExecutionTask!);
+
+        Assert.Contains(nameof(ICommandExceptionHandler), exception.Message, StringComparison.Ordinal);
+        Assert.Same(original, exception.InnerException);
+    }
+
+    [Fact]
+    public async Task ExceptionHandlerFailureIsDiagnosedWithoutReplacingOriginalException()
+    {
+        var diagnostics = new InMemoryHostDiagnostics();
+        var original = new InvalidOperationException("command-failure");
+        var command = CommandFactory.CreateAsync(
+            _ => throw original,
+            canExecute: null,
+            state: new CommandExecutionState("save", typeof(SaveViewModel)),
+            exceptionHandler: new ThrowingExceptionHandler(),
+            diagnostics: diagnostics);
+
+        ((System.Windows.Input.ICommand)command).Execute(null);
+        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            command.ExecutionTask!);
+
+        Assert.Same(original, thrown);
+        Assert.Contains(
+            diagnostics.Records,
+            record =>
+                record.Code == MvvmDiagnosticIds.CommandExceptionHandlerFailed
+                && record.Context?["commandName"] == "save"
+                && record.Context["exceptionType"] == typeof(ApplicationException).FullName);
+    }
+
+    [Fact]
+    public async Task ICommandCancellationDoesNotInvokeExceptionHandler()
+    {
+        var handler = new RecordingExceptionHandler();
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var command = CommandFactory.CreateAsync(
+            async cancellationToken =>
+            {
+                started.SetResult();
+                await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            },
+            canExecute: null,
+            exceptionHandler: handler);
+
+        ((System.Windows.Input.ICommand)command).Execute(null);
+        await started.Task;
+        command.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => command.ExecutionTask!);
+        Assert.Empty(handler.Contexts);
     }
 
     [Fact]
@@ -357,5 +623,43 @@ public sealed class CommandTests
         }
     }
 
-    private sealed class SaveViewModel;
+    private sealed class RecordingExceptionHandler : ICommandExceptionHandler
+    {
+        public List<CommandExceptionContext> Contexts { get; } = [];
+
+        public ValueTask HandleAsync(
+            CommandExceptionContext context,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Contexts.Add(context);
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class ThrowingExceptionHandler : ICommandExceptionHandler
+    {
+        public ValueTask HandleAsync(
+            CommandExceptionContext context,
+            CancellationToken cancellationToken = default)
+        {
+            throw new ApplicationException("handler-failure");
+        }
+    }
+
+    private sealed class TestActivationOwner : IActivationScopeOwner
+    {
+        public TestActivationOwner(IActivationScope activationScope)
+        {
+            CurrentActivationScope = activationScope;
+        }
+
+        public ActivationState ActivationState => ActivationState.Active;
+
+        public bool IsActive => true;
+
+        public IActivationScope? CurrentActivationScope { get; }
+    }
+
+    public sealed class SaveViewModel : ViewModelBase;
 }

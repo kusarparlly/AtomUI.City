@@ -1,12 +1,12 @@
 # AtomUI.City.Mvvm Structured Concurrency And Commands V2
 
-状态：Approved Design / Implementation Pending
+状态：Implemented / Release Validation Pending
 
 关联决策：[ADR 0010](../../decisions/0010-activation-scoped-structured-concurrency.md)
 
 ## 功能范围
 
-本文定义以下 Planned Feature 的实现合同：
+本文定义以下已实现 Feature 的行为合同；全解决方案发布门禁通过前仍保持 Release Validation Pending：
 
 | Feature ID | 名称 | 解决的问题 |
 | --- | --- | --- |
@@ -102,14 +102,14 @@ Open
 | UI 通过 `ICommand.Execute` | 更新 Failed 状态和诊断后，把原异常恰好一次提交给 `ICommandExceptionHandler`。 |
 
 - `OperationCanceledException` 只有在本次 operation token 已请求取消时分类为 Canceled；它不进入异常 handler。
-- `ICommandExceptionHandler` 是应用策略扩展点。context 至少包含异常、command name、owner type、operation id 和参数摘要；不得包含秘密或完整凭据。
+- `ICommandExceptionHandler` 是应用策略扩展点。context 包含原异常、command name、owner type 和 operation id；框架不自动复制命令参数，避免把秘密或完整凭据带入异常链路。
 - handler 失败产生独立诊断，不能覆盖原命令异常，也不能再次递归调用 handler。
 - City 只保证可捕获托管异常链路；StackOverflow、进程终止等 CLR 致命情况不在保证范围内。
 - City.Mvvm 不提供 UI、磁盘日志或 file sink。应用可以在 handler 中选择展示、遥测或自己的日志 provider。
 
 ## 诊断合同
 
-| Planned Code | Name | 必需上下文 |
+| Code | Name | 必需上下文 |
 | --- | --- | --- |
 | `AUCMVVM009` | ActivationTaskRejected | `scopeId`, `taskName`, `taskKey`, `reason` |
 | `AUCMVVM010` | ActivationTaskFailed | `scopeId`, `taskName`, `taskKey`, `exceptionType` |
@@ -117,7 +117,7 @@ Open
 | `AUCMVVM012` | CommandInactive | `commandName`, `ownerType`, `activationState` |
 | `AUCMVVM013` | CommandExceptionHandlerFailed | `commandName`, `ownerType`, `operationId`, `exceptionType` |
 
-这些 code 在源码落地前属于 approved/reserved，不得作为“当前已实现诊断”报告。
+这些 code 已由 `MvvmDiagnosticIds` 公开，并有 failure-path 断言测试。
 
 ## 测试矩阵
 

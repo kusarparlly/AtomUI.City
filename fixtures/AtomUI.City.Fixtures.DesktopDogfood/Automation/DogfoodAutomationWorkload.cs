@@ -228,7 +228,17 @@ internal sealed class DogfoodAutomationWorkload
         var failed = CommandFactory.CreateAsync(
             static (CancellationToken _) => Task.FromException(new InvalidOperationException("expected-command-failure")),
             failedState);
-        await failed.ExecuteAsync(null);
+        try
+        {
+            await failed.ExecuteAsync(null);
+            throw new InvalidOperationException("A deliberately failing command did not rethrow its original exception.");
+        }
+        catch (InvalidOperationException exception)
+            when (exception.Message == "expected-command-failure")
+        {
+            // Directly awaited command execution preserves the original exception.
+        }
+
         if (failedState.LastResult?.Status != OperationStatus.Failed ||
             failedState.LastError?.Message != "expected-command-failure")
         {
@@ -255,7 +265,16 @@ internal sealed class DogfoodAutomationWorkload
 
         _ledger.Record("rejection", "mvvm-command", "expected-failure");
         cancelled.Cancel();
-        await execution;
+        try
+        {
+            await execution;
+            throw new InvalidOperationException("A cancelled command did not propagate cancellation.");
+        }
+        catch (OperationCanceledException)
+        {
+            // Directly awaited command execution preserves cooperative cancellation.
+        }
+
         if (cancelledState.LastResult?.Status != OperationStatus.Canceled)
         {
             throw new InvalidOperationException("A cancelled command did not publish its canceled execution state.");

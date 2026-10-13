@@ -13,7 +13,7 @@ public sealed class OperationScope : IDisposable
     private readonly Stopwatch _stopwatch;
     private CancellationTokenRegistration _externalCancellation;
     private OperationStatus _status = OperationStatus.Running;
-    private OperationResult? _result;
+    private OperationExecutionResult? _result;
     private Exception? _error;
     private bool _isDisposed;
 
@@ -58,7 +58,7 @@ public sealed class OperationScope : IDisposable
     /// <summary>
     /// Represents the result value.
     /// </summary>
-    public OperationResult? Result
+    public OperationExecutionResult? Result
     {
         get
         {
@@ -122,7 +122,7 @@ public sealed class OperationScope : IDisposable
     /// <summary>
     /// Executes the complete operation.
     /// </summary>
-    public OperationResult Complete()
+    public OperationExecutionResult Complete()
     {
         return Finish(OperationStatus.Completed, null, requestCancellation: false, throwIfDisposed: true);
     }
@@ -130,7 +130,7 @@ public sealed class OperationScope : IDisposable
     /// <summary>
     /// Executes the cancel operation.
     /// </summary>
-    public OperationResult Cancel()
+    public OperationExecutionResult Cancel()
     {
         return Finish(OperationStatus.Canceled, null, requestCancellation: true, throwIfDisposed: true);
     }
@@ -138,7 +138,7 @@ public sealed class OperationScope : IDisposable
     /// <summary>
     /// Executes the fail operation.
     /// </summary>
-    public OperationResult Fail(Exception exception)
+    public OperationExecutionResult Fail(Exception exception)
     {
         ArgumentNullException.ThrowIfNull(exception);
 
@@ -148,7 +148,7 @@ public sealed class OperationScope : IDisposable
     /// <summary>
     /// Executes the reject operation.
     /// </summary>
-    public OperationResult Reject()
+    public OperationExecutionResult Reject()
     {
         return Finish(OperationStatus.Rejected, null, requestCancellation: false, throwIfDisposed: true);
     }
@@ -171,7 +171,7 @@ public sealed class OperationScope : IDisposable
             {
                 _stopwatch.Stop();
                 _status = OperationStatus.Canceled;
-                _result = new OperationResult(Id, OperationStatus.Canceled, _stopwatch.Elapsed);
+                _result = new OperationExecutionResult(Id, OperationStatus.Canceled, _stopwatch.Elapsed);
                 shouldCancel = !_cancellationSource.IsCancellationRequested;
             }
 
@@ -187,14 +187,14 @@ public sealed class OperationScope : IDisposable
         _cancellationSource.Dispose();
     }
 
-    private OperationResult Finish(
+    private OperationExecutionResult Finish(
         OperationStatus status,
         Exception? error,
         bool requestCancellation,
         bool throwIfDisposed)
     {
         var shouldCancel = false;
-        OperationResult result;
+        OperationExecutionResult result;
 
         lock (_gate)
         {
@@ -211,7 +211,7 @@ public sealed class OperationScope : IDisposable
             _stopwatch.Stop();
             _status = status;
             _error = error;
-            _result = new OperationResult(Id, status, _stopwatch.Elapsed, error);
+            _result = new OperationExecutionResult(Id, status, _stopwatch.Elapsed, error);
             result = _result;
             shouldCancel = requestCancellation && !_cancellationSource.IsCancellationRequested;
         }

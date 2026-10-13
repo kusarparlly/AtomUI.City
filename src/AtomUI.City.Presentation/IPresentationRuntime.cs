@@ -35,6 +35,11 @@ public interface IPresentationRuntime
     IReadOnlyCollection<WindowSession> Windows { get; }
 
     /// <summary>
+    /// Gets the runtime-level logical ViewModel composition owner.
+    /// </summary>
+    ViewModelCompositionOwner ViewModels { get; }
+
+    /// <summary>
     /// Executes the attach operation.
     /// </summary>
     void Attach(

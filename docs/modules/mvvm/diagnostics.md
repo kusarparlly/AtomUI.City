@@ -20,18 +20,11 @@
 | `AUCMVVM006` | InteractionFailed | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
 | `AUCMVVM007` | ActivationScopeDisposeFailed | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
 | `AUCMVVM008` | ValidationFailed | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
-
-## 已批准但待实现的诊断码
-
-| Reserved Code | Name | Required Context |
-| --- | --- | --- |
-| `AUCMVVM009` | ActivationTaskRejected | `scopeId`, `taskName`, `taskKey`, `reason` |
-| `AUCMVVM010` | ActivationTaskFailed | `scopeId`, `taskName`, `taskKey`, `exceptionType` |
-| `AUCMVVM011` | ActivationTaskDrainTimedOut | `scopeId`, `activeTaskCount`, `timeout` |
-| `AUCMVVM012` | CommandInactive | `commandName`, `ownerType`, `activationState` |
-| `AUCMVVM013` | CommandExceptionHandlerFailed | `commandName`, `ownerType`, `operationId`, `exceptionType` |
-
-这些编号由 `AUC-MVVM-007` 至 `010` 保留，源码和断言测试落地前不得列入“当前源码诊断码”。
+| `AUCMVVM009` | ActivationTaskRejected | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
+| `AUCMVVM010` | ActivationTaskFailed | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
+| `AUCMVVM011` | ActivationTaskDrainTimedOut | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
+| `AUCMVVM012` | CommandInactive | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
+| `AUCMVVM013` | CommandExceptionHandlerFailed | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
 
 ## 上下文 key 合同
 
@@ -43,6 +36,11 @@
 | `AUCMVVM005`/`AUCMVVM006` | `requestType`、`resultType`、`activationScopeId`、`exceptionType`。 |
 | `AUCMVVM007` | `scopeId`。 |
 | `AUCMVVM008` | `ownerScopeId`、`exceptionType`。 |
+| `AUCMVVM009` | `scopeId`、`taskName`、`taskKey`、`reason`。 |
+| `AUCMVVM010` | `scopeId`、`taskName`、`taskKey`、`exceptionType`。 |
+| `AUCMVVM011` | `scopeId`、`activeTaskCount`、`timeout`。 |
+| `AUCMVVM012` | `commandName`、`ownerType`、`activationState`。 |
+| `AUCMVVM013` | `commandName`、`ownerType`、`operationId`、`exceptionType`。 |
 
 ## 产品级必须诊断的失败
 
@@ -52,8 +50,8 @@
 - Interaction 无 handler：写 `AUCMVVM005`；handler 异常：写 `AUCMVVM006`。
 - ActivationScope 资源释放失败：写 `AUCMVVM007`。
 - Validation 逻辑异常：写 `AUCMVVM008`。
-- Activation task 重复/关闭后准入、执行失败或 drain 超时：功能落地后分别写 `AUCMVVM009-011`。
-- inactive Command 和应用异常 handler 失败：功能落地后分别写 `AUCMVVM012-013`。
+- Activation task 重复/关闭后准入、执行失败或 drain 超时：分别写 `AUCMVVM009-011`。
+- inactive Command 和应用异常 handler 失败：分别写 `AUCMVVM012-013`。
 - Command/Activation 诊断只输出结构化上下文，不创建或写入任何磁盘日志文件。
 
 ## 上下文字段

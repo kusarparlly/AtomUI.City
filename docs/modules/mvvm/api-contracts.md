@@ -6,9 +6,9 @@
 
 本模块当前全部 public 类型和成员均为 `Preview`。`PublicAPI.Unshipped.txt` 只冻结待审签名，不表示 `Stable`；升为稳定 API 必须逐项补齐 API Card、兼容规则和测试证据。
 
-## 已批准、待实现的 API 变更
+## Commands V2 已实现 API
 
-以下 contract 由 [ADR 0010](../../decisions/0010-activation-scoped-structured-concurrency.md) 批准，当前仍是 Planned，不得误报为现有源码能力：
+以下 contract 由 [ADR 0010](../../decisions/0010-activation-scoped-structured-concurrency.md) 批准并已落地；发布验证状态以全局跟踪文档为准：
 
 | API | 目标合同 |
 | --- | --- |
@@ -28,7 +28,7 @@
 | --- | --- | --- | --- |
 | ViewModel Base | ViewModelBase | 属性通知和释放入口。 | 不引用具体 View 或 Avalonia visual。 |
 | Activation | IActivatable, ICanDeactivate, IConfirmDeactivate, ActivationScope, DeactivationGuard | ViewModel 激活和停用。 | 状态机必须可测试，拒绝停用不抛业务异常。 |
-| Command | CommandFactory, OperationScope, OperationResult | 命令执行和操作结果。 | 异常、取消、并发拒绝必须有稳定结果。 |
+| Command | CommandFactory, OperationScope, OperationExecutionResult | 命令执行和操作结果。 | 异常、取消、并发拒绝必须有稳定结果。 |
 | Interaction | Interaction<TRequest, TResult> | ViewModel 到 UI 的请求 contract。 | 无 handler 返回 NotHandled，不直接依赖 Presentation 类型。 |
 | Validation | ValidationScope, ValidationMessage, ValidationChangedEventArgs | 验证状态和消息聚合。 | 消息变化可被 Presentation 绑定。 |
 
@@ -40,12 +40,12 @@
 | Interaction<TRequest, TResult>.RegisterHandler | 注册 Interaction handler。 | handler 不得为 null；activationScope 可选。 | IDisposable（随 ActivationScope 释放或手动解除）。 | handler 为 null 抛 `ArgumentNullException`；scope 已释放时立即释放 handler。 | handler 持 activationScope token，停用时取消。 | 多 handler 时最后注册者优先（last-wins）；释放后不再接收请求。 |
 | ViewModelBase.Dispose | 释放 ViewModel 生命周期资源。 | 无。 | void。 | 重复 Dispose 幂等；释放当前 ActivationScope。 | 同步 API 无 token。 | 进入 Disposed 终态，后续 mutation 被拒绝；**不执行 Deactivating/OnDeactivatedAsync 钩子**——需要停用语义时先调 DeactivateAsync 再 Dispose。 |
 | ViewModelBase.ActivateAsync | 激活 ViewModel。 | ActivationContext 不得为 null；scope 不得为 null。 | ValueTask。 | 激活异常不进入 Active，释放 ActivationScope，并在 exception data 写入 ViewModel type、scope id 和 stage。 | 必须观察 token；预取消释放候选 scope 后抛 `OperationCanceledException`。 | Active 状态下重复 Activate 幂等返回。 |
-| ViewModelBase.DeactivateAsync | 停用 ViewModel。 | CancellationToken 可选。 | ValueTask。 | 取消在进入 Deactivating 前抛出并保持 Active scope；已进入停用后释放当前 scope。 | 必须观察 token。 | Constructed、Deactivated 或 Disposed 状态下幂等返回。 |
+| ViewModelBase.DeactivateAsync | 停用 ViewModel。 | CancellationToken 可选。 | ValueTask。 | 取消在进入 Deactivating 前抛出并保持 Active scope；已进入停用后释放当前 scope；Disposed 后调用抛 `ObjectDisposedException`。 | 必须观察 token。 | Constructed、Deactivated 或 Deactivating 状态下幂等返回。 |
 | DeactivationGuard.CanDeactivateAsync | 离开前确认。 | viewModel 不得为 null；可实现 ICanDeactivate 或 IConfirmDeactivate。 | DeactivationResult。 | 拒绝返回 Reject；取消返回 Cancel；异常映射 Failed，不抛业务异常。 | 预取消跳过 viewModel 并返回 Cancel。 | 先执行 ICanDeactivate，Allow 后再执行 IConfirmDeactivate。 |
-| CommandFactory.Create | 创建同步命令。 | execute 不得为 null；canExecute 和 state 可选。 | IRelayCommand。 | execute 异常映射 OperationResult Failed，不外抛到 UI。 | 同步 API 无 token。 | 写入 CommandExecutionState；CanExecuteChanged 可通知 Presentation。 |
-| CommandFactory.CreateAsync | 创建异步命令。 | execute 不得为 null；state 和 activationScope 可选。 | IAsyncRelayCommand。 | execute 异常映射 OperationResult Failed；并发执行映射 Rejected。 | 命令 token 必须传递到 execute，并链接 ActivationScope token。 | 单一 command state 同时只允许一个 running operation；执行完成后的 `CanExecuteChanged`/`PropertyChanged` 必须回到调用 `ExecuteAsync` 时捕获的同步上下文。 |
+| CommandFactory.Create | 创建同步命令。 | execute 不得为 null；canExecute 和 state 可选。 | IRelayCommand。 | execute 异常写入 `OperationExecutionResult` Failed 后重抛原异常。 | 同步 API 无 token。 | 写入 CommandExecutionState；CanExecuteChanged 可通知 Presentation。 |
+| CommandFactory.CreateAsync | 创建异步命令。 | execute 不得为 null；state、activation owner/fixed scope、并发策略和异常 handler 按重载可选。 | IAsyncRelayCommand / IAsyncRelayCommand<T>。 | 直接 await 写入 Failed 后重抛原异常；`ICommand.Execute` 提交应用 handler；并发冲突映射 Rejected。 | 命令 token 必须传递到 execute，并链接当前 ActivationScope token。 | 默认 Reject；可选 Allow/RejectByKey；owner 重载每次执行解析当前 Scope。 |
 | OperationScope.Start | 创建一次可观测 operation。 | cancellationToken 可为 None。 | OperationScope，包含 Id、Status、Result、Error、Elapsed 和 CancellationToken。 | 外部 token 取消会先标记 Canceled result，再通知 operation token callback。 | OperationScope 持有自己的取消源，并链接外部 token。 | 初始 Status 为 Running；Result 在终态前为 null；Dispose 释放取消源和外部注册。 |
-| OperationScope.Complete/Cancel/Fail/Reject | 结束 operation。 | Fail 的 exception 不得为 null。 | OperationResult。 | Dispose 后调用抛 `ObjectDisposedException`；Fail 空 exception 抛 `ArgumentNullException`。 | Cancel 先提交 Canceled result，再取消 operation token。 | 首次终态胜出；重复终态返回同一个 OperationResult，Elapsed 保持稳定。 |
+| OperationScope.Complete/Cancel/Fail/Reject | 结束 operation。 | Fail 的 exception 不得为 null。 | OperationExecutionResult。 | Dispose 后调用抛 `ObjectDisposedException`；Fail 空 exception 抛 `ArgumentNullException`。 | Cancel 先提交 Canceled result，再取消 operation token。 | 首次终态胜出；重复终态返回同一个 OperationExecutionResult，Elapsed 保持稳定。 |
 | OperationScope.Dispose | 释放 operation scope。 | 无。 | void。 | 重复 Dispose 幂等；Dispose 后 mutating API 被拒绝。 | 未终止 operation 在 Dispose 时进入 Canceled 并通知 token callback。 | Dispose 后 Id、Status、Result、Error、Elapsed 仍可读取。 |
 | Interaction.RequestAsync | 请求 UI interaction。 | request 为 TRequest；handler 通过 ActivationScope 可选绑定。 | InteractionResult<TResult>。 | 无 handler 返回 NotHandled；handler 异常返回 Failed。 | 取消后不提交 handler result。 | 每次调用独立 InteractionContext，包含 request id、request type、handler type 和 scope id。 |
 | ValidationScope.SetMessages | 替换字段验证消息。 | field key 可为空表示 global；messages 不得含 null。 | void；状态通过 Status 读取。 | Dispose 后抛 `ObjectDisposedException`；空 messages 清理 field；重复 message 去重。 | 同步 API 无 token。 | 提交后触发 ValidationChanged，事件包含 field key、Status、Errors、Messages 和 owner scope id。 |
@@ -72,8 +72,8 @@
 | `InteractionContext<TRequest>` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `InteractionResult<TResult>` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `InteractionResultStatus` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `MvvmDiagnosticIds` | 诊断 contract | AUCMVVM001-008 的删除、重命名或语义变化必须更新本文档、diagnostics 和 compatibility。 |
-| `OperationResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `MvvmDiagnosticIds` | 诊断 contract | AUCMVVM001-013 的删除、重命名或语义变化必须更新本文档、diagnostics 和 compatibility。 |
+| `OperationExecutionResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `OperationScope` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `OperationStatus` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `ValidationMessage` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
@@ -105,4 +105,4 @@
 
 以下改动必须先更新文档并 review：新增 public 类型或成员；修改异常、Result status、诊断码、默认 options、manifest/schema、generated output、MSBuild property、CLI JSON envelope 或模板变量。
 
-`AUC-MVVM-007` 至 `010` 实现时还必须证明：同步 Dispose 不等待异步任务；所有用户回调在锁外；泛型/非泛型命令语义一致；`OperationResult` 重命名已同步 API baseline 和迁移说明。
+`AUC-MVVM-007` 至 `010` 已通过模块测试证明：同步 Dispose 不等待异步任务；用户回调不在框架锁内；泛型/非泛型命令语义一致；`OperationResult` 重命名已同步 API baseline 和迁移说明。

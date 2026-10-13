@@ -1,5 +1,6 @@
 using AtomUI.City.Core.Diagnostics;
 using AtomUI.City.Core.Lifecycle;
+using AtomUI.City.Mvvm;
 using AtomUI.City.Presentation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -105,6 +106,27 @@ public sealed class PresentationRuntimeTests
     }
 
     [Fact]
+    public async Task StopAsyncDisposesRuntimeViewModelCompositionBeforeScope()
+    {
+        await using var application = LifecycleScope.CreateRoot(
+            LifecycleScopeKind.Application,
+            "application");
+        var runtime = new PresentationRuntime();
+        var viewModel = new TestCompositionViewModel();
+
+        await runtime.StartAsync(application);
+        var lease = await runtime.ViewModels.AttachRootAsync(
+            "shell",
+            ViewModelLease.EntryOwned(viewModel));
+
+        await runtime.StopAsync();
+
+        Assert.True(lease.IsDisposed);
+        Assert.True(viewModel.WasDeactivated);
+        Assert.True(viewModel.IsDisposed);
+    }
+
+    [Fact]
     public async Task ServiceCollectionRegistersPresentationRuntime()
     {
         var services = new ServiceCollection();
@@ -135,5 +157,40 @@ public sealed class PresentationRuntimeTests
         Assert.Contains(
             diagnostics.Records,
             record => record.Code == PresentationDiagnosticIds.RuntimeReady);
+    }
+
+    private sealed class TestCompositionViewModel : IActivatable, IAsyncDisposable
+    {
+        public bool WasDeactivated { get; private set; }
+
+        public bool IsDisposed { get; private set; }
+
+        public ValueTask ActivateAsync(IActivationScope scope) => ValueTask.CompletedTask;
+
+        public ValueTask ActivateAsync(
+            IActivationScope scope,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask DeactivateAsync()
+        {
+            WasDeactivated = true;
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask DeactivateAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return DeactivateAsync();
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            IsDisposed = true;
+            return ValueTask.CompletedTask;
+        }
     }
 }

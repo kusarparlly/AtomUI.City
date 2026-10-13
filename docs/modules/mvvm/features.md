@@ -8,14 +8,14 @@
 | --- | --- | --- | --- | --- |
 | AUC-MVVM-001 | ViewModel Base and Notification | Completed | ViewModelBase | ViewModelBaseTests |
 | AUC-MVVM-002 | Activation and Deactivation | Completed | IActivatable, ICanDeactivate, ActivationScope | ActivationScopeTests; DeactivationTests |
-| AUC-MVVM-003 | Command Execution | Completed | CommandFactory, OperationScope, OperationResult, CommandExecutionState, CommandGroup | CommandTests |
+| AUC-MVVM-003 | Command Execution | Completed | CommandFactory, OperationScope, OperationExecutionResult, CommandExecutionState, CommandGroup | CommandTests |
 | AUC-MVVM-004 | Interaction Requests | Completed | Interaction<TRequest, TResult>, InteractionContext<TRequest> | InteractionTests |
 | AUC-MVVM-005 | Validation Model | Completed | ValidationScope, ValidationMessage, ValidationStatus | ValidationScopeTests |
 | AUC-MVVM-006 | Operation and Cancellation Scope | Completed | OperationScope, CommandExecutionState | CommandTests |
-| AUC-MVVM-007 | Activation-scoped Structured Tasks | Planned | IActivationScope.StartAsync/StartUniqueAsync, ActivationScope | ActivationScopeTests |
-| AUC-MVVM-008 | Typed Commands and CanExecute | Planned | CommandFactory generic overloads, OperationExecutionResult | CommandTests |
-| AUC-MVVM-009 | Command Concurrency and Activation Ownership | Planned | Command concurrency policy, activation owner contract | CommandTests; ViewModelBaseTests |
-| AUC-MVVM-010 | Command Exception Delivery | Planned | ICommandExceptionHandler, command exception context | CommandTests |
+| AUC-MVVM-007 | Activation-scoped Structured Tasks | Implemented | IActivationScope.StartAsync/StartUniqueAsync, ActivationScope | ActivationScopeTests |
+| AUC-MVVM-008 | Typed Commands and CanExecute | Implemented | CommandFactory generic overloads, OperationExecutionResult | CommandTests |
+| AUC-MVVM-009 | Command Concurrency and Activation Ownership | Implemented | Command concurrency policy, activation owner contract | CommandTests; ViewModelBaseTests |
+| AUC-MVVM-010 | Command Exception Delivery | Implemented | ICommandExceptionHandler, command exception context | CommandTests |
 
 ## Feature 硬门禁
 
@@ -67,8 +67,8 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 Feature ID: `AUC-MVVM-003`
 Status: Completed
 Goal: 提供 .NET 风格命令执行、CanExecute、并发和错误结果。
-Public Contract: CommandFactory, OperationScope, OperationResult, CommandExecutionState
-Runtime / Build Behavior: Command 执行进入 OperationScope；同步和异步命令都写入 CommandExecutionState 和 OperationResult；CanExecute 变化可被 Presentation 绑定。
+Public Contract: CommandFactory, OperationScope, OperationExecutionResult, CommandExecutionState
+Runtime / Build Behavior: Command 执行进入 OperationScope；同步和异步命令都写入 CommandExecutionState 和 OperationExecutionResult；CanExecute 变化可被 Presentation 绑定。
 Failure Behavior: 执行异常映射为 Failed；并发执行返回 Rejected result；失败不得吞掉诊断。
 Threading / Cancellation: 异步命令必须观察 token；取消返回 Cancelled，不混用 Success。
 Diagnostics: command diagnostics 包含 command name、owner ViewModel type 和 operation id。
@@ -121,13 +121,13 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 ## AUC-MVVM-007 Activation-scoped Structured Tasks
 
 Feature ID: `AUC-MVVM-007`
-Status: Planned
+Status: Implemented
 Goal: 让一次 ActivationScope 内的异步工作有可控准入、监控、取消、drain 和唯一 worker 语义。
 Public Contract: `IActivationScope.StartAsync`, `IActivationScope.StartUniqueAsync`, activity snapshot/count, async disposal.
 Runtime / Build Behavior: Scope 在调用用户委托前注册任务；关闭时拒绝新准入、取消、等待任务、再释放资源；unique key 在任务终态后释放。
 Failure Behavior: 重复 key、关闭后准入和非法参数稳定拒绝；非取消异常保留在返回 Task 并写诊断；超时不能伪装成强杀成功。
 Threading / Cancellation: 用户委托和 continuation 不在框架锁内运行；外部 token 只取消本任务，Scope token 取消全部归属任务。
-Diagnostics: `AUCMVVM009-011`（approved/reserved，待源码落地）。
+Diagnostics: `AUCMVVM009-011`。
 Tests: `ActivationScopeTests`
 Required Assertions: 准入、唯一 key、完成移除、关闭竞态、取消、drain、释放顺序、异常、超时和 registry 回收。
 Acceptance Criteria: [结构化并发和 Commands V2](structured-concurrency-and-commands-v2.md) 的全部合同可由测试证明。
@@ -135,7 +135,7 @@ Acceptance Criteria: [结构化并发和 Commands V2](structured-concurrency-and
 ## AUC-MVVM-008 Typed Commands and CanExecute
 
 Feature ID: `AUC-MVVM-008`
-Status: Planned
+Status: Implemented
 Goal: 提供同步/异步泛型参数命令、开发者业务谓词、准确通知和无领域歧义的执行结果类型。
 Public Contract: `CommandFactory.Create<T>`, `CommandFactory.CreateAsync<T>`, `OperationExecutionResult`.
 Runtime / Build Behavior: 泛型命令遵守 CommunityToolkit 参数语义；最终 CanExecute 组合业务 predicate、activation 和并发状态。
@@ -149,13 +149,13 @@ Acceptance Criteria: 泛型与非泛型入口行为一致，City 结果不表达
 ## AUC-MVVM-009 Command Concurrency and Activation Ownership
 
 Feature ID: `AUC-MVVM-009`
-Status: Planned
+Status: Implemented
 Goal: 用原子准入实现 Reject、Allow、RejectByKey，并让稳定 Command 对象在每次执行时绑定当前 ActivationScope。
 Public Contract: command concurrency policy/options, activation owner contract, `CommandExecutionState` active count/result snapshot.
 Runtime / Build Behavior: 默认 Reject；RejectByKey 同 key 单飞、不同 key 并行；每次执行解析当前 Scope 并通过 Scope task admission 进入监督。
 Failure Behavior: inactive/deactivating/disposed owner 和原子并发冲突稳定拒绝，不调用用户委托；key selector 异常不隐式退化。
 Threading / Cancellation: 只在短临界区修改 admission registry，任何锁不跨 await；Scope A 结束后重新激活使用 Scope B。
-Diagnostics: `AUCMVVM004` 和 `AUCMVVM012`（后者 approved/reserved，待源码落地）。
+Diagnostics: `AUCMVVM004` 和 `AUCMVVM012`。
 Tests: `CommandTests; ViewModelBaseTests`
 Required Assertions: 三种策略、活动计数、同 key 竞态、完成后恢复、Scope A/B 和 inactive rejection。
 Acceptance Criteria: `CanExecute` 仅作提示，执行入口仍能原子保证并发策略。
@@ -163,13 +163,13 @@ Acceptance Criteria: `CanExecute` 仅作提示，执行入口仍能原子保证�
 ## AUC-MVVM-010 Command Exception Delivery
 
 Feature ID: `AUC-MVVM-010`
-Status: Planned
+Status: Implemented
 Goal: 保证命令异常不被静默吞掉，同时把应用展示/持久化策略留在框架外。
 Public Contract: `ICommandExceptionHandler`, command exception context, async CommandFactory exception path.
 Runtime / Build Behavior: awaited `ExecuteAsync` 更新状态和诊断后重抛原异常；`ICommand.Execute` 把原异常恰好一次提交应用 handler。
 Failure Behavior: cancellation 不进入 handler；handler 失败记录独立诊断且不递归；City 不写磁盘或展示 UI。
 Threading / Cancellation: handler 不在框架锁内调用；handler completion 进入 Command ExecutionTask 监督。
-Diagnostics: `AUCMVVM003` 和 `AUCMVVM013`（后者 approved/reserved，待源码落地）。
+Diagnostics: `AUCMVVM003` 和 `AUCMVVM013`。
 Tests: `CommandTests`
 Required Assertions: awaited 原异常/堆栈、UI handler 恰好一次、取消排除、handler 失败、无文件系统副作用。
 Acceptance Criteria: 每个可捕获命令异常都能从调用者、handler 或结构化诊断中被明确观察。

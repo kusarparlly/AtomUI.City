@@ -7,7 +7,12 @@ namespace AtomUI.City.Mvvm;
 /// <summary>
 /// Represents view model base.
 /// </summary>
-public abstract class ViewModelBase : ObservableValidator, IActivatable, IDisposable
+public abstract class ViewModelBase :
+    ObservableValidator,
+    IActivatable,
+    IActivationScopeOwner,
+    IDisposable,
+    IAsyncDisposable
 {
     private readonly IHostDiagnostics? _diagnostics;
     private readonly object _stateSyncRoot = new();
@@ -121,18 +126,13 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
                     $"ViewModel activation is already in progress ({ActivationState}).");
             }
 
-            if (cancellationToken.IsCancellationRequested)
-            {
-                AbortActivation(context);
-                cancellationToken.ThrowIfCancellationRequested();
-            }
-
             ActivationState = ActivationState.Activating;
             ActivationContext = context;
         }
 
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
             context.Scope.CancellationToken.ThrowIfCancellationRequested();
 
             await OnActivatedAsync(context, cancellationToken).ConfigureAwait(false);
@@ -146,16 +146,16 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
                 ActivationState = ActivationState.Active;
             }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException exception)
         {
-            AbortActivation(context);
+            await AbortActivationAsync(context, exception).ConfigureAwait(false);
             throw;
         }
         catch (Exception exception)
         {
             EnrichActivationException(exception, context, "Activating");
             WriteActivationFailedDiagnostic(exception, context);
-            AbortActivation(context);
+            await AbortActivationAsync(context, exception).ConfigureAwait(false);
             throw;
         }
     }
@@ -205,12 +205,24 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         }
         finally
         {
-            ActivationContext?.Scope.Dispose();
-
-            lock (_stateSyncRoot)
+            var scope = ActivationContext?.Scope;
+            try
             {
-                ActivationContext = null;
-                ActivationState = ActivationState.Deactivated;
+                if (scope is not null)
+                {
+                    await scope.DisposeAsync().ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                lock (_stateSyncRoot)
+                {
+                    ActivationContext = null;
+                    if (!_disposed)
+                    {
+                        ActivationState = ActivationState.Deactivated;
+                    }
+                }
             }
         }
     }
@@ -238,6 +250,40 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         try
         {
             scope?.Dispose();
+        }
+        finally
+        {
+            OnDisposed();
+            GC.SuppressFinalize(this);
+        }
+    }
+
+    /// <summary>
+    /// Asynchronously releases the current activation session and then the ViewModel.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        IActivationScope? scope;
+
+        lock (_stateSyncRoot)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            scope = ActivationContext?.Scope;
+            ActivationContext = null;
+            ActivationState = ActivationState.Disposed;
+        }
+
+        try
+        {
+            if (scope is not null)
+            {
+                await scope.DisposeAsync().ConfigureAwait(false);
+            }
         }
         finally
         {
@@ -358,15 +404,53 @@ public abstract class ViewModelBase : ObservableValidator, IActivatable, IDispos
         }
     }
 
-    private void AbortActivation(ActivationContext context)
+    private async ValueTask AbortActivationAsync(
+        ActivationContext context,
+        Exception? primaryException = null)
     {
-        context.Scope.Dispose();
+        try
+        {
+            await context.Scope.DisposeAsync().ConfigureAwait(false);
+        }
+        catch (Exception cleanupException)
+        {
+            WriteActivationScopeCleanupFailedDiagnostic(cleanupException, context);
+            if (primaryException is null)
+            {
+                throw;
+            }
+
+            AddExceptionData(
+                primaryException,
+                "AtomUI.City.Mvvm.ActivationCleanupException",
+                cleanupException);
+        }
 
         lock (_stateSyncRoot)
         {
-            ActivationContext = null;
-            ActivationState = ActivationState.Deactivated;
+            if (!_disposed)
+            {
+                ActivationContext = null;
+                ActivationState = ActivationState.Deactivated;
+            }
         }
+    }
+
+    private void WriteActivationScopeCleanupFailedDiagnostic(
+        Exception exception,
+        ActivationContext context)
+    {
+        _diagnostics?.Write(new HostDiagnosticRecord(
+            MvvmDiagnosticIds.ActivationScopeDisposeFailed,
+            $"Activation scope '{context.Scope.Id}' cleanup failed for '{GetType().FullName}': {exception.Message}",
+            HostDiagnosticSeverity.Error)
+        {
+            Context = new Dictionary<string, string?>
+            {
+                ["viewModelType"] = GetType().FullName,
+                ["scopeId"] = context.Scope.Id.ToString(),
+            }
+        });
     }
 
     private void EnrichActivationException(

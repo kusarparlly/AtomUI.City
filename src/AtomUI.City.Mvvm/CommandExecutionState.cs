@@ -6,6 +6,12 @@ namespace AtomUI.City.Mvvm;
 public sealed class CommandExecutionState
 {
     private readonly object _gate = new();
+    private int _activeExecutionCount;
+    private OperationExecutionResult? _lastResult;
+    private OperationExecutionResult? _lastRejectedResult;
+    private int _rejectedExecutionCount;
+    private Exception? _lastError;
+    private CancellationToken _cancellationToken;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandExecutionState"/> type.
@@ -29,73 +35,146 @@ public sealed class CommandExecutionState
     public Type? OwnerType { get; }
 
     /// <summary>
-    /// Gets or sets is executing.
+    /// Gets a value indicating whether one or more executions are active.
     /// </summary>
-    public bool IsExecuting { get; private set; }
+    public bool IsExecuting => ActiveExecutionCount != 0;
+
+    /// <summary>
+    /// Gets the number of currently active executions.
+    /// </summary>
+    public int ActiveExecutionCount
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _activeExecutionCount;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets or sets last result.
     /// </summary>
-    public OperationResult? LastResult { get; private set; }
+    public OperationExecutionResult? LastResult
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _lastResult;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets or sets last rejected result.
     /// </summary>
-    public OperationResult? LastRejectedResult { get; private set; }
+    public OperationExecutionResult? LastRejectedResult
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _lastRejectedResult;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets or sets rejected execution count.
     /// </summary>
-    public int RejectedExecutionCount { get; private set; }
+    public int RejectedExecutionCount
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _rejectedExecutionCount;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets or sets last error.
     /// </summary>
-    public Exception? LastError { get; private set; }
+    public Exception? LastError
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _lastError;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets or sets cancellation token.
     /// </summary>
-    public CancellationToken CancellationToken { get; private set; }
+    public CancellationToken CancellationToken
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _cancellationToken;
+            }
+        }
+    }
 
     internal bool TryBegin(CancellationToken cancellationToken)
     {
         lock (_gate)
         {
-            if (IsExecuting)
+            if (_activeExecutionCount != 0)
             {
                 return false;
             }
 
-            IsExecuting = true;
-            LastResult = null;
-            LastError = null;
-            CancellationToken = cancellationToken;
+            _activeExecutionCount++;
+            _lastResult = null;
+            _lastError = null;
+            _cancellationToken = cancellationToken;
 
             return true;
         }
     }
 
-    internal void Complete(OperationResult result)
+    internal void Begin(CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(result);
-
         lock (_gate)
         {
-            LastResult = result;
-            LastError = result.Error;
-            IsExecuting = false;
+            _activeExecutionCount++;
+            _lastResult = null;
+            _lastError = null;
+            _cancellationToken = cancellationToken;
         }
     }
 
-    internal void Reject(OperationResult result)
+    internal void Complete(OperationExecutionResult result)
     {
         ArgumentNullException.ThrowIfNull(result);
 
         lock (_gate)
         {
-            LastRejectedResult = result;
-            RejectedExecutionCount++;
+            _lastResult = result;
+            _lastError = result.Error;
+            if (_activeExecutionCount > 0)
+            {
+                _activeExecutionCount--;
+            }
+        }
+    }
+
+    internal void Reject(OperationExecutionResult result)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+
+        lock (_gate)
+        {
+            _lastRejectedResult = result;
+            _rejectedExecutionCount++;
         }
     }
 }

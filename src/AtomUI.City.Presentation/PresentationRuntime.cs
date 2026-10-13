@@ -20,6 +20,7 @@ public sealed class PresentationRuntime : IPresentationRuntime
     private readonly IPresentationFailurePresenter _failurePresenter;
     private readonly VisualLifecycleHub? _lifecycleHub;
     private LifecycleScope? _presentationScope;
+    private ViewModelCompositionOwner? _viewModels;
     private IApplicationLifetime? _applicationLifetime;
     private PresentationRuntimeState _state = PresentationRuntimeState.NotReady;
     private Task? _stopTask;
@@ -121,6 +122,19 @@ public sealed class PresentationRuntime : IPresentationRuntime
         }
     }
 
+    /// <inheritdoc />
+    public ViewModelCompositionOwner ViewModels
+    {
+        get
+        {
+            lock (_syncRoot)
+            {
+                EnsureReady();
+                return _viewModels!;
+            }
+        }
+    }
+
     /// <summary>
     /// Executes the attach operation.
     /// </summary>
@@ -150,6 +164,10 @@ public sealed class PresentationRuntime : IPresentationRuntime
             scope = hostScope.CreateChild(LifecycleScopeKind.Presentation, presentationScopeId);
             _applicationLifetime = applicationLifetime;
             _presentationScope = scope;
+            _viewModels = new ViewModelCompositionOwner(
+                "runtime",
+                scope.CancellationToken,
+                _diagnostics);
             TransitionStateUnderLock(PresentationRuntimeState.Ready);
         }
 
@@ -179,6 +197,10 @@ public sealed class PresentationRuntime : IPresentationRuntime
             ThrowIfStopping();
             scope = applicationScope.CreateChild(LifecycleScopeKind.Presentation, presentationScopeId);
             _presentationScope = scope;
+            _viewModels = new ViewModelCompositionOwner(
+                "runtime",
+                scope.CancellationToken,
+                _diagnostics);
             TransitionStateUnderLock(PresentationRuntimeState.Ready);
         }
 
@@ -283,10 +305,12 @@ public sealed class PresentationRuntime : IPresentationRuntime
     private async Task RunStopAsync(TaskCompletionSource completion)
     {
         LifecycleScope? presentationScope;
+        ViewModelCompositionOwner? viewModels;
         WindowSession[] windows;
         lock (_syncRoot)
         {
             presentationScope = _presentationScope;
+            viewModels = _viewModels;
             windows = _windows.Values.ToArray();
         }
 
@@ -317,6 +341,18 @@ public sealed class PresentationRuntime : IPresentationRuntime
                             PresentationError.WindowCloseRejected,
                             $"Window '{window.Id}' rejected application shutdown."));
                     }
+                }
+                catch (Exception exception)
+                {
+                    failures.Add(exception);
+                }
+            }
+
+            if (viewModels is not null)
+            {
+                try
+                {
+                    await viewModels.DisposeAsync().ConfigureAwait(false);
                 }
                 catch (Exception exception)
                 {

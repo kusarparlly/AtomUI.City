@@ -37,4 +37,29 @@ public static class MvvmDiagnosticIds
     /// Represents the validation failed value.
     /// </summary>
     public const string ValidationFailed = "AUCMVVM008";
+
+    /// <summary>
+    /// Activation-scoped task admission was rejected.
+    /// </summary>
+    public const string ActivationTaskRejected = "AUCMVVM009";
+
+    /// <summary>
+    /// Activation-scoped task execution failed.
+    /// </summary>
+    public const string ActivationTaskFailed = "AUCMVVM010";
+
+    /// <summary>
+    /// Activation-scoped tasks did not drain within the configured timeout.
+    /// </summary>
+    public const string ActivationTaskDrainTimedOut = "AUCMVVM011";
+
+    /// <summary>
+    /// Command execution was rejected because its owner was not active.
+    /// </summary>
+    public const string CommandInactive = "AUCMVVM012";
+
+    /// <summary>
+    /// The application command exception handler failed.
+    /// </summary>
+    public const string CommandExceptionHandlerFailed = "AUCMVVM013";
 }

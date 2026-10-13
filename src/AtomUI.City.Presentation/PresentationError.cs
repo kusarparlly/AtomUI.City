@@ -85,4 +85,8 @@ public enum PresentationError
     /// Represents the multiple close confirmations value.
     /// </summary>
     MultipleCloseConfirmations,
+    /// <summary>
+    /// Represents a rejected logical ViewModel composition operation.
+    /// </summary>
+    ViewModelCompositionRejected,
 }

@@ -50,6 +50,10 @@ public sealed class WindowSession : IAsyncDisposable
         _queueOptions = queueOptions;
         _failurePresenter = failurePresenter ?? new NullPresentationFailurePresenter();
         _lifecycleHub = lifecycleHub;
+        ViewModels = new ViewModelCompositionOwner(
+            $"window:{id}",
+            scope.CancellationToken,
+            diagnostics);
         _state = WindowSessionState.Registered;
 
         Window.Closing += HandleWindowClosing;
@@ -72,6 +76,11 @@ public sealed class WindowSession : IAsyncDisposable
     /// Gets scope.
     /// </summary>
     public LifecycleScope Scope { get; }
+
+    /// <summary>
+    /// Gets the logical ViewModel composition owner for this Window.
+    /// </summary>
+    public ViewModelCompositionOwner ViewModels { get; }
 
     /// <summary>
     /// Represents the state value.
@@ -437,6 +446,15 @@ public sealed class WindowSession : IAsyncDisposable
                     RouteOutletProperties.SetWindowSession(Window, null);
                 },
                 CancellationToken.None).ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            failures.Add(exception);
+        }
+
+        try
+        {
+            await ViewModels.DisposeAsync().ConfigureAwait(false);
         }
         catch (Exception exception)
         {

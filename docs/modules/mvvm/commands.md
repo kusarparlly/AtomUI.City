@@ -110,7 +110,7 @@ CanExecute check
 终态规则：
 
 - `Complete`、`Cancel`、`Fail`、`Reject` 首次调用决定唯一终态。
-- 重复终态返回同一个 `OperationResult`，不改写 `Elapsed` 或 `Error`。
+- 重复终态返回同一个 `OperationExecutionResult`，不改写 `Elapsed` 或 `Error`。
 - `Cancel` 和 active `Dispose` 都必须在取消 token callback 前提交 `Canceled` 状态。
 - `Dispose` 后 `Id`、`Status`、`Result`、`Error`、`Elapsed` 仍可读取，mutating API 抛 `ObjectDisposedException`。
 

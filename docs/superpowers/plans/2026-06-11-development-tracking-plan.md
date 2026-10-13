@@ -4,8 +4,9 @@
 
 ## 当前结论
 
-- 1.0 总包发布状态：扩展后的 1.0 Feature 集合尚未完成；MVVM 结构化任务/Command V2 和 Presentation ViewModel Composition 完成前不得发布新候选。
-- 运行时本地候选状态：既有 Build、Core、EventBus、State、MVVM、Routing、Data、Localization、Security、Presentation 候选曾通过隔离本地 NuGet consumer；该证据不覆盖 2026-10-13 新增的 5 个 Planned Feature。
+- 1.0 总包发布状态：MVVM 结构化任务/Command V2 和 Presentation ViewModel Composition 已实现并通过模块测试与全解决方案 Release 构建，但尚未完成全套发布验证，暂不得发布新候选。
+- 运行时本地候选状态：既有 Build、Core、EventBus、State、MVVM、Routing、Data、Localization、Security、Presentation 候选曾通过隔离本地 NuGet consumer；2026-10-13 新增的 5 个 Feature 尚需重新执行 package consumer 与全套发布门禁。
+- 本轮验证备注：相关 MVVM 测试 `87/87`、Composition/Runtime/CommandBinding 测试 `23/23`、全解决方案 Release 构建零警告零错误；全量测试仍受既有 DTR-13 外部端点重启恢复波动和未生成本地 NuGet 包的 TemplateSmoke 前置条件影响，因此以下 5 项暂不勾选。
 - 全局进度：152/157。
 - 模块 Feature 合同：142/147。
 - 最终发布门禁：10/10。
@@ -128,7 +129,7 @@
 - [x] AUC-PRESENTATION-014 Hierarchical Fault Model。验收重点：Operation/Outlet/Window/Runtime 故障域、失败注入和诊断。
 - [x] AUC-PRESENTATION-015 Bounded Backpressure and Candidate Ownership。验收重点：有界 FIFO、满载拒绝、single owner 和竞态回收。
 - [x] AUC-PRESENTATION-016 Deterministic Window Close Origins and Confirmation。验收重点：三类 close origin、唯一 confirmation、并发事务和真实平台证明。
-- [ ] AUC-PRESENTATION-017 Logical Root and Owned Child ViewModels。验收重点：显式 Root/Child lease、独立链接 Scope、leaf-to-root、部分失败继续和 Outlet 隔离。
+- [ ] AUC-PRESENTATION-017 Logical Root and Owned Child ViewModels（Implemented / Release Validation Pending）。验收重点：显式 Root/Child lease、独立链接 Scope、leaf-to-root、部分失败继续和 Outlet 隔离。
 
 ## MVVM
 
@@ -138,10 +139,10 @@
 - [x] AUC-MVVM-004 Interaction Requests。验收重点：有 handler、无 handler、异常、取消、泛型 result 和 handler scope 释放。
 - [x] AUC-MVVM-005 Validation Model。验收重点：消息增删、状态聚合、重复处理、释放和 Presentation binding 输入。
 - [x] AUC-MVVM-006 Operation and Cancellation Scope。验收重点：状态转换、取消顺序、重复终态、耗时字段和资源释放。
-- [ ] AUC-MVVM-007 Activation-scoped Structured Tasks。验收重点：Start/Unique、准入关闭、取消 drain、Dispose 竞态、超时诊断和回收。
-- [ ] AUC-MVVM-008 Typed Commands and CanExecute。验收重点：泛型参数、业务 predicate、通知、取消和 OperationExecutionResult API。
-- [ ] AUC-MVVM-009 Command Concurrency and Activation Ownership。验收重点：Reject/Allow/RejectByKey、原子准入、活动计数、Scope A/B 和 inactive rejection。
-- [ ] AUC-MVVM-010 Command Exception Delivery。验收重点：await 原异常、ICommand handler 恰好一次、取消排除、handler 失败和无磁盘副作用。
+- [ ] AUC-MVVM-007 Activation-scoped Structured Tasks（Implemented / Release Validation Pending）。验收重点：Start/Unique、准入关闭、取消 drain、Dispose 竞态、超时诊断和回收。
+- [ ] AUC-MVVM-008 Typed Commands and CanExecute（Implemented / Release Validation Pending）。验收重点：泛型参数、业务 predicate、通知、取消和 OperationExecutionResult API。
+- [ ] AUC-MVVM-009 Command Concurrency and Activation Ownership（Implemented / Release Validation Pending）。验收重点：Reject/Allow/RejectByKey、原子准入、活动计数、Scope A/B 和 inactive rejection。
+- [ ] AUC-MVVM-010 Command Exception Delivery（Implemented / Release Validation Pending）。验收重点：await 原异常、ICommand handler 恰好一次、取消排除、handler 失败和无磁盘副作用。
 
 ## State
 

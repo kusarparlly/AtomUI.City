@@ -169,4 +169,16 @@ public static class PresentationDiagnosticIds
     /// Represents the multiple close confirmations value.
     /// </summary>
     public const string MultipleCloseConfirmations = "AUCPRS043";
+    /// <summary>
+    /// Represents a successfully attached logical ViewModel composition.
+    /// </summary>
+    public const string ViewModelCompositionAttached = "AUCPRS044";
+    /// <summary>
+    /// Represents a rejected logical ViewModel composition.
+    /// </summary>
+    public const string ViewModelCompositionRejected = "AUCPRS045";
+    /// <summary>
+    /// Represents a logical ViewModel composition cleanup failure.
+    /// </summary>
+    public const string ViewModelCompositionCleanupFailed = "AUCPRS046";
 }

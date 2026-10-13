@@ -1,6 +1,6 @@
 # AtomUI.City.Presentation ViewModel Composition
 
-状态：Approved Design / Implementation Pending
+状态：Implemented / Release Validation Pending
 
 Feature ID：`AUC-PRESENTATION-017`
 
@@ -18,7 +18,7 @@ Feature ID：`AUC-PRESENTATION-017`
 - 同一 ViewModel 实例不能同时被两个 composition owner 以 owned 方式 attach。
 - `Borrowed` 对象的最终 Dispose 仍由外部 owner 负责，但其 activation session 必须由 composition lease 完整停用。
 
-最终 public 类型名称在 API review 中确定，行为合同不得弱化为同步 `IDisposable` 或反射发现。
+最终 public 类型为 `ViewModelCompositionOwner` 与 `ViewModelCompositionLease`；行为合同不得弱化为同步 `IDisposable` 或反射发现。
 
 ## 所有权模型
 
@@ -55,13 +55,13 @@ Created
 
 ## 失败和诊断
 
-| Planned Code | Name | 必需上下文 |
+| Code | Name | 必需上下文 |
 | --- | --- | --- |
 | `AUCPRS044` | ViewModelCompositionAttached | `ownerId`, `compositionId`, `parentId`, `viewModelType`, `role` |
 | `AUCPRS045` | ViewModelCompositionRejected | `ownerId`, `compositionId`, `parentId`, `viewModelType`, `reason` |
 | `AUCPRS046` | ViewModelCompositionCleanupFailed | `ownerId`, `compositionId`, `viewModelType`, `stage`, `exceptionType` |
 
-源码落地前上述 code 属于 approved/reserved。identity 冲突、owner 终态、重复 owned instance 和跨 owner parent 都必须稳定拒绝。
+上述 code 已由 `PresentationDiagnosticIds` 公开并有 failure-path 断言测试。identity 冲突、owner 终态、重复 owned instance 和跨 owner parent 都稳定拒绝。
 
 ## 非目标
 

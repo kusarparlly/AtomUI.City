@@ -658,3 +658,27 @@ static AtomUI.City.Presentation.VisualIdentity.operator ==(AtomUI.City.Presentat
 static AtomUI.City.Presentation.VisualLifecycleEvent.operator !=(AtomUI.City.Presentation.VisualLifecycleEvent? left, AtomUI.City.Presentation.VisualLifecycleEvent? right) -> bool
 static AtomUI.City.Presentation.VisualLifecycleEvent.operator ==(AtomUI.City.Presentation.VisualLifecycleEvent? left, AtomUI.City.Presentation.VisualLifecycleEvent? right) -> bool
 static readonly AtomUI.City.Presentation.RouteOutletProperties.NameProperty -> Avalonia.AttachedProperty<string?>!
+AtomUI.City.Presentation.IPresentationRuntime.ViewModels.get -> AtomUI.City.Presentation.ViewModelCompositionOwner!
+AtomUI.City.Presentation.PresentationError.ViewModelCompositionRejected = 20 -> AtomUI.City.Presentation.PresentationError
+AtomUI.City.Presentation.PresentationRuntime.ViewModels.get -> AtomUI.City.Presentation.ViewModelCompositionOwner!
+AtomUI.City.Presentation.ViewModelCompositionLease
+AtomUI.City.Presentation.ViewModelCompositionLease.ActivationScope.get -> AtomUI.City.Mvvm.IActivationScope!
+AtomUI.City.Presentation.ViewModelCompositionLease.AttachChildAsync(string! compositionId, AtomUI.City.Presentation.ViewModelLease! viewModelLease, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.ViewModelCompositionLease!>
+AtomUI.City.Presentation.ViewModelCompositionLease.Children.get -> System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Presentation.ViewModelCompositionLease!>!
+AtomUI.City.Presentation.ViewModelCompositionLease.CompositionId.get -> string!
+AtomUI.City.Presentation.ViewModelCompositionLease.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.ViewModelCompositionLease.IsActive.get -> bool
+AtomUI.City.Presentation.ViewModelCompositionLease.IsDisposed.get -> bool
+AtomUI.City.Presentation.ViewModelCompositionLease.OwnerId.get -> string!
+AtomUI.City.Presentation.ViewModelCompositionLease.ParentId.get -> string?
+AtomUI.City.Presentation.ViewModelCompositionLease.ViewModel.get -> object!
+AtomUI.City.Presentation.ViewModelCompositionOwner
+AtomUI.City.Presentation.ViewModelCompositionOwner.AttachRootAsync(string! compositionId, AtomUI.City.Presentation.ViewModelLease! viewModelLease, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.ViewModelCompositionLease!>
+AtomUI.City.Presentation.ViewModelCompositionOwner.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.ViewModelCompositionOwner.OwnerId.get -> string!
+AtomUI.City.Presentation.ViewModelCompositionOwner.Roots.get -> System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Presentation.ViewModelCompositionLease!>!
+AtomUI.City.Presentation.ViewModelCompositionOwner.ViewModelCompositionOwner(string! ownerId, System.Threading.CancellationToken ownerCancellationToken = default(System.Threading.CancellationToken), AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Presentation.WindowSession.ViewModels.get -> AtomUI.City.Presentation.ViewModelCompositionOwner!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ViewModelCompositionAttached = "AUCPRS044" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ViewModelCompositionCleanupFailed = "AUCPRS046" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.ViewModelCompositionRejected = "AUCPRS045" -> string!

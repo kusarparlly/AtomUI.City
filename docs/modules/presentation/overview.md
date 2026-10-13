@@ -42,8 +42,8 @@ City Host 使用 `UseModule<PresentationModule>()`；独立 DI/测试使用 `Add
 | [compatibility.md](compatibility.md) | 1.0 兼容承诺 |
 | [state-and-localization.md](state-and-localization.md) | State/Localization 边界 |
 | [resources-and-plugins.md](resources-and-plugins.md) | owner-bound UI contribution |
-| [viewmodel-composition.md](viewmodel-composition.md) | 已批准的逻辑 Root/Owned Child ViewModel 组合合同 |
+| [viewmodel-composition.md](viewmodel-composition.md) | 已实现的逻辑 Root/Owned Child ViewModel 组合合同 |
 
 ## 成熟度
 
-`AUC-PRESENTATION-001` 至 `016` 的 Windows 基线已完成 Release Verified；`AUC-PRESENTATION-017` 已批准设计但尚未实现，因此扩展后的 1.0 Feature 集合不能报告为全部完成。Linux/macOS 仍是 build-only experimental，不属于平台发布证明。
+`AUC-PRESENTATION-001` 至 `016` 的 Windows 基线已完成 Release Verified；`AUC-PRESENTATION-017` 已实现并通过组合与 Runtime 生命周期模块测试，但在全套发布门禁完成前保持 `Implemented`。Linux/macOS 仍是 build-only experimental，不属于平台发布证明。
