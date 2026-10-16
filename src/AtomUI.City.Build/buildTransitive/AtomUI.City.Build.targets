@@ -14,7 +14,7 @@
   <UsingTask TaskName="AtomUI.City.Build.Tasks.ValidateManifestFilesTask" AssemblyFile="$(AtomUICityBuildTasksAssembly)" />
 
   <ItemGroup Condition="'$(AtomUICityEnableAnalyzers)' != 'true'">
-    <Analyzer Remove="@(Analyzer)" Condition="'%(Filename)%(Extension)' == 'AtomUI.City.Generators.dll'" />
+    <Analyzer Remove="@(Analyzer->WithMetadataValue('Filename', 'AtomUI.City.Generators')->WithMetadataValue('Extension', '.dll'))" />
   </ItemGroup>
 
   <Target Name="ValidateAtomUICityBuildProperties" BeforeTargets="CoreCompile">

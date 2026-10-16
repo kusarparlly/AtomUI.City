@@ -20,4 +20,8 @@
     <ProjectReference Include="../../src/AtomUI.City.Build/AtomUI.City.Build.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="../Shared/ProcessTestRunner.cs" Link="ProcessTestRunner.cs" />
+  </ItemGroup>
+
 </Project>

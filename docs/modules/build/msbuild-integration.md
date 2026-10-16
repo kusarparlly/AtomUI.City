@@ -42,7 +42,7 @@
 | AUC-BUILD-004 | Dependency Boundary | ProjectDependencyBoundaryTests |
 | AUC-BUILD-005 | Source Generator Packaging | SourceGeneratorProjectStructureTests |
 | AUC-BUILD-006 | Release Gates | PackagingReleaseGateTests; EngineeringGateTests |
-| AUC-BUILD-008 | MSBuild Transitive Assets | BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests |
+| AUC-BUILD-008 | MSBuild Transitive Assets | BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests; BuildTransitiveEvaluationTests |
 | AUC-BUILD-010 | RESX Language Package Compilation | ManifestTaskTests; GenerationTemplateRendererTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
@@ -96,6 +96,7 @@ tools/
 规则：
 
 - `buildTransitive` 用于应用和插件项目自动获得构建规则。
+- `buildTransitive` 中的 Property、Item 和 Condition 必须同时兼容正常 target 执行与 evaluation-only 项目查询；不得依赖未限定 Item 类型的 metadata 批处理上下文。`dotnet run`、IDE 和工程工具使用的 `-getProperty/-getItem` 路径属于正式兼容面。
 - `AtomUI.City.Build.contract.json` 是 Property、Item、Target、默认值、可见性和 package asset 的机器可读 Preview baseline；测试必须与真实 MSBuild XML 精确比较。
 - Roslyn generator/analyzer 作为 analyzer asset 引入。
 - MSBuild task 不进入运行时包主链路。
