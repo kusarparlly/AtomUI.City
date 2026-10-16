@@ -62,4 +62,9 @@ public static class MvvmDiagnosticIds
     /// The application command exception handler failed.
     /// </summary>
     public const string CommandExceptionHandlerFailed = "AUCMVVM013";
+
+    /// <summary>
+    /// A command notification could not be delivered through its configured dispatcher.
+    /// </summary>
+    public const string CommandNotificationFailed = "AUCMVVM014";
 }

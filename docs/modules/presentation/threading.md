@@ -11,6 +11,8 @@
 
 ViewModel 获取、DI scope、route prepare、leave/confirm guard、activation/deactivation、诊断组装和非 UI 资源清理必须在线程池/调用线程执行，不得为了方便整体搬到 UI 线程。
 
+绑定到 Avalonia View 的 City async command 必须在组合根通过 `CommandFactory.CreateAsync(..., notificationDispatcher: dispatcher)` 接入 Presentation/Core UI dispatcher。这里只调度 `CanExecuteChanged` 与命令状态属性通知；不能把 ViewModel 生命周期整体包装进 dispatcher。
+
 ## 并发纪律
 
 - `CommitAsync` 可从任意线程调用；同一 Outlet FIFO，不同 Outlet 可并行。

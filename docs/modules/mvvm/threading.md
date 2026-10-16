@@ -19,6 +19,8 @@
 
 - 非 Presentation 模块不得直接操作 Avalonia visual tree。
 - 需要 UI 更新的结果必须通过 Presentation dispatcher、State 或 EventBus contract 间接到达 UI。
+- `CommandFactory.CreateAsync` 可接收 `notificationDispatcher`。配置后，`CanExecuteChanged` 以及 `ExecutionTask`、`CanBeCanceled`、`IsCancellationRequested`、`IsRunning` 的属性通知必须经该 dispatcher 交付；命令执行体、Activation/Deactivation 本身不因此搬到 UI 线程。
+- UI 绑定命令若同时绑定 `IActivationScopeOwner`，组合根必须传入 UI dispatcher，因为 `ActivationStateChanged` 允许从生命周期串行通道触发。
 - Presentation 的 VisualTree 修改必须在 UI dispatcher 上执行。
 
 ## 后台任务和取消

@@ -173,3 +173,17 @@ Diagnostics: `AUCMVVM003` 和 `AUCMVVM013`。
 Tests: `CommandTests`
 Required Assertions: awaited 原异常/堆栈、UI handler 恰好一次、取消排除、handler 失败、无文件系统副作用。
 Acceptance Criteria: 每个可捕获命令异常都能从调用者、handler 或结构化诊断中被明确观察。
+
+## AUC-MVVM-011 Command Notification Dispatch
+
+Feature ID: `AUC-MVVM-011`
+Status: Implemented
+Goal: 让绑定到 UI 的异步命令在生命周期由后台串行通道驱动时，仍只在 UI dispatcher 上发布可观察通知。
+Public Contract: `CommandFactory.CreateAsync` 的可选 `notificationDispatcher` 参数。
+Runtime / Build Behavior: 命令业务和 ViewModel 生命周期保持原线程模型；`CanExecuteChanged` 与命令状态 `PropertyChanged` 经 dispatcher 投递。
+Failure Behavior: dispatcher 同步抛错或异步失败记录 `AUCMVVM014`，不得产生未观察 Task 异常。
+Threading / Cancellation: dispatcher 只负责通知；不得把命令执行体、Activation 或 Deactivation 整体搬入 UI 线程。
+Diagnostics: `AUCMVVM014`。
+Tests: `CommandTests`
+Required Assertions: Activation 状态变化从非 UI 线程到达时，通知先排入 dispatcher，drain 后才交付观察者。
+Acceptance Criteria: Avalonia 等具有线程亲和性的绑定不会因 City 生命周期后台执行而收到跨线程命令通知。

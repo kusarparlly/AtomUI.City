@@ -40,7 +40,7 @@
 | --- | --- | --- |
 | AUC-MVVM-001 | ViewModel Base | ViewModelBaseTests |
 | AUC-MVVM-002 | Activation and Deactivation | ActivationScopeTests; DeactivationTests; ViewModelBaseTests |
-| AUC-MVVM-003 | Commands | CommandTests |
+| AUC-MVVM-003 | Commands（含 UI 通知调度） | CommandTests |
 | AUC-MVVM-004 | Interactions | InteractionTests |
 | AUC-MVVM-005 | Validation | ValidationScopeTests |
 | AUC-MVVM-006 | Operation Scope | CommandTests |
@@ -129,6 +129,15 @@ Command 需要标准化运行状态：
 | `CancellationToken` | 当前执行取消令牌。 |
 
 这些状态应可被 UI、Diagnostics 和 Testing 读取。
+
+### 4.1 UI 通知调度
+
+`CommandFactory.CreateAsync` 的 `notificationDispatcher` 是 UI 可观察通知的显式线程边界。未配置时保留调用方/当前同步上下文行为；配置后，以下通知统一通过 dispatcher 投递：
+
+- `CanExecuteChanged`，包括 Activation 状态变化引发的通知。
+- `ExecutionTask`、`CanBeCanceled`、`IsCancellationRequested`、`IsRunning` 的 `PropertyChanged`。
+
+dispatcher 只负责通知，不负责运行命令业务、解析 `CanExecute`、激活或停用 ViewModel。投递失败记录 `AUCMVVM014`，不得让游离通知异常变成未观察 Task；应用层仍负责把正确的 UI dispatcher 传给绑定到视图的命令。
 
 ### 5. 权限和路由联动
 

@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using AtomUI.City.Core.Diagnostics;
+using AtomUI.City.Core.Threading;
 using AtomUI.City.Mvvm;
 using CommunityToolkit.Mvvm.Input;
 
@@ -129,6 +130,56 @@ public sealed class CommandTests
         thread.Start();
         Assert.True(await result.Task.WaitAsync(TimeSpan.FromSeconds(10)));
         Assert.True(thread.Join(TimeSpan.FromSeconds(10)));
+    }
+
+    [Fact]
+    public void ActivationNotificationsArePostedThroughConfiguredDispatcher()
+    {
+        var scope = new ActivationScope();
+        var owner = new TestActivationOwner(scope);
+        var dispatcher = new QueueingUiDispatcher();
+        var notifications = 0;
+        var command = CommandFactory.CreateAsync(
+            _ => Task.CompletedTask,
+            canExecute: null,
+            activationOwner: owner,
+            notificationDispatcher: dispatcher);
+        command.CanExecuteChanged += (_, _) => notifications++;
+
+        owner.RaiseActivationStateChanged();
+
+        Assert.Equal(0, notifications);
+        Assert.Equal(1, dispatcher.PendingCount);
+
+        dispatcher.Drain();
+
+        Assert.Equal(1, notifications);
+    }
+
+    [Fact]
+    public void NotificationDispatcherFailureWritesStructuredDiagnostic()
+    {
+        var scope = new ActivationScope();
+        var owner = new TestActivationOwner(scope);
+        var diagnostics = new InMemoryHostDiagnostics();
+        var command = CommandFactory.CreateAsync(
+            _ => Task.CompletedTask,
+            canExecute: null,
+            state: new CommandExecutionState("refresh", typeof(SaveViewModel)),
+            activationOwner: owner,
+            diagnostics: diagnostics,
+            notificationDispatcher: new ThrowingUiDispatcher());
+        command.CanExecuteChanged += (_, _) => { };
+
+        owner.RaiseActivationStateChanged();
+
+        Assert.Contains(
+            diagnostics.Records,
+            record =>
+                record.Code == MvvmDiagnosticIds.CommandNotificationFailed
+                && record.Context?["commandName"] == "refresh"
+                && record.Context["dispatcherType"] == typeof(ThrowingUiDispatcher).FullName
+                && record.Context["exceptionType"] == typeof(InvalidOperationException).FullName);
     }
 
     [Fact]
@@ -681,10 +732,72 @@ public sealed class CommandTests
 
         public IActivationScope? CurrentActivationScope { get; }
 
-        public event EventHandler? ActivationStateChanged
+        public event EventHandler? ActivationStateChanged;
+
+        public void RaiseActivationStateChanged()
         {
-            add { }
-            remove { }
+            ActivationStateChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    private sealed class QueueingUiDispatcher : IUiDispatcher
+    {
+        private readonly Queue<Func<ValueTask>> _queue = [];
+
+        public int PendingCount => _queue.Count;
+
+        public bool CheckAccess() => false;
+
+        public ValueTask InvokeAsync(Action callback, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            callback();
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask<T> InvokeAsync<T>(Func<T> callback, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return ValueTask.FromResult(callback());
+        }
+
+        public ValueTask PostAsync(
+            Func<CancellationToken, ValueTask> callback,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            _queue.Enqueue(() => callback(cancellationToken));
+            return ValueTask.CompletedTask;
+        }
+
+        public void Drain()
+        {
+            while (_queue.TryDequeue(out var callback))
+            {
+                callback().GetAwaiter().GetResult();
+            }
+        }
+    }
+
+    private sealed class ThrowingUiDispatcher : IUiDispatcher
+    {
+        public bool CheckAccess() => false;
+
+        public ValueTask InvokeAsync(Action callback, CancellationToken cancellationToken)
+        {
+            throw new InvalidOperationException("dispatcher-stopped");
+        }
+
+        public ValueTask<T> InvokeAsync<T>(Func<T> callback, CancellationToken cancellationToken)
+        {
+            throw new InvalidOperationException("dispatcher-stopped");
+        }
+
+        public ValueTask PostAsync(
+            Func<CancellationToken, ValueTask> callback,
+            CancellationToken cancellationToken = default)
+        {
+            throw new InvalidOperationException("dispatcher-stopped");
         }
     }
 

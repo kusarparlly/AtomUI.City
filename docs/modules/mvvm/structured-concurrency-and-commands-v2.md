@@ -117,6 +117,7 @@ Open
 | `AUCMVVM011` | ActivationTaskDrainTimedOut | `scopeId`, `activeTaskCount`, `timeout` |
 | `AUCMVVM012` | CommandInactive | `commandName`, `ownerType`, `activationState` |
 | `AUCMVVM013` | CommandExceptionHandlerFailed | `commandName`, `ownerType`, `operationId`, `exceptionType` |
+| `AUCMVVM014` | CommandNotificationFailed | `commandName`, `ownerType`, `dispatcherType`, `exceptionType` |
 
 这些 code 已由 `MvvmDiagnosticIds` 公开，并有 failure-path 断言测试。
 
@@ -127,6 +128,7 @@ Open
 - Concurrency：Reject、Allow、RejectByKey，同 key 竞态和不同 key 并行，完成/取消/失败后准入恢复。
 - Activation：构造期无 Scope、Scope A、停用、inactive rejection、Scope B 和 dispose。
 - Exception：awaited 原异常、ICommand handler 恰好一次、取消排除、handler 失败和无磁盘副作用。
+- Notification：Activation 状态变化和执行状态变化经配置的 UI dispatcher 交付，dispatcher 失败产生结构化诊断。
 - Compatibility：PublicAPI baseline、`OperationResult` 重命名和迁移编译样例。
 
 ## 完成标准

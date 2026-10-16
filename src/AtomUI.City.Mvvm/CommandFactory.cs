@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using AtomUI.City.Core.Diagnostics;
+using AtomUI.City.Core.Threading;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AtomUI.City.Mvvm;
@@ -55,7 +56,8 @@ public static class CommandFactory
         Func<CancellationToken, Task> execute,
         CommandExecutionState? state = null,
         IActivationScope? activationScope = null,
-        IHostDiagnostics? diagnostics = null)
+        IHostDiagnostics? diagnostics = null,
+        IUiDispatcher? notificationDispatcher = null)
     {
         ArgumentNullException.ThrowIfNull(execute);
 
@@ -68,7 +70,8 @@ public static class CommandFactory
             CommandConcurrencyPolicy.Reject,
             concurrencyKeySelector: null,
             exceptionHandler: null,
-            diagnostics);
+            diagnostics,
+            notificationDispatcher);
 
         return new TrackedAsyncRelayCommand<object?>(runtime);
     }
@@ -83,7 +86,8 @@ public static class CommandFactory
         IActivationScopeOwner? activationOwner = null,
         CommandConcurrencyPolicy concurrencyPolicy = CommandConcurrencyPolicy.Reject,
         ICommandExceptionHandler? exceptionHandler = null,
-        IHostDiagnostics? diagnostics = null)
+        IHostDiagnostics? diagnostics = null,
+        IUiDispatcher? notificationDispatcher = null)
     {
         ArgumentNullException.ThrowIfNull(execute);
 
@@ -102,7 +106,8 @@ public static class CommandFactory
             concurrencyPolicy,
             concurrencyKeySelector,
             exceptionHandler,
-            diagnostics);
+            diagnostics,
+            notificationDispatcher);
 
         return new TrackedAsyncRelayCommand<object?>(runtime);
     }
@@ -118,7 +123,8 @@ public static class CommandFactory
         CommandConcurrencyPolicy concurrencyPolicy = CommandConcurrencyPolicy.Reject,
         Func<T?, object?>? concurrencyKeySelector = null,
         ICommandExceptionHandler? exceptionHandler = null,
-        IHostDiagnostics? diagnostics = null)
+        IHostDiagnostics? diagnostics = null,
+        IUiDispatcher? notificationDispatcher = null)
     {
         ArgumentNullException.ThrowIfNull(execute);
         ValidateConcurrency(concurrencyPolicy, concurrencyKeySelector);
@@ -132,7 +138,8 @@ public static class CommandFactory
             concurrencyPolicy,
             concurrencyKeySelector,
             exceptionHandler,
-            diagnostics);
+            diagnostics,
+            notificationDispatcher);
 
         return new TrackedAsyncRelayCommand<T>(runtime);
     }
@@ -225,6 +232,7 @@ public static class CommandFactory
         private readonly Func<T?, object?>? _concurrencyKeySelector;
         private readonly ICommandExceptionHandler? _exceptionHandler;
         private readonly IHostDiagnostics? _diagnostics;
+        private readonly IUiDispatcher? _notificationDispatcher;
         private readonly ConcurrencyGate _concurrencyGate = new();
 
         public AsyncCommandRuntime(
@@ -236,7 +244,8 @@ public static class CommandFactory
             CommandConcurrencyPolicy concurrencyPolicy,
             Func<T?, object?>? concurrencyKeySelector,
             ICommandExceptionHandler? exceptionHandler,
-            IHostDiagnostics? diagnostics)
+            IHostDiagnostics? diagnostics,
+            IUiDispatcher? notificationDispatcher)
         {
             _execute = execute;
             _canExecute = canExecute;
@@ -247,6 +256,7 @@ public static class CommandFactory
             _concurrencyKeySelector = concurrencyKeySelector;
             _exceptionHandler = exceptionHandler;
             _diagnostics = diagnostics;
+            _notificationDispatcher = notificationDispatcher;
         }
 
         public CommandExecutionState State { get; }
@@ -254,6 +264,8 @@ public static class CommandFactory
         public ICommandExceptionHandler? ExceptionHandler => _exceptionHandler;
 
         public IActivationScopeOwner? ActivationOwner => _activationOwner;
+
+        public IUiDispatcher? NotificationDispatcher => _notificationDispatcher;
 
         public bool CanExecute(T? parameter)
         {
@@ -365,6 +377,23 @@ public static class CommandFactory
                     }
                 });
             }
+        }
+
+        public void WriteNotificationFailure(Exception exception)
+        {
+            _diagnostics?.Write(new HostDiagnosticRecord(
+                MvvmDiagnosticIds.CommandNotificationFailed,
+                $"Command notification dispatch failed for '{State.CommandName ?? "<unnamed>"}': {exception.Message}",
+                HostDiagnosticSeverity.Error)
+            {
+                Context = new Dictionary<string, string?>
+                {
+                    ["commandName"] = State.CommandName,
+                    ["ownerType"] = State.OwnerType?.FullName,
+                    ["dispatcherType"] = _notificationDispatcher?.GetType().FullName,
+                    ["exceptionType"] = exception.GetType().FullName,
+                }
+            });
         }
 
         private async Task ExecuteAdmittedAsync(T? parameter, CancellationToken cancellationToken)
@@ -532,7 +561,7 @@ public static class CommandFactory
 
         public void NotifyCanExecuteChanged()
         {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+            DispatchNotification(() => CanExecuteChanged?.Invoke(this, EventArgs.Empty));
         }
 
         private Task StartExecution(T? parameter, bool fromCommandInterface)
@@ -608,11 +637,14 @@ public static class CommandFactory
 
         private void NotifyStateChanged()
         {
-            NotifyCanExecuteChanged();
-            OnPropertyChanged(nameof(ExecutionTask));
-            OnPropertyChanged(nameof(CanBeCanceled));
-            OnPropertyChanged(nameof(IsCancellationRequested));
-            OnPropertyChanged(nameof(IsRunning));
+            DispatchNotification(() =>
+            {
+                CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+                OnPropertyChanged(nameof(ExecutionTask));
+                OnPropertyChanged(nameof(CanBeCanceled));
+                OnPropertyChanged(nameof(IsCancellationRequested));
+                OnPropertyChanged(nameof(IsRunning));
+            });
         }
 
         private void HandleActivationStateChanged(object? sender, EventArgs args)
@@ -623,6 +655,63 @@ public static class CommandFactory
         private void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void DispatchNotification(Action notification)
+        {
+            var dispatcher = _runtime.NotificationDispatcher;
+            if (dispatcher is null)
+            {
+                notification();
+                return;
+            }
+
+            bool hasAccess;
+            try
+            {
+                hasAccess = dispatcher.CheckAccess();
+            }
+            catch (Exception exception)
+            {
+                _runtime.WriteNotificationFailure(exception);
+                return;
+            }
+
+            if (hasAccess)
+            {
+                notification();
+                return;
+            }
+
+            try
+            {
+                var operation = dispatcher.PostAsync(
+                    _ =>
+                    {
+                        notification();
+                        return ValueTask.CompletedTask;
+                    });
+                if (!operation.IsCompletedSuccessfully)
+                {
+                    _ = ObserveNotificationAsync(operation);
+                }
+            }
+            catch (Exception exception)
+            {
+                _runtime.WriteNotificationFailure(exception);
+            }
+        }
+
+        private async Task ObserveNotificationAsync(ValueTask operation)
+        {
+            try
+            {
+                await operation.ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                _runtime.WriteNotificationFailure(exception);
+            }
         }
     }
 

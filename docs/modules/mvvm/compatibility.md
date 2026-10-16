@@ -30,6 +30,7 @@
 - 旧的“异步命令异常只记录 Failed 且不向 awaited caller 抛出”行为已由 `AUC-MVVM-010` 替换。调用方必须迁移为 await/catch，UI `ICommand` 路径必须提供应用异常 handler。
 - `IActivationScope.StartAsync/StartUniqueAsync`、三种命令并发策略和 activation owner 合同已进入 Preview 二进制兼容面。
 - `IActivationScopeOwner.ActivationStateChanged` 已进入 Preview 二进制兼容面；自定义 owner 必须在 state 或 current scope 变化后发布通知，以保证 owner-bound command 的 `CanExecute` 可观察。
+- `CommandFactory.CreateAsync` 新增可选 `notificationDispatcher`；未传入时保持既有通知线程行为，UI 绑定命令应显式传入 dispatcher。通知投递失败使用新增稳定诊断 `AUCMVVM014`。
 
 ## 数据格式兼容
 
