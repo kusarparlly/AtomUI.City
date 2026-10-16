@@ -4,7 +4,9 @@
 
 本专题属于 `AtomUI.City.Templates` 模块文档体系，必须与 [overview.md](overview.md)、[features.md](features.md)、[api-contracts.md](api-contracts.md)、[testing.md](testing.md) 保持一致。它只细化 `Page Template` 相关实现决策，不重新定义模块边界。
 
-Feature：`AUC-TEMPLATES-007`。状态：Completed。公开入口为 `GenerationTemplateRenderer` 的 Page kind，Presentation 生成合同已稳定。
+Feature：`AUC-TEMPLATES-007`。状态：Blocked。公开入口为 `GenerationTemplateRenderer` 的 Page kind；当前生成 View 尚未满足 Presentation 的运行时绑定合同。
+
+阻塞原因：当前生成的 View 只有 `[ViewFor]`，没有实现 `IViewDataContextAware`；`ViewBinder.Bind` 会拒绝该 View。恢复为 Completed 前，生成代码必须实现该合同，并由测试实际调用 `ViewBinder.Bind` 验证成功绑定，而不能只证明生成物可编译或 attribute 可反射。
 
 ## 设计决策
 
@@ -128,7 +130,7 @@ View 默认包含最小可渲染结构。
 
 - 不生成业务布局。
 - 不生成过度装饰。
-- View 和 ViewModel 绑定必须可被 Presentation source generator 识别。
+- View 和 ViewModel 绑定必须可被 Presentation source generator 识别；View 还必须实现 `IViewDataContextAware`，满足 `ViewBinder.Bind` 的运行时合同。
 - View code-behind 不写业务逻辑。
 
 ### 6. 测试
@@ -139,7 +141,7 @@ View 默认包含最小可渲染结构。
 - ViewModel target 测试。
 - activation 测试。
 - cancellation 测试。
-- Presentation fake commit 测试，如果启用 View。
+- 真实 `ViewBinder.Bind` 测试，并验证生成 View 可接收 ViewModel。
 
 真实 visual tree 测试放平台集成测试。
 
@@ -150,5 +152,5 @@ View 默认包含最小可渲染结构。
 | RoutePath | Unit | match、参数、约束失败。 |
 | ViewModel Target | Unit | target 解析。 |
 | Activation | Unit | activate、cancel、dispose。 |
-| View mapping | Generator/Unit | ViewModel -> View 映射生成。 |
+| View mapping | Generator/FrameworkIntegration | ViewModel -> View 映射生成，并由真实 `ViewBinder.Bind` 完成绑定。 |
 | Outlet commit | Framework integration | fake outlet commit。 |

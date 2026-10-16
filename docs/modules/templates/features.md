@@ -12,7 +12,7 @@
 | AUC-TEMPLATES-004 | Plugin Template | Completed | Plugin template package | TemplatePackageLayoutTests |
 | AUC-TEMPLATES-005 | Test Template | Completed | ApplicationTemplateRenderer, test project template | ApplicationTemplateBuildSmokeTests |
 | AUC-TEMPLATES-006 | Module Template | Completed | GenerationTemplateRenderer, generated module source | GenerationTemplateRendererTests |
-| AUC-TEMPLATES-007 | Page Template | Completed | GenerationTemplateRenderer, generated View/ViewModel/route source | GenerationTemplateRendererTests |
+| AUC-TEMPLATES-007 | Page Template | Blocked | GenerationTemplateRenderer, generated View/ViewModel/route source | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-008 | Localization Template | Completed | GenerationTemplateRenderer, generated localization package source | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-009 | Configuration Template | Completed | GenerationTemplateRenderer, generated Options source | GenerationTemplateRendererTests |
 | AUC-TEMPLATES-010 | Avalonia Desktop Application Template | Completed | Presentation desktop bootstrap output | ApplicationTemplateBuildSmokeTests, DotnetNewTemplateIntegrationTests, ApplicationTemplateDesktopProcessTests |
@@ -65,16 +65,18 @@ Acceptance Criteria: 生成物在真实临时工作区与 Core、Generators 一�
 ## AUC-TEMPLATES-007 Page Template
 
 Feature ID: `AUC-TEMPLATES-007`
-Status: Completed
+Status: Blocked
 Goal: 生成 RouteMap、ViewModel、Avalonia View、Presentation mapping 和页面测试骨架。
 Public Contract: `GenerationTemplateRenderer`, `GenerationTemplateOptions`, `GenerationTemplateKind.Page`
-Runtime / Build Behavior: Route 只声明 ViewModel target；View 使用 `[ViewFor]` 进入 Presentation manifest；ViewModel 使用 MVVM activation contract。
+Runtime / Build Behavior: Route 只声明 ViewModel target；View 使用 `[ViewFor]` 进入 Presentation manifest，并且必须实现 `IViewDataContextAware`，才能满足 `ViewBinder.Bind` 的运行时绑定合同；ViewModel 使用 MVVM activation contract。
 Failure Behavior: 缺失或非法绝对 route 返回 `AUCTPL2004` 且不写文件；事务失败遵循统一回滚合同。
 Threading / Cancellation: 生成阶段无 UI 线程要求；写入观察 token，生成的 ViewModel activation 观察调用方 token。
 Diagnostics: `AUCTPL2001~2004` 和 `AUCTPL1004~1006`。
 Tests: `GenerationTemplateRendererTests`
-Required Assertions: RouteMap/route generator、ViewFor mapping、activate/deactivate/cancel、FeatureTestMatrix 和真实 Avalonia build/test。
-Acceptance Criteria: 生成物由 Router 与 Presentation generator 成功处理，生成测试通过。
+Required Assertions: RouteMap/route generator、ViewFor mapping、`IViewDataContextAware` 合同、真实 `ViewBinder.Bind`、activate/deactivate/cancel、FeatureTestMatrix 和真实 Avalonia build/test。
+Acceptance Criteria: 生成物由 Router 与 Presentation generator 成功处理，并能通过真实 `ViewBinder.Bind` 完成 ViewModel 绑定；生成测试通过。
+
+Known Defect: 当前 `GenerationTemplateRenderer.CreateViewCodeBehind` 仅生成继承 `UserControl` 且带 `[ViewFor]` 的 View，没有实现 `IViewDataContextAware`。现有测试只证明生成物可编译、attribute 可反射且 ViewModel 可激活，没有执行真实 `ViewBinder.Bind`；运行时绑定会以 `PresentationError.BindingFailed` 失败。在修复生成代码并补齐真实绑定测试前，本 Feature 不得恢复为 Completed。
 
 ## AUC-TEMPLATES-008 Localization Template
 

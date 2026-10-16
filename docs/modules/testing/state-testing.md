@@ -1,5 +1,7 @@
 # AtomUI.City.Testing State Testing 合同
 
+> 当前实现说明（2026-10-14）：本页后半部分的 `StateTestStore`、状态记录器、computed/snapshot 断言和 scoped state host 仍是目标设计，尚未分配独立 Feature ID，也未进入 `AtomUI.City.Testing` 源码或 public API。当前可用能力以 [features.md](features.md) 和 [api-contracts.md](api-contracts.md) 为准；在相应 Feature 完成前，不得把这些目标类型写成已经交付的测试工具。
+
 ## 适用范围
 
 本专题属于 `AtomUI.City.Testing` 模块文档体系，必须与 [overview.md](overview.md)、[features.md](features.md)、[api-contracts.md](api-contracts.md)、[testing.md](testing.md) 保持一致。它只细化 `State Testing` 相关实现决策，不重新定义模块边界。
@@ -66,7 +68,7 @@ State 测试必须证明状态读写、通知、快照和释放在多线程桌�
 
 ### 2. StateTestStore
 
-Testing 提供：
+Testing 的目标设计包括（当前尚未实现）：
 
 - fake application state。
 - scoped state host。

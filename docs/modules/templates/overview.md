@@ -1,7 +1,7 @@
 # AtomUI.City.Templates
 
 文档等级：Level 2
-成熟度：Verified
+成熟度：Partially Implemented
 执行边界：Template render and package boundary
 程序集：`AtomUI.City.Templates`
 源码：`src/AtomUI.City.Templates`
@@ -66,6 +66,6 @@ Templates 生成 Host 应用骨架，但不参与 Host 运行时。
 
 ## 当前成熟度状态
 
-Verified
+Partially Implemented
 
-当前 10 个已登记 Feature 均为 Completed。应用模板已通过真实生成、事务回滚、restore/build/test、Avalonia Headless 和 Windows 原生 desktop process 门禁；单个功能点状态以 [features.md](features.md) 和 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。
+当前 10 个已登记 Feature 中 9 个为 Completed，`AUC-TEMPLATES-007 Page Template` 因生成 View 不满足 Presentation 的运行时绑定合同而处于 Blocked。应用模板已通过真实生成、事务回滚、restore/build/test、Avalonia Headless 和 Windows 原生 desktop process 门禁；单个功能点状态以 [features.md](features.md) 和 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。

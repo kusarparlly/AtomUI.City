@@ -74,6 +74,8 @@
 - [x] AUC-TESTING-008 AOT Check。验收重点：反射扫描、dynamic code、trimming 风险诊断。
 - [x] AUC-TESTING-009 Test Layers。验收重点：Unit/Contract/Integration/Platform/Dogfood 分层标记。
 
+文档一致性债务（2026-10-14）：`state-testing.md` 和 `detailed-design.md` 曾把 `StateTestStore`、状态记录器、computed/snapshot 断言及 `UseStateTesting` 写成现有能力，但它们没有 Feature ID、源码实现或 public API。文档已明确标记为目标设计；若决定交付，必须先建立新 Feature、API、失败行为和测试矩阵，不能仅凭旧设计段落宣称已实现。
+
 ## Build
 
 - [x] AUC-BUILD-001 Output Layout。验收重点：artifacts、packages、logs、test-results 都在 output 下。
@@ -240,7 +242,7 @@
 - [x] AUC-TEMPLATES-004 Plugin Template。验收重点：单 assembly、NuGet metadata、manifest、msbuild 属性和测试项目。
 - [x] AUC-TEMPLATES-005 Test Template。验收重点：测试项目 build/test、测试矩阵、基础 smoke test、Testing 引用边界和命名规则。
 - [x] AUC-TEMPLATES-006 Module Template。验收重点：模块类型、依赖声明、服务注册、manifest/source generator 输入和 build test。
-- [x] AUC-TEMPLATES-007 Page Template。验收重点：View/ViewModel、route declaration、Presentation 绑定和激活测试。
+- [ ] AUC-TEMPLATES-007 Page Template。当前阻塞：生成 View 未实现 `IViewDataContextAware`，现有测试没有执行真实 `ViewBinder.Bind`。验收重点：View/ViewModel、route declaration、真实 Presentation 绑定和激活测试。
 - [x] AUC-TEMPLATES-008 Localization Template。验收重点：culture package、fallback、generated manifest 和 Localization 测试。
 - [x] AUC-TEMPLATES-009 Configuration Template。验收重点：Options binding、validation、reload policy 和配置测试。
 - [x] AUC-TEMPLATES-010 Avalonia Desktop Application Template。验收重点：Avalonia Application、desktop lifetime、DI 主窗口、Presentation bootstrap、Headless smoke 和 Windows 原生进程启动/关闭。

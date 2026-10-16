@@ -132,6 +132,8 @@ Testing 不负责：
 
 ### 5. 核心组件
 
+> 当前实现说明（2026-10-14）：下表同时包含已交付组件和目标设计。只有进入 [features.md](features.md)、[api-contracts.md](api-contracts.md) 及源码 public API 的组件才可视为可用；`LifecycleDriver`、`ContributionTestRegistry`、`PresentationTestRuntime`、`MvvmTestKit`、`StateTestStore`、`EventBusRecorder`、`SecurityTestKit`、`LocalizationTestKit`、`DiagnosticsAssertions` 以及对应 `Use*Testing` 入口当前均未实现。
+
 | 组件 | 职责 |
 |---|---|
 | `TestHost` | 构造最小 Host，注入测试配置、模块、服务和 fake runtime。 |
