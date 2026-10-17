@@ -41,3 +41,4 @@ ADR 用于记录已经形成约束力的重要决策，包括背景、决策、�
 - [0009-unit-test-gate.md](0009-unit-test-gate.md)
 - [0010-activation-scoped-structured-concurrency.md](0010-activation-scoped-structured-concurrency.md)
 - [0011-presentation-root-child-ownership.md](0011-presentation-root-child-ownership.md)
+- [0012-effective-cancellation-token-contract.md](0012-effective-cancellation-token-contract.md)

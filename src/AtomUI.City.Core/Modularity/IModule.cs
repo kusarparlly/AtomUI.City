@@ -25,33 +25,33 @@ public interface IModule
     /// </summary>
     ValueTask ConfigureContributionsAsync(
         ContributionConfigurationContext context,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Executes the on pre application initialization async operation.
     /// </summary>
     ValueTask OnPreApplicationInitializationAsync(
         ApplicationInitializationContext context,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Executes the on application initialization async operation.
     /// </summary>
     ValueTask OnApplicationInitializationAsync(
         ApplicationInitializationContext context,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Executes the on post application initialization async operation.
     /// </summary>
     ValueTask OnPostApplicationInitializationAsync(
         ApplicationInitializationContext context,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Executes the on application shutdown async operation.
     /// </summary>
     ValueTask OnApplicationShutdownAsync(
         ApplicationShutdownContext context,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
 }

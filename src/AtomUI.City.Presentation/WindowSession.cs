@@ -166,7 +166,8 @@ public sealed class WindowSession : IAsyncDisposable
                     _failurePresenter,
                     _queueOptions,
                     _lifecycleHub,
-                    Id));
+                    Id,
+                    Scope.CancellationToken));
             _outlets.Add(name, registration);
             return registration;
         }
@@ -192,9 +193,9 @@ public sealed class WindowSession : IAsyncDisposable
     /// <summary>
     /// Executes the close async operation.
     /// </summary>
-    public ValueTask<bool> CloseAsync(CancellationToken cancellationToken = default)
+    public ValueTask<bool> CloseAsync(CancellationToken waitCancellationToken = default)
     {
-        return CloseAsync(WindowCloseOrigin.Application, cancellationToken);
+        return CloseAsync(WindowCloseOrigin.Application, waitCancellationToken);
     }
 
     /// <summary>
@@ -202,9 +203,9 @@ public sealed class WindowSession : IAsyncDisposable
     /// </summary>
     public ValueTask<bool> CloseAsync(
         WindowCloseOrigin origin,
-        CancellationToken cancellationToken = default)
+        CancellationToken waitCancellationToken = default)
     {
-        return CloseCoreAsync(origin, canReject: origin != WindowCloseOrigin.OperatingSystem, cancellationToken);
+        return CloseCoreAsync(origin, canReject: origin != WindowCloseOrigin.OperatingSystem, waitCancellationToken);
     }
 
     /// <summary>
@@ -220,15 +221,15 @@ public sealed class WindowSession : IAsyncDisposable
 
     internal ValueTask<bool> CloseForHostShutdownAsync(
         WindowCloseOrigin origin,
-        CancellationToken cancellationToken)
+        CancellationToken waitCancellationToken)
     {
-        return CloseCoreAsync(origin, canReject: false, cancellationToken);
+        return CloseCoreAsync(origin, canReject: false, waitCancellationToken);
     }
 
     private ValueTask<bool> CloseCoreAsync(
         WindowCloseOrigin origin,
         bool canReject,
-        CancellationToken cancellationToken)
+        CancellationToken waitCancellationToken)
     {
         if (!Enum.IsDefined(origin))
         {
@@ -266,7 +267,7 @@ public sealed class WindowSession : IAsyncDisposable
             _ = Task.Run(() => RunCloseAsync(completion, origin));
         }
 
-        return new ValueTask<bool>(closeTask.WaitAsync(cancellationToken));
+        return new ValueTask<bool>(closeTask.WaitAsync(waitCancellationToken));
     }
 
     private async Task RunCloseAsync(

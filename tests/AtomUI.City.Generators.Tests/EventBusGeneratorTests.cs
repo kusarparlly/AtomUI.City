@@ -28,7 +28,7 @@ public sealed class EventBusGeneratorTests
             [EventHandler(typeof(AppModule), ChannelName = "ui", DispatchPolicy = EventDispatchPolicy.Background)]
             public sealed class WorkspaceHandler(HandlerDependency dependency) : IEventHandler<WorkspaceChanged>
             {
-                public ValueTask HandleAsync(EventContext<WorkspaceChanged> context) => ValueTask.CompletedTask;
+                public ValueTask HandleAsync(EventContext<WorkspaceChanged> context, System.Threading.CancellationToken cancellationToken) => ValueTask.CompletedTask;
             }
             """), out var output);
 
@@ -80,7 +80,7 @@ public sealed class EventBusGeneratorTests
             [EventHandler(typeof(AppModule), DisableSubscriptionAfterFailures = 0)]
             public abstract class BadHandler : IEventHandler<SampleEvent>
             {
-                public ValueTask HandleAsync(EventContext<SampleEvent> context) => ValueTask.CompletedTask;
+                public ValueTask HandleAsync(EventContext<SampleEvent> context, System.Threading.CancellationToken cancellationToken) => ValueTask.CompletedTask;
             }
             """), out _);
 
@@ -103,7 +103,7 @@ public sealed class EventBusGeneratorTests
             [EventHandler(typeof(AppModule))]
             public sealed class MissingContractHandler : IEventHandler<MissingContractEvent>
             {
-                public ValueTask HandleAsync(EventContext<MissingContractEvent> context) => ValueTask.CompletedTask;
+                public ValueTask HandleAsync(EventContext<MissingContractEvent> context, System.Threading.CancellationToken cancellationToken) => ValueTask.CompletedTask;
             }
             """), out _);
 
@@ -138,7 +138,7 @@ public sealed class EventBusGeneratorTests
             [EventHandler(typeof(AppModule))]
             public sealed class SharedEventHandler : IEventHandler<SharedEvent>
             {
-                public ValueTask HandleAsync(EventContext<SharedEvent> context) => ValueTask.CompletedTask;
+                public ValueTask HandleAsync(EventContext<SharedEvent> context, System.Threading.CancellationToken cancellationToken) => ValueTask.CompletedTask;
             }
             """, "Events.Application", [contractReference]), out _);
 
@@ -171,7 +171,7 @@ public sealed class EventBusGeneratorTests
             [EventHandler(typeof(AppModule))]
             public sealed class SharedEventHandler : IEventHandler<SharedEvent>
             {
-                public ValueTask HandleAsync(EventContext<SharedEvent> context) => ValueTask.CompletedTask;
+                public ValueTask HandleAsync(EventContext<SharedEvent> context, System.Threading.CancellationToken cancellationToken) => ValueTask.CompletedTask;
             }
             """, "Events.Application", [contractReference]), out _);
 

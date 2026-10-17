@@ -441,7 +441,7 @@ public interface IGrpcClientStream<in TRequest, TResponse> : IAsyncDisposable
     /// <summary>
     /// Executes the complete async operation.
     /// </summary>
-    ValueTask<DataResult<TResponse>> CompleteAsync(CancellationToken cancellationToken = default);
+    ValueTask<DataResult<TResponse>> CompleteAsync(CancellationToken waitCancellationToken = default);
 }
 
 /// <summary>
@@ -499,7 +499,7 @@ internal sealed class GrpcClientStream<TRequest, TResponse>(
         }
     }
 
-    public ValueTask<DataResult<TResponse>> CompleteAsync(CancellationToken cancellationToken = default)
+    public ValueTask<DataResult<TResponse>> CompleteAsync(CancellationToken waitCancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposed) != 0, this);
         Task<DataResult<TResponse>> completion;
@@ -521,7 +521,7 @@ internal sealed class GrpcClientStream<TRequest, TResponse>(
             _ = CompleteCoreAsync(transaction);
         }
 
-        return new ValueTask<DataResult<TResponse>>(completion.WaitAsync(cancellationToken));
+        return new ValueTask<DataResult<TResponse>>(completion.WaitAsync(waitCancellationToken));
     }
 
     public ValueTask DisposeAsync()

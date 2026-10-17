@@ -62,7 +62,7 @@ public sealed class EventSubscriptionTests
         Assert.Throws<ObjectDisposedException>(
             () => eventBus.Subscribe<TestEvent>(
                 owner,
-                _ => ValueTask.CompletedTask));
+                (_, _) => ValueTask.CompletedTask));
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public sealed class EventSubscriptionTests
         var releaseHandler = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var subscription = eventBus.Subscribe<TestEvent>(
             owner,
-            async _ =>
+            async (_, _) =>
             {
                 handlerStarted.SetResult();
                 await releaseHandler.Task;
@@ -214,7 +214,7 @@ public sealed class EventSubscriptionTests
 
         var subscription = subscriber.Subscribe<TestEvent>(
             owner,
-            context => received = context.Event.Value);
+            (context, _) => received = context.Event.Value);
         await eventBus.PublishAsync(new TestEvent("handled"));
 
         Assert.Equal("handled", received);
@@ -253,7 +253,7 @@ public sealed class EventSubscriptionTests
         var receivedCount = 0;
         var subscription = eventBus.Subscribe<TestEvent>(
             owner,
-            _ =>
+            (_, _) =>
             {
                 receivedCount++;
                 return ValueTask.CompletedTask;
@@ -277,14 +277,14 @@ public sealed class EventSubscriptionTests
         var workspaceCount = 0;
         var windowSubscription = eventBus.Subscribe<TestEvent>(
             windowOwner,
-            _ =>
+            (_, _) =>
             {
                 windowCount++;
                 return ValueTask.CompletedTask;
             });
         eventBus.Subscribe<TestEvent>(
             workspaceOwner,
-            _ =>
+            (_, _) =>
             {
                 workspaceCount++;
                 return ValueTask.CompletedTask;
@@ -307,10 +307,10 @@ public sealed class EventSubscriptionTests
         var handlerStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var subscription = eventBus.Subscribe<TestEvent>(
             owner,
-            async context =>
+            async (context, cancellationToken) =>
             {
                 handlerStarted.SetResult();
-                await Task.Delay(Timeout.InfiniteTimeSpan, context.CancellationToken);
+                await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             });
 
         var publication = eventBus.PublishAsync(new TestEvent("cancel")).AsTask();
@@ -333,7 +333,7 @@ public sealed class EventSubscriptionTests
         var releaseHandler = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var subscription = eventBus.Subscribe<TestEvent>(
             owner,
-            async _ =>
+            async (_, _) =>
             {
                 handlerStarted.SetResult();
                 await releaseHandler.Task;
@@ -363,7 +363,7 @@ public sealed class EventSubscriptionTests
     {
         var eventBus = new InMemoryEventBus();
         var owner = LifecycleScope.CreateRoot(LifecycleScopeKind.Window, "window");
-        var subscription = eventBus.Subscribe<TestEvent>(owner, _ => ValueTask.CompletedTask);
+        var subscription = eventBus.Subscribe<TestEvent>(owner, (_, _) => ValueTask.CompletedTask);
 
         var stopTasks = Enumerable.Range(0, 32)
             .Select(_ => Task.Run(async () => await subscription.StopAsync()))
@@ -389,17 +389,17 @@ public sealed class EventSubscriptionTests
         var handlerStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var subscription = eventBus.Subscribe<TestEvent>(
             owner,
-            async context =>
+            async (context, cancellationToken) =>
             {
-                using var registration = context.CancellationToken.Register(
+                using var registration = cancellationToken.Register(
                     static () => throw new InvalidOperationException("cancellation cleanup failed"));
                 handlerStarted.SetResult();
 
                 try
                 {
-                    await Task.Delay(Timeout.InfiniteTimeSpan, context.CancellationToken);
+                    await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
                 }
-                catch (OperationCanceledException) when (context.CancellationToken.IsCancellationRequested)
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
                 {
                 }
             });
@@ -440,7 +440,7 @@ public sealed class EventSubscriptionTests
                 {
                     subscription = eventBus.Subscribe<TestEvent>(
                         owner,
-                        _ => ValueTask.CompletedTask);
+                        (_, _) => ValueTask.CompletedTask);
                 }
                 catch (InvalidOperationException)
                 {
@@ -478,7 +478,7 @@ public sealed class EventSubscriptionTests
         Assert.Throws<InvalidOperationException>(
             () => eventBus.Subscribe<TestEvent>(
                 owner,
-                _ => ValueTask.CompletedTask));
+                (_, _) => ValueTask.CompletedTask));
 
         Assert.DoesNotContain(
             diagnostics.Records,
@@ -491,7 +491,9 @@ public sealed class EventSubscriptionTests
     {
         public string? Value { get; private set; }
 
-        public ValueTask HandleAsync(EventContext<TestEvent> context)
+        public ValueTask HandleAsync(
+            EventContext<TestEvent> context,
+            CancellationToken cancellationToken)
         {
             Value = context.Event.Value;
 

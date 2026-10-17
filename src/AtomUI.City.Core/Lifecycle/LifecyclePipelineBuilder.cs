@@ -54,7 +54,8 @@ public sealed class LifecyclePipelineBuilder
     /// <summary>
     /// Executes the build operation.
     /// </summary>
-    public LifecyclePipeline Build(Func<LifecycleContext, ValueTask> terminalHandler)
+    public LifecyclePipeline Build(
+        Func<LifecycleContext, CancellationToken, ValueTask> terminalHandler)
     {
         ArgumentNullException.ThrowIfNull(terminalHandler);
 

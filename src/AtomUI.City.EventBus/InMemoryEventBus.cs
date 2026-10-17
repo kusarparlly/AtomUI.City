@@ -125,7 +125,7 @@ public sealed class InMemoryEventBus :
     /// </summary>
     public IEventSubscription Subscribe<TEvent>(
         LifecycleScope owner,
-        Func<EventContext<TEvent>, ValueTask> handler,
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
         EventSubscriptionOptions? options = null)
     {
         return Subscribe(owner, EventChannel<TEvent>.Default, handler, options);
@@ -137,7 +137,7 @@ public sealed class InMemoryEventBus :
     public IEventSubscription Subscribe<TEvent>(
         LifecycleScope owner,
         EventChannel<TEvent> channel,
-        Func<EventContext<TEvent>, ValueTask> handler,
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
         EventSubscriptionOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(owner);
@@ -174,7 +174,7 @@ public sealed class InMemoryEventBus :
         return SubscribeCore<TEvent>(
             owner,
             channel.Name,
-            context => handler.HandleAsync(context),
+            (context, cancellationToken) => handler.HandleAsync(context, cancellationToken),
             options ?? EventSubscriptionOptions.Serialized,
             handler.GetType().FullName);
     }
@@ -643,12 +643,12 @@ public sealed class InMemoryEventBus :
         return ValueTask.CompletedTask;
     }
 
-    ValueTask IEventBusLifecycleController.StopAsync(CancellationToken cancellationToken)
+    ValueTask IEventBusLifecycleController.StopAsync(CancellationToken waitCancellationToken)
     {
         var termination = RequestDisposal();
-        return termination.IsCompletedSuccessfully || !cancellationToken.CanBeCanceled
+        return termination.IsCompletedSuccessfully || !waitCancellationToken.CanBeCanceled
             ? new ValueTask(termination)
-            : new ValueTask(termination.WaitAsync(cancellationToken));
+            : new ValueTask(termination.WaitAsync(waitCancellationToken));
     }
 
     ValueTask<IEventBusContributionLease> IEventBusContributionController.CreateAsync(
@@ -1129,7 +1129,7 @@ public sealed class InMemoryEventBus :
     private IEventSubscription SubscribeCore<TEvent>(
         LifecycleScope owner,
         string channelName,
-        Func<EventContext<TEvent>, ValueTask> handler,
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
         EventSubscriptionOptions options,
         string? handlerTypeId = null)
     {
@@ -1158,10 +1158,9 @@ public sealed class InMemoryEventBus :
                     delivery.PublishedAt,
                     delivery.PublishDepth,
                     delivery.SubscriptionId,
-                    delivery.DispatchPolicy,
-                    delivery.CancellationToken);
+                    delivery.DispatchPolicy);
 
-                return handler(context);
+                return handler(context, delivery.CancellationToken);
             },
             _diagnostics,
             _backgroundScheduler);
@@ -1800,7 +1799,7 @@ public sealed class InMemoryEventBus :
             }
         }
 
-        public async ValueTask StopAsync(CancellationToken cancellationToken = default)
+        public async ValueTask StopAsync(CancellationToken waitCancellationToken = default)
         {
             lock (_stateGate)
             {
@@ -1811,7 +1810,7 @@ public sealed class InMemoryEventBus :
             }
 
             var terminationTask = RequestTermination();
-            await terminationTask.WaitAsync(cancellationToken).ConfigureAwait(false);
+            await terminationTask.WaitAsync(waitCancellationToken).ConfigureAwait(false);
         }
 
         public void Dispose()

@@ -44,32 +44,32 @@ public static class PhaseF
 
         using var handlers = eventOwnerRoot.CreateChild(LifecycleScopeKind.Subscription, "phase-f-chain");
         var routed = 0;
-        _ = eventBus.Subscribe<OrderSubmitted>(handlers, async context =>
+        _ = eventBus.Subscribe<OrderSubmitted>(handlers, async (context, handlerCancellationToken) =>
         {
             var amount = calculator.Settle(context.Event.Price * context.Event.Quantity);
-            await eventBus.PublishAsync(new BillingSettled(amount), cancellationToken: context.CancellationToken);
+            await eventBus.PublishAsync(new BillingSettled(amount), cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<BillingSettled>(handlers, async context =>
+        _ = eventBus.Subscribe<BillingSettled>(handlers, async (context, handlerCancellationToken) =>
         {
             ledger.Record(context.Event.Amount);
             dashboard.SeedState(ledger.Settled);
             await eventBus.PublishAsync(
                 new AuditAppended($"billing:{context.Event.Amount}"),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<AuditAppended>(handlers, async context =>
+        _ = eventBus.Subscribe<AuditAppended>(handlers, async (context, handlerCancellationToken) =>
         {
             audit.Append(context.Event.Entry);
             await eventBus.PublishAsync(
                 new DashboardUpdated($"round:{audit.Entries}"),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<DashboardUpdated>(handlers, async context =>
+        _ = eventBus.Subscribe<DashboardUpdated>(handlers, async (context, handlerCancellationToken) =>
         {
             var navigation = await router.NavigateAsync(
                 FixtureRoutes.Dashboard(),
                 new NavigationOptions { ForceReload = true },
-                context.CancellationToken);
+                handlerCancellationToken);
             if (navigation.Status == NavigationResultStatus.Success)
             {
                 Interlocked.Increment(ref routed);

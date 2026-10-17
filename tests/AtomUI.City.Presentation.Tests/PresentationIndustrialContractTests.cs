@@ -249,11 +249,6 @@ public sealed class PresentationIndustrialContractTests
             await _release.Task.WaitAsync(cancellationToken);
         }
 
-        public ValueTask ActivateAsync(IActivationScope scope) =>
-            ActivateAsync(scope, CancellationToken.None);
-
-        public ValueTask DeactivateAsync() => ValueTask.CompletedTask;
-
         public ValueTask DeactivateAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
 
         public void Release() => _release.TrySetResult();
@@ -261,16 +256,11 @@ public sealed class PresentationIndustrialContractTests
 
     private sealed class RecordingActivatable(int value, List<int> order) : IActivatable
     {
-        public ValueTask ActivateAsync(IActivationScope scope) =>
-            ActivateAsync(scope, CancellationToken.None);
-
         public ValueTask ActivateAsync(IActivationScope scope, CancellationToken cancellationToken)
         {
             order.Add(value);
             return ValueTask.CompletedTask;
         }
-
-        public ValueTask DeactivateAsync() => ValueTask.CompletedTask;
 
         public ValueTask DeactivateAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
     }

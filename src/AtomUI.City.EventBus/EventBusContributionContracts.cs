@@ -266,7 +266,7 @@ public interface IEventBusContributionLease : IDisposable, IAsyncDisposable
     /// <summary>
     /// Executes the stop async operation.
     /// </summary>
-    ValueTask StopAsync(CancellationToken cancellationToken = default);
+    ValueTask StopAsync(CancellationToken waitCancellationToken = default);
 }
 
 /// <summary>
@@ -305,10 +305,12 @@ public interface IPluginEventSubscriber
     /// Executes the subscribe&lt;tevent&gt; operation.
     /// </summary>
     IEventSubscription Subscribe<TEvent>(EventPluginPlane plane,
-        Func<EventContext<TEvent>, ValueTask> handler, EventSubscriptionOptions? options = null);
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
+        EventSubscriptionOptions? options = null);
     /// <summary>
     /// Executes the subscribe&lt;tevent&gt; operation.
     /// </summary>
     IEventSubscription Subscribe<TEvent>(EventPluginPlane plane, EventChannel<TEvent> channel,
-        Func<EventContext<TEvent>, ValueTask> handler, EventSubscriptionOptions? options = null);
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
+        EventSubscriptionOptions? options = null);
 }

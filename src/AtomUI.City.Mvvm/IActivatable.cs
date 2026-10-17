@@ -8,17 +8,9 @@ public interface IActivatable
     /// <summary>
     /// Executes the activate async operation.
     /// </summary>
-    ValueTask ActivateAsync(IActivationScope scope);
-
-    /// <summary>
-    /// Executes the activate async operation.
-    /// </summary>
-    ValueTask ActivateAsync(IActivationScope scope, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Executes the deactivate async operation.
-    /// </summary>
-    ValueTask DeactivateAsync();
+    ValueTask ActivateAsync(
+        IActivationScope scope,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// Executes the deactivate async operation.

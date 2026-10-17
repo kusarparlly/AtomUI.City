@@ -23,7 +23,7 @@ public class EventPublicationBenchmarks
         {
             _eventBus.Subscribe<BenchmarkEvent>(
                 _owner,
-                static _ => ValueTask.CompletedTask);
+                static (_, _) => ValueTask.CompletedTask);
         }
     }
 
@@ -83,7 +83,7 @@ public class EventSubscriptionLifecycleBenchmarks
     {
         using var subscription = _eventBus.Subscribe<BenchmarkEvent>(
             _owner,
-            static _ => ValueTask.CompletedTask);
+            static (_, _) => ValueTask.CompletedTask);
     }
 
     [GlobalCleanup]
@@ -116,7 +116,7 @@ public class EventBackpressureBenchmarks
         });
         _eventBus.Subscribe<BenchmarkEvent>(
             _owner,
-            static async _ => await Task.Delay(1).ConfigureAwait(false));
+            static async (_, _) => await Task.Delay(1).ConfigureAwait(false));
     }
 
     [Benchmark]

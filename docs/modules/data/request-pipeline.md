@@ -98,7 +98,6 @@ Runtime gate / operation scheduler
 - OperationId。
 - DataClientId。
 - Operation name。
-- CancellationToken。
 - Transport kind。
 - Access mode。
 - Attempt。
@@ -111,7 +110,7 @@ Request context 不能包含 UI 控件实例。
 
 ### 4. Operation 生命周期
 
-每次请求都是逻辑 Operation。实现创建独立 `DataRequestContext` 和 linked cancellation source；Core `LifecycleScope` 仅作为可选 parent owner，不为短暂请求额外创建一棵 scope 子树。
+每次请求都是逻辑 Operation。实现创建独立 `DataRequestContext` 和 linked cancellation source；Core `LifecycleScope` 仅作为可选 parent owner，不为短暂请求额外创建一棵 scope 子树。context 只保存描述与工作区；pipeline 将合成后的唯一有效令牌作为显式末尾参数传给 handler、transport 和 mapper。
 
 规则：
 
@@ -128,7 +127,7 @@ Request context 不能包含 UI 控件实例。
 
 - Handler 必须是可组合、可测试的。
 - Handler 不访问 UI。
-- Handler 必须尊重 cancellation token。
+- Handler 必须尊重并向下传递显式收到的唯一 cancellation token，不从 context 读取第二个 token。
 - Handler 异常进入 DataError mapping。
 - 每个 handler 在一次 attempt 内最多调用 continuation 一次。
 - handler source 或 capability authorizer 异常在 transport 前映射为 `PolicyRejected` 并记录诊断。

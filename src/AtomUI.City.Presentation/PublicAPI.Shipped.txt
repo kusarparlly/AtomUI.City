@@ -126,7 +126,7 @@ AtomUI.City.Presentation.IPresentationRuntime.PresentationScope.get -> AtomUI.Ci
 AtomUI.City.Presentation.IPresentationRuntime.RegisterWindow(Avalonia.Controls.Window! window, string! windowId) -> AtomUI.City.Presentation.WindowSession!
 AtomUI.City.Presentation.IPresentationRuntime.StartAsync(AtomUI.City.Core.Lifecycle.LifecycleScope! applicationScope, string! presentationScopeId = "presentation", System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
 AtomUI.City.Presentation.IPresentationRuntime.State.get -> AtomUI.City.Presentation.PresentationRuntimeState
-AtomUI.City.Presentation.IPresentationRuntime.StopAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.IPresentationRuntime.StopAsync(System.Threading.CancellationToken waitCancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
 AtomUI.City.Presentation.IPresentationRuntime.Windows.get -> System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Presentation.WindowSession!>!
 AtomUI.City.Presentation.IRouteOutlet
 AtomUI.City.Presentation.IRouteOutlet.CommitAsync(AtomUI.City.Presentation.RouteOutletCommitPlan! plan, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.RouteOutletCommitResult!>
@@ -322,7 +322,7 @@ AtomUI.City.Presentation.PresentationRuntime.PresentationScope.get -> AtomUI.Cit
 AtomUI.City.Presentation.PresentationRuntime.RegisterWindow(Avalonia.Controls.Window! window, string! windowId) -> AtomUI.City.Presentation.WindowSession!
 AtomUI.City.Presentation.PresentationRuntime.StartAsync(AtomUI.City.Core.Lifecycle.LifecycleScope! applicationScope, string! presentationScopeId = "presentation", System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
 AtomUI.City.Presentation.PresentationRuntime.State.get -> AtomUI.City.Presentation.PresentationRuntimeState
-AtomUI.City.Presentation.PresentationRuntime.StopAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Presentation.PresentationRuntime.StopAsync(System.Threading.CancellationToken waitCancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
 AtomUI.City.Presentation.PresentationRuntime.Windows.get -> System.Collections.Generic.IReadOnlyCollection<AtomUI.City.Presentation.WindowSession!>!
 AtomUI.City.Presentation.PresentationRuntimeServiceCollectionExtensions
 AtomUI.City.Presentation.PresentationRuntimeState
@@ -341,11 +341,10 @@ AtomUI.City.Presentation.RouteOutlet.Name.get -> string!
 AtomUI.City.Presentation.RouteOutlet.QueueSnapshot.get -> AtomUI.City.Presentation.PresentationQueueSnapshot!
 AtomUI.City.Presentation.RouteOutlet.RouteOutlet(string! name, AtomUI.City.Core.Threading.IUiDispatcher! dispatcher) -> void
 AtomUI.City.Presentation.RouteOutlet.RouteOutlet(string! name, AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics) -> void
-AtomUI.City.Presentation.RouteOutlet.RouteOutlet(string! name, AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, AtomUI.City.Presentation.IRouteOutletTarget? target, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null, AtomUI.City.Presentation.IPresentationFailurePresenter? failurePresenter = null, AtomUI.City.Presentation.PresentationQueueOptions? queueOptions = null, AtomUI.City.Presentation.VisualLifecycleHub? lifecycleHub = null, string? windowId = null) -> void
+AtomUI.City.Presentation.RouteOutlet.RouteOutlet(string! name, AtomUI.City.Core.Threading.IUiDispatcher! dispatcher, AtomUI.City.Presentation.IRouteOutletTarget? target, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null, AtomUI.City.Presentation.IPresentationFailurePresenter? failurePresenter = null, AtomUI.City.Presentation.PresentationQueueOptions? queueOptions = null, AtomUI.City.Presentation.VisualLifecycleHub? lifecycleHub = null, string? windowId = null, System.Threading.CancellationToken ownerCancellationToken = default(System.Threading.CancellationToken)) -> void
 AtomUI.City.Presentation.RouteOutlet.State.get -> AtomUI.City.Presentation.RouteOutletState
 AtomUI.City.Presentation.RouteOutletCommitPlan
 AtomUI.City.Presentation.RouteOutletCommitPlan.Handle.get -> AtomUI.City.Presentation.BoundViewHandle?
-AtomUI.City.Presentation.RouteOutletCommitPlan.LifecycleToken.get -> System.Threading.CancellationToken
 AtomUI.City.Presentation.RouteOutletCommitPlan.Operation.get -> AtomUI.City.Presentation.RouteOutletOperation
 AtomUI.City.Presentation.RouteOutletCommitPlan.OutletName.get -> string!
 AtomUI.City.Presentation.RouteOutletCommitPlan.ReuseKey.get -> string?
@@ -533,8 +532,8 @@ AtomUI.City.Presentation.WindowCloseOrigin.OperatingSystem = 2 -> AtomUI.City.Pr
 AtomUI.City.Presentation.WindowCloseOrigin.User = 0 -> AtomUI.City.Presentation.WindowCloseOrigin
 AtomUI.City.Presentation.WindowSession
 AtomUI.City.Presentation.WindowSession.ActiveCloseOrigin.get -> AtomUI.City.Presentation.WindowCloseOrigin?
-AtomUI.City.Presentation.WindowSession.CloseAsync(AtomUI.City.Presentation.WindowCloseOrigin origin, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<bool>
-AtomUI.City.Presentation.WindowSession.CloseAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<bool>
+AtomUI.City.Presentation.WindowSession.CloseAsync(AtomUI.City.Presentation.WindowCloseOrigin origin, System.Threading.CancellationToken waitCancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<bool>
+AtomUI.City.Presentation.WindowSession.CloseAsync(System.Threading.CancellationToken waitCancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<bool>
 AtomUI.City.Presentation.WindowSession.DisposeAsync() -> System.Threading.Tasks.ValueTask
 AtomUI.City.Presentation.WindowSession.GetOutlet(string! name) -> AtomUI.City.Presentation.IRouteOutlet!
 AtomUI.City.Presentation.WindowSession.Id.get -> string!
@@ -599,7 +598,7 @@ override AtomUI.City.Presentation.PresentationFailure.Equals(object? obj) -> boo
 override AtomUI.City.Presentation.PresentationFailure.GetHashCode() -> int
 override AtomUI.City.Presentation.PresentationFailure.ToString() -> string!
 override AtomUI.City.Presentation.PresentationModule.ConfigureServices(AtomUI.City.Core.Modularity.ServiceConfigurationContext! context) -> void
-override AtomUI.City.Presentation.PresentationModule.OnApplicationShutdownAsync(AtomUI.City.Core.Modularity.ApplicationShutdownContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+override AtomUI.City.Presentation.PresentationModule.OnApplicationShutdownAsync(AtomUI.City.Core.Modularity.ApplicationShutdownContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 override AtomUI.City.Presentation.PresentationPluginUnloadError.Equals(object? obj) -> bool
 override AtomUI.City.Presentation.PresentationPluginUnloadError.GetHashCode() -> int
 override AtomUI.City.Presentation.PresentationPluginUnloadError.ToString() -> string!
@@ -638,7 +637,7 @@ static AtomUI.City.Presentation.PresentationRuntimeServiceCollectionExtensions.A
 static AtomUI.City.Presentation.PresentationServiceCollectionExtensions.AddPresentation(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static AtomUI.City.Presentation.PresentationServiceCollectionExtensions.AddPresentation(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, AtomUI.City.Presentation.PresentationQueueOptions! queueOptions) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static AtomUI.City.Presentation.RouteOutletCommitPlan.Clear(string! outletName) -> AtomUI.City.Presentation.RouteOutletCommitPlan!
-static AtomUI.City.Presentation.RouteOutletCommitPlan.Replace(string! outletName, AtomUI.City.Presentation.BoundViewHandle! handle, AtomUI.City.Presentation.ViewModelLease? viewModelLease = null, string? routeId = null, string? reuseKey = null, System.Threading.CancellationToken lifecycleToken = default(System.Threading.CancellationToken)) -> AtomUI.City.Presentation.RouteOutletCommitPlan!
+static AtomUI.City.Presentation.RouteOutletCommitPlan.Replace(string! outletName, AtomUI.City.Presentation.BoundViewHandle! handle, AtomUI.City.Presentation.ViewModelLease? viewModelLease = null, string? routeId = null, string? reuseKey = null) -> AtomUI.City.Presentation.RouteOutletCommitPlan!
 static AtomUI.City.Presentation.RouteOutletCommitResult.Failed(AtomUI.City.Presentation.PresentationError error, string! message, long operationId = 0) -> AtomUI.City.Presentation.RouteOutletCommitResult!
 static AtomUI.City.Presentation.RouteOutletCommitResult.Success(long operationId = 0) -> AtomUI.City.Presentation.RouteOutletCommitResult!
 static AtomUI.City.Presentation.RouteOutletProperties.GetName(Avalonia.Controls.Control! control) -> string?

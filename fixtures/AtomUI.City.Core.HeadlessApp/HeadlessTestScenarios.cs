@@ -177,7 +177,7 @@ internal static class HeadlessTestScenarios
         var defaultLifecycleContextStageRejected = Rejects<ArgumentException>(() =>
             new LifecycleContext(default));
         var defaultLifecycleMiddlewareStageRejected = Rejects<ArgumentException>(() =>
-            new LifecyclePipelineBuilder().Use(default, static (_, _) => default));
+            new LifecyclePipelineBuilder().Use(default, static (_, _, _) => default));
         var defaultDiagnosticStageRejected = Rejects<ArgumentException>(() =>
             new HostDiagnosticRecord(
                 "BOUNDARY001",
@@ -654,7 +654,7 @@ internal static class HeadlessTestScenarios
             services.AddSingleton<IHostedService>(provider => provider.GetRequiredService<HostedProbe>());
         });
         builder.ConfigureLifecycle(lifecycle =>
-            lifecycle.Use(LifecycleStages.ApplicationStop, async (_, next) =>
+            lifecycle.Use(LifecycleStages.ApplicationStop, async (_, next, _) =>
             {
                 stopMiddlewareCount++;
                 await next();
@@ -815,13 +815,13 @@ internal static class HeadlessTestScenarios
         });
         builder.ConfigureLifecycle(lifecycle =>
         {
-            lifecycle.Use(LifecycleStages.ApplicationStart, async (_, next) =>
+            lifecycle.Use(LifecycleStages.ApplicationStart, async (_, next, _) =>
             {
                 HeadlessRecorder.Record("application:start:before");
                 await next();
                 HeadlessRecorder.Record("application:start:after");
             });
-            lifecycle.Use(LifecycleStages.ApplicationStop, async (_, next) =>
+            lifecycle.Use(LifecycleStages.ApplicationStop, async (_, next, _) =>
             {
                 HeadlessRecorder.Record("application:stop:before");
                 await next();
@@ -987,7 +987,7 @@ internal static class HeadlessTestScenarios
         builder.ConfigureLifecycle(lifecycle =>
             lifecycle.Use<HeadlessStopFailureMiddleware>(
                 LifecycleStages.ApplicationStop,
-                static (_, _) => ValueTask.FromException(
+                static (_, _, _) => ValueTask.FromException(
                     new InvalidOperationException("headless lifecycle middleware failed"))));
         builder.ConfigureServices(services =>
         {
@@ -1110,7 +1110,7 @@ internal static class HeadlessTestScenarios
         IApplicationHost? host = null;
         var builder = CreateBuilder();
         builder.ConfigureLifecycle(lifecycle =>
-            lifecycle.Use(LifecycleStages.ApplicationStop, (_, next) =>
+            lifecycle.Use(LifecycleStages.ApplicationStop, (_, next, _) =>
             {
                 host!.StopAsync();
                 return next();
@@ -1263,7 +1263,7 @@ internal static class HeadlessTestScenarios
         builder.ConfigureLifecycle(lifecycle =>
             lifecycle.Use<LifecycleNextOwnershipMiddleware>(
                 LifecycleStages.ApplicationStart,
-                static (context, next) =>
+                static (context, next, cancellationToken) =>
                 {
                     _ = next();
                     return ValueTask.CompletedTask;
@@ -1304,7 +1304,7 @@ internal static class HeadlessTestScenarios
         stopBuilder.ConfigureLifecycle(lifecycle =>
             lifecycle.Use<LifecycleNextOwnershipMiddleware>(
                 LifecycleStages.ApplicationStop,
-                static (context, next) =>
+                static (context, next, cancellationToken) =>
                 {
                     _ = next();
                     return ValueTask.CompletedTask;
@@ -1344,12 +1344,12 @@ internal static class HeadlessTestScenarios
         LifecycleNext? savedNext = null;
         var savedTerminalCount = 0;
         var savedPipeline = new LifecyclePipelineBuilder()
-            .Use((_, next) =>
+            .Use((_, next, _) =>
             {
                 savedNext = next;
                 return ValueTask.CompletedTask;
             })
-            .Build(_ =>
+            .Build((_, _) =>
             {
                 Interlocked.Increment(ref savedTerminalCount);
                 return ValueTask.CompletedTask;
@@ -1372,7 +1372,7 @@ internal static class HeadlessTestScenarios
         var rejectedConcurrentCalls = 0;
         using var concurrentStart = new ManualResetEventSlim();
         var concurrentPipeline = new LifecyclePipelineBuilder()
-            .Use(async (_, next) =>
+            .Use(async (_, next, _) =>
             {
                 var callers = Enumerable.Range(0, concurrentCallerCount)
                     .Select(_ => Task.Run(async () =>
@@ -1393,7 +1393,7 @@ internal static class HeadlessTestScenarios
                 concurrentStart.Set();
                 await Task.WhenAll(callers);
             })
-            .Build(_ =>
+            .Build((_, _) =>
             {
                 Interlocked.Increment(ref concurrentTerminalCount);
                 return ValueTask.CompletedTask;
@@ -1403,8 +1403,8 @@ internal static class HeadlessTestScenarios
 
         var directTerminalCount = 0;
         var directPipeline = new LifecyclePipelineBuilder()
-            .Use(static (_, next) => next())
-            .Build(_ =>
+            .Use(static (_, next, _) => next())
+            .Build((_, _) =>
             {
                 Interlocked.Increment(ref directTerminalCount);
                 return ValueTask.CompletedTask;
@@ -1720,7 +1720,7 @@ internal static class HeadlessTestScenarios
 
         public override async ValueTask OnApplicationInitializationAsync(
             ApplicationInitializationContext context,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             await Task.Yield();
             _ = context.Services.GetRequiredService<SynchronousServiceConfigurationProbe>();
@@ -2011,7 +2011,7 @@ internal static class HeadlessTestScenarios
 
         public override async ValueTask OnApplicationShutdownAsync(
             ApplicationShutdownContext context,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             ShutdownCount++;
             Entered.TrySetResult();
@@ -2242,7 +2242,7 @@ internal static class HeadlessTestScenarios
     {
         public override ValueTask OnApplicationShutdownAsync(
             ApplicationShutdownContext context,
-            CancellationToken cancellationToken = default) => RegistryRaceRecorder.ShutdownAsync(name);
+            CancellationToken cancellationToken) => RegistryRaceRecorder.ShutdownAsync(name);
 
         public ValueTask DisposeAsync() => RegistryRaceRecorder.DisposeAsync(name);
     }

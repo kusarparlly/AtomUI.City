@@ -135,7 +135,7 @@ public sealed class EventChannelRuntimeTests
         var releaseFirst = NewCompletion();
         var observed = new List<string>();
 
-        eventBus.Subscribe<TestEvent>(async context =>
+        eventBus.Subscribe<TestEvent>(async (context, cancellationToken) =>
         {
             lock (observed)
             {
@@ -175,7 +175,7 @@ public sealed class EventChannelRuntimeTests
         var releaseFirst = NewCompletion();
         var lateSubscriberDeliveries = 0;
 
-        eventBus.Subscribe<TestEvent>(async context =>
+        eventBus.Subscribe<TestEvent>(async (context, cancellationToken) =>
         {
             if (context.Event.Sequence == 1)
             {
@@ -207,7 +207,7 @@ public sealed class EventChannelRuntimeTests
         var firstEntered = NewCompletion();
         var releaseFirst = NewCompletion();
 
-        eventBus.Subscribe<TestEvent>(async context =>
+        eventBus.Subscribe<TestEvent>(async (context, cancellationToken) =>
         {
             if (context.Event.Sequence == 1)
             {
@@ -662,12 +662,12 @@ public sealed class EventChannelRuntimeTests
             channelOptions: new EventChannelOptions { Capacity = 1 });
         var firstEntered = NewCompletion();
 
-        eventBus.Subscribe<TestEvent>(async context =>
+        eventBus.Subscribe<TestEvent>(async (context, cancellationToken) =>
         {
             if (context.Event.Sequence == 1)
             {
                 firstEntered.TrySetResult();
-                await Task.Delay(Timeout.InfiniteTimeSpan, context.CancellationToken);
+                await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             }
         });
 

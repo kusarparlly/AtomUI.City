@@ -111,7 +111,7 @@
 | Thread Safety | lifecycle transaction Task 在 lock 内先发布、在 lock 外执行；`StartAsync` 并发调用必须串行或拒绝；`StopAsync` 并发调用合并为同一停止事务；查询上下文可并发读取。 |
 | Disposal | `Dispose` 和 `DisposeAsync` 幂等；Dispose 后 mutating API 失败，immutable context 可读取。 |
 | Nullability | `CancellationToken` 可为默认值；返回值不得为空。 |
-| Cancellation | `StartAsync` 观察 token；`StopAsync` 的取消只影响等待，不跳过最小清理。 |
+| Cancellation | `StartAsync(cancellationToken)` 的首次调用令牌驱动启动事务；middleware 和 terminal 只接收框架合成后的单一有效令牌。`StopAsync(waitCancellationToken)` 的令牌只影响当前等待，不跳过最小清理。 |
 | Failure Behavior | middleware、module initialization 或 shutdown 失败进入 diagnostics；Start 回滚成功时原样抛出主异常，回滚失败时完成全部最低清理后抛出以主异常为第一项的有序 `AggregateException`；启动取消且回滚失败时任务为 Faulted 聚合而不是 Canceled；Host 状态必须稳定；进入 Stopped 后再次 Start，以及同一 Host lifecycle 调用链中的 Start/Stop/Dispose 公共 API 重入，抛 `InvalidOperationException`。 |
 | Diagnostics | Start/Stop 写 `AUCHOST002`、`AUCHOST003` 和失败诊断。 |
 | Plugin Boundary | Host 停止时必须请求插件来源 owner 释放，但不直接加载插件程序集。 |
@@ -163,7 +163,7 @@
 | Thread Safety | pipeline 构建后不可变；执行阶段必须由 Host 串行调度。每个 `next` 使用原子单所有权，只允许当前 middleware 调用一次；并发重复调用只有一个调用者可以进入下游。 |
 | Disposal | pipeline 本身无外部资源；middleware 释放通过 scope 处理。 |
 | Nullability | stage、context、middleware delegate 不得为空。 |
-| Cancellation | 每个 middleware 调用前后观察 token；取消不得跳过 cleanup stage。 |
+| Cancellation | `ExecuteAsync(context, cancellationToken)` 将显式有效令牌传给每个 `LifecycleMiddleware(context, next, cancellationToken)` 和 terminal；`LifecycleContext` 不保存第二份 token。每个 middleware 调用前后观察 token；取消不得跳过 cleanup stage。 |
 | Failure Behavior | middleware 异常进入 Faulted，错误聚合后继续必要清理。middleware 可以显式 short-circuit；一旦调用 `next`，必须 `await` 或直接返回，禁止丢弃、缓存或延迟调用。middleware 提前返回时 Pipeline 必须收拢已启动的下游任务后以 `InvalidOperationException` 拒绝，transaction 结束后的旧 `next` 立即失败。 |
 | Diagnostics | middleware 失败写 `AUCHOST108`，强类型 `Stage` 和 context 必须包含 `middlewareType`、`operationId`、`exceptionType`；同一异常只归因到实际失败 middleware 一次，terminal 异常不得误报为 middleware 失败。正常 cancellation 不写该错误，diagnostics sink 失败不得替换原始异常。 |
 | Plugin Boundary | 插件 middleware 必须绑定 owner；插件停用时撤销后不再执行。 |
@@ -1028,6 +1028,8 @@ Tests: ApplicationHostModuleLifecycleTests。
 
 ## Cancellation 合同
 
+- 遵守全局 [Effective Cancellation Token 合同](../../architecture/cancellation.md)：业务回调只接收一个显式末尾 token，context 不重复承载普通操作 token。
+- 仅取消等待的参数必须命名为 `waitCancellationToken`；当前 `IApplicationHost.StopAsync` 属于 wait-only，真实 Stop transaction 继续执行最低清理。
 - 接收 `CancellationToken` 的 API 必须在 IO、子进程、网络、dispatcher work、插件代码、handler 调用前后观察取消。
 - 取消后不得提交状态、缓存、事件、UI 或 manifest 输出。
 - 取消结果必须稳定：返回 Cancelled Result 或抛 `OperationCanceledException`，不能混用成功结果。

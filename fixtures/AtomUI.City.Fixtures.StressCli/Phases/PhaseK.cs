@@ -103,7 +103,7 @@ public static class PhaseK
         var cultureEvents = 0;
         eventBus.Subscribe<SettingsChanged>(
             eventOwner,
-            context =>
+            (context, _) =>
             {
                 if (context.Event.Key.StartsWith("culture:", StringComparison.Ordinal))
                 {

@@ -14,7 +14,7 @@ internal static class EventBusTestExtensions
 
     public static IEventSubscription Subscribe<TEvent>(
         this InMemoryEventBus eventBus,
-        Func<EventContext<TEvent>, ValueTask> handler,
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
         EventSubscriptionOptions? options = null)
     {
         return eventBus.Subscribe(ProcessOwner, handler, options);
@@ -23,7 +23,7 @@ internal static class EventBusTestExtensions
     public static IEventSubscription Subscribe<TEvent>(
         this InMemoryEventBus eventBus,
         EventChannel<TEvent> channel,
-        Func<EventContext<TEvent>, ValueTask> handler,
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
         EventSubscriptionOptions? options = null)
     {
         return eventBus.Subscribe(ProcessOwner, channel, handler, options);
@@ -31,10 +31,41 @@ internal static class EventBusTestExtensions
 
     public static IEventSubscription Subscribe<TEvent>(
         this InMemoryEventBus eventBus,
+        Func<EventContext<TEvent>, ValueTask> handler,
+        EventSubscriptionOptions? options = null)
+    {
+        return eventBus.Subscribe<TEvent>(
+            ProcessOwner,
+            (context, _) => handler(context),
+            options);
+    }
+
+    public static IEventSubscription Subscribe<TEvent>(
+        this InMemoryEventBus eventBus,
+        EventChannel<TEvent> channel,
+        Func<EventContext<TEvent>, ValueTask> handler,
+        EventSubscriptionOptions? options = null)
+    {
+        return eventBus.Subscribe<TEvent>(
+            ProcessOwner,
+            channel,
+            (context, _) => handler(context),
+            options);
+    }
+
+    public static IEventSubscription Subscribe<TEvent>(
+        this InMemoryEventBus eventBus,
         Action<EventContext<TEvent>> handler,
         EventSubscriptionOptions? options = null)
     {
-        return eventBus.Subscribe(ProcessOwner, handler, options);
+        return eventBus.Subscribe<TEvent>(
+            ProcessOwner,
+            (context, _) =>
+            {
+                handler(context);
+                return ValueTask.CompletedTask;
+            },
+            options);
     }
 
     public static IEventSubscription Subscribe<TEvent>(
@@ -43,7 +74,15 @@ internal static class EventBusTestExtensions
         Action<EventContext<TEvent>> handler,
         EventSubscriptionOptions? options = null)
     {
-        return eventBus.Subscribe(ProcessOwner, channel, handler, options);
+        return eventBus.Subscribe<TEvent>(
+            ProcessOwner,
+            channel,
+            (context, _) =>
+            {
+                handler(context);
+                return ValueTask.CompletedTask;
+            },
+            options);
     }
 
     public static IEventSubscription Subscribe<TEvent>(

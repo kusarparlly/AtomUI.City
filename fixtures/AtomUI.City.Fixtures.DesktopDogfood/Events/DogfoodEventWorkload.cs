@@ -227,7 +227,7 @@ internal sealed class DogfoodEventWorkload : IDisposable
             var delivered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             var options = CreateSubscriptionOptions(_index, dispatcher);
             var projectionHandler = new ProjectionHandler<TEvent>(
-                context =>
+                (context, _) =>
                 {
                     if (options.DispatchPolicy == EventDispatchPolicy.UiThread && !dispatcher.CheckAccess())
                     {
@@ -245,12 +245,12 @@ internal sealed class DogfoodEventWorkload : IDisposable
             if (channel is null)
             {
                 eventBus.Subscribe(projectionOwner, projectionHandler, options);
-                eventBus.Subscribe<TEvent>(auditOwner, _ => SignalDelivery(ref deliveryCount, delivered), options);
+                eventBus.Subscribe<TEvent>(auditOwner, (_, _) => SignalDelivery(ref deliveryCount, delivered), options);
             }
             else
             {
                 eventBus.Subscribe(projectionOwner, channel.Value, projectionHandler, options);
-                eventBus.Subscribe<TEvent>(auditOwner, channel.Value, _ => SignalDelivery(ref deliveryCount, delivered), options);
+                eventBus.Subscribe<TEvent>(auditOwner, channel.Value, (_, _) => SignalDelivery(ref deliveryCount, delivered), options);
             }
 
             var publishOptions = new EventPublishOptions
@@ -313,11 +313,11 @@ internal sealed class DogfoodEventWorkload : IDisposable
         }
     }
 
-    private sealed class ProjectionHandler<TEvent>(Action<EventContext<TEvent>> handler) : IEventHandler<TEvent>
+    private sealed class ProjectionHandler<TEvent>(Action<EventContext<TEvent>, CancellationToken> handler) : IEventHandler<TEvent>
     {
-        public ValueTask HandleAsync(EventContext<TEvent> context)
+        public ValueTask HandleAsync(EventContext<TEvent> context, CancellationToken cancellationToken)
         {
-            handler(context);
+            handler(context, cancellationToken);
             return ValueTask.CompletedTask;
         }
     }
@@ -334,7 +334,7 @@ public sealed class ApplicationReadyAuditHandler(AuditSink auditSink) : IEventHa
 
     public static int CallCount => Volatile.Read(ref _callCount);
 
-    public ValueTask HandleAsync(EventContext<ApplicationReady> context)
+    public ValueTask HandleAsync(EventContext<ApplicationReady> context, CancellationToken cancellationToken)
     {
         auditSink.Execute($"application-ready:{context.Event.Revision}");
         Interlocked.Increment(ref _callCount);

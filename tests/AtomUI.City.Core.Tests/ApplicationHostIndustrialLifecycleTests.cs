@@ -27,7 +27,7 @@ public sealed class ApplicationHostIndustrialLifecycleTests
                          LifecycleStages.ModuleStop,
                      })
             {
-                lifecycle.Use(stage, async (context, next) =>
+                lifecycle.Use(stage, async (context, next, cancellationToken) =>
                 {
                     operationIds[stage.Key] = context.OperationId;
                     calls.Add($"{stage.Key}:before");
@@ -163,7 +163,7 @@ public sealed class ApplicationHostIndustrialLifecycleTests
         {
             lifecycle.Use<StartupFailureMiddleware>(
                 LifecycleStages.ApplicationStart,
-                (context, _) =>
+                (context, _, cancellationToken) =>
                 {
                     startOperationId = context.OperationId;
                     return ValueTask.FromException(
@@ -171,7 +171,7 @@ public sealed class ApplicationHostIndustrialLifecycleTests
                 });
             lifecycle.Use<RollbackProbeMiddleware>(
                 LifecycleStages.ApplicationStop,
-                async (context, next) =>
+                async (context, next, cancellationToken) =>
                 {
                     rollbackOperationId = context.OperationId;
                     await next();
@@ -328,7 +328,7 @@ public sealed class ApplicationHostIndustrialLifecycleTests
         var builder = ApplicationHostTestBuilder.Create();
         builder.UseModule<CreatedStopModule1>();
         builder.ConfigureLifecycle(lifecycle =>
-            lifecycle.Use(LifecycleStages.ApplicationStop, async (_, next) =>
+            lifecycle.Use(LifecycleStages.ApplicationStop, async (_, next, _) =>
             {
                 entered.TrySetResult();
                 await release.Task;
@@ -387,7 +387,7 @@ public sealed class ApplicationHostIndustrialLifecycleTests
         IApplicationHost? host = null;
         var builder = ApplicationHostTestBuilder.Create();
         builder.ConfigureLifecycle(lifecycle =>
-            lifecycle.Use(LifecycleStages.ApplicationStop, (_, next) =>
+            lifecycle.Use(LifecycleStages.ApplicationStop, (_, next, _) =>
             {
                 host!.StopAsync();
                 return next();
@@ -436,7 +436,7 @@ public sealed class ApplicationHostIndustrialLifecycleTests
         IApplicationHost? host = null;
         var builder = ApplicationHostTestBuilder.Create();
         builder.ConfigureLifecycle(lifecycle =>
-            lifecycle.Use(LifecycleStages.ApplicationStart, (_, next) =>
+            lifecycle.Use(LifecycleStages.ApplicationStart, (_, next, _) =>
             {
                 host!.StartAsync();
                 return next();
@@ -456,7 +456,7 @@ public sealed class ApplicationHostIndustrialLifecycleTests
         IApplicationHost? host = null;
         var builder = ApplicationHostTestBuilder.Create();
         builder.ConfigureLifecycle(lifecycle =>
-            lifecycle.Use(LifecycleStages.ApplicationStop, (_, next) =>
+            lifecycle.Use(LifecycleStages.ApplicationStop, (_, next, _) =>
             {
                 host!.DisposeAsync();
                 return next();
@@ -523,7 +523,7 @@ public sealed class ApplicationHostIndustrialLifecycleTests
     {
         var builder = ApplicationHostTestBuilder.Create();
         builder.ConfigureLifecycle(lifecycle =>
-            lifecycle.Use<StopFailureMiddleware>(LifecycleStages.ApplicationStop, static (_, _) =>
+            lifecycle.Use<StopFailureMiddleware>(LifecycleStages.ApplicationStop, static (_, _, _) =>
                 ValueTask.FromException(new InvalidOperationException("stop middleware failed"))));
         builder.ConfigureServices(services =>
         {
@@ -645,7 +645,7 @@ public sealed class ApplicationHostIndustrialLifecycleTests
 
         public override async ValueTask OnApplicationInitializationAsync(
             ApplicationInitializationContext context,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             Entered.TrySetResult();
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
@@ -742,7 +742,7 @@ public sealed class ApplicationHostIndustrialLifecycleTests
 
         public override async ValueTask OnApplicationShutdownAsync(
             ApplicationShutdownContext context,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             Entered.SetResult();
             await Release.Task.WaitAsync(cancellationToken);
@@ -763,7 +763,7 @@ public sealed class ApplicationHostIndustrialLifecycleTests
 
         public override async ValueTask OnApplicationShutdownAsync(
             ApplicationShutdownContext context,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
         }
@@ -791,7 +791,7 @@ public sealed class ApplicationHostIndustrialLifecycleTests
 
         public override async ValueTask OnApplicationShutdownAsync(
             ApplicationShutdownContext context,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             ControllerWasResolvable = context.Services.GetService<IModuleLifecycleController>() is not null;
             await ValueTask.CompletedTask;

@@ -23,7 +23,7 @@ public sealed class SignalRDataTransportTests
                 return ValueTask.FromResult("42");
             });
         var cancellation = new CancellationTokenSource();
-        var context = DataRequestContext.Create(request, cancellation.Token);
+        var context = DataRequestContext.Create(request);
         context.SetCredential(DataCredential.Bearer("hub-token"));
 
         var result = await transport.SendAsync(
@@ -53,7 +53,7 @@ public sealed class SignalRDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.False(result.Succeeded);
         Assert.Equal(DataErrorKind.TransportError, result.Error?.Kind);
@@ -73,7 +73,7 @@ public sealed class SignalRDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None),
+            DataRequestContext.Create(request),
             CancellationToken.None);
 
         Assert.Equal(DataResultStatus.Failed, result.Status);
@@ -102,7 +102,7 @@ public sealed class SignalRDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.False(result.Succeeded);
         Assert.Equal(expectedError, result.Error?.Kind);
@@ -129,7 +129,7 @@ public sealed class SignalRDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, cancellation.Token),
+            DataRequestContext.Create(request),
             cancellation.Token);
 
         Assert.Equal(DataResultStatus.Cancelled, result.Status);
@@ -158,7 +158,7 @@ public sealed class SignalRDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(otherRequest, CancellationToken.None));
+            DataRequestContext.Create(otherRequest));
 
         Assert.Equal(DataResultStatus.Failed, result.Status);
         Assert.Equal(DataErrorKind.PolicyRejected, result.Error?.Kind);
@@ -183,7 +183,7 @@ public sealed class SignalRDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, cancellation.Token),
+            DataRequestContext.Create(request),
             cancellation.Token);
 
         Assert.Equal(DataResultStatus.Cancelled, result.Status);

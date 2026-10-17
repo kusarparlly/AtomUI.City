@@ -35,6 +35,7 @@
 - 大载荷固定缓冲、进度字段、range fallback、响应声明长度校验和未提交临时文件清理进入 1.0 兼容承诺。
 - gRPC client/duplex stream 的并发 dispose 共享事务，并等待当前 writer 退出后释放底层 call；SignalR dispose 共享事务且终态必须为 Stopped 或 Faulted。
 - `InMemoryDataDiagnostics` 默认容量 4096、FIFO 淘汰和 `DroppedCount` 属于 1.0 默认行为。
+- 1.0 Preview 取消合同收口移除 `DataRequestContext.CancellationToken` 和对应构造参数；handler/transport 只消费显式末尾有效令牌。`IGrpcClientStream.CompleteAsync` 的 wait-only 参数命名为 `waitCancellationToken`。
 
 ## 数据格式兼容
 

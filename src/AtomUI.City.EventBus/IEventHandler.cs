@@ -8,5 +8,7 @@ public interface IEventHandler<TEvent>
     /// <summary>
     /// Executes the handle async operation.
     /// </summary>
-    ValueTask HandleAsync(EventContext<TEvent> context);
+    ValueTask HandleAsync(
+        EventContext<TEvent> context,
+        CancellationToken cancellationToken);
 }

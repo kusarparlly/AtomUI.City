@@ -84,7 +84,7 @@ HTTP、gRPC、SignalR 回调都不能假设发生在 UI Thread。Data 必须遵�
 
 ### 3. Operation 语义
 
-Data 1.0 的每个请求均具有 `OperationId`、linked `CancellationToken`、timeout、diagnostics 和 `ConcurrencyPolicy`；`ParentScope` 是可选项。`DataRequestContext` 是请求的逻辑 operation transaction；提供 `ParentScope` 时，它同时受该 City lifecycle scope 取消约束：
+Data 1.0 的每个请求均具有 `OperationId`、linked `CancellationToken`、timeout、diagnostics 和 `ConcurrencyPolicy`；`ParentScope` 是可选项。`DataRequestContext` 是请求的逻辑 operation descriptor，不重复暴露 token；提供 `ParentScope` 时，pipeline 把调用方、scope、shutdown 和 timeout 合成为一个显式有效令牌：
 
 - OperationId。
 - ParentScope。

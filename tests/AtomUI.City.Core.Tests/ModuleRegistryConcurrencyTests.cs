@@ -327,11 +327,11 @@ public sealed class ModuleRegistryConcurrencyTests
 
         public override ValueTask ConfigureContributionsAsync(
             ContributionConfigurationContext context,
-            CancellationToken cancellationToken = default) => Contributions.WaitAsync();
+            CancellationToken cancellationToken) => Contributions.WaitAsync();
 
         public override ValueTask OnApplicationInitializationAsync(
             ApplicationInitializationContext context,
-            CancellationToken cancellationToken = default) => Initialization.WaitAsync();
+            CancellationToken cancellationToken) => Initialization.WaitAsync();
 
         public override void OnApplicationShutdown(ApplicationShutdownContext context) =>
             Interlocked.Increment(ref ShutdownCount);
@@ -480,7 +480,7 @@ public sealed class ModuleRegistryConcurrencyTests
     {
         public override ValueTask OnApplicationShutdownAsync(
             ApplicationShutdownContext context,
-            CancellationToken cancellationToken = default) => TerminalRecorder.ShutdownAsync(name);
+            CancellationToken cancellationToken) => TerminalRecorder.ShutdownAsync(name);
 
         public ValueTask DisposeAsync() => TerminalRecorder.DisposeAsync(name);
     }

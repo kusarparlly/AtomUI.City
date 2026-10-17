@@ -15,7 +15,7 @@ public sealed class GrpcDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.True(result.Succeeded);
         Assert.Equal("grpc-response", result.Value);
@@ -37,7 +37,7 @@ public sealed class GrpcDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.False(result.Succeeded);
         Assert.Equal(expectedError, result.Error?.Kind);
@@ -88,7 +88,7 @@ public sealed class GrpcDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.False(result.Succeeded);
         Assert.Equal(expectedError, result.Error?.Kind);
@@ -106,7 +106,7 @@ public sealed class GrpcDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.Equal(DataResultStatus.Cancelled, result.Status);
         Assert.Equal(DataErrorKind.Cancelled, result.Error?.Kind);
@@ -124,7 +124,7 @@ public sealed class GrpcDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.Equal(DataResultStatus.Failed, result.Status);
         Assert.Equal(DataErrorKind.Timeout, result.Error?.Kind);
@@ -143,7 +143,7 @@ public sealed class GrpcDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.Equal(DataResultStatus.Cancelled, result.Status);
         Assert.Equal(DataErrorKind.Cancelled, result.Error?.Kind);
@@ -161,7 +161,7 @@ public sealed class GrpcDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.False(result.Succeeded);
         Assert.Equal(DataErrorKind.TransportError, result.Error?.Kind);
@@ -186,7 +186,7 @@ public sealed class GrpcDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, cancellation.Token),
+            DataRequestContext.Create(request),
             cancellation.Token);
 
         Assert.Equal(DataResultStatus.Cancelled, result.Status);
@@ -213,7 +213,7 @@ public sealed class GrpcDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(otherRequest, CancellationToken.None));
+            DataRequestContext.Create(otherRequest));
 
         Assert.Equal(DataResultStatus.Failed, result.Status);
         Assert.Equal(DataErrorKind.PolicyRejected, result.Error?.Kind);
@@ -231,7 +231,7 @@ public sealed class GrpcDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.Equal(DataResultStatus.Failed, result.Status);
         Assert.Equal(DataErrorKind.TransportError, result.Error?.Kind);
@@ -254,7 +254,7 @@ public sealed class GrpcDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, cancellation.Token),
+            DataRequestContext.Create(request),
             cancellation.Token);
 
         Assert.Equal(DataResultStatus.Cancelled, result.Status);

@@ -151,7 +151,7 @@ EventBus 遵守以下原则：
 | `IEventSubscriber` | 只提供事件订阅能力。 |
 | `IEventHandler<TEvent>` | 强类型异步事件处理器。 |
 | `IEventSubscription` | 可停止、可释放、可诊断的订阅句柄。 |
-| `EventContext<TEvent>` | 事件数据、诊断上下文和取消令牌。 |
+| `EventContext<TEvent>` | 事件数据与诊断/关联上下文；不重复保存操作令牌。 |
 | `EventChannel<TEvent>` | 强类型事件通道定义。 |
 | `EventContractId` | 稳定事件契约标识。 |
 | `EventPublishOptions` | 发布完成语义、channel、partition 和错误策略。 |
@@ -225,7 +225,6 @@ public sealed class EventContext<TEvent>
     public required string CorrelationId { get; init; }
     public string? CausationId { get; init; }
     public required DateTimeOffset PublishedAt { get; init; }
-    public required CancellationToken CancellationToken { get; init; }
 }
 ```
 
@@ -240,7 +239,7 @@ public sealed class EventContext<TEvent>
 - Publish depth。
 - DiagnosticContext。
 
-EventContext 是只读执行上下文，不允许 handler 修改事件全局元数据。
+EventContext 是只读执行上下文，不允许 handler 修改事件全局元数据。有效取消令牌由 `HandleAsync(context, cancellationToken)` 或订阅 delegate 的显式末尾参数交付。
 
 ### 8. 事件契约
 

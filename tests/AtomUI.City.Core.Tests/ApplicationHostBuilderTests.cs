@@ -685,7 +685,7 @@ public sealed class ApplicationHostBuilderTests
         Assert.Throws<InvalidOperationException>(() => builder.UseModule<LateModule>());
         Assert.Throws<InvalidOperationException>(() =>
             builder.ConfigureLifecycle(lifecycle =>
-                lifecycle.Use(static (_, next) => next())));
+                lifecycle.Use(static (_, next, _) => next())));
     }
 
     [Fact]

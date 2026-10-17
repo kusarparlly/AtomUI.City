@@ -81,6 +81,7 @@ builder.ConfigureServices(services => services.AddSingleton<AppService>());
 - `ServiceRegistrationOwnerAttribute`：把当前程序集的自动服务注册唯一归属到由当前程序集声明的静态 Module；registrar 不得登记到其他程序集的 owner，仅当本地 owner 位于启动依赖闭包中时进入 Root DI。
 - `GeneratedServiceManifestAttribute`、`IServiceRegistrar`、`IServiceRegistrarContext`：连接生成服务清单与 Host Build；属于 generated-code bridge，应用业务代码不直接调用。
 - `LifecycleContext.OperationId`：增加只读 lifecycle transaction id；构造函数末尾的可选参数保持现有调用源码兼容。
+- 1.0 Preview 取消合同收口：`LifecycleContext.CancellationToken` 被移除；`LifecycleMiddleware`、pipeline terminal、`IModule` lifecycle callback 和 `ExecuteAsync` 使用显式末尾 token，其中框架回调 token 不可省略。`IApplicationHost.StopAsync` 的 wait-only 参数改名为 `waitCancellationToken`。
 - `LifecyclePipelineBuilder.Use<TMiddleware>(...)`：允许显式声明稳定 middleware 诊断类型；现有 delegate overload 保留并使用兼容推断。
 - `HostDiagnosticIds.LifecycleMiddlewareFailed` (`AUCHOST108`)：定位 lifecycle middleware 的 stage、类型、operationId 和异常类型。
 - `HostDiagnosticIds.HostBuildCleanupFailed` (`AUCHOST109`)：定位 Build 失败回滚中的 Generic Host 或 Module 清理异常。

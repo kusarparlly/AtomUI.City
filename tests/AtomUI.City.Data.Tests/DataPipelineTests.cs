@@ -972,9 +972,9 @@ public sealed class DataPipelineTests
     [Fact]
     public async Task PipelineMapsOperationTimeout()
     {
-        var transport = new RecordingTransport(async context =>
+        var transport = new RecordingTransport(async (context, cancellationToken) =>
         {
-            await Task.Delay(TimeSpan.FromSeconds(5), context.CancellationToken);
+            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
 
             return DataResult<string>.Success("late");
         });
@@ -996,9 +996,9 @@ public sealed class DataPipelineTests
     [Fact]
     public async Task PipelineMapsTransportSuccessAfterOperationTimeout()
     {
-        var transport = new RecordingTransport(async context =>
+        var transport = new RecordingTransport(async (context, cancellationToken) =>
         {
-            while (!context.CancellationToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(1));
             }
@@ -1023,11 +1023,11 @@ public sealed class DataPipelineTests
     [Fact]
     public async Task PipelineMapsTransportCancellationCausedByOperationTimeout()
     {
-        var transport = new RecordingTransport(async context =>
+        var transport = new RecordingTransport(async (context, cancellationToken) =>
         {
             try
             {
-                await Task.Delay(TimeSpan.FromSeconds(5), context.CancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
             }
             catch (OperationCanceledException)
             {
@@ -1084,10 +1084,10 @@ public sealed class DataPipelineTests
     {
         var parent = LifecycleScope.CreateRoot(LifecycleScopeKind.Route, "route:/items");
         var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var transport = new RecordingTransport(async context =>
+        var transport = new RecordingTransport(async (context, cancellationToken) =>
         {
             entered.TrySetResult();
-            await Task.Delay(Timeout.InfiniteTimeSpan, context.CancellationToken);
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             return DataResult<string>.Success("unreachable");
         });
         var pipeline = new DataRequestPipeline(transport);
@@ -1229,28 +1229,35 @@ public sealed class DataPipelineTests
 
     private sealed class RecordingTransport : IRequestResponseTransport
     {
-        private readonly Func<DataRequestContext, ValueTask<DataResult<string>>> _handler;
+        private readonly Func<DataRequestContext, CancellationToken, ValueTask<DataResult<string>>> _handler;
 
         public RecordingTransport(Func<DataRequestContext, DataResult<string>> handler)
-            : this(context => ValueTask.FromResult(handler(context)), DataTransportKind.Http)
+            : this((context, _) => ValueTask.FromResult(handler(context)), DataTransportKind.Http)
         {
         }
 
         public RecordingTransport(
             Func<DataRequestContext, DataResult<string>> handler,
             DataTransportKind kind)
-            : this(context => ValueTask.FromResult(handler(context)), kind)
+            : this((context, _) => ValueTask.FromResult(handler(context)), kind)
         {
         }
 
         public RecordingTransport(Func<DataRequestContext, ValueTask<DataResult<string>>> handler)
-            : this(handler, DataTransportKind.Http)
+            : this((context, _) => handler(context), DataTransportKind.Http)
         {
         }
 
         public RecordingTransport(
             Func<DataRequestContext, ValueTask<DataResult<string>>> handler,
             DataTransportKind kind)
+            : this((context, _) => handler(context), kind)
+        {
+        }
+
+        public RecordingTransport(
+            Func<DataRequestContext, CancellationToken, ValueTask<DataResult<string>>> handler,
+            DataTransportKind kind = DataTransportKind.Http)
         {
             _handler = handler;
             Kind = kind;
@@ -1269,7 +1276,7 @@ public sealed class DataPipelineTests
         {
             Attempts++;
             LastContext = context;
-            var result = await _handler(context);
+            var result = await _handler(context, cancellationToken);
 
             return result.Cast<TResponse>();
         }

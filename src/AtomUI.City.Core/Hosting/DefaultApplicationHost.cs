@@ -106,14 +106,14 @@ internal sealed class DefaultApplicationHost : IApplicationHost
             : startTask.WaitAsync(cancellationToken);
     }
 
-    public Task StopAsync(CancellationToken cancellationToken = default)
+    public Task StopAsync(CancellationToken waitCancellationToken = default)
     {
         LifecycleInvocationGuard.ThrowIfReentrant(this, LifecycleOperationKind.Stop);
 
-        return GetOrStartStopTask(cancellationToken);
+        return GetOrStartStopTask(waitCancellationToken);
     }
 
-    private Task GetOrStartStopTask(CancellationToken cancellationToken)
+    private Task GetOrStartStopTask(CancellationToken waitCancellationToken)
     {
         DeferredLifecycleOperation? operation = null;
         CancellationTokenSource? startupCancellation = null;
@@ -171,8 +171,8 @@ internal sealed class DefaultApplicationHost : IApplicationHost
                     : () => StopAfterStartAsync(startTask, startupCancellation!));
         }
 
-        return cancellationToken.CanBeCanceled
-            ? stopTask.WaitAsync(cancellationToken)
+        return waitCancellationToken.CanBeCanceled
+            ? stopTask.WaitAsync(waitCancellationToken)
             : stopTask;
     }
 
@@ -331,9 +331,11 @@ internal sealed class DefaultApplicationHost : IApplicationHost
         }
     }
 
-    private async ValueTask StartTransactionAsync(LifecycleContext context)
+    private async ValueTask StartTransactionAsync(
+        LifecycleContext context,
+        CancellationToken cancellationToken)
     {
-        await _genericHost.StartAsync(context.CancellationToken).ConfigureAwait(false);
+        await _genericHost.StartAsync(cancellationToken).ConfigureAwait(false);
         _genericHostStarted = true;
 
         _applicationServiceScope = Services.CreateScope();
@@ -344,25 +346,25 @@ internal sealed class DefaultApplicationHost : IApplicationHost
         await _moduleLifecycle.ConfigureContributionsAsync(
             Context,
             applicationServices,
-            context.CancellationToken).ConfigureAwait(false);
+            cancellationToken).ConfigureAwait(false);
 
         await ExecuteRequiredStageAsync(
             LifecycleStages.ModuleInitialize,
-            async stageContext =>
+            async (_, stageCancellationToken) =>
             {
                 await _moduleLifecycle.InitializeAsync(
                     Context,
                     applicationServices,
                     applicationScope,
-                    stageContext.CancellationToken).ConfigureAwait(false);
+                    stageCancellationToken).ConfigureAwait(false);
             },
-            context.CancellationToken,
+            cancellationToken,
             context.OperationId).ConfigureAwait(false);
 
         await ExecuteRequiredStageAsync(
             LifecycleStages.ModuleStart,
-            static _ => ValueTask.CompletedTask,
-            context.CancellationToken,
+            static (_, _) => ValueTask.CompletedTask,
+            cancellationToken,
             context.OperationId).ConfigureAwait(false);
     }
 
@@ -514,22 +516,22 @@ internal sealed class DefaultApplicationHost : IApplicationHost
         var context = new LifecycleContext(
             LifecycleStages.ApplicationStop,
             _applicationServiceScope?.ServiceProvider ?? Services,
-            cancellationToken,
-            operationId);
+            operationId: operationId);
 
         try
         {
             await _lifecyclePipeline.ExecuteAsync(
                 context,
-                async _ =>
+                async (_, effectiveCancellationToken) =>
                 {
                     await ExecuteStopTerminalAsync(
-                        cancellationToken,
+                        effectiveCancellationToken,
                         failures,
                         operationId).ConfigureAwait(false);
                 },
                 guaranteeTerminal: true,
-                diagnostics: _diagnostics).ConfigureAwait(false);
+                diagnostics: _diagnostics,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -565,22 +567,22 @@ internal sealed class DefaultApplicationHost : IApplicationHost
         var moduleStopContext = new LifecycleContext(
             LifecycleStages.ModuleStop,
             _applicationServiceScope?.ServiceProvider ?? Services,
-            cancellationToken,
-            operationId);
+            operationId: operationId);
 
         try
         {
             await _lifecyclePipeline.ExecuteAsync(
                 moduleStopContext,
-                async _ =>
+                async (_, effectiveCancellationToken) =>
                 {
                     await _moduleLifecycle.ShutdownAsync(
                         Context,
                         _applicationServiceScope?.ServiceProvider ?? Services,
-                        cancellationToken).ConfigureAwait(false);
+                        effectiveCancellationToken).ConfigureAwait(false);
                 },
                 guaranteeTerminal: true,
-                diagnostics: _diagnostics).ConfigureAwait(false);
+                diagnostics: _diagnostics,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -643,7 +645,7 @@ internal sealed class DefaultApplicationHost : IApplicationHost
 
     private async ValueTask ExecuteRequiredStageAsync(
         LifecycleStage stage,
-        Func<LifecycleContext, ValueTask> terminal,
+        Func<LifecycleContext, CancellationToken, ValueTask> terminal,
         CancellationToken cancellationToken,
         string operationId)
     {
@@ -651,18 +653,18 @@ internal sealed class DefaultApplicationHost : IApplicationHost
         var context = new LifecycleContext(
             stage,
             _applicationServiceScope?.ServiceProvider ?? Services,
-            cancellationToken,
-            operationId);
+            operationId: operationId);
 
         await _lifecyclePipeline.ExecuteAsync(
             context,
-            async stageContext =>
+            async (stageContext, effectiveCancellationToken) =>
             {
-                await terminal(stageContext).ConfigureAwait(false);
+                await terminal(stageContext, effectiveCancellationToken).ConfigureAwait(false);
                 terminalCompleted = true;
             },
             guaranteeTerminal: false,
-            diagnostics: _diagnostics).ConfigureAwait(false);
+            diagnostics: _diagnostics,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (!terminalCompleted)
         {

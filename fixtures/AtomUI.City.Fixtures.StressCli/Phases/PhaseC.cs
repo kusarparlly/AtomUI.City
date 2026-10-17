@@ -59,7 +59,7 @@ public static class PhaseC
         {
             return eventBus.Subscribe<TEvent>(
                 owner,
-                context =>
+                (context, _) =>
                 {
                     Bump(counterKey);
                     return ValueTask.CompletedTask;
@@ -125,10 +125,10 @@ public static class PhaseC
         using var serializedOwner = ownerRoot.CreateChild(LifecycleScopeKind.Subscription, "owner-serialized");
         _ = eventBus.Subscribe<TelemetrySampled>(
             serializedOwner,
-            async context =>
+            async (context, handlerCancellationToken) =>
             {
                 var start = Environment.TickCount64;
-                await Task.Delay(30, context.CancellationToken).ConfigureAwait(false);
+                await Task.Delay(30, handlerCancellationToken).ConfigureAwait(false);
                 lock (serializedGate)
                 {
                     SerializedWindows.Add((start, Environment.TickCount64));
@@ -263,17 +263,17 @@ public static class PhaseC
 
         _ = eventBus.Subscribe<FaultInjected>(
             errorOwner,
-            context => { Bump("errorpolicy-continue"); ++continueHits; return ValueTask.CompletedTask; },
+            (context, _) => { Bump("errorpolicy-continue"); ++continueHits; return ValueTask.CompletedTask; },
             EventSubscriptionOptions.Current.WithErrorPolicy(EventErrorPolicy.ContinueAndReport));
 
         _ = eventBus.Subscribe<FaultInjected>(
             errorOwner,
-            _ => throw new InvalidOperationException("StopPublication 探针"),
+            (_, _) => throw new InvalidOperationException("StopPublication 探针"),
             EventSubscriptionOptions.Current.WithErrorPolicy(EventErrorPolicy.StopPublication));
 
         _ = eventBus.Subscribe<FaultInjected>(
             errorOwner,
-            context => { Bump("errorpolicy-stop"); ++stopTailHits; return ValueTask.CompletedTask; },
+            (context, _) => { Bump("errorpolicy-stop"); ++stopTailHits; return ValueTask.CompletedTask; },
             EventSubscriptionOptions.Current);
 
         var failPublisherObserved = false;
@@ -282,7 +282,7 @@ public static class PhaseC
             using var failOwner = ownerRoot.CreateChild(LifecycleScopeKind.Subscription, "owner-failpublisher");
             _ = eventBus.Subscribe<FaultInjected>(
                 failOwner,
-                _ => throw new InvalidOperationException("FailPublisher 探针"),
+                (_, _) => throw new InvalidOperationException("FailPublisher 探针"),
                 EventSubscriptionOptions.Current.WithErrorPolicy(EventErrorPolicy.FailPublisher));
 
             var result = await eventBus.PublishAsync(new FaultInjected("错误策略演练"), cancellationToken: cancellationToken);
@@ -309,7 +309,7 @@ public static class PhaseC
         using var ephemeralOwner = ownerRoot.CreateChild(LifecycleScopeKind.Subscription, "owner-ephemeral");
         _ = eventBus.Subscribe<SettingsChanged>(
             ephemeralOwner,
-            context => { Bump("ephemeral"); return ValueTask.CompletedTask; },
+            (context, _) => { Bump("ephemeral"); return ValueTask.CompletedTask; },
             EventSubscriptionOptions.Current);
 
         ephemeralOwner.Dispose();

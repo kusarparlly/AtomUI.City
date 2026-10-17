@@ -95,6 +95,19 @@ Activation 不负责：
 
 ViewModel 默认可以继承 `ViewModelBase`，也可以只实现 `IActivatable`。
 
+`IActivatable` 固定使用单一取消入口：
+
+```csharp
+ValueTask ActivateAsync(
+    IActivationScope scope,
+    CancellationToken cancellationToken);
+
+ValueTask DeactivateAsync(
+    CancellationToken cancellationToken);
+```
+
+`ViewModelBase` 在边界把调用方 token 与当前 `ActivationScope.CancellationToken` 合成为一个有效令牌，再交给 `OnActivatedAsync(context, cancellationToken)` 或 `OnDeactivatedAsync(cancellationToken)`。派生类只传递这个令牌，不自行链接 Scope token。
+
 ### 4. 生命周期状态
 
 ViewModel 生命周期：

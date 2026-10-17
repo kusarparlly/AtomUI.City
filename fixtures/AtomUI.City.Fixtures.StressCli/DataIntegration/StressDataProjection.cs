@@ -20,26 +20,26 @@ public sealed class StressRemoteProjection(
     {
         ArgumentNullException.ThrowIfNull(owner);
 
-        eventBus.Subscribe<RemoteProductLoaded>(owner, context =>
+        eventBus.Subscribe<RemoteProductLoaded>(owner, (context, _) =>
         {
             writer.Update(PhaseD.StateCatalog.RemoteProductsLoaded, value => value + 1);
             writer.Set(PhaseD.StateCatalog.RemoteInventory, context.Event.Product.Quantity);
             writer.Set(PhaseD.StateCatalog.RemoteStatus, "product-loaded");
         });
-        eventBus.Subscribe<RemoteOrderSubmitted>(owner, context =>
+        eventBus.Subscribe<RemoteOrderSubmitted>(owner, (context, _) =>
         {
             writer.Update(PhaseD.StateCatalog.RemoteOrdersSubmitted, value => value + 1);
             writer.Update(PhaseD.StateCatalog.RemoteRevenue, value => value + context.Event.Receipt.Amount);
             writer.Set(PhaseD.StateCatalog.RemoteLastOrderId, context.Event.Receipt.OrderId);
             writer.Set(PhaseD.StateCatalog.RemoteStatus, "order-submitted");
         });
-        eventBus.Subscribe<RemoteDataFailed>(owner, context =>
+        eventBus.Subscribe<RemoteDataFailed>(owner, (context, _) =>
         {
             writer.Update(PhaseD.StateCatalog.RemoteFailures, value => value + 1);
             writer.Set(PhaseD.StateCatalog.RemoteStatus, $"failed:{context.Event.ErrorKind}");
             writer.Set(PhaseD.StateCatalog.RemoteMessage, context.Event.MessageKey);
         });
-        eventBus.Subscribe<RemoteInventoryChanged>(owner, context =>
+        eventBus.Subscribe<RemoteInventoryChanged>(owner, (context, _) =>
         {
             if (IsCurrentPrincipal(context.Event.PrincipalRevision))
             {
@@ -47,7 +47,7 @@ public sealed class StressRemoteProjection(
                 writer.Update(PhaseD.StateCatalog.RemoteRealtimeUpdates, value => value + 1);
             }
         });
-        eventBus.Subscribe<RemotePriceChanged>(owner, context =>
+        eventBus.Subscribe<RemotePriceChanged>(owner, (context, _) =>
         {
             if (IsCurrentPrincipal(context.Event.PrincipalRevision))
             {
@@ -55,7 +55,7 @@ public sealed class StressRemoteProjection(
                 writer.Set(PhaseD.StateCatalog.RemoteStatus, $"price:{context.Event.Price:0.00}");
             }
         });
-        eventBus.Subscribe<RemoteShipmentProgressed>(owner, context =>
+        eventBus.Subscribe<RemoteShipmentProgressed>(owner, (context, _) =>
         {
             if (IsCurrentPrincipal(context.Event.PrincipalRevision))
             {
@@ -63,7 +63,7 @@ public sealed class StressRemoteProjection(
                 writer.Set(PhaseD.StateCatalog.RemoteStatus, $"shipment:{context.Event.Status}");
             }
         });
-        eventBus.Subscribe<RemotePrincipalSwitched>(owner, context =>
+        eventBus.Subscribe<RemotePrincipalSwitched>(owner, (context, _) =>
         {
             writer.Set(PhaseD.StateCatalog.RemotePrincipal, context.Event.CurrentPrincipal);
             writer.Set(PhaseD.StateCatalog.RemotePrincipalRevision, context.Event.CurrentRevision);

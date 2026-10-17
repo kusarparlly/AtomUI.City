@@ -289,8 +289,7 @@ internal sealed class DogfoodDesktopCoordinator
                     handle,
                     lease,
                     navigation.Route.RouteId,
-                    target.ReuseKey,
-                    targetSession.Scope.CancellationToken),
+                    target.ReuseKey),
                 targetSession.Scope.CancellationToken);
             if (!result.Succeeded)
             {
@@ -337,8 +336,7 @@ internal sealed class DogfoodDesktopCoordinator
                         handle,
                         lease,
                         routeId: $"dogfood.viewmodel.{viewModelType.Name}",
-                        reuseKey: viewModelType.FullName,
-                        cancellationToken),
+                        reuseKey: viewModelType.FullName),
                     cancellationToken);
                 if (!result.Succeeded)
                 {

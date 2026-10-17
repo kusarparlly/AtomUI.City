@@ -423,7 +423,7 @@ public sealed class DataPluginLifecycleTests
             DataRequest<TResponse> request,
             DataRequestContext context,
             DataRequestHandlerDelegate<TResponse> next,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             await lease.RevokeAsync();
             ContinuedAfterRevoke = true;

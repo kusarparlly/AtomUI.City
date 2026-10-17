@@ -171,7 +171,7 @@ public sealed class DataContributionRegistry : IDataRequestHandlerSource, IDataC
             DataRequest<TResponse> request,
             DataRequestContext context,
             DataRequestHandlerDelegate<TResponse> next,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken) =>
             ValueTask.FromResult(DataResult<TResponse>.Failed(
                 new DataError(DataErrorKind.PluginUnavailable, "Data contribution is no longer active.")));
     }
@@ -634,7 +634,7 @@ public sealed class DataContributionLease : IAsyncDisposable
             DataRequest<TResponse> request,
             DataRequestContext context,
             DataRequestHandlerDelegate<TResponse> next,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             if (_rejected || _contributionCancellation.IsCancellationRequested)
             {

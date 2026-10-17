@@ -264,7 +264,7 @@ public sealed class ModuleTestHostTests
 
         public override ValueTask OnApplicationInitializationAsync(
             ApplicationInitializationContext context,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             ObservedToken = cancellationToken;
             cancellationToken.ThrowIfCancellationRequested();

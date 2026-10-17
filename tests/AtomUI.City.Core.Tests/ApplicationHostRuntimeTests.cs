@@ -68,7 +68,7 @@ public sealed class ApplicationHostRuntimeTests
             services.AddSingleton<IHostedService>(provider => provider.GetRequiredService<RuntimeProbe>());
         });
         builder.ConfigureLifecycle(lifecycle =>
-            lifecycle.Use(LifecycleStages.ApplicationStop, async (_, next) =>
+            lifecycle.Use(LifecycleStages.ApplicationStop, async (_, next, _) =>
             {
                 Interlocked.Increment(ref stopMiddlewareCount);
                 await next();
@@ -152,7 +152,7 @@ public sealed class ApplicationHostRuntimeTests
         builder.ConfigureLifecycle(lifecycle =>
             lifecycle.Use<FireAndForgetStartMiddleware>(
                 LifecycleStages.ApplicationStart,
-                static (context, next) =>
+                static (context, next, cancellationToken) =>
                 {
                     _ = next();
                     return ValueTask.CompletedTask;

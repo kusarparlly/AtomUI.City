@@ -87,7 +87,7 @@ public sealed class RemoteOperationsViewModel : ViewModelBase
         var result = await _operations.GetProductAsync(
             sku,
             _requestScope,
-            cancellationToken: LinkCancellation(cancellationToken)).ConfigureAwait(false);
+            cancellationToken: cancellationToken).ConfigureAwait(false);
         if (result.Succeeded)
         {
             await _eventBus.PublishAsync(new RemoteProductLoaded(result.Value!), cancellationToken: cancellationToken)
@@ -118,7 +118,7 @@ public sealed class RemoteOperationsViewModel : ViewModelBase
             new StressSubmitOrderRequest(sku, quantity, Guid.NewGuid().ToString("N")),
             optimistic,
             _requestScope,
-            LinkCancellation(cancellationToken)).ConfigureAwait(false);
+            cancellationToken).ConfigureAwait(false);
         if (result.Succeeded)
         {
             await _eventBus.PublishAsync(new RemoteOrderSubmitted(result.Value!), cancellationToken: cancellationToken)
@@ -149,7 +149,7 @@ public sealed class RemoteOperationsViewModel : ViewModelBase
             new StressSearchRequest(term, delayMilliseconds),
             DataConcurrencyPolicy.LatestWins,
             _requestScope,
-            LinkCancellation(cancellationToken)).ConfigureAwait(false);
+            cancellationToken).ConfigureAwait(false);
         if (result.Succeeded)
         {
             Message = result.Value!;
@@ -163,7 +163,9 @@ public sealed class RemoteOperationsViewModel : ViewModelBase
         return result;
     }
 
-    protected override ValueTask OnActivatedAsync(ActivationContext context)
+    protected override ValueTask OnActivatedAsync(
+        ActivationContext context,
+        CancellationToken cancellationToken)
     {
         _requestScope = _eventOwnerRoot.CreateChild(LifecycleScopeKind.Operation, "remote-operations-requests");
         context.Scope.Add(_requestScope);
@@ -172,20 +174,10 @@ public sealed class RemoteOperationsViewModel : ViewModelBase
         return ValueTask.CompletedTask;
     }
 
-    protected override ValueTask OnDeactivatedAsync()
+    protected override ValueTask OnDeactivatedAsync(CancellationToken cancellationToken)
     {
         _requestScope = null;
         return ValueTask.CompletedTask;
-    }
-
-    private CancellationToken LinkCancellation(CancellationToken cancellationToken)
-    {
-        if (_requestScope is null)
-        {
-            throw new InvalidOperationException("RemoteOperationsViewModel must be activated before data commands execute.");
-        }
-
-        return cancellationToken.CanBeCanceled ? cancellationToken : _requestScope.CancellationToken;
     }
 
     private async Task PublishFailureAsync(

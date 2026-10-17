@@ -40,8 +40,8 @@
 | ViewModelBase.SetProperty | 更新属性并触发通知。 | propertyName 必须稳定且非空白，比较器可选。 | bool 表示是否变化。 | Dispose 后抛 `ObjectDisposedException`；空白 propertyName 抛 `ArgumentException`。 | 同步 API 无 token。 | 相等值不重复通知；调用线程发布通知，UI marshal 由 Presentation 负责。 |
 | Interaction<TRequest, TResult>.RegisterHandler | 注册 Interaction handler。 | handler 不得为 null；activationScope 可选。 | IDisposable（随 ActivationScope 释放或手动解除）。 | handler 为 null 抛 `ArgumentNullException`；scope 已释放时立即释放 handler。 | handler 持 activationScope token，停用时取消。 | 多 handler 时最后注册者优先（last-wins）；释放后不再接收请求。 |
 | ViewModelBase.Dispose | 释放 ViewModel 生命周期资源。 | 无。 | void。 | 重复 Dispose 幂等；释放当前 ActivationScope。 | 同步 API 无 token。 | 进入 Disposed 终态，后续 mutation 被拒绝；**不执行 Deactivating/OnDeactivatedAsync 钩子**——需要停用语义时先调 DeactivateAsync 再 Dispose。 |
-| ViewModelBase.ActivateAsync | 激活 ViewModel。 | ActivationContext 不得为 null；scope 不得为 null。 | ValueTask。 | 激活异常不进入 Active，释放 ActivationScope，并在 exception data 写入 ViewModel type、scope id 和 stage。 | 必须观察 token；预取消释放候选 scope 后抛 `OperationCanceledException`。 | Active 状态下重复 Activate 幂等返回。 |
-| ViewModelBase.DeactivateAsync | 停用 ViewModel。 | CancellationToken 可选。 | ValueTask。 | 取消在进入 Deactivating 前抛出并保持 Active scope；已进入停用后释放当前 scope；Disposed 后调用抛 `ObjectDisposedException`。 | 必须观察 token。 | Constructed、Deactivated 或 Deactivating 状态下幂等返回。 |
+| ViewModelBase.ActivateAsync | 激活 ViewModel。 | ActivationContext 不得为 null；scope 不得为 null；调用方 token 可选。 | ValueTask。 | 激活异常不进入 Active，释放 ActivationScope，并在 exception data 写入 ViewModel type、scope id 和 stage。 | 调用方 token 与 ActivationScope token 由基类合成为唯一有效令牌；预取消释放候选 scope 后抛 `OperationCanceledException`。 | Active 状态下重复 Activate 幂等返回。 |
+| ViewModelBase.DeactivateAsync | 停用 ViewModel。 | CancellationToken 可选。 | ValueTask。 | 取消在进入 Deactivating 前抛出并保持 Active scope；已进入停用后释放当前 scope；Disposed 后调用抛 `ObjectDisposedException`。 | 调用方 token 与当前 ActivationScope token 合成后传给唯一停用钩子。 | Constructed、Deactivated 或 Deactivating 状态下幂等返回。 |
 | DeactivationGuard.CanDeactivateAsync | 离开前确认。 | viewModel 不得为 null；可实现 ICanDeactivate 或 IConfirmDeactivate。 | DeactivationResult。 | 拒绝返回 Reject；取消返回 Cancel；异常映射 Failed，不抛业务异常。 | 预取消跳过 viewModel 并返回 Cancel。 | 先执行 ICanDeactivate，Allow 后再执行 IConfirmDeactivate。 |
 | CommandFactory.Create | 创建同步命令。 | execute 不得为 null；canExecute 和 state 可选。 | IRelayCommand。 | execute 异常写入 `OperationExecutionResult` Failed 后重抛原异常。 | 同步 API 无 token。 | 写入 CommandExecutionState；CanExecuteChanged 可通知 Presentation。 |
 | CommandFactory.CreateAsync | 创建异步命令。 | execute 不得为 null；state、activation owner/fixed scope、并发策略、异常 handler 和 notification dispatcher 按重载可选。 | IAsyncRelayCommand / IAsyncRelayCommand<T>。 | 直接 await 写入 Failed 后重抛原异常；`ICommand.Execute` 提交应用 handler；并发冲突映射 Rejected；通知调度失败记录 `AUCMVVM014`。 | 命令 token 必须传递到 execute，并链接当前 ActivationScope token；UI 可观察通知经配置的 dispatcher 投递。 | 默认 Reject；可选 Allow/RejectByKey；owner 重载每次执行解析当前 Scope；dispatcher 不改变业务执行线程。 |
@@ -92,6 +92,8 @@
 
 ## Cancellation 合同
 
+- `IActivatable`、`ViewModelBase` 和 protected activation hooks 不保留 tokenless/tokenful 双入口；开发者只实现或覆盖一个带末尾 token 的方法。
+- Scope token 是框架所有权信号，不要求业务代码额外读取；回调只向下传递收到的有效令牌。
 - 接收 `CancellationToken` 的 API 必须在 IO、子进程、网络、dispatcher work、插件代码、handler 调用前后观察取消。
 - 取消后不得提交状态、缓存、事件、UI 或 manifest 输出。
 - 取消结果必须稳定：返回 Cancelled Result 或抛 `OperationCanceledException`，不能混用成功结果。

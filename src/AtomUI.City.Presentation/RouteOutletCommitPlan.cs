@@ -15,7 +15,6 @@ public sealed class RouteOutletCommitPlan
         ViewModelLease? viewModelLease,
         string? routeId,
         string? reuseKey,
-        CancellationToken lifecycleToken,
         bool leaveApproved)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(outletName);
@@ -26,7 +25,6 @@ public sealed class RouteOutletCommitPlan
         ViewModelLease = viewModelLease;
         RouteId = string.IsNullOrWhiteSpace(routeId) ? null : routeId;
         ReuseKey = string.IsNullOrWhiteSpace(reuseKey) ? null : reuseKey;
-        LifecycleToken = lifecycleToken;
         LeaveApproved = leaveApproved;
     }
 
@@ -59,11 +57,6 @@ public sealed class RouteOutletCommitPlan
     /// Gets reuse key.
     /// </summary>
     public string? ReuseKey { get; }
-
-    /// <summary>
-    /// Gets lifecycle token.
-    /// </summary>
-    public CancellationToken LifecycleToken { get; }
 
     internal bool LeaveApproved { get; }
 
@@ -148,8 +141,7 @@ public sealed class RouteOutletCommitPlan
         BoundViewHandle handle,
         ViewModelLease? viewModelLease = null,
         string? routeId = null,
-        string? reuseKey = null,
-        CancellationToken lifecycleToken = default)
+        string? reuseKey = null)
     {
         ArgumentNullException.ThrowIfNull(handle);
 
@@ -160,7 +152,6 @@ public sealed class RouteOutletCommitPlan
             viewModelLease,
             routeId,
             reuseKey,
-            lifecycleToken,
             leaveApproved: false);
     }
 
@@ -176,11 +167,10 @@ public sealed class RouteOutletCommitPlan
             viewModelLease: null,
             routeId: null,
             reuseKey: null,
-            lifecycleToken: default,
             leaveApproved: false);
     }
 
-    internal static RouteOutletCommitPlan ClearApproved(string outletName, CancellationToken lifecycleToken)
+    internal static RouteOutletCommitPlan ClearApproved(string outletName)
     {
         return new RouteOutletCommitPlan(
             outletName,
@@ -189,7 +179,6 @@ public sealed class RouteOutletCommitPlan
             viewModelLease: null,
             routeId: null,
             reuseKey: null,
-            lifecycleToken,
             leaveApproved: true);
     }
 }

@@ -134,7 +134,7 @@ internal sealed class DogfoodContributionWorkload
             rollback.Push(() => eventLease.StopAsync());
             await using var eventSubscription = eventLease.Subscriber.Subscribe<NavigationCommitted>(
                 EventPluginPlane.Shared,
-                _ => ValueTask.CompletedTask);
+                (_, _) => ValueTask.CompletedTask);
             Inject(failureStage, stage++);
 
             var routeId = $"seasonal.route.{cycle:000}";

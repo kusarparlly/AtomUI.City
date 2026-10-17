@@ -109,7 +109,7 @@ public sealed class DataRequestHandlerTests
             DataRequest<TResponse> request,
             DataRequestContext context,
             DataRequestHandlerDelegate<TResponse> next,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             calls.Add($"{name}:before");
             var result = await next(cancellationToken);
@@ -126,7 +126,7 @@ public sealed class DataRequestHandlerTests
             DataRequest<TResponse> request,
             DataRequestContext context,
             DataRequestHandlerDelegate<TResponse> next,
-            CancellationToken cancellationToken = default) =>
+            CancellationToken cancellationToken) =>
             ValueTask.FromResult(DataResult<TResponse>.Failed(
                 new DataError(DataErrorKind.PolicyRejected, "rejected")));
     }
@@ -151,7 +151,7 @@ public sealed class DataRequestHandlerTests
             DataRequest<TResponse> request,
             DataRequestContext context,
             DataRequestHandlerDelegate<TResponse> next,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             _ = await next(cancellationToken);
             return await next(cancellationToken);

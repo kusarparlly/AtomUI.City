@@ -17,7 +17,7 @@
 - 删除、重命名、改变默认行为、异常类型、Result status 或诊断码语义属于 breaking change。
 - 新增 API 可以 minor 版本发布，但必须有文档、测试和迁移说明。
 - `ViewModelBase` 实现 `IDisposable`、`IsDisposed`、`SetProperty` 释放后拒绝和 `OnDisposed` 继承钩子；这些行为进入 1.0 兼容承诺。
-- `ActivationScope.Id`、`ActivationScope.IsDisposed`、`IActivatable` cancellation overload、`DeactivationGuard` 执行顺序和 `DeactivationStatus.Failed` 进入 1.0 兼容承诺。
+- `ActivationScope.Id`、`ActivationScope.IsDisposed`、`IActivatable` 单一 cancellation 入口、`DeactivationGuard` 执行顺序和 `DeactivationStatus.Failed` 进入 1.0 兼容承诺。Preview 阶段已移除 tokenless activation/deactivation overload；调用方 token 与 Scope token 由框架合成。
 - `CommandExecutionState` 的 command name、owner type、active/rejected execution 统计、`OperationExecutionResult.OperationId` 和 `OperationStatus.Rejected` 进入 1.0 兼容承诺。
 - `OperationScope` 的 `IDisposable`、`Status`、`Result`、`Error`、`Elapsed`、`IsDisposed`、`OperationStatus.Running`、首次终态胜出和取消先提交状态再通知 token callback 进入 1.0 兼容承诺。
 - `InteractionContext` 的 request id、request type、activation scope id、handler type，以及 Interaction 取消后不提交 handler result 的行为进入 1.0 兼容承诺。

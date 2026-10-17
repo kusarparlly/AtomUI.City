@@ -390,7 +390,6 @@ AtomUI.City.Data.DataRequest<TResponse>.TransportKind.get -> AtomUI.City.Data.Da
 AtomUI.City.Data.DataRequestContext
 AtomUI.City.Data.DataRequestContext.AccessMode.get -> AtomUI.City.Data.DataAccessMode
 AtomUI.City.Data.DataRequestContext.Attempt.get -> int
-AtomUI.City.Data.DataRequestContext.CancellationToken.get -> System.Threading.CancellationToken
 AtomUI.City.Data.DataRequestContext.ClientId.get -> string!
 AtomUI.City.Data.DataRequestContext.CorrelationId.get -> string!
 AtomUI.City.Data.DataRequestContext.Credential.get -> AtomUI.City.Data.DataCredential?
@@ -637,7 +636,7 @@ AtomUI.City.Data.IDataRequestCache.InvalidateAsync(AtomUI.City.Data.DataCacheKey
 AtomUI.City.Data.IDataRequestCache.SetAsync<TResponse>(AtomUI.City.Data.DataCacheKey! key, TResponse? value, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
 AtomUI.City.Data.IDataRequestCache.TryGetAsync<TResponse>(AtomUI.City.Data.DataCacheKey! key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataCacheLookup<TResponse>!>
 AtomUI.City.Data.IDataRequestHandler
-AtomUI.City.Data.IDataRequestHandler.InvokeAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataRequestContext! context, AtomUI.City.Data.DataRequestHandlerDelegate<TResponse>! next, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.IDataRequestHandler.InvokeAsync<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, AtomUI.City.Data.DataRequestContext! context, AtomUI.City.Data.DataRequestHandlerDelegate<TResponse>! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
 AtomUI.City.Data.IDataRequestHandler.Order.get -> int
 AtomUI.City.Data.IDataRequestHandlerSource
 AtomUI.City.Data.IDataRequestHandlerSource.GetHandlers<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request) -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Data.IDataRequestHandler!>!
@@ -654,7 +653,7 @@ AtomUI.City.Data.IDataSubscription.Owner.get -> AtomUI.City.Data.DataConnectionO
 AtomUI.City.Data.IDataSubscription.RevokeAsync() -> System.Threading.Tasks.ValueTask
 AtomUI.City.Data.IDataSubscription.SubscriptionId.get -> System.Guid
 AtomUI.City.Data.IGrpcClientStream<TRequest, TResponse>
-AtomUI.City.Data.IGrpcClientStream<TRequest, TResponse>.CompleteAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
+AtomUI.City.Data.IGrpcClientStream<TRequest, TResponse>.CompleteAsync(System.Threading.CancellationToken waitCancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
 AtomUI.City.Data.IGrpcClientStream<TRequest, TResponse>.WriteAsync(TRequest message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
 AtomUI.City.Data.IGrpcDuplexStream<TRequest, TResponse>
 AtomUI.City.Data.IGrpcDuplexStream<TRequest, TResponse>.CompleteRequestAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
@@ -798,7 +797,7 @@ override AtomUI.City.Data.DataError.Equals(object? obj) -> bool
 override AtomUI.City.Data.DataError.GetHashCode() -> int
 override AtomUI.City.Data.DataError.ToString() -> string!
 override AtomUI.City.Data.DataModule.ConfigureServices(AtomUI.City.Core.Modularity.ServiceConfigurationContext! context) -> void
-override AtomUI.City.Data.DataModule.OnApplicationShutdownAsync(AtomUI.City.Core.Modularity.ApplicationShutdownContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+override AtomUI.City.Data.DataModule.OnApplicationShutdownAsync(AtomUI.City.Core.Modularity.ApplicationShutdownContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 override AtomUI.City.Data.DataTransferProgress.Equals(object? obj) -> bool
 override AtomUI.City.Data.DataTransferProgress.GetHashCode() -> int
 override AtomUI.City.Data.DataTransferProgress.ToString() -> string!
@@ -852,7 +851,7 @@ static AtomUI.City.Data.DataErrorMapper.FromHttpStatusCode(System.Net.HttpStatus
 static AtomUI.City.Data.DataFallbackResult<TResponse>.FromResult(AtomUI.City.Data.DataResult<TResponse>! result) -> AtomUI.City.Data.DataFallbackResult<TResponse>!
 static AtomUI.City.Data.DataFallbackResult<TResponse>.None() -> AtomUI.City.Data.DataFallbackResult<TResponse>!
 static AtomUI.City.Data.DataRateLimitOptions.Disabled.get -> AtomUI.City.Data.DataRateLimitOptions!
-static AtomUI.City.Data.DataRequestContext.Create<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken) -> AtomUI.City.Data.DataRequestContext!
+static AtomUI.City.Data.DataRequestContext.Create<TResponse>(AtomUI.City.Data.DataRequest<TResponse>! request) -> AtomUI.City.Data.DataRequestContext!
 static AtomUI.City.Data.DataRequestOrigin.Host.get -> AtomUI.City.Data.DataRequestOrigin!
 static AtomUI.City.Data.DataResilienceOptions.None.get -> AtomUI.City.Data.DataResilienceOptions!
 static AtomUI.City.Data.DataResult<T>.Cancelled(string? message = null) -> AtomUI.City.Data.DataResult<T>!

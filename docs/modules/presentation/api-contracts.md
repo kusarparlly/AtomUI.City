@@ -28,7 +28,7 @@ public 类型最终命名需要在实现提交的 API review 中冻结，行为�
 | `IPresentationRuntime.Attach` | Host 已启动、Avalonia 已初始化、UI lifetime 非空；创建 PresentationScope；同一 lifetime 重复调用幂等，换 lifetime 失败。 |
 | `IPresentationRuntime.RegisterWindow` | Runtime Ready、UI 线程、Window 尚未 Show 且未重复注册；返回唯一 WindowSession。 |
 | `IPresentationRuntime.StartAsync/CreateWindowScope` | headless/test/compatibility 低级入口，不附加 Avalonia lifetime，不替代桌面主路径。 |
-| `IPresentationRuntime.StopAsync` | 并发调用共享同一事务；caller token 只取消等待；尝试清理全部 Window 和 PresentationScope；聚合失败后 Runtime Faulted。 |
+| `IPresentationRuntime.StopAsync` | 并发调用共享同一事务；`waitCancellationToken` 只取消等待；尝试清理全部 Window 和 PresentationScope；聚合失败后 Runtime Faulted。 |
 
 ## View 和 ViewModel
 
@@ -45,8 +45,8 @@ public 类型最终命名需要在实现提交的 API review 中冻结，行为�
 
 | API | 合同 |
 | --- | --- |
-| `RouteOutletCommitPlan.Replace/Clear` | plan 单次使用；Replace 必须带 handle；lifecycle token 控制最终提交前事务。 |
-| `IRouteOutlet.CommitAsync` | 可从任意线程调用；admission 立即转移候选 ownership；同 Outlet FIFO；caller token 入队后只取消等待。 |
+| `RouteOutletCommitPlan.Replace/Clear` | plan 单次使用；Replace 必须带 handle；plan 只描述候选资源与路由 metadata，不保存 token。 |
+| `IRouteOutlet.CommitAsync` | 可从任意线程调用；admission 立即转移候选 ownership；同 Outlet FIFO；调用方 token 与可选 Window Scope token 在边界合成为唯一有效令牌。取消会在 final commit 前停止事务，并在回滚、候选释放完成后报告。 |
 | `IRouteOutlet.QueueSnapshot` | 返回 capacity、pending、in-flight、peak pending、rejected count 的一致快照。 |
 | `PresentationEntry.DisposeAsync` | 幂等；deactivate、ActivationScope、UI 解绑、ViewModelLease 均尝试执行；聚合失败；最后释放 plan ownership。 |
 | `IRouteOutletTarget` | 物理 content target；Avalonia 实现的读写必须在 UI dispatcher。 |

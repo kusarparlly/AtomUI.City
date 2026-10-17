@@ -34,7 +34,7 @@ public abstract class ModuleBase : IModule
     /// </summary>
     public virtual ValueTask ConfigureContributionsAsync(
         ContributionConfigurationContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
         cancellationToken.ThrowIfCancellationRequested();
@@ -56,7 +56,7 @@ public abstract class ModuleBase : IModule
     /// </summary>
     public virtual ValueTask OnPreApplicationInitializationAsync(
         ApplicationInitializationContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
         cancellationToken.ThrowIfCancellationRequested();
@@ -78,7 +78,7 @@ public abstract class ModuleBase : IModule
     /// </summary>
     public virtual ValueTask OnApplicationInitializationAsync(
         ApplicationInitializationContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
         cancellationToken.ThrowIfCancellationRequested();
@@ -100,7 +100,7 @@ public abstract class ModuleBase : IModule
     /// </summary>
     public virtual ValueTask OnPostApplicationInitializationAsync(
         ApplicationInitializationContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
         cancellationToken.ThrowIfCancellationRequested();
@@ -122,7 +122,7 @@ public abstract class ModuleBase : IModule
     /// </summary>
     public virtual ValueTask OnApplicationShutdownAsync(
         ApplicationShutdownContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
         cancellationToken.ThrowIfCancellationRequested();

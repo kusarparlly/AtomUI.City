@@ -29,7 +29,7 @@ internal sealed class DataRuntimeGate : IDisposable
         }
     }
 
-    public ValueTask StopAsync(CancellationToken cancellationToken = default)
+    public ValueTask StopAsync(CancellationToken waitCancellationToken = default)
     {
         Task stopTask;
         TaskCompletionSource? completion = null;
@@ -50,7 +50,7 @@ internal sealed class DataRuntimeGate : IDisposable
             _ = CompleteStopAsync(completion);
         }
 
-        return new ValueTask(stopTask.WaitAsync(cancellationToken));
+        return new ValueTask(stopTask.WaitAsync(waitCancellationToken));
     }
 
     public void Dispose()

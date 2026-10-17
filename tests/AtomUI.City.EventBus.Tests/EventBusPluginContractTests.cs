@@ -25,7 +25,7 @@ public sealed class EventBusPluginContractTests
         await using var subscription = lease.Subscriber.Subscribe<SharedPluginEvent>(
             EventPluginPlane.Shared,
             new EventChannel<SharedPluginEvent>("plugin"),
-            context => { received = context.Event.Value; return ValueTask.CompletedTask; });
+            (context, _) => { received = context.Event.Value; return ValueTask.CompletedTask; });
 
         var result = await lease.Publisher.PublishAsync(
             EventPluginPlane.Shared,
@@ -38,7 +38,9 @@ public sealed class EventBusPluginContractTests
         await Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
             await lease.Publisher.PublishAsync(EventPluginPlane.Shared, new SharedPluginEvent(1)));
         Assert.Throws<UnauthorizedAccessException>(() =>
-            lease.Subscriber.Subscribe<OtherPluginEvent>(EventPluginPlane.Shared, _ => ValueTask.CompletedTask));
+            lease.Subscriber.Subscribe<OtherPluginEvent>(
+                EventPluginPlane.Shared,
+                (_, _) => ValueTask.CompletedTask));
         var rejections = host.Services.GetRequiredService<IHostDiagnostics>().Records
             .Where(record => record.Code == EventDiagnosticIds.PluginContributionRejected).ToArray();
         Assert.Equal(2, rejections.Length);
@@ -103,14 +105,16 @@ public sealed class EventBusPluginContractTests
         _ = lease.Subscriber.Subscribe<SharedPluginEvent>(
             EventPluginPlane.Shared,
             new EventChannel<SharedPluginEvent>("plugin"),
-            _ => ValueTask.CompletedTask);
+            (_, _) => ValueTask.CompletedTask);
 
         await lease.StopAsync();
 
         Assert.Equal(EventBusContributionState.Disposed, lease.State);
         Assert.Equal(0, host.Services.GetRequiredService<IEventBusMonitor>().GetSnapshot().ActiveSubscriptionCount);
         Assert.Throws<ObjectDisposedException>(() =>
-            lease.Subscriber.Subscribe<SharedPluginEvent>(EventPluginPlane.Shared, _ => ValueTask.CompletedTask));
+            lease.Subscriber.Subscribe<SharedPluginEvent>(
+                EventPluginPlane.Shared,
+                (_, _) => ValueTask.CompletedTask));
         await using var replacement = await controller.CreateAsync(request);
         Assert.Equal(EventBusContributionState.Active, replacement.State);
     }
@@ -142,7 +146,7 @@ public sealed class EventBusPluginContractTests
         _ = lease.Subscriber.Subscribe<SharedPluginEvent>(
             EventPluginPlane.Shared,
             new EventChannel<SharedPluginEvent>("plugin"),
-            async _ => { entered.TrySetResult(); await release.Task.ConfigureAwait(false); });
+            async (_, _) => { entered.TrySetResult(); await release.Task.ConfigureAwait(false); });
         var publication = lease.Publisher.PublishAsync(
             EventPluginPlane.Shared,
             new EventChannel<SharedPluginEvent>("plugin"),
@@ -179,7 +183,7 @@ public sealed class EventBusPluginContractTests
         _ = lease.Subscriber.Subscribe<SharedPluginEvent>(
             EventPluginPlane.Shared,
             new EventChannel<SharedPluginEvent>("plugin"),
-            async _ =>
+            async (_, cancellationToken) =>
             {
                 entered.TrySetResult();
                 await release.Task.ConfigureAwait(false);
@@ -238,7 +242,7 @@ public sealed class EventBusPluginContractTests
         await using var applicationSubscription = host.Services.GetRequiredService<IEventSubscriber>().Subscribe<SharedPluginEvent>(
             host.ApplicationScope!,
             new EventChannel<SharedPluginEvent>("plugin"),
-            async _ =>
+            async (_, cancellationToken) =>
             {
                 entered.TrySetResult();
                 await release.Task.ConfigureAwait(false);
@@ -286,7 +290,7 @@ public sealed class EventBusPluginContractTests
         _ = lease.Subscriber.Subscribe<SharedPluginEvent>(
             EventPluginPlane.Shared,
             new EventChannel<SharedPluginEvent>("plugin"),
-            async _ =>
+            async (_, cancellationToken) =>
             {
                 entered.TrySetResult();
                 await release.Task.ConfigureAwait(false);
@@ -435,7 +439,7 @@ public sealed class EventBusPluginContractTests
         Assert.Throws<ObjectDisposedException>(() => lease.Subscriber.Subscribe<SharedPluginEvent>(
             EventPluginPlane.Shared,
             new EventChannel<SharedPluginEvent>("plugin"),
-            _ => ValueTask.CompletedTask));
+            (_, _) => ValueTask.CompletedTask));
         Assert.NotNull(reentrantStop);
         await reentrantStop;
 
@@ -468,7 +472,7 @@ public sealed class EventBusPluginContractTests
                     return lease.Subscriber.Subscribe<SharedPluginEvent>(
                         EventPluginPlane.Shared,
                         new EventChannel<SharedPluginEvent>("plugin"),
-                        _ => ValueTask.CompletedTask);
+                        (_, _) => ValueTask.CompletedTask);
                 }
                 catch (ObjectDisposedException)
                 {
@@ -519,7 +523,7 @@ public sealed class EventBusPluginContractTests
         var subscribe = Task.Run(() => lease.Subscriber.Subscribe<SharedPluginEvent>(
             EventPluginPlane.Shared,
             new EventChannel<SharedPluginEvent>("plugin"),
-            _ => ValueTask.CompletedTask));
+            (_, _) => ValueTask.CompletedTask));
         await callbackEntered.Task.WaitAsync(TimeSpan.FromSeconds(2));
 
         EventPluginDrainTimeoutException exception;

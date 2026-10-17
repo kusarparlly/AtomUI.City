@@ -361,7 +361,9 @@ public sealed class EventBusRegistrationTests
 
     private sealed class GeneratedHandler : IEventHandler<RegisteredEvent>
     {
-        public ValueTask HandleAsync(EventContext<RegisteredEvent> context) => ValueTask.CompletedTask;
+        public ValueTask HandleAsync(
+            EventContext<RegisteredEvent> context,
+            CancellationToken cancellationToken) => ValueTask.CompletedTask;
     }
 
     private sealed record TestApplicationContext : IApplicationContext

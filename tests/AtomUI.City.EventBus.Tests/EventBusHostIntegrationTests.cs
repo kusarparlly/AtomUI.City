@@ -49,7 +49,7 @@ public sealed class EventBusHostIntegrationTests
         var received = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
         await using var subscription = subscriber.Subscribe<HostEvent>(
             host.ApplicationScope,
-            context =>
+            (context, cancellationToken) =>
             {
                 received.TrySetResult(context.Event.Value);
                 return ValueTask.CompletedTask;
@@ -224,7 +224,7 @@ public sealed class EventBusHostIntegrationTests
             .GetRequiredService<IEventSubscriber>()
             .Subscribe<HostEvent>(
                 host.ApplicationScope!,
-                async _ =>
+                async (_, cancellationToken) =>
                 {
                     handlerEntered.TrySetResult();
                     await releaseHandler.Task.ConfigureAwait(false);
@@ -293,7 +293,9 @@ public sealed class EventBusHostIntegrationTests
 
         public static int ActivationCount => Volatile.Read(ref _activationCount);
 
-        public ValueTask HandleAsync(EventContext<MissingGeneratedContractEvent> context) => ValueTask.CompletedTask;
+        public ValueTask HandleAsync(
+            EventContext<MissingGeneratedContractEvent> context,
+            CancellationToken cancellationToken) => ValueTask.CompletedTask;
     }
 
     [DependsOn(typeof(EventBusModule))]
@@ -321,7 +323,9 @@ public sealed class EventBusHostIntegrationTests
 
         public static void Reset() => Volatile.Write(ref _lastValue, 0);
 
-        public ValueTask HandleAsync(EventContext<HostEvent> context)
+        public ValueTask HandleAsync(
+            EventContext<HostEvent> context,
+            CancellationToken cancellationToken)
         {
             Volatile.Write(ref _lastValue, context.Event.Value);
             return ValueTask.CompletedTask;
@@ -339,7 +343,7 @@ public sealed class EventBusHostIntegrationTests
 
         public override async ValueTask OnPreApplicationInitializationAsync(
             ApplicationInitializationContext context,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             var result = await context.Services
                 .GetRequiredService<IEventPublisher>()
@@ -357,7 +361,7 @@ public sealed class EventBusHostIntegrationTests
     {
         public override ValueTask OnPreApplicationInitializationAsync(
             ApplicationInitializationContext context,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             throw new InvalidOperationException("dependent module startup failed");
         }

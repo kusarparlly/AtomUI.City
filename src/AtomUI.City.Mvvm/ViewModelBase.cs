@@ -77,15 +77,9 @@ public abstract class ViewModelBase :
     /// <summary>
     /// Executes the activate async operation.
     /// </summary>
-    public async ValueTask ActivateAsync(IActivationScope scope)
-    {
-        await ActivateAsync(scope, CancellationToken.None).ConfigureAwait(false);
-    }
-
-    /// <summary>
-    /// Executes the activate async operation.
-    /// </summary>
-    public async ValueTask ActivateAsync(IActivationScope scope, CancellationToken cancellationToken)
+    public async ValueTask ActivateAsync(
+        IActivationScope scope,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(scope);
 
@@ -95,15 +89,9 @@ public abstract class ViewModelBase :
     /// <summary>
     /// Executes the activate async operation.
     /// </summary>
-    public async ValueTask ActivateAsync(ActivationContext context)
-    {
-        await ActivateAsync(context, CancellationToken.None).ConfigureAwait(false);
-    }
-
-    /// <summary>
-    /// Executes the activate async operation.
-    /// </summary>
-    public async ValueTask ActivateAsync(ActivationContext context, CancellationToken cancellationToken)
+    public async ValueTask ActivateAsync(
+        ActivationContext context,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -127,19 +115,23 @@ public abstract class ViewModelBase :
         }
         OnActivationStateChanged();
 
+        using var effectiveCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+            cancellationToken,
+            context.Scope.CancellationToken);
+        var effectiveCancellationToken = effectiveCancellation.Token;
+
         try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            context.Scope.CancellationToken.ThrowIfCancellationRequested();
+            effectiveCancellationToken.ThrowIfCancellationRequested();
 
-            await OnActivatedAsync(context, cancellationToken).ConfigureAwait(false);
+            await OnActivatedAsync(context, effectiveCancellationToken).ConfigureAwait(false);
 
-            cancellationToken.ThrowIfCancellationRequested();
+            effectiveCancellationToken.ThrowIfCancellationRequested();
 
             lock (_stateSyncRoot)
             {
                 ThrowIfDisposed();
-                context.Scope.CancellationToken.ThrowIfCancellationRequested();
+                effectiveCancellationToken.ThrowIfCancellationRequested();
                 _activationState = ActivationState.Active;
             }
             OnActivationStateChanged();
@@ -161,16 +153,10 @@ public abstract class ViewModelBase :
     /// <summary>
     /// Executes the deactivate async operation.
     /// </summary>
-    public async ValueTask DeactivateAsync()
+    public async ValueTask DeactivateAsync(CancellationToken cancellationToken = default)
     {
-        await DeactivateAsync(CancellationToken.None).ConfigureAwait(false);
-    }
+        IActivationScope? scope;
 
-    /// <summary>
-    /// Executes the deactivate async operation.
-    /// </summary>
-    public async ValueTask DeactivateAsync(CancellationToken cancellationToken)
-    {
         lock (_stateSyncRoot)
         {
             ThrowIfDisposed();
@@ -190,12 +176,19 @@ public abstract class ViewModelBase :
 
             cancellationToken.ThrowIfCancellationRequested();
             _activationState = ActivationState.Deactivating;
+            scope = ActivationContext?.Scope;
         }
         OnActivationStateChanged();
 
+        using var effectiveCancellation = scope is null
+            ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken)
+            : CancellationTokenSource.CreateLinkedTokenSource(
+                cancellationToken,
+                scope.CancellationToken);
+
         try
         {
-            await OnDeactivatedAsync(cancellationToken).ConfigureAwait(false);
+            await OnDeactivatedAsync(effectiveCancellation.Token).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -204,7 +197,6 @@ public abstract class ViewModelBase :
         }
         finally
         {
-            var scope = ActivationContext?.Scope;
             try
             {
                 if (scope is not null)
@@ -360,30 +352,15 @@ public abstract class ViewModelBase :
     }
 
     /// <summary>
-    /// Gets on activated async.
-    /// </summary>
-    protected virtual ValueTask OnActivatedAsync(ActivationContext context) => OnActivatedAsync(context.Scope);
-
-    /// <summary>
-    /// Executes the on activated async operation.
+    /// Runs activation with the framework-composed effective cancellation token.
     /// </summary>
     protected virtual ValueTask OnActivatedAsync(
         ActivationContext context,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return OnActivatedAsync(context);
+        return ValueTask.CompletedTask;
     }
-
-    /// <summary>
-    /// Gets on activated async.
-    /// </summary>
-    protected virtual ValueTask OnActivatedAsync(IActivationScope scope) => ValueTask.CompletedTask;
-
-    /// <summary>
-    /// Gets on deactivated async.
-    /// </summary>
-    protected virtual ValueTask OnDeactivatedAsync() => ValueTask.CompletedTask;
 
     /// <summary>
     /// Executes the on deactivated async operation.
@@ -391,7 +368,7 @@ public abstract class ViewModelBase :
     protected virtual ValueTask OnDeactivatedAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return OnDeactivatedAsync();
+        return ValueTask.CompletedTask;
     }
 
     /// <summary>

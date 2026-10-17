@@ -17,8 +17,7 @@ public sealed class EventContext<TEvent>
         DateTimeOffset publishedAt,
         int publishDepth,
         EventSubscriptionId subscriptionId,
-        EventDispatchPolicy dispatchPolicy,
-        CancellationToken cancellationToken)
+        EventDispatchPolicy dispatchPolicy)
     {
         ArgumentNullException.ThrowIfNull(eventData);
         EventContractId.ThrowIfDefault(contractId, nameof(contractId));
@@ -53,7 +52,6 @@ public sealed class EventContext<TEvent>
         PublishDepth = publishDepth;
         SubscriptionId = subscriptionId;
         DispatchPolicy = dispatchPolicy;
-        CancellationToken = cancellationToken;
     }
 
     /// <summary>
@@ -101,8 +99,4 @@ public sealed class EventContext<TEvent>
     /// </summary>
     public EventDispatchPolicy DispatchPolicy { get; }
 
-    /// <summary>
-    /// Gets a value indicating whether cancellation token.
-    /// </summary>
-    public CancellationToken CancellationToken { get; }
 }

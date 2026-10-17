@@ -89,7 +89,9 @@ public abstract class FixtureViewModelBase : ViewModelBase
         }
     }
 
-    protected override async ValueTask OnActivatedAsync(ActivationContext context)
+    protected override async ValueTask OnActivatedAsync(
+        ActivationContext context,
+        CancellationToken cancellationToken)
     {
         // State Reaction → ActivationScope（停用即释放）。
         context.Scope.Add(_state.Get(StateKey).OnChange(_ => Bump("state-reaction")));
@@ -100,7 +102,7 @@ public abstract class FixtureViewModelBase : ViewModelBase
 
         _eventBus.Subscribe<SettingsChanged>(
             coreScope,
-            _ =>
+            (_, _) =>
             {
                 Bump("event");
                 return ValueTask.CompletedTask;

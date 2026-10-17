@@ -23,7 +23,7 @@ public sealed class DataModule : ModuleBase
     /// </summary>
     public override async ValueTask OnApplicationShutdownAsync(
         ApplicationShutdownContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
 

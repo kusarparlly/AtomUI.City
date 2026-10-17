@@ -20,7 +20,7 @@ AtomUI.City.Data 的架构目标是把模块职责变成可实现、可测试、
 | 概念 | 职责 | 创建者 | 释放/失效规则 |
 | --- | --- | --- | --- |
 | DataRequest<TResponse> | 统一请求模型。 | 调用方 | 单次请求有效。 |
-| DataRequestContext | operationId、transport、client、attempt、cancellation。 | Pipeline | 单次请求有效。 |
+| DataRequestContext | operationId、transport、client、attempt、credential 和 operation metadata。 | Pipeline | 单次请求有效；不重复保存 token。 |
 | IDataRequestPipeline | 认证、缓存、传输、重试和错误映射。 | DI | 默认 pipeline 随 DI provider；`DataModule` shutdown 先关闭 runtime gate，再停止连接。 |
 | IRequestResponseTransport | HTTP/gRPC/SignalR 传输。 | DI 或 client registry | 随 DI 或 owner。 |
 | DataConnectionManager | 长连接注册、启动、停止。 | DI | `DataModule` 在 Host shutdown 调用 StopAll；普通 owner 显式 StopOwner/revoke，Plugin owner 由 contribution lease 自动撤销。 |

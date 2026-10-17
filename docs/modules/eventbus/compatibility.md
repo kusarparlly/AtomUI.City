@@ -21,7 +21,7 @@
 - `EventDeliveryResult` 成功结果的 error message 必须为 null；`EventPostResult` accepted 结果的 rejection reason 必须为 null，rejected 结果必须携带非空白 rejection reason。
 - `EventDeliveryResult.Duration`、`EventBusMetricsSnapshot`、`IEventBusMonitor`、`EventBusDiagnosticsOptions` 和安全 payload projector 合同进入 1.0 公开 API 基线。
 - EventBus 默认 `InMemoryHostDiagnostics` 容量为 2048；应用预注册 sink 的 override 语义保持不变。
-- `IEventSubscriber.Subscribe` 只保留显式 `LifecycleScope` owner 的异步 delegate 和 `IEventHandler<TEvent>` 两种核心 handler 形式，并分别提供默认/命名 channel overload；同步 `Action<EventContext<TEvent>>` 由同样有 owner 的默认/命名 channel 扩展方法提供。
+- `IEventSubscriber.Subscribe` 只保留显式 `LifecycleScope` owner 的异步 delegate 和 `IEventHandler<TEvent>` 两种核心 handler 形式，并分别提供默认/命名 channel overload；两者都通过显式末尾 token 接收唯一有效令牌。同步 `Action<EventContext<TEvent>, CancellationToken>` 由同样有 owner 的默认/命名 channel 扩展方法提供。
 - 一条 subscription 只有一个 owner；owner running 原子校验、Quiescing barrier、唯一终止事务、StopAsync drain、owner cancellation 和 EventBus dispose 清理进入 1.0 兼容承诺。
 - `EventSubscriptionState` 的稳定值为 `Created=0`、`Active=1`、`Quiescing=2`、`Draining=3`、`Disposed=4`、`Faulted=5`；timeout 不形成独立永久状态。
 - `IEventContractRegistry` 的 shared-only 配置期注册、Default ALC 身份校验、冻结快照、精确 id/type 查询、重复 contract id/type 拒绝，以及冻结后未知 contract 拒绝进入 1.0 兼容承诺；DI 创建 EventBus 前必须汇入 collected descriptors、冻结并核验映射。
@@ -65,6 +65,7 @@ EventBus 尚未正式发布，下列第一版源码入口不进入 1.0 合同，
 
 - 所有 ownerless `Subscribe<TEvent>` overload。
 - `Subscribe<TEvent>(Func<TEvent, CancellationToken, ValueTask>)` 简化入口。
+- `EventContext<TEvent>.CancellationToken` 以及 tokenless handler/delegate 入口；迁移到显式末尾 `CancellationToken`。
 - 核心接口中的同步 `Action<EventContext<TEvent>>` overload；迁移到 `EventSubscriberExtensions.Subscribe` 并显式传入 owner。
 
 迁移规则：应用级静态/DI handler 由 generated registration 自动绑定 `ApplicationScope`；Window、Route、Activation 等动态订阅传入对应 `LifecycleScope`；插件 handler 通过 EventBus contribution contract 注册并由领域 Lease 持有。

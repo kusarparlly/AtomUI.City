@@ -10,7 +10,7 @@ public abstract class CountingHandler<TEvent>(IDogfoodLedger ledger, string name
 {
     protected IDogfoodLedger Ledger { get; } = ledger;
 
-    public virtual ValueTask HandleAsync(EventContext<TEvent> context)
+    public virtual ValueTask HandleAsync(EventContext<TEvent> context, CancellationToken cancellationToken)
     {
         Ledger.Record(name, GetBusinessId(context.Event));
         return ValueTask.CompletedTask;
@@ -42,10 +42,10 @@ public sealed class JobSubmissionMetricsHandler(IDogfoodLedger ledger) : Countin
 [EventHandler(typeof(JobsModule))]
 public sealed class JobAcceptedAuditHandler(IDogfoodLedger ledger, IAuditSink audit) : CountingHandler<JobAccepted>(ledger, nameof(JobAcceptedAuditHandler))
 {
-    public override ValueTask HandleAsync(EventContext<JobAccepted> context)
+    public override ValueTask HandleAsync(EventContext<JobAccepted> context, CancellationToken cancellationToken)
     {
         audit.Write(context.Event.JobId);
-        return base.HandleAsync(context);
+        return base.HandleAsync(context, cancellationToken);
     }
     protected override string GetBusinessId(JobAccepted e) => e.JobId;
 }
@@ -61,10 +61,10 @@ public sealed class JobQueueHandler(IDogfoodLedger ledger) : CountingHandler<Job
 [EventHandler(typeof(ExecutionModule))]
 public sealed class ExecutionStartHandler(IDogfoodLedger ledger, IExecutionEngine engine) : CountingHandler<ExecutionStarted>(ledger, nameof(ExecutionStartHandler))
 {
-    public override ValueTask HandleAsync(EventContext<ExecutionStarted> context)
+    public override ValueTask HandleAsync(EventContext<ExecutionStarted> context, CancellationToken cancellationToken)
     {
         _ = engine.Execute(context.Event.JobId);
-        return base.HandleAsync(context);
+        return base.HandleAsync(context, cancellationToken);
     }
     protected override string GetBusinessId(ExecutionStarted e) => e.JobId;
 }
@@ -84,10 +84,10 @@ public sealed class ProgressMetricsHandler(IDogfoodLedger ledger) : CountingHand
 [EventHandler(typeof(ExecutionModule))]
 public sealed class CompletionAuditHandler(IDogfoodLedger ledger, IAuditSink audit) : CountingHandler<JobCompleted>(ledger, nameof(CompletionAuditHandler))
 {
-    public override ValueTask HandleAsync(EventContext<JobCompleted> context)
+    public override ValueTask HandleAsync(EventContext<JobCompleted> context, CancellationToken cancellationToken)
     {
         audit.Write($"completed:{context.Event.JobId}");
-        return base.HandleAsync(context);
+        return base.HandleAsync(context, cancellationToken);
     }
     protected override string GetBusinessId(JobCompleted e) => e.JobId;
 }
@@ -95,10 +95,10 @@ public sealed class CompletionAuditHandler(IDogfoodLedger ledger, IAuditSink aud
 [EventHandler(typeof(NotificationModule))]
 public sealed class CompletionNotificationHandler(IDogfoodLedger ledger, INotificationGateway notifications) : CountingHandler<JobCompleted>(ledger, nameof(CompletionNotificationHandler))
 {
-    public override ValueTask HandleAsync(EventContext<JobCompleted> context)
+    public override ValueTask HandleAsync(EventContext<JobCompleted> context, CancellationToken cancellationToken)
     {
         notifications.Send(context.Event.JobId);
-        return base.HandleAsync(context);
+        return base.HandleAsync(context, cancellationToken);
     }
     protected override string GetBusinessId(JobCompleted e) => e.JobId;
 }

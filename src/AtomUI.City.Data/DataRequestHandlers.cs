@@ -23,7 +23,7 @@ public interface IDataRequestHandler
         DataRequest<TResponse> request,
         DataRequestContext context,
         DataRequestHandlerDelegate<TResponse> next,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
 }
 
 /// <summary>

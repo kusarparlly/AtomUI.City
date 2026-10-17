@@ -100,7 +100,7 @@ AtomUI.City.Core.Hosting.IApplicationHost.HostScope.get -> AtomUI.City.Core.Life
 AtomUI.City.Core.Hosting.IApplicationHost.RunAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 AtomUI.City.Core.Hosting.IApplicationHost.Services.get -> System.IServiceProvider!
 AtomUI.City.Core.Hosting.IApplicationHost.StartAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-AtomUI.City.Core.Hosting.IApplicationHost.StopAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+AtomUI.City.Core.Hosting.IApplicationHost.StopAsync(System.Threading.CancellationToken waitCancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 AtomUI.City.Core.Hosting.IApplicationHostBuilder
 AtomUI.City.Core.Hosting.IApplicationHostBuilder.Build() -> AtomUI.City.Core.Hosting.IApplicationHost!
 AtomUI.City.Core.Hosting.IApplicationHostBuilder.Configuration.get -> Microsoft.Extensions.Configuration.IConfigurationManager!
@@ -108,10 +108,9 @@ AtomUI.City.Core.Hosting.IApplicationHostBuilder.ConfigureHost(System.Action<Ato
 AtomUI.City.Core.Hosting.IApplicationHostBuilder.ConfigureServices(System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection!>! configureServices) -> AtomUI.City.Core.Hosting.IApplicationHostBuilder!
 AtomUI.City.Core.Lifecycle.ApplicationHostBuilderLifecycleExtensions
 AtomUI.City.Core.Lifecycle.LifecycleContext
-AtomUI.City.Core.Lifecycle.LifecycleContext.CancellationToken.get -> System.Threading.CancellationToken
 AtomUI.City.Core.Lifecycle.LifecycleContext.IsShortCircuited.get -> bool
 AtomUI.City.Core.Lifecycle.LifecycleContext.Items.get -> System.Collections.Generic.IDictionary<object!, object?>!
-AtomUI.City.Core.Lifecycle.LifecycleContext.LifecycleContext(AtomUI.City.Core.Lifecycle.LifecycleStage stage, System.IServiceProvider? services = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken), string? operationId = null) -> void
+AtomUI.City.Core.Lifecycle.LifecycleContext.LifecycleContext(AtomUI.City.Core.Lifecycle.LifecycleStage stage, System.IServiceProvider? services = null, string? operationId = null) -> void
 AtomUI.City.Core.Lifecycle.LifecycleContext.OperationId.get -> string!
 AtomUI.City.Core.Lifecycle.LifecycleContext.Services.get -> System.IServiceProvider!
 AtomUI.City.Core.Lifecycle.LifecycleContext.ShortCircuit() -> void
@@ -119,9 +118,9 @@ AtomUI.City.Core.Lifecycle.LifecycleContext.Stage.get -> AtomUI.City.Core.Lifecy
 AtomUI.City.Core.Lifecycle.LifecycleMiddleware
 AtomUI.City.Core.Lifecycle.LifecycleNext
 AtomUI.City.Core.Lifecycle.LifecyclePipeline
-AtomUI.City.Core.Lifecycle.LifecyclePipeline.ExecuteAsync(AtomUI.City.Core.Lifecycle.LifecycleContext! context) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Core.Lifecycle.LifecyclePipeline.ExecuteAsync(AtomUI.City.Core.Lifecycle.LifecycleContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
 AtomUI.City.Core.Lifecycle.LifecyclePipelineBuilder
-AtomUI.City.Core.Lifecycle.LifecyclePipelineBuilder.Build(System.Func<AtomUI.City.Core.Lifecycle.LifecycleContext!, System.Threading.Tasks.ValueTask>! terminalHandler) -> AtomUI.City.Core.Lifecycle.LifecyclePipeline!
+AtomUI.City.Core.Lifecycle.LifecyclePipelineBuilder.Build(System.Func<AtomUI.City.Core.Lifecycle.LifecycleContext!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>! terminalHandler) -> AtomUI.City.Core.Lifecycle.LifecyclePipeline!
 AtomUI.City.Core.Lifecycle.LifecyclePipelineBuilder.LifecyclePipelineBuilder() -> void
 AtomUI.City.Core.Lifecycle.LifecyclePipelineBuilder.Use(AtomUI.City.Core.Lifecycle.LifecycleMiddleware! middleware) -> AtomUI.City.Core.Lifecycle.LifecyclePipelineBuilder!
 AtomUI.City.Core.Lifecycle.LifecyclePipelineBuilder.Use(AtomUI.City.Core.Lifecycle.LifecycleStage stage, AtomUI.City.Core.Lifecycle.LifecycleMiddleware! middleware) -> AtomUI.City.Core.Lifecycle.LifecyclePipelineBuilder!
@@ -202,12 +201,12 @@ AtomUI.City.Core.Modularity.GeneratedModuleManifestAttribute
 AtomUI.City.Core.Modularity.GeneratedModuleManifestAttribute.GeneratedModuleManifestAttribute(System.Type! registrarType) -> void
 AtomUI.City.Core.Modularity.GeneratedModuleManifestAttribute.RegistrarType.get -> System.Type!
 AtomUI.City.Core.Modularity.IModule
-AtomUI.City.Core.Modularity.IModule.ConfigureContributionsAsync(AtomUI.City.Core.Modularity.ContributionConfigurationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Core.Modularity.IModule.ConfigureContributionsAsync(AtomUI.City.Core.Modularity.ContributionConfigurationContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 AtomUI.City.Core.Modularity.IModule.ConfigureServices(AtomUI.City.Core.Modularity.ServiceConfigurationContext! context) -> void
-AtomUI.City.Core.Modularity.IModule.OnApplicationInitializationAsync(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
-AtomUI.City.Core.Modularity.IModule.OnApplicationShutdownAsync(AtomUI.City.Core.Modularity.ApplicationShutdownContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
-AtomUI.City.Core.Modularity.IModule.OnPostApplicationInitializationAsync(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
-AtomUI.City.Core.Modularity.IModule.OnPreApplicationInitializationAsync(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Core.Modularity.IModule.OnApplicationInitializationAsync(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Core.Modularity.IModule.OnApplicationShutdownAsync(AtomUI.City.Core.Modularity.ApplicationShutdownContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Core.Modularity.IModule.OnPostApplicationInitializationAsync(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+AtomUI.City.Core.Modularity.IModule.OnPreApplicationInitializationAsync(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 AtomUI.City.Core.Modularity.IModule.PostConfigureServices(AtomUI.City.Core.Modularity.ServiceConfigurationContext! context) -> void
 AtomUI.City.Core.Modularity.IModule.PreConfigureServices(AtomUI.City.Core.Modularity.ServiceConfigurationContext! context) -> void
 AtomUI.City.Core.Modularity.IModuleRegistrar
@@ -334,19 +333,19 @@ static readonly AtomUI.City.Core.Lifecycle.LifecycleStages.PluginUnload -> AtomU
 static readonly AtomUI.City.Core.Lifecycle.LifecycleStages.RouteEnter -> AtomUI.City.Core.Lifecycle.LifecycleStage
 static readonly AtomUI.City.Core.Lifecycle.LifecycleStages.RouteLeave -> AtomUI.City.Core.Lifecycle.LifecycleStage
 static readonly AtomUI.City.Core.Lifecycle.LifecycleStages.RouteNavigate -> AtomUI.City.Core.Lifecycle.LifecycleStage
-virtual AtomUI.City.Core.Lifecycle.LifecycleMiddleware.Invoke(AtomUI.City.Core.Lifecycle.LifecycleContext! context, AtomUI.City.Core.Lifecycle.LifecycleNext! next) -> System.Threading.Tasks.ValueTask
+virtual AtomUI.City.Core.Lifecycle.LifecycleMiddleware.Invoke(AtomUI.City.Core.Lifecycle.LifecycleContext! context, AtomUI.City.Core.Lifecycle.LifecycleNext! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 virtual AtomUI.City.Core.Lifecycle.LifecycleNext.Invoke() -> System.Threading.Tasks.ValueTask
 virtual AtomUI.City.Core.Modularity.ModuleBase.ConfigureContributions(AtomUI.City.Core.Modularity.ContributionConfigurationContext! context) -> void
-virtual AtomUI.City.Core.Modularity.ModuleBase.ConfigureContributionsAsync(AtomUI.City.Core.Modularity.ContributionConfigurationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+virtual AtomUI.City.Core.Modularity.ModuleBase.ConfigureContributionsAsync(AtomUI.City.Core.Modularity.ContributionConfigurationContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 virtual AtomUI.City.Core.Modularity.ModuleBase.ConfigureServices(AtomUI.City.Core.Modularity.ServiceConfigurationContext! context) -> void
 virtual AtomUI.City.Core.Modularity.ModuleBase.OnApplicationInitialization(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context) -> void
-virtual AtomUI.City.Core.Modularity.ModuleBase.OnApplicationInitializationAsync(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+virtual AtomUI.City.Core.Modularity.ModuleBase.OnApplicationInitializationAsync(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 virtual AtomUI.City.Core.Modularity.ModuleBase.OnApplicationShutdown(AtomUI.City.Core.Modularity.ApplicationShutdownContext! context) -> void
-virtual AtomUI.City.Core.Modularity.ModuleBase.OnApplicationShutdownAsync(AtomUI.City.Core.Modularity.ApplicationShutdownContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+virtual AtomUI.City.Core.Modularity.ModuleBase.OnApplicationShutdownAsync(AtomUI.City.Core.Modularity.ApplicationShutdownContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 virtual AtomUI.City.Core.Modularity.ModuleBase.OnPostApplicationInitialization(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context) -> void
-virtual AtomUI.City.Core.Modularity.ModuleBase.OnPostApplicationInitializationAsync(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+virtual AtomUI.City.Core.Modularity.ModuleBase.OnPostApplicationInitializationAsync(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 virtual AtomUI.City.Core.Modularity.ModuleBase.OnPreApplicationInitialization(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context) -> void
-virtual AtomUI.City.Core.Modularity.ModuleBase.OnPreApplicationInitializationAsync(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+virtual AtomUI.City.Core.Modularity.ModuleBase.OnPreApplicationInitializationAsync(AtomUI.City.Core.Modularity.ApplicationInitializationContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 virtual AtomUI.City.Core.Modularity.ModuleBase.PostConfigureServices(AtomUI.City.Core.Modularity.ServiceConfigurationContext! context) -> void
 virtual AtomUI.City.Core.Modularity.ModuleBase.PreConfigureServices(AtomUI.City.Core.Modularity.ServiceConfigurationContext! context) -> void
 ~override AtomUI.City.Core.Lifecycle.LifecycleStage.Equals(object obj) -> bool

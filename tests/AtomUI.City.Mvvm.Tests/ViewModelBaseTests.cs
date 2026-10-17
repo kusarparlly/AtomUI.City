@@ -7,6 +7,20 @@ namespace AtomUI.City.Mvvm.Tests;
 public sealed class ViewModelBaseTests
 {
     [Fact]
+    public void ActivationCallbacksRequireExplicitCancellationToken()
+    {
+        var methods = typeof(IActivatable).GetMethods();
+
+        Assert.All(methods, method =>
+        {
+            var cancellationToken = Assert.Single(
+                method.GetParameters(),
+                parameter => parameter.ParameterType == typeof(CancellationToken));
+            Assert.False(cancellationToken.IsOptional);
+        });
+    }
+
+    [Fact]
     public void SetPropertyRaisesPropertyChangedWithStablePropertyName()
     {
         var viewModel = new TestViewModel();
@@ -365,13 +379,15 @@ public sealed class ViewModelBaseTests
             return SetProperty(ref _title, value, propertyName);
         }
 
-        protected override ValueTask OnActivatedAsync(IActivationScope scope)
+        protected override ValueTask OnActivatedAsync(
+            ActivationContext context,
+            CancellationToken cancellationToken)
         {
             ActivatedCount++;
             return ValueTask.CompletedTask;
         }
 
-        protected override ValueTask OnDeactivatedAsync()
+        protected override ValueTask OnDeactivatedAsync(CancellationToken cancellationToken)
         {
             DeactivatedCount++;
             return ValueTask.CompletedTask;
@@ -380,7 +396,9 @@ public sealed class ViewModelBaseTests
 
     public sealed class FailingActivationViewModel(Exception exception) : TestViewModel
     {
-        protected override ValueTask OnActivatedAsync(IActivationScope scope)
+        protected override ValueTask OnActivatedAsync(
+            ActivationContext context,
+            CancellationToken cancellationToken)
         {
             throw exception;
         }

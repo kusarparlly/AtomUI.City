@@ -13,7 +13,7 @@ public static class EventSubscriberExtensions
     public static IEventSubscription Subscribe<TEvent>(
         this IEventSubscriber subscriber,
         LifecycleScope owner,
-        Action<EventContext<TEvent>> handler,
+        Action<EventContext<TEvent>, CancellationToken> handler,
         EventSubscriptionOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(subscriber);
@@ -22,9 +22,9 @@ public static class EventSubscriberExtensions
 
         return subscriber.Subscribe<TEvent>(
             owner,
-            context =>
+            (context, cancellationToken) =>
             {
-                handler(context);
+                handler(context, cancellationToken);
                 return ValueTask.CompletedTask;
             },
             options);
@@ -37,7 +37,7 @@ public static class EventSubscriberExtensions
         this IEventSubscriber subscriber,
         LifecycleScope owner,
         EventChannel<TEvent> channel,
-        Action<EventContext<TEvent>> handler,
+        Action<EventContext<TEvent>, CancellationToken> handler,
         EventSubscriptionOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(subscriber);
@@ -48,9 +48,9 @@ public static class EventSubscriberExtensions
         return subscriber.Subscribe(
             owner,
             channel,
-            context =>
+            (context, cancellationToken) =>
             {
-                handler(context);
+                handler(context, cancellationToken);
                 return ValueTask.CompletedTask;
             },
             options);

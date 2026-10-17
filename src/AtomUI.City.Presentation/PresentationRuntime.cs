@@ -273,9 +273,9 @@ public sealed class PresentationRuntime : IPresentationRuntime
     /// <summary>
     /// Executes the stop async operation.
     /// </summary>
-    public ValueTask StopAsync(CancellationToken cancellationToken = default)
+    public ValueTask StopAsync(CancellationToken waitCancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        waitCancellationToken.ThrowIfCancellationRequested();
 
         Task stopTask;
         TaskCompletionSource? completion = null;
@@ -283,7 +283,7 @@ public sealed class PresentationRuntime : IPresentationRuntime
         {
             if (_stopTask is not null)
             {
-                return new ValueTask(_stopTask.WaitAsync(cancellationToken));
+                return new ValueTask(_stopTask.WaitAsync(waitCancellationToken));
             }
 
             if (_state == PresentationRuntimeState.Stopped)
@@ -299,7 +299,7 @@ public sealed class PresentationRuntime : IPresentationRuntime
         }
 
         _ = RunStopAsync(completion);
-        return new ValueTask(stopTask.WaitAsync(cancellationToken));
+        return new ValueTask(stopTask.WaitAsync(waitCancellationToken));
     }
 
     private async Task RunStopAsync(TaskCompletionSource completion)

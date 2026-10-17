@@ -26,11 +26,11 @@ public sealed class LifecycleMiddlewarePipelineTests
         Assert.Throws<ArgumentException>(() => new LifecycleContext(default));
 
         var builder = new LifecyclePipelineBuilder();
-        Assert.Throws<ArgumentException>(() => builder.Use(default, static (_, _) => default));
+        Assert.Throws<ArgumentException>(() => builder.Use(default, static (_, _, _) => default));
         Assert.Throws<ArgumentException>(() =>
             builder.Use<LifecycleBoundariesRejectDefaultStageValuesMiddleware>(
                 default,
-                static (_, _) => default));
+                static (_, _, _) => default));
     }
 
     [Fact]
@@ -38,19 +38,19 @@ public sealed class LifecycleMiddlewarePipelineTests
     {
         var trace = new List<string>();
         var pipeline = new LifecyclePipelineBuilder()
-            .Use(async (context, next) =>
+            .Use(async (context, next, cancellationToken) =>
             {
                 trace.Add("one.before");
                 await next().ConfigureAwait(false);
                 trace.Add("one.after");
             })
-            .Use(async (context, next) =>
+            .Use(async (context, next, cancellationToken) =>
             {
                 trace.Add("two.before");
                 await next().ConfigureAwait(false);
                 trace.Add("two.after");
             })
-            .Build(context =>
+            .Build((context, cancellationToken) =>
             {
                 trace.Add("terminal");
 
@@ -69,8 +69,8 @@ public sealed class LifecycleMiddlewarePipelineTests
     {
         var terminalCalls = 0;
         var pipeline = new LifecyclePipelineBuilder()
-            .Use(static (_, next) => next())
-            .Build(_ =>
+            .Use(static (_, next, _) => next())
+            .Build((_, _) =>
             {
                 Interlocked.Increment(ref terminalCalls);
                 return ValueTask.CompletedTask;
@@ -89,12 +89,12 @@ public sealed class LifecycleMiddlewarePipelineTests
         var releaseTerminal = new TaskCompletionSource(
             TaskCreationOptions.RunContinuationsAsynchronously);
         var pipeline = new LifecyclePipelineBuilder()
-            .Use(static (context, next) =>
+            .Use(static (context, next, cancellationToken) =>
             {
                 _ = next();
                 return ValueTask.CompletedTask;
             })
-            .Build(async _ =>
+            .Build(async (_, _) =>
             {
                 terminalEntered.TrySetResult();
                 await releaseTerminal.Task.ConfigureAwait(false);
@@ -117,12 +117,12 @@ public sealed class LifecycleMiddlewarePipelineTests
         LifecycleNext? savedNext = null;
         var terminalCalls = 0;
         var pipeline = new LifecyclePipelineBuilder()
-            .Use((_, next) =>
+            .Use((_, next, _) =>
             {
                 savedNext = next;
                 return ValueTask.CompletedTask;
             })
-            .Build(_ =>
+            .Build((_, _) =>
             {
                 Interlocked.Increment(ref terminalCalls);
                 return ValueTask.CompletedTask;
@@ -144,7 +144,7 @@ public sealed class LifecycleMiddlewarePipelineTests
         var rejectedCalls = 0;
         using var start = new ManualResetEventSlim();
         var pipeline = new LifecyclePipelineBuilder()
-            .Use(async (_, next) =>
+            .Use(async (_, next, _) =>
             {
                 var callers = Enumerable.Range(0, callerCount)
                     .Select(_ => Task.Run(async () =>
@@ -166,7 +166,7 @@ public sealed class LifecycleMiddlewarePipelineTests
                 start.Set();
                 await Task.WhenAll(callers);
             })
-            .Build(_ =>
+            .Build((_, _) =>
             {
                 Interlocked.Increment(ref terminalCalls);
                 return ValueTask.CompletedTask;
@@ -184,12 +184,12 @@ public sealed class LifecycleMiddlewarePipelineTests
         LifecycleNext? savedNext = null;
         var terminalCalls = 0;
         var pipeline = new LifecyclePipelineBuilder()
-            .Use(async (_, next) =>
+            .Use(async (_, next, _) =>
             {
                 savedNext = next;
                 await next();
             })
-            .Build(_ =>
+            .Build((_, _) =>
             {
                 Interlocked.Increment(ref terminalCalls);
                 return ValueTask.CompletedTask;
@@ -208,17 +208,17 @@ public sealed class LifecycleMiddlewarePipelineTests
     {
         var trace = new List<string>();
         var pipeline = new LifecyclePipelineBuilder()
-            .Use(LifecycleStages.ApplicationStart, async (context, next) =>
+            .Use(LifecycleStages.ApplicationStart, async (context, next, cancellationToken) =>
             {
                 trace.Add("start");
                 await next().ConfigureAwait(false);
             })
-            .Use(LifecycleStages.ApplicationStop, async (context, next) =>
+            .Use(LifecycleStages.ApplicationStop, async (context, next, cancellationToken) =>
             {
                 trace.Add("stop");
                 await next().ConfigureAwait(false);
             })
-            .Build(context =>
+            .Build((context, cancellationToken) =>
             {
                 trace.Add("terminal");
 
@@ -235,14 +235,14 @@ public sealed class LifecycleMiddlewarePipelineTests
     {
         var trace = new List<string>();
         var pipeline = new LifecyclePipelineBuilder()
-            .Use((context, next) =>
+            .Use((context, next, cancellationToken) =>
             {
                 trace.Add("short");
                 context.ShortCircuit();
 
                 return ValueTask.CompletedTask;
             })
-            .Build(context =>
+            .Build((context, cancellationToken) =>
             {
                 trace.Add("terminal");
 
@@ -262,22 +262,21 @@ public sealed class LifecycleMiddlewarePipelineTests
     {
         var terminalCalled = false;
         var pipeline = new LifecyclePipelineBuilder()
-            .Build(static _ => ValueTask.CompletedTask);
+            .Build(static (_, _) => ValueTask.CompletedTask);
         using var cancellation = new CancellationTokenSource();
         cancellation.Cancel();
-        var context = new LifecycleContext(
-            LifecycleStages.ApplicationStop,
-            cancellationToken: cancellation.Token);
+        var context = new LifecycleContext(LifecycleStages.ApplicationStop);
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
             await pipeline.ExecuteAsync(
                 context,
-                _ =>
+                (_, _) =>
                 {
                     terminalCalled = true;
                     return ValueTask.CompletedTask;
                 },
-                guaranteeTerminal: true));
+                guaranteeTerminal: true,
+                cancellationToken: cancellation.Token));
 
         Assert.True(terminalCalled);
     }
@@ -288,9 +287,9 @@ public sealed class LifecycleMiddlewarePipelineTests
         var diagnostics = new InMemoryHostDiagnostics();
         var expectedFailure = new InvalidOperationException("middleware failed");
         var pipeline = new LifecyclePipelineBuilder()
-            .Use<OuterMiddleware>(static async (_, next) => await next())
-            .Use<FailingMiddleware>((_, _) => ValueTask.FromException(expectedFailure))
-            .Build(static _ => ValueTask.CompletedTask);
+            .Use<OuterMiddleware>(static async (_, next, _) => await next())
+            .Use<FailingMiddleware>((_, _, _) => ValueTask.FromException(expectedFailure))
+            .Build(static (_, _) => ValueTask.CompletedTask);
         var context = new LifecycleContext(
             LifecycleStages.ModuleInitialize,
             operationId: "start-operation");
@@ -298,7 +297,7 @@ public sealed class LifecycleMiddlewarePipelineTests
         var failure = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await pipeline.ExecuteAsync(
                 context,
-                static _ => ValueTask.CompletedTask,
+                static (_, _) => ValueTask.CompletedTask,
                 guaranteeTerminal: false,
                 diagnostics: diagnostics));
 
@@ -318,12 +317,12 @@ public sealed class LifecycleMiddlewarePipelineTests
         var diagnostics = new InMemoryHostDiagnostics();
         var pipeline = new LifecyclePipelineBuilder()
             .Use(LifecycleStages.ApplicationStart, InferredMiddleware.InvokeAsync)
-            .Build(static _ => ValueTask.CompletedTask);
+            .Build(static (_, _) => ValueTask.CompletedTask);
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await pipeline.ExecuteAsync(
                 new LifecycleContext(LifecycleStages.ApplicationStart),
-                static _ => ValueTask.CompletedTask,
+                static (_, _) => ValueTask.CompletedTask,
                 guaranteeTerminal: false,
                 diagnostics: diagnostics));
 
@@ -339,14 +338,14 @@ public sealed class LifecycleMiddlewarePipelineTests
         var diagnostics = new InMemoryHostDiagnostics();
         var expectedFailure = new InvalidOperationException("terminal failed");
         var pipeline = new LifecyclePipelineBuilder()
-            .Use<OuterMiddleware>(static async (_, next) => await next())
-            .Build(_ => ValueTask.FromException(expectedFailure));
+            .Use<OuterMiddleware>(static async (_, next, _) => await next())
+            .Build((_, _) => ValueTask.FromException(expectedFailure));
         var context = new LifecycleContext(LifecycleStages.ApplicationStart);
 
         var failure = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await pipeline.ExecuteAsync(
                 context,
-                _ => ValueTask.FromException(expectedFailure),
+                (_, _) => ValueTask.FromException(expectedFailure),
                 guaranteeTerminal: false,
                 diagnostics: diagnostics));
 
@@ -362,22 +361,21 @@ public sealed class LifecycleMiddlewarePipelineTests
         var diagnostics = new InMemoryHostDiagnostics();
         using var cancellation = new CancellationTokenSource();
         var pipeline = new LifecyclePipelineBuilder()
-            .Use<CancelingMiddleware>((_, next) =>
+            .Use<CancelingMiddleware>((_, next, _) =>
             {
                 cancellation.Cancel();
                 return next();
             })
-            .Build(static _ => ValueTask.CompletedTask);
-        var context = new LifecycleContext(
-            LifecycleStages.ApplicationStop,
-            cancellationToken: cancellation.Token);
+            .Build(static (_, _) => ValueTask.CompletedTask);
+        var context = new LifecycleContext(LifecycleStages.ApplicationStop);
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
             await pipeline.ExecuteAsync(
                 context,
-                static _ => ValueTask.CompletedTask,
+                static (_, _) => ValueTask.CompletedTask,
                 guaranteeTerminal: false,
-                diagnostics: diagnostics));
+                diagnostics: diagnostics,
+                cancellationToken: cancellation.Token));
 
         Assert.DoesNotContain(
             diagnostics.Records,
@@ -389,13 +387,13 @@ public sealed class LifecycleMiddlewarePipelineTests
     {
         var expectedFailure = new InvalidOperationException("original failure");
         var pipeline = new LifecyclePipelineBuilder()
-            .Use<FailingMiddleware>((_, _) => ValueTask.FromException(expectedFailure))
-            .Build(static _ => ValueTask.CompletedTask);
+            .Use<FailingMiddleware>((_, _, _) => ValueTask.FromException(expectedFailure))
+            .Build(static (_, _) => ValueTask.CompletedTask);
 
         var failure = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await pipeline.ExecuteAsync(
                 new LifecycleContext(LifecycleStages.ApplicationStart),
-                static _ => ValueTask.CompletedTask,
+                static (_, _) => ValueTask.CompletedTask,
                 guaranteeTerminal: false,
                 diagnostics: new ThrowingHostDiagnostics()));
 
@@ -410,7 +408,10 @@ public sealed class LifecycleMiddlewarePipelineTests
 
     private static class InferredMiddleware
     {
-        public static ValueTask InvokeAsync(LifecycleContext context, LifecycleNext next)
+        public static ValueTask InvokeAsync(
+            LifecycleContext context,
+            LifecycleNext next,
+            CancellationToken cancellationToken)
         {
             return ValueTask.FromException(new InvalidOperationException("inferred middleware failed"));
         }

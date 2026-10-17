@@ -165,8 +165,6 @@ public sealed class PresentationRuntimeTests
 
         public bool IsDisposed { get; private set; }
 
-        public ValueTask ActivateAsync(IActivationScope scope) => ValueTask.CompletedTask;
-
         public ValueTask ActivateAsync(
             IActivationScope scope,
             CancellationToken cancellationToken)
@@ -175,16 +173,11 @@ public sealed class PresentationRuntimeTests
             return ValueTask.CompletedTask;
         }
 
-        public ValueTask DeactivateAsync()
-        {
-            WasDeactivated = true;
-            return ValueTask.CompletedTask;
-        }
-
         public ValueTask DeactivateAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return DeactivateAsync();
+            WasDeactivated = true;
+            return ValueTask.CompletedTask;
         }
 
         public ValueTask DisposeAsync()

@@ -19,6 +19,26 @@ public sealed class ModuleBaseTests
     }
 
     [Fact]
+    public void AsyncLifecycleCallbacksRequireAnExplicitCancellationToken()
+    {
+        var callbackNames = new[]
+        {
+            nameof(IModule.ConfigureContributionsAsync),
+            nameof(IModule.OnPreApplicationInitializationAsync),
+            nameof(IModule.OnApplicationInitializationAsync),
+            nameof(IModule.OnPostApplicationInitializationAsync),
+            nameof(IModule.OnApplicationShutdownAsync),
+        };
+
+        foreach (var callbackName in callbackNames)
+        {
+            var tokenParameter = typeof(IModule).GetMethod(callbackName)!.GetParameters()[1];
+            Assert.Equal(typeof(CancellationToken), tokenParameter.ParameterType);
+            Assert.False(tokenParameter.IsOptional);
+        }
+    }
+
+    [Fact]
     public async Task LifecycleMethodsRunInOrder()
     {
         var applicationContext = ApplicationHostTestBuilder.CreateContext();
@@ -31,11 +51,11 @@ public sealed class ModuleBaseTests
         module.PreConfigureServices(new ServiceConfigurationContext(applicationContext, services));
         module.ConfigureServices(new ServiceConfigurationContext(applicationContext, services));
         module.PostConfigureServices(new ServiceConfigurationContext(applicationContext, services));
-        await module.ConfigureContributionsAsync(new ContributionConfigurationContext(applicationContext, serviceProvider));
-        await module.OnPreApplicationInitializationAsync(new ApplicationInitializationContext(applicationContext, serviceProvider, applicationScope));
-        await module.OnApplicationInitializationAsync(new ApplicationInitializationContext(applicationContext, serviceProvider, applicationScope));
-        await module.OnPostApplicationInitializationAsync(new ApplicationInitializationContext(applicationContext, serviceProvider, applicationScope));
-        await module.OnApplicationShutdownAsync(new ApplicationShutdownContext(applicationContext, serviceProvider));
+        await module.ConfigureContributionsAsync(new ContributionConfigurationContext(applicationContext, serviceProvider), CancellationToken.None);
+        await module.OnPreApplicationInitializationAsync(new ApplicationInitializationContext(applicationContext, serviceProvider, applicationScope), CancellationToken.None);
+        await module.OnApplicationInitializationAsync(new ApplicationInitializationContext(applicationContext, serviceProvider, applicationScope), CancellationToken.None);
+        await module.OnPostApplicationInitializationAsync(new ApplicationInitializationContext(applicationContext, serviceProvider, applicationScope), CancellationToken.None);
+        await module.OnApplicationShutdownAsync(new ApplicationShutdownContext(applicationContext, serviceProvider), CancellationToken.None);
 
         Assert.Equal(
             [
@@ -63,11 +83,11 @@ public sealed class ModuleBaseTests
         module.PreConfigureServices(new ServiceConfigurationContext(applicationContext, services));
         module.ConfigureServices(new ServiceConfigurationContext(applicationContext, services));
         module.PostConfigureServices(new ServiceConfigurationContext(applicationContext, services));
-        await module.ConfigureContributionsAsync(new ContributionConfigurationContext(applicationContext, serviceProvider));
-        await module.OnPreApplicationInitializationAsync(new ApplicationInitializationContext(applicationContext, serviceProvider, applicationScope));
-        await module.OnApplicationInitializationAsync(new ApplicationInitializationContext(applicationContext, serviceProvider, applicationScope));
-        await module.OnPostApplicationInitializationAsync(new ApplicationInitializationContext(applicationContext, serviceProvider, applicationScope));
-        await module.OnApplicationShutdownAsync(new ApplicationShutdownContext(applicationContext, serviceProvider));
+        await module.ConfigureContributionsAsync(new ContributionConfigurationContext(applicationContext, serviceProvider), CancellationToken.None);
+        await module.OnPreApplicationInitializationAsync(new ApplicationInitializationContext(applicationContext, serviceProvider, applicationScope), CancellationToken.None);
+        await module.OnApplicationInitializationAsync(new ApplicationInitializationContext(applicationContext, serviceProvider, applicationScope), CancellationToken.None);
+        await module.OnPostApplicationInitializationAsync(new ApplicationInitializationContext(applicationContext, serviceProvider, applicationScope), CancellationToken.None);
+        await module.OnApplicationShutdownAsync(new ApplicationShutdownContext(applicationContext, serviceProvider), CancellationToken.None);
     }
 
     [Fact]
@@ -78,11 +98,11 @@ public sealed class ModuleBaseTests
         Assert.Throws<ArgumentNullException>(() => module.PreConfigureServices(null!));
         Assert.Throws<ArgumentNullException>(() => module.ConfigureServices(null!));
         Assert.Throws<ArgumentNullException>(() => module.PostConfigureServices(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await module.ConfigureContributionsAsync(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await module.OnPreApplicationInitializationAsync(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await module.OnApplicationInitializationAsync(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await module.OnPostApplicationInitializationAsync(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await module.OnApplicationShutdownAsync(null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await module.ConfigureContributionsAsync(null!, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await module.OnPreApplicationInitializationAsync(null!, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await module.OnApplicationInitializationAsync(null!, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await module.OnPostApplicationInitializationAsync(null!, CancellationToken.None));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await module.OnApplicationShutdownAsync(null!, CancellationToken.None));
     }
 
     [Fact]

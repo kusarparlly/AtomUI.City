@@ -67,20 +67,22 @@ public sealed class WorkspaceChangedHandler : IEventHandler<WorkspaceChanged>;
 ```csharp
 public interface IEventHandler<TEvent>
 {
-    ValueTask HandleAsync(EventContext<TEvent> context);
+    ValueTask HandleAsync(
+        EventContext<TEvent> context,
+        CancellationToken cancellationToken);
 }
 
 public interface IEventSubscriber
 {
     IEventSubscription Subscribe<TEvent>(
         LifecycleScope owner,
-        Func<EventContext<TEvent>, ValueTask> handler,
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
         EventSubscriptionOptions? options = null);
 
     IEventSubscription Subscribe<TEvent>(
         LifecycleScope owner,
         EventChannel<TEvent> channel,
-        Func<EventContext<TEvent>, ValueTask> handler,
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
         EventSubscriptionOptions? options = null);
 
     IEventSubscription Subscribe<TEvent>(
@@ -100,14 +102,14 @@ public static class EventSubscriberExtensions
     public static IEventSubscription Subscribe<TEvent>(
         this IEventSubscriber subscriber,
         LifecycleScope owner,
-        Action<EventContext<TEvent>> handler,
+        Action<EventContext<TEvent>, CancellationToken> handler,
         EventSubscriptionOptions? options = null);
 
     public static IEventSubscription Subscribe<TEvent>(
         this IEventSubscriber subscriber,
         LifecycleScope owner,
         EventChannel<TEvent> channel,
-        Action<EventContext<TEvent>> handler,
+        Action<EventContext<TEvent>, CancellationToken> handler,
         EventSubscriptionOptions? options = null);
 }
 
@@ -115,14 +117,14 @@ public interface IEventSubscription : IDisposable, IAsyncDisposable
 {
     EventSubscriptionId Id { get; }
     EventSubscriptionState State { get; }
-    ValueTask StopAsync(CancellationToken cancellationToken = default);
+    ValueTask StopAsync(CancellationToken waitCancellationToken = default);
 }
 ```
 
 - `LifecycleScope` 是 Application Plane 动态订阅的 public owner 类型；不引入当前 Core 中不存在的 `ILifecycleScope`。
 - `IEventHandler<TEvent>` 保持 invariant。`EventContext<TEvent>` 不能支持安全的 `in TEvent` 合同。
 - 核心接口不提供 ownerless overload，也不提供 `Func<TEvent, CancellationToken, ValueTask>` 简化入口。
-- 同步 `Action<EventContext<TEvent>>` 只是便利扩展，必须显式传入 owner，并转接到异步核心入口。
+- 同步 `Action<EventContext<TEvent>, CancellationToken>` 只是便利扩展，必须显式传入 owner，并转接到异步核心入口。
 - 静态/DI handler 的 owner 由 generated registration 和 EventBus Host controller 绑定为 `ApplicationScope`，不通过 ownerless public API 绕过所有权。
 - 插件 handler 由 EventBus 领域 ContributionLease 持有，不允许插件把私有生命周期冒充 Host `LifecycleScope`。
 - 不带 `EventChannel<TEvent>` 的 overload 等价于使用 `EventChannel<TEvent>.Default`；带 channel 的发布和订阅只在该强类型 channel 内匹配。
@@ -178,12 +180,12 @@ Timeout 或调用方取消只结束当前等待，不形成永久 `StopTimedOut`
 | IEventPublisher.PublishAsync | 发布事件。 | event 实例非 null，options 可选。 | EventPublishResult。 | event 为 null 抛 `ArgumentNullException`；disposed bus 抛 `ObjectDisposedException`；contract 非法、handler 失败、channel 拒绝或 runtime 总量达到上限时抛明确异常；取消按取消合同传播。 | 进入 contract registry 和 subscription snapshot 前必须观察 token；随后与 PostAsync 进入同一 contract/channel admission，并等待该 publication 的 delivery plan 完成。 | 同一默认 Serialized channel 按原子接受顺序执行；并发 publish 使用各自在 API 入口捕获的 subscription snapshot。 |
 | IEventPublisher.PostAsync | 接受异步发布请求。 | event 实例非 null，options 可选。 | EventPostResult。 | event 为 null 抛 `ArgumentNullException`；disposed bus 抛 `ObjectDisposedException`；预取消、等待容量时取消、channel full/closed 或 runtime 总量达到上限时返回 rejected result。 | 接受前必须观察 token；`Wait` 可取消；接受后调用方 token 进入 delivery 组合 token，失败由 EventBus 观察。 | 与 PublishAsync 共享同一 admission；只在事件已经由有界 runtime 接管后返回 Accepted，并沿用同一 EventId。 |
 | `IEventSubscriber.Subscribe<TEvent>` | 创建一条绑定单一 owner 的动态订阅。 | owner、handler 非 null；owner 必须为 `Running`；options 可为 null 并采用声明的默认值。 | 独立的 `IEventSubscription`。 | owner/handler 为 null 抛 `ArgumentNullException`；owner 非 Running、EventBus 不再接受订阅或 contract 非法时在提交前失败。 | 注册操作不接受 token；提交后由 owner/subscription token 管理生命周期。 | EventBus accepting 状态、owner 状态、owner token registration、状态转换和 snapshot 提交组成一个原子提交；与 owner/EventBus stop 竞争时不得留下 Active 或半注册订阅。 |
-| `IEventHandler<TEvent>.HandleAsync` | 处理强类型 delivery。 | context 非 null，并携带当前 delivery 的组合 token。 | `ValueTask`，完成表示本次 handler delivery 完成。 | 同步或异步异常进入订阅错误策略。 | context token 组合 publisher、owner/subscription 和 EventBus shutdown；handler 必须向下游异步操作传播。 | EventBus 不在内部锁内调用；并发度服从 subscription/channel policy。 |
+| `IEventHandler<TEvent>.HandleAsync` | 处理强类型 delivery。 | context 非 null；末尾非可选 token 是当前 delivery 的唯一有效令牌。 | `ValueTask`，完成表示本次 handler delivery 完成。 | 同步或异步异常进入订阅错误策略。 | 显式 token 组合 publisher、owner/subscription、EventBus shutdown 和 handler timeout；handler 必须向下游异步操作传播。 | EventBus 不在内部锁内调用；并发度服从 subscription/channel policy。 |
 | `EventSubscriberExtensions.Subscribe<TEvent>` | 为同步 handler 提供有 owner 的便利入口。 | subscriber、owner、handler 非 null；options 可为 null。 | 核心异步 Subscribe 返回的 `IEventSubscription`。 | 非法参数使用标准参数异常；其余失败与核心 Subscribe 一致。 | 与核心 Subscribe 一致。 | 只适配 delegate，不建立第二套注册或生命周期逻辑。 |
 | IEventBus.Dispose / DisposeAsync | 结束进程内事件总线生命周期。 | 无。 | Dispose 快速发布终止事务；DisposeAsync 等待同一事务。 | 重复调用不抛异常；Dispose 后 publish、post 和 subscribe API 抛 `ObjectDisposedException`；异步清理失败由 DisposeAsync 传播。 | shutdown token 取消 in-flight delivery；未开始 publication 明确失败，不再调用 handler。 | 两个入口共享唯一终止事务；停止 admission、完成 worker、取消/释放 subscriptions 后才完成异步释放。 |
 | EventBusServiceCollectionExtensions.AddEventBus | 注册 EventBus 默认服务。 | services 非 null；可选非 null defaultChannelOptions。 | 原 IServiceCollection。 | services/options 为 null 抛 `ArgumentNullException`；非法 capacity/policy 抛 `ArgumentOutOfRangeException`。 | 无。 | 使用 TryAdd 语义注册默认 diagnostics、contract registry、channel options、runtime options 和 EventBus 接口；显式 channel options overload 替换 global fallback，调用方预注册配置和 diagnostics 不被覆盖。 |
 | `EventBusModule` | 把 EventBus 服务接入 City Host。 | 由 `UseModule<EventBusModule>`、generated module dependency 或上层 Module 的 `DependsOn` 选择。 | 无状态 `ModuleBase` adapter。 | Host-managed runtime 在 pre-initialization 前收到 publish/post/subscribe 时抛 `InvalidOperationException`；初始化 Scope 非 Running 时启动失败；shutdown 清理失败继续遵循 Host 聚合合同。 | pre-initialization 和 shutdown token 分别来自 Core Host transaction；调用方取消等待不得创建第二个终止事务。 | ConfigureServices 调用 `AddEventBus` 并标记 Host-managed；pre-initialization 把同一个 `ApplicationScope` 交给 internal controller，使依赖模块的同阶段 hook 可用；shutdown 加入 runtime 唯一终止事务。Module 不拥有第二套状态。 |
-| internal `IEventBusLifecycleController` | 隔离 Host 生命周期控制权。 | 只能由同程序集 `EventBusModule` 解析和调用。 | `StartAsync(ApplicationScope, token)` / `StopAsync(token)`。 | 不允许 null、非 Running Scope、Dispose 后 Start 或用不同 Scope 重复 Start。 | Stop token 只控制当前等待；已经发布的终止事务继续运行。 | controller 由 `InMemoryEventBus` 的同一实例实现，不注册为公共业务能力，不使用 `IHostedService`。 |
+| internal `IEventBusLifecycleController` | 隔离 Host 生命周期控制权。 | 只能由同程序集 `EventBusModule` 解析和调用。 | `StartAsync(ApplicationScope, cancellationToken)` / `StopAsync(waitCancellationToken)`。 | 不允许 null、非 Running Scope、Dispose 后 Start 或用不同 Scope 重复 Start。 | Stop 的 wait token 只控制当前等待；已经发布的终止事务继续运行。 | controller 由 `InMemoryEventBus` 的同一实例实现，不注册为公共业务能力，不使用 `IHostedService`。 |
 | `EventChannel<TEvent>` | 声明强类型顺序、隔离和容量域。 | name 非空白、无首尾空白和控制字符；default struct 非法。 | 保存稳定 channel name；`Default.Name="default"`。 | 非法 name 抛 `ArgumentException`；default struct 在 API 边界抛 `ArgumentException`。 | 无。 | identity 为精确事件类型 + ordinal channel name；不同 identity 使用不同 runtime。 |
 | EventChannelOptions | 配置未被 contract/channel descriptor 覆盖的默认 runtime 边界。 | Capacity > 0；两个 enum 必须为已定义值；MaximumConcurrency > 0；Serialized 必须等于 1；QueueWaitTimeout 为 null 或 `0 < timeout <= Int32.MaxValue ms`。 | immutable init-only options；默认 Capacity=256、Wait、Serialized、MaximumConcurrency=1、无限等待。 | 构造 EventBus、descriptor 或调用配置入口时立即验证非法边界。 | Wait admission 同时观察发布方 token、EventBus shutdown token和可选 timeout。 | 每个精确 event contract/channel 拥有独立 runtime；options 是 fallback，不把不同 identity 合并为全局顺序队列。 |
 | `EventBusRuntimeOptions` | 限制单个 EventBus 实例可以创建的精确 channel runtime 总量。 | `MaximumChannelRuntimes` 必须在 1..65536；默认 256。 | immutable init-only options。 | 非法值在 EventBus 构造或 DI 配置时抛 `ArgumentOutOfRangeException`；配置 descriptor 数已经超过上限时构造失败；运行期新 identity 达到上限时 Publish 抛 `EventPublicationRejectedException`，Post 返回 rejected result，并写 `EventRejected`。 | 无。 | 上限检查、已有 runtime 查找和新 runtime 提交在同一 EventBus 锁内原子完成；达到上限不影响已经存在的 runtime。 |
@@ -192,19 +194,19 @@ Timeout 或调用方取消只结束当前等待，不形成永久 `StopTimedOut`
 | `IEventChannelMonitor.GetChannelSnapshots` | 获取已经实例化的 channel runtime 瞬时指标。 | 无。 | 按 ContractId、ChannelName ordinal 排序的只读快照。 | disposed bus 返回终止事务清理后的现有快照；不返回内部可变集合。 | 无。 | Pending/InFlight 在同一 runtime 锁内采样；计数器是并发安全的单调累计值，跨字段不承诺全局原子时刻。 |
 | EventPublicationRejectedException | 表达 PublishAsync 未被 channel 接受或排队后被显式替换。 | EventId 非空、ContractId 非 default、reason 非空白。 | 携带 EventId、ContractId 和稳定可诊断原因。 | constructor 非法输入使用标准参数异常。 | queue closed/canceled 的具体规则由发布入口决定。 | 不把拒绝伪装成成功的空 delivery result。 |
 | `EventPluginQuotas` | 限制单个插件 EventBus 领域资源和终止等待。 | 四个数量配额为正；MaximumPrivateChannelRuntimes 不超过 65536；DrainTimeout 必须大于零且不超过 `Int32.MaxValue` 毫秒，默认 30 秒。 | immutable init-only 配额快照。 | 非法值在 request 构造阶段抛 `ArgumentOutOfRangeException`，不得等到 lease 激活后失败。 | DrainTimeout 是领域内部 deadline，不等同于 StopAsync 调用方 token。 | 一个 lease 只读取 request 已验证的固定配额，不支持运行期热更新。 |
-| `IEventBusContributionLease.StopAsync / DisposeAsync` | 关闭插件 EventBus admission 并确定性等待领域终止。 | StopAsync token 只控制当前调用方等待。 | 正常进入 Disposed；普通清理失败进入 Faulted 并传播；超过总 deadline 进入 Faulted 并抛 timeout exception。 | timeout 不得被包装成成功或普通 cancellation；迟到异常必须被观察和诊断。 | 调用方取消不停止后台唯一事务；领域 DrainTimeout 到达后公开事务以 timeout 失败完成。 | Stop/Dispose/DisposeAsync 共享同一 Task；先在锁内发布 Quiescing 和唯一 Task，再在锁外诊断/清理；等待 pending registrations 完整提交或回滚；timeout 后真实清理结束前保留 PluginId。 |
+| `IEventBusContributionLease.StopAsync / DisposeAsync` | 关闭插件 EventBus admission 并确定性等待领域终止。 | `StopAsync(waitCancellationToken)` 只控制当前调用方等待。 | 正常进入 Disposed；普通清理失败进入 Faulted 并传播；超过总 deadline 进入 Faulted 并抛 timeout exception。 | timeout 不得被包装成成功或普通 cancellation；迟到异常必须被观察和诊断。 | 调用方取消不停止后台唯一事务；领域 DrainTimeout 到达后公开事务以 timeout 失败完成。 | Stop/Dispose/DisposeAsync 共享同一 Task；先在锁内发布 Quiescing 和唯一 Task，再在锁外诊断/清理；等待 pending registrations 完整提交或回滚；timeout 后真实清理结束前保留 PluginId。 |
 | `EventPluginDrainTimeoutException` | 稳定表达一个 plugin EventBus 领域未在总 deadline 内 drain。 | pluginId 合法；drainTimeout 为合法正值；active operation/subscription、pending registration 数非负。 | `TimeoutException` 子类，公开 PluginId、DrainTimeout、ActiveOperations、ActiveSubscriptions、PendingRegistrations 快照。 | 非法构造参数使用标准参数异常。 | 只表达领域 deadline，不用于调用方 token cancellation。 | 同一 lease 的并发终止调用观察同一个 exception-bearing 终止 Task。 |
 | `IEventContractRegistry.Register` | 在 Host 配置阶段注册 shared event contract descriptor。 | descriptor 非 null 且 plane 必须为 Shared。 | 无。 | descriptor 为 null 抛 `ArgumentNullException`；plugin-private descriptor、重复 id/type 或 registry 已冻结时抛 `InvalidOperationException`。 | 无。 | 单次注册原子提交；重复注册不得静默覆盖。 |
 | `IEventContractRegistry.Freeze` | 结束 Shared Registry 配置并发布运行时快照。 | 无。 | 无。 | 已冻结后重复调用作为 no-op；与 Register 竞争时，descriptor 要么完整进入快照，要么 Register 明确失败。 | 无。 | 发布按 ContractId ordinal 排序的 immutable snapshot；冻结后不再发生隐式创建。 |
 | `IEventContractRegistry.TryGet` | 按稳定 ContractId 或精确 CLR Type 查询 descriptor。 | ContractId 必须已创建；Type 非 null。 | 找到返回 true 和 descriptor，否则返回 false/null。 | default ContractId 抛 `ArgumentException`；Type 为 null 抛 `ArgumentNullException`。 | 无。 | 冻结后可并发无副作用读取，不进行继承、多态或类型名称匹配。 |
 | `IEventContractRegistry.GetOrCreate<TEvent>` | 获取精确类型 descriptor；仅允许未冻结 Registry 为 Default ALC 中的应用内部事件建立临时默认 descriptor。 | 泛型事件类型。 | 已登记 descriptor，或配置期默认 descriptor。 | Plugin/collectible ALC 类型始终抛 `InvalidOperationException`；冻结后未知类型抛 `InvalidOperationException`。 | 无。 | 只按精确 Type 匹配；生产 DI Registry 在 EventBus 可解析前已经冻结，因此运行时路径等价于 required lookup。 |
 | `IEventSubscription.Dispose` | 快速撤销订阅。 | 可重复调用。 | 无。 | 不同步传播 in-flight handler 的清理失败；失败由共享终止事务和 diagnostics 观察。 | 触发 subscription cancellation，但不等待 handler。 | 原子执行 Active -> Quiescing、移出新 snapshot 并发布唯一终止事务；不得同步等待异步 handler。 |
-| `IEventSubscription.DisposeAsync / StopAsync` | 确定性停止并释放订阅。 | 可重复调用；StopAsync token 只控制当前等待。 | 共享终止事务完成时状态为 Disposed，失败时为 Faulted。 | 一个清理失败传播原异常；多个失败使用 `AggregateException`，同时写 diagnostics 并继续清理其余资源。 | owner/Dispose 触发终止后不能由调用方 token 撤销；已 Disposed 后再次 StopAsync 即使 token 已取消也作为 no-op。 | 并发 Dispose、DisposeAsync、StopAsync 和 owner cancellation 共享唯一终止事务；Quiescing 后不得开始新 handler。 |
+| `IEventSubscription.DisposeAsync / StopAsync` | 确定性停止并释放订阅。 | 可重复调用；`StopAsync(waitCancellationToken)` 只控制当前等待。 | 共享终止事务完成时状态为 Disposed，失败时为 Faulted。 | 一个清理失败传播原异常；多个失败使用 `AggregateException`，同时写 diagnostics 并继续清理其余资源。 | owner/Dispose 触发终止后不能由调用方 wait token 撤销；已 Disposed 后再次 StopAsync 即使 wait token 已取消也作为 no-op。 | 并发 Dispose、DisposeAsync、StopAsync 和 owner cancellation 共享唯一终止事务；Quiescing 后不得开始新 handler。 |
 | EventPublishResult constructor | 创建发布结果。 | eventId 必须非空，contractId 必须已创建，deliveries 不得为 null 且不得包含 null 项；duration 不得为负。 | EventPublishResult，包含 subscription/delivered/failure/cancellation/timeout/skipped 计数和总 Duration。 | eventId 为空、contractId 为 default、deliveries 包含 null 项或 duration 为负时使用标准参数异常；deliveries 为 null 抛 `ArgumentNullException`。 | 无。 | delivery 列表创建后不可由外部 mutation 改变；三参数兼容构造的 Duration 为零，运行时发布使用实测 duration。 |
 | EventDeliveryResult constructor/init | 创建单个订阅 delivery 结果。 | subscriptionId 必须已创建，dispatchPolicy 必须是已定义值，Duration 不得为负，成功结果不得同时取消或携带 error message。 | EventDeliveryResult；Status 稳定归类为 Succeeded/Failed/Canceled/TimedOut/Skipped。 | constructor 或 init mutation 中 subscriptionId 为 default、Duration 为负、成功且取消、成功且 error message 非 null 抛出标准参数异常；未知 dispatchPolicy 抛 `ArgumentOutOfRangeException`。 | Canceled 与 TimedOut 分开统计；尚未开始的 delivery 使用 Skipped。 | result 列表保持 snapshot 顺序；TimedOut handler 实际退出前仍属于 subscription in-flight。 |
 | EventPostResult constructor/init | 创建 post 接受或拒绝结果。 | eventId 必须非空，contractId 必须已创建；Accepted 为 true 时 rejection reason 必须为 null，Accepted 为 false 时必须有非空白 rejection reason。 | EventPostResult。 | constructor 或 init mutation 中 eventId 为空、contractId 为 default 或 accepted/rejection reason 状态不一致时抛 `ArgumentException`。 | 无。 | constructor 与 init mutation 均保持同一状态一致性。 |
 | EventPublishOptions | 描述 publish 上下文。 | `PublishDepth` >= 0；`CorrelationId`/`CausationId`/`PartitionKey` 为 null 或稳定 id，不得为空白、包含首尾空白或控制字符。 | EventPublishOptions。 | publish depth 小于 0 抛 `ArgumentOutOfRangeException`；三个 id/key 非法抛 `ArgumentException`；partition key 与 channel mode 不匹配时发布入口抛 `InvalidOperationException`。 | 无。 | API 入口读取一次并随 publication request 保存，不回写 options。 |
-| EventContext<TEvent> constructor | 创建 handler 执行上下文。 | eventData 非 null，contractId/subscriptionId 必须已创建，eventId 必须非空，correlationId 必须为稳定 id，causationId 为 null 或稳定 id，二者不得为空白、包含首尾空白或控制字符，publishDepth 必须大于等于 0，dispatchPolicy 必须是已定义值。 | EventContext<TEvent>。 | eventData 为 null 抛 `ArgumentNullException`；contractId/subscriptionId 为 default、eventId 为空或 correlationId/causationId 无效抛 `ArgumentException`；publishDepth 小于 0 或未知 dispatchPolicy 抛 `ArgumentOutOfRangeException`。 | 仅保存 token，不主动取消。 | 创建后不可变。 |
+| EventContext<TEvent> constructor | 创建 handler 诊断与关联上下文。 | eventData 非 null，contractId/subscriptionId 必须已创建，eventId 必须非空，correlationId 必须为稳定 id，causationId 为 null 或稳定 id，二者不得为空白、包含首尾空白或控制字符，publishDepth 必须大于等于 0，dispatchPolicy 必须是已定义值。 | EventContext<TEvent>。 | eventData 为 null 抛 `ArgumentNullException`；contractId/subscriptionId 为 default、eventId 为空或 correlationId/causationId 无效抛 `ArgumentException`；publishDepth 小于 0 或未知 dispatchPolicy 抛 `ArgumentOutOfRangeException`。 | context 不保存 token；有效令牌由 handler 的显式参数交付。 | 创建后不可变。 |
 | EventSubscriptionOptions | 创建或派生单条订阅的 dispatch/failure policy。 | UiThread dispatcher 非 null；dispatch mode/error policy 必须是已定义值；handler timeout 为 null 或 `0 < timeout <= Int32.MaxValue ms`；disable threshold > 0。 | immutable EventSubscriptionOptions；默认 Serialized/Current handler timeout 为 30s，disable threshold 为 3。 | 非法 dispatcher、enum、timeout 或 threshold 使用标准参数异常；FailPublisher 传播异常；StopPublication 不再开始后续 delivery；ContinueAndReport 聚合并继续；DisableSubscription 达到连续失败阈值后进入唯一 quiesce/termination 事务。 | timeout 触发当前 delivery token；忽略 token 的 handler 仍保留真实 in-flight/drain 所有权。 | `WithErrorPolicy`、`WithHandlerTimeout`、`WithDisableSubscriptionAfterFailures` 不修改原 options；1.0 只存在 subscription-level error policy。 |
 | EventBusDispatchOptions | 限制单次 publication 内独立 subscription delivery 的并发。 | MaximumConcurrentDeliveriesPerPublication 必须在 1..1024。 | immutable init-only options；默认 16。 | EventBus 构造或 DI 解析时非法值抛 `ArgumentOutOfRangeException`。 | 不替代 handler、owner 或 shutdown cancellation。 | 与 channel publication concurrency 分层；多个独立 handler 分批启动，不能无界 fan-out。 |
 | IEventBackgroundScheduler.RunAsync | 在 EventBus 管理的后台执行目标运行 handler 并观察完成。 | callback 非 null；token 可取消。 | callback 完成对应的 ValueTask。 | callback 失败/取消原样进入 EventBus delivery policy；默认 ThreadPool 实现不传播 publisher ExecutionContext。 | 调度前和 callback 执行期间传递同一个 delivery token。 | EventBus 通过 DI/constructor 注入唯一 scheduler；运行时不得绕过它裸用 Task.Run。 |
@@ -266,6 +268,9 @@ Timeout 或调用方取消只结束当前等待，不形成永久 `StopTimedOut`
 
 ## Cancellation 合同
 
+- `EventContext<TEvent>` 不承载 token；delegate 与 `IEventHandler<TEvent>` 只接收一个显式末尾有效令牌。
+- delivery token 由 publisher、subscription owner、EventBus shutdown 和 handler timeout 合成；handler 不再手工读取或链接第二个 context token。
+- 仅取消终止事务等待的 `StopAsync` 参数固定命名为 `waitCancellationToken`。
 - 接收 `CancellationToken` 的 API 必须在 IO、子进程、网络、dispatcher work、插件代码、handler 调用前后观察取消。
 - 取消后不得提交状态、缓存、事件、UI 或 manifest 输出。
 - 取消结果必须稳定：返回 Cancelled Result 或抛 `OperationCanceledException`，不能混用成功结果。

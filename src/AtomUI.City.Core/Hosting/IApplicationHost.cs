@@ -35,7 +35,7 @@ public interface IApplicationHost : IDisposable, IAsyncDisposable
     /// <summary>
     /// Executes the stop async operation.
     /// </summary>
-    Task StopAsync(CancellationToken cancellationToken = default);
+    Task StopAsync(CancellationToken waitCancellationToken = default);
 
     /// <summary>
     /// Executes the run async operation.

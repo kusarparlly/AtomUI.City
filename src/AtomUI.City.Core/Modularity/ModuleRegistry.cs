@@ -359,6 +359,10 @@ internal sealed class ModuleRegistry : IModuleLifecycleController
         LifecycleScope applicationScope,
         CancellationToken cancellationToken)
     {
+        using var effectiveCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+            cancellationToken,
+            applicationScope.CancellationToken);
+        var effectiveCancellationToken = effectiveCancellation.Token;
         var context = new ApplicationInitializationContext(
             applicationContext,
             services,
@@ -371,7 +375,7 @@ internal sealed class ModuleRegistry : IModuleLifecycleController
             "OnPreApplicationInitialization",
             static (module, moduleContext, token) =>
                 module.OnPreApplicationInitializationAsync(moduleContext, token),
-            cancellationToken).ConfigureAwait(false);
+            effectiveCancellationToken).ConfigureAwait(false);
 
         await ExecuteInitializationStageAsync(
             context,
@@ -379,7 +383,7 @@ internal sealed class ModuleRegistry : IModuleLifecycleController
             "OnApplicationInitialization",
             static (module, moduleContext, token) =>
                 module.OnApplicationInitializationAsync(moduleContext, token),
-            cancellationToken).ConfigureAwait(false);
+            effectiveCancellationToken).ConfigureAwait(false);
 
         await ExecuteInitializationStageAsync(
             context,
@@ -387,7 +391,7 @@ internal sealed class ModuleRegistry : IModuleLifecycleController
             "OnPostApplicationInitialization",
             static (module, moduleContext, token) =>
                 module.OnPostApplicationInitializationAsync(moduleContext, token),
-            cancellationToken).ConfigureAwait(false);
+            effectiveCancellationToken).ConfigureAwait(false);
 
     }
 

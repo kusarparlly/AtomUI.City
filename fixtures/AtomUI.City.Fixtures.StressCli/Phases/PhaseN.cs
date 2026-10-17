@@ -90,7 +90,7 @@ public static class PhaseN
             var observedEvents = 0;
             eventBus.Subscribe<SettingsChanged>(
                 eventOwner,
-                context =>
+                (context, _) =>
                 {
                     if (context.Event.Key.StartsWith("chaos:", StringComparison.Ordinal))
                     {

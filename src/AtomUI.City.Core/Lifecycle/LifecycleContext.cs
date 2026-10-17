@@ -25,7 +25,6 @@ public sealed class LifecycleContext
     public LifecycleContext(
         LifecycleStage stage,
         IServiceProvider? services = null,
-        CancellationToken cancellationToken = default,
         string? operationId = null)
     {
         stage.ThrowIfInvalid(nameof(stage));
@@ -37,7 +36,6 @@ public sealed class LifecycleContext
 
         Stage = stage;
         Services = services ?? NullServiceProvider.Instance;
-        CancellationToken = cancellationToken;
         OperationId = operationId ?? Guid.NewGuid().ToString("N");
     }
 
@@ -50,11 +48,6 @@ public sealed class LifecycleContext
     /// Gets the services value.
     /// </summary>
     public IServiceProvider Services { get; }
-
-    /// <summary>
-    /// Gets the cancellation token value.
-    /// </summary>
-    public CancellationToken CancellationToken { get; }
 
     /// <summary>
     /// Gets the operation id value.

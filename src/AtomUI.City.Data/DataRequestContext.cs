@@ -15,8 +15,7 @@ public sealed class DataRequestContext
         string clientId,
         string operationName,
         DataTransportKind transportKind,
-        DataAccessMode accessMode,
-        CancellationToken cancellationToken)
+        DataAccessMode accessMode)
     {
         _request = request;
         OperationId = operationId;
@@ -25,7 +24,6 @@ public sealed class DataRequestContext
         OperationName = operationName;
         TransportKind = transportKind;
         AccessMode = accessMode;
-        CancellationToken = cancellationToken;
     }
 
     /// <summary>
@@ -64,11 +62,6 @@ public sealed class DataRequestContext
     public int Attempt { get; internal set; }
 
     /// <summary>
-    /// Gets a value indicating whether cancellation token.
-    /// </summary>
-    public CancellationToken CancellationToken { get; }
-
-    /// <summary>
     /// Gets or sets credential.
     /// </summary>
     public DataCredential? Credential { get; private set; }
@@ -97,9 +90,7 @@ public sealed class DataRequestContext
     /// <summary>
     /// Executes the create&lt;tresponse&gt; operation.
     /// </summary>
-    public static DataRequestContext Create<TResponse>(
-        DataRequest<TResponse> request,
-        CancellationToken cancellationToken)
+    public static DataRequestContext Create<TResponse>(DataRequest<TResponse> request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -109,7 +100,6 @@ public sealed class DataRequestContext
             request.ClientId,
             request.OperationName,
             request.TransportKind,
-            request.AccessMode,
-            cancellationToken);
+            request.AccessMode);
     }
 }

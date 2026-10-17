@@ -101,6 +101,27 @@ public sealed class RouteOutletTests
     }
 
     [Fact]
+    public async Task ClearCancellationAfterVisualMutationRollsBackBeforeReportingCancellation()
+    {
+        using var cancellation = new CancellationTokenSource();
+        var dispatcher = new RecordingDispatcher();
+        var target = new CancelOnClearTarget(cancellation);
+        var outlet = new RouteOutlet("primary", dispatcher, target);
+        var previous = BoundViewHandle.FromExisting(new SettingsView(), new SettingsViewModel());
+
+        await outlet.CommitAsync(RouteOutletCommitPlan.Replace("primary", previous));
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => outlet.CommitAsync(
+            RouteOutletCommitPlan.Clear("primary"),
+            cancellation.Token).AsTask());
+
+        Assert.Same(previous.View, outlet.CurrentContent);
+        Assert.Same(previous.View, target.Content);
+        Assert.False(previous.IsDisposed);
+        Assert.Equal(RouteOutletState.Committed, outlet.State);
+    }
+
+    [Fact]
     public async Task OutletCanceledBeforeAttachKeepsPreviousContentAndDisposesRejectedHandle()
     {
         var dispatcher = new RecordingDispatcher();
@@ -111,11 +132,10 @@ public sealed class RouteOutletTests
 
         await outlet.CommitAsync(RouteOutletCommitPlan.Replace("primary", previous));
         await cancellation.CancelAsync();
-        var result = await outlet.CommitAsync(
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => outlet.CommitAsync(
             RouteOutletCommitPlan.Replace("primary", rejected),
-            cancellation.Token);
+            cancellation.Token).AsTask());
 
-        Assert.False(result.Succeeded);
         Assert.Same(previous.View, outlet.CurrentContent);
         Assert.False(previous.IsDisposed);
         Assert.True(rejected.IsDisposed);
@@ -162,7 +182,7 @@ public sealed class RouteOutletTests
     }
 
     [Fact]
-    public async Task AcceptedCommitCancellationStopsWaitingButDoesNotRemoveSerializedCommit()
+    public async Task AcceptedCommitCancellationRollsBackBeforeAdvancingSerializedLane()
     {
         var dispatcher = new RecordingDispatcher();
         var outlet = new RouteOutlet("primary", dispatcher);
@@ -179,12 +199,33 @@ public sealed class RouteOutletTests
         await callerCancellation.CancelAsync();
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => firstCommit);
-        Assert.False(secondCommit.IsCompleted);
-
-        activation.Release();
         Assert.True((await secondCommit).Succeeded);
         Assert.Same(second.View, outlet.CurrentContent);
         Assert.True(first.IsDisposed);
+    }
+
+    [Fact]
+    public async Task OwnerCancellationCancelsAcceptedCommitWithoutSecondDeveloperToken()
+    {
+        var dispatcher = new RecordingDispatcher();
+        using var ownerCancellation = new CancellationTokenSource();
+        var outlet = new RouteOutlet(
+            "primary",
+            dispatcher,
+            target: null,
+            ownerCancellationToken: ownerCancellation.Token);
+        var activation = new DelayedActivatable();
+        var candidate = BoundViewHandle.FromExisting(new SettingsView(), activation);
+
+        var commit = outlet.CommitAsync(
+            RouteOutletCommitPlan.Replace("primary", candidate)).AsTask();
+        await activation.Started.Task;
+        await ownerCancellation.CancelAsync();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => commit);
+        Assert.True(candidate.IsDisposed);
+        Assert.Null(outlet.CurrentContent);
+        Assert.Equal(RouteOutletState.Empty, outlet.State);
     }
 
     [Fact]
@@ -313,6 +354,20 @@ public sealed class RouteOutletTests
         }
     }
 
+    private sealed class CancelOnClearTarget(CancellationTokenSource cancellation) : IRouteOutletTarget
+    {
+        public object? Content { get; private set; }
+
+        public void SetContent(object? content)
+        {
+            Content = content;
+            if (content is null)
+            {
+                cancellation.Cancel();
+            }
+        }
+    }
+
     private sealed class RecordingFailurePresenter : IPresentationFailurePresenter
     {
         public List<PresentationFailure> Failures { get; } = [];
@@ -328,12 +383,8 @@ public sealed class RouteOutletTests
 
     private sealed class FailingActivatable : IActivatable
     {
-        public ValueTask ActivateAsync(IActivationScope scope) => ActivateAsync(scope, CancellationToken.None);
-
         public ValueTask ActivateAsync(IActivationScope scope, CancellationToken cancellationToken) =>
             ValueTask.FromException(new InvalidOperationException("activation failed"));
-
-        public ValueTask DeactivateAsync() => ValueTask.CompletedTask;
 
         public ValueTask DeactivateAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
     }
@@ -344,15 +395,11 @@ public sealed class RouteOutletTests
 
         public TaskCompletionSource Started { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        public ValueTask ActivateAsync(IActivationScope scope) => ActivateAsync(scope, CancellationToken.None);
-
         public async ValueTask ActivateAsync(IActivationScope scope, CancellationToken cancellationToken)
         {
             Started.TrySetResult();
             await _release.Task.WaitAsync(cancellationToken);
         }
-
-        public ValueTask DeactivateAsync() => ValueTask.CompletedTask;
 
         public ValueTask DeactivateAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
 

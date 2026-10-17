@@ -59,7 +59,7 @@ public interface IEventSubscriber
     /// </summary>
     IEventSubscription Subscribe<TEvent>(
         LifecycleScope owner,
-        Func<EventContext<TEvent>, ValueTask> handler,
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
         EventSubscriptionOptions? options = null);
 
     /// <summary>
@@ -68,7 +68,7 @@ public interface IEventSubscriber
     IEventSubscription Subscribe<TEvent>(
         LifecycleScope owner,
         EventChannel<TEvent> channel,
-        Func<EventContext<TEvent>, ValueTask> handler,
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
         EventSubscriptionOptions? options = null);
 
     /// <summary>

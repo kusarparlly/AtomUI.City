@@ -26,7 +26,7 @@ public sealed class PresentationModule : ModuleBase
     /// </summary>
     public override ValueTask OnApplicationShutdownAsync(
         ApplicationShutdownContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
 

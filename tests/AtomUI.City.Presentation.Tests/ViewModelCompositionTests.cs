@@ -233,11 +233,6 @@ public sealed class ViewModelCompositionTests
 
         public bool IsDisposed { get; private set; }
 
-        public ValueTask ActivateAsync(IActivationScope scope)
-        {
-            return ActivateAsync(scope, CancellationToken.None);
-        }
-
         public ValueTask ActivateAsync(
             IActivationScope scope,
             CancellationToken cancellationToken)
@@ -245,11 +240,6 @@ public sealed class ViewModelCompositionTests
             cancellationToken.ThrowIfCancellationRequested();
             _events?.Add($"activate:{_name}");
             return ValueTask.CompletedTask;
-        }
-
-        public ValueTask DeactivateAsync()
-        {
-            return DeactivateAsync(CancellationToken.None);
         }
 
         public ValueTask DeactivateAsync(CancellationToken cancellationToken)
@@ -280,9 +270,6 @@ public sealed class ViewModelCompositionTests
 
         public bool IsDisposed { get; private set; }
 
-        public ValueTask ActivateAsync(IActivationScope scope) =>
-            ActivateAsync(scope, CancellationToken.None);
-
         public async ValueTask ActivateAsync(
             IActivationScope scope,
             CancellationToken cancellationToken)
@@ -290,8 +277,6 @@ public sealed class ViewModelCompositionTests
             _started.TrySetResult();
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
         }
-
-        public ValueTask DeactivateAsync() => ValueTask.CompletedTask;
 
         public ValueTask DeactivateAsync(CancellationToken cancellationToken) =>
             ValueTask.CompletedTask;

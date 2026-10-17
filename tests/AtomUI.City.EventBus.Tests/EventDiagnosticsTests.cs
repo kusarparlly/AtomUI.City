@@ -191,10 +191,10 @@ public sealed class EventDiagnosticsTests
         var eventBus = new InMemoryEventBus(diagnostics: diagnostics);
         using var cancellation = new CancellationTokenSource();
 
-        eventBus.Subscribe<TestEvent>(context =>
+        eventBus.Subscribe<TestEvent>((context, cancellationToken) =>
         {
             cancellation.Cancel();
-            context.CancellationToken.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
 
             return ValueTask.CompletedTask;
         });
@@ -221,10 +221,10 @@ public sealed class EventDiagnosticsTests
         var eventBus = new InMemoryEventBus(diagnostics: diagnostics);
         using var cancellation = new CancellationTokenSource();
 
-        var subscription = eventBus.Subscribe<TestEvent>(context =>
+        var subscription = eventBus.Subscribe<TestEvent>((context, cancellationToken) =>
         {
             cancellation.Cancel();
-            context.CancellationToken.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
 
             return ValueTask.CompletedTask;
         });
@@ -278,10 +278,10 @@ public sealed class EventDiagnosticsTests
         using var cancellation = new CancellationTokenSource();
         var laterHandlerCalled = false;
 
-        eventBus.Subscribe<TestEvent>(context =>
+        eventBus.Subscribe<TestEvent>((context, cancellationToken) =>
         {
             cancellation.Cancel();
-            context.CancellationToken.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
 
             return ValueTask.CompletedTask;
         });

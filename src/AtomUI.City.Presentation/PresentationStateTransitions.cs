@@ -56,8 +56,8 @@ internal static class PresentationStateTransitions
             RouteOutletState.OutOfSync => next is RouteOutletState.Preparing or RouteOutletState.Stopping or RouteOutletState.Faulted,
             RouteOutletState.Preparing => next is RouteOutletState.Empty or RouteOutletState.TemporaryAttached or
                 RouteOutletState.Committed or RouteOutletState.OutOfSync or RouteOutletState.Stopping or RouteOutletState.Faulted,
-            RouteOutletState.TemporaryAttached => next is RouteOutletState.Committed or RouteOutletState.OutOfSync or
-                RouteOutletState.Stopping or RouteOutletState.Faulted,
+            RouteOutletState.TemporaryAttached => next is RouteOutletState.Empty or RouteOutletState.Committed or
+                RouteOutletState.OutOfSync or RouteOutletState.Stopping or RouteOutletState.Faulted,
             RouteOutletState.Stopping => next is RouteOutletState.Stopped or RouteOutletState.Faulted,
             RouteOutletState.Faulted => next is RouteOutletState.Stopping or RouteOutletState.Stopped,
             _ => false,

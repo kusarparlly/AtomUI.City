@@ -53,6 +53,6 @@ internal static class LifecycleConfigurationStore
             configure(pipelineBuilder);
         }
 
-        return pipelineBuilder.Build(static _ => ValueTask.CompletedTask);
+        return pipelineBuilder.Build(static (_, _) => ValueTask.CompletedTask);
     }
 }

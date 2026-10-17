@@ -120,8 +120,7 @@ public sealed class EventPublicationTests
             DateTimeOffset.UtcNow,
             publishDepth: 0,
             EventSubscriptionId.New(),
-            EventDispatchPolicy.Serialized,
-            CancellationToken.None));
+            EventDispatchPolicy.Serialized));
     }
 
     [Fact]
@@ -136,8 +135,7 @@ public sealed class EventPublicationTests
             DateTimeOffset.UtcNow,
             publishDepth: 0,
             EventSubscriptionId.New(),
-            EventDispatchPolicy.Serialized,
-            CancellationToken.None));
+            EventDispatchPolicy.Serialized));
     }
 
     [Theory]
@@ -154,8 +152,7 @@ public sealed class EventPublicationTests
             DateTimeOffset.UtcNow,
             publishDepth: 0,
             EventSubscriptionId.New(),
-            EventDispatchPolicy.Serialized,
-            CancellationToken.None));
+            EventDispatchPolicy.Serialized));
     }
 
     [Fact]
@@ -170,8 +167,7 @@ public sealed class EventPublicationTests
             DateTimeOffset.UtcNow,
             publishDepth: -1,
             EventSubscriptionId.New(),
-            EventDispatchPolicy.Serialized,
-            CancellationToken.None));
+            EventDispatchPolicy.Serialized));
     }
 
     [Fact]
@@ -186,8 +182,7 @@ public sealed class EventPublicationTests
             DateTimeOffset.UtcNow,
             publishDepth: 0,
             default,
-            EventDispatchPolicy.Serialized,
-            CancellationToken.None));
+            EventDispatchPolicy.Serialized));
     }
 
     [Fact]
@@ -202,8 +197,7 @@ public sealed class EventPublicationTests
             DateTimeOffset.UtcNow,
             publishDepth: 0,
             EventSubscriptionId.New(),
-            (EventDispatchPolicy)999,
-            CancellationToken.None));
+            (EventDispatchPolicy)999));
     }
 
     [Theory]
@@ -222,8 +216,7 @@ public sealed class EventPublicationTests
             DateTimeOffset.UtcNow,
             publishDepth: 0,
             EventSubscriptionId.New(),
-            EventDispatchPolicy.Serialized,
-            CancellationToken.None));
+            EventDispatchPolicy.Serialized));
     }
 
     [Fact]

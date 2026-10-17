@@ -37,7 +37,7 @@ public sealed class EventBusModule : ModuleBase
     /// </summary>
     public override ValueTask OnPreApplicationInitializationAsync(
         ApplicationInitializationContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -51,7 +51,7 @@ public sealed class EventBusModule : ModuleBase
     /// </summary>
     public override ValueTask OnApplicationShutdownAsync(
         ApplicationShutdownContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
 

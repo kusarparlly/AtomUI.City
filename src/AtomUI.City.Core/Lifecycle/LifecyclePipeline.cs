@@ -8,11 +8,11 @@ namespace AtomUI.City.Core.Lifecycle;
 public sealed class LifecyclePipeline
 {
     private readonly IReadOnlyList<LifecycleMiddlewareRegistration> _middleware;
-    private readonly Func<LifecycleContext, ValueTask> _terminalHandler;
+    private readonly Func<LifecycleContext, CancellationToken, ValueTask> _terminalHandler;
 
     internal LifecyclePipeline(
         IReadOnlyList<LifecycleMiddlewareRegistration> middleware,
-        Func<LifecycleContext, ValueTask> terminalHandler)
+        Func<LifecycleContext, CancellationToken, ValueTask> terminalHandler)
     {
         _middleware = middleware;
         _terminalHandler = terminalHandler;
@@ -21,18 +21,25 @@ public sealed class LifecyclePipeline
     /// <summary>
     /// Executes the execute async operation.
     /// </summary>
-    public ValueTask ExecuteAsync(LifecycleContext context)
+    public ValueTask ExecuteAsync(
+        LifecycleContext context,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        return ExecuteAsync(context, _terminalHandler, guaranteeTerminal: false);
+        return ExecuteAsync(
+            context,
+            _terminalHandler,
+            guaranteeTerminal: false,
+            cancellationToken: cancellationToken);
     }
 
     internal async ValueTask ExecuteAsync(
         LifecycleContext context,
-        Func<LifecycleContext, ValueTask> terminalHandler,
+        Func<LifecycleContext, CancellationToken, ValueTask> terminalHandler,
         bool guaranteeTerminal,
-        IHostDiagnostics? diagnostics = null)
+        IHostDiagnostics? diagnostics = null,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(terminalHandler);
@@ -79,7 +86,7 @@ public sealed class LifecyclePipeline
 
         async ValueTask InvokeAsync(int index)
         {
-            context.CancellationToken.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (context.IsShortCircuited)
             {
@@ -97,7 +104,7 @@ public sealed class LifecyclePipeline
             if (registration.Stage is { } stage && context.Stage != stage)
             {
                 await InvokeAsync(index + 1).ConfigureAwait(false);
-                context.CancellationToken.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();
                 return;
             }
 
@@ -108,7 +115,10 @@ public sealed class LifecyclePipeline
 
             try
             {
-                await registration.Handler(context, next.InvokeAsync).ConfigureAwait(false);
+                await registration.Handler(
+                    context,
+                    next.InvokeAsync,
+                    cancellationToken).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
@@ -146,7 +156,7 @@ public sealed class LifecyclePipeline
                     .Throw();
             }
 
-            context.CancellationToken.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
         }
 
         async ValueTask InvokeTerminalAsync(bool observeCancellation)
@@ -158,14 +168,14 @@ public sealed class LifecyclePipeline
 
             if (observeCancellation)
             {
-                context.CancellationToken.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();
             }
 
             terminalInvoked = true;
 
             try
             {
-                await terminalHandler(context).ConfigureAwait(false);
+                await terminalHandler(context, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
@@ -175,14 +185,14 @@ public sealed class LifecyclePipeline
 
             if (observeCancellation)
             {
-                context.CancellationToken.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();
             }
         }
 
         bool IsExpectedCancellation(Exception exception)
         {
             return exception is OperationCanceledException &&
-                   context.CancellationToken.IsCancellationRequested;
+                   cancellationToken.IsCancellationRequested;
         }
     }
 

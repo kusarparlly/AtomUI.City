@@ -129,7 +129,7 @@ Realtime connection transport 输出 `IDataConnection`。
 传输 metadata 分层承载：
 
 - `DataRequest<T>`：transport/client/operation/access、auth、cache、resilience、concurrency、consistency、origin 和可选 `ParentScope`。
-- `DataRequestContext`：每次调用的 operation id、attempt、cancellation 和已解析 credential。
+- `DataRequestContext`：每次调用的 operation id、attempt、已解析 credential 和 operation-local metadata；有效令牌由 transport 方法参数交付。
 - `HttpDataRequest`、`NativeGrpcDataRequest`、`SignalRDataRequest`：各协议的 factory/invoker 与映射逻辑。
 - generated `DataClientDescriptor` / `DataOperationDescriptor`：静态 client/operation metadata，不包含 endpoint、runtime operation id、serializer 或 connection 实例。
 

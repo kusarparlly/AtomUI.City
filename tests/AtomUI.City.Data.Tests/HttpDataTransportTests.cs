@@ -23,7 +23,7 @@ public sealed class HttpDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.True(result.Succeeded);
         Assert.Equal("payload", result.Value);
@@ -55,7 +55,7 @@ public sealed class HttpDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, cancellation.Token),
+            DataRequestContext.Create(request),
             cancellation.Token);
 
         Assert.True(result.Succeeded);
@@ -77,7 +77,7 @@ public sealed class HttpDataTransportTests
             "api",
             _ => new HttpRequestMessage(HttpMethod.Get, "https://server/items"),
             async response => await response.Content.ReadAsStringAsync());
-        var context = DataRequestContext.Create(request, CancellationToken.None);
+        var context = DataRequestContext.Create(request);
         context.SetCredential(DataCredential.Bearer("access-token"));
 
         var result = await transport.SendAsync(request, context);
@@ -109,7 +109,7 @@ public sealed class HttpDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.False(result.Succeeded);
         Assert.Equal(expectedError, result.Error?.Kind);
@@ -129,7 +129,7 @@ public sealed class HttpDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.Equal(DataResultStatus.Cancelled, result.Status);
         Assert.Equal(DataErrorKind.Cancelled, result.Error?.Kind);
@@ -150,7 +150,7 @@ public sealed class HttpDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None),
+            DataRequestContext.Create(request),
             CancellationToken.None);
 
         Assert.Equal(DataResultStatus.Failed, result.Status);
@@ -177,7 +177,7 @@ public sealed class HttpDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.False(result.Succeeded);
         Assert.Equal(DataErrorKind.SerializationError, result.Error?.Kind);
@@ -207,7 +207,7 @@ public sealed class HttpDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.False(result.Succeeded);
         Assert.Equal(DataErrorKind.TransportError, result.Error?.Kind);
@@ -229,7 +229,7 @@ public sealed class HttpDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.False(result.Succeeded);
         Assert.Equal(DataErrorKind.TransportError, result.Error?.Kind);
@@ -257,7 +257,7 @@ public sealed class HttpDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, cancellation.Token),
+            DataRequestContext.Create(request),
             cancellation.Token);
 
         Assert.Equal(DataResultStatus.Cancelled, result.Status);
@@ -285,7 +285,7 @@ public sealed class HttpDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(otherRequest, CancellationToken.None));
+            DataRequestContext.Create(otherRequest));
 
         Assert.Equal(DataResultStatus.Failed, result.Status);
         Assert.Equal(DataErrorKind.PolicyRejected, result.Error?.Kind);
@@ -306,7 +306,7 @@ public sealed class HttpDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, CancellationToken.None));
+            DataRequestContext.Create(request));
 
         Assert.Equal(DataResultStatus.Failed, result.Status);
         Assert.Equal(DataErrorKind.TransportError, result.Error?.Kind);
@@ -333,7 +333,7 @@ public sealed class HttpDataTransportTests
 
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, cancellation.Token),
+            DataRequestContext.Create(request),
             cancellation.Token);
 
         Assert.Equal(DataResultStatus.Cancelled, result.Status);

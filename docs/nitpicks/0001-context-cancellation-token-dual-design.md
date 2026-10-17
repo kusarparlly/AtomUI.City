@@ -1,39 +1,29 @@
-# 0001 context 上下文参数 + 独立 CancellationToken 参数的双设计
+# 0001 context 与 CancellationToken 的双设计
 
 - 日期：2026-10-14
-- 范围：`AtomUI.City.Core`（Scope/Context）、`AtomUI.City.Mvvm`（激活/命令）、`AtomUI.City.EventBus`、`AtomUI.City.Data`
-- 结论：语义正确，人体工学欠账。综合 **8/10**（语义 9，人体工学 6.5）。
+- 复核日期：2026-10-17
+- 范围：Core、MVVM、EventBus、Data、Presentation
+- 状态：Accepted，由 [ADR 0012](../decisions/0012-effective-cancellation-token-contract.md) 裁决并进入施工。
 
-## 1. 背景（核实过的事实，带出处）
+## 1. 问题
 
-- `LifecycleScope` 是同一类 + `Kind` 区分（`src/AtomUI.City.Core/Lifecycle/LifecycleScopeKind.cs:6-48`），父子靠 `Parent + _children`（`LifecycleScope.cs:11,50`）。
-- 每个 Scope 私藏一颗 CTS，对外只露 `Token`（`LifecycleScope.cs:10,83`）；孩子出生即链接父 token（`LifecycleScope.cs:141`），父红子必红，反之不然。
-- token 随 Scope 生（`Build()` 生 `HostScope`，`Start()` 生 `ApplicationScope`，导航/激活/点击逐层生）；context 随调用现包现扔（`LifecycleContext.cs:25-42`）。
-- 每个 context 只带**一个** token 属性（`LifecycleContext` / `EventContext<T>.cs:107` / `DataRequestContext.cs:69`）；`ActivationContext` 无 token 属性，经由 `.Scope.CancellationToken` 取。
-- “两个 token”只出现在**方法签名**上（如 `OnActivatedAsync(context, ct)`），且是两个不同的值：Scope 的命 vs 本次调用的命。`ViewModelBase.cs:132-142` 两处都要查即为实证。
-- 命令递给开发者的是**新操作自己的** token，不是传进来的那个（`CommandFactory.cs:370-378`，`OperationScope.cs:11,26-31` 自建 CTS + 登记外部）。
-- `CancellationToken` 是结构体，无字符串内容，只能问红没红；追踪靠 `OperationId / CorrelationId / EventId`（`EventId/OperationId` 每次新建，`CorrelationId` 同因果链共用）。
+旧 API 把取消暴露成多种不一致形状：token 可能位于 context、独立参数、Scope，或只取消调用方等待。开发者需要记忆模块特例；漏查某个取消来源仍能编译，直到生命周期竞争时才表现为后台工作越界、资源延迟释放或路由事务继续提交。
 
-## 2. 好的地方
+原文关于“开发者应手工链接两个 token”的建议经代码复核后被否决。Command、Data 和 EventBus 已在部分内部路径执行链接，继续把链接责任交给业务代码会重复组合并扩大误用面。
 
-1. **区分是真实需求**：桌面 Scope 活几小时、调用活几秒，“页面关了”与“调用被顶掉”是两种死法，必须两个 token。ASP.NET Core 单 `RequestAborted` 够用只因请求 Scope ≈ 调用。
-2. **符合 .NET TAP 惯例**：下游 `HttpClient/EF/Task.Delay` 只认 `ct` 参数，独立参数透传零摩擦；context 管记账，token 管红绿。
-3. **基础设施以身作则**：全仓 30 处 `CreateLinkedTokenSource`（Scope 建孩子、命令执行、Data 管线、EventBus 派发），取消纪律统一。
+## 2. 裁决
 
-## 3. 欠的地方（带证据）
+- 保留 .NET 标准 `CancellationToken`，不创建 City token 数据结构。
+- City 在框架边界合成唯一 Effective Token。
+- 开发者回调只接收、检查和向下传递这一个 token。
+- context 回归描述信息，不再重复携带常规操作 token。
+- 仅取消等待的参数必须明确命名为 `waitCancellationToken`。
+- 已准入事务先回滚和释放，再向调用方报告取消。
 
-1. **双 token 并列是 footgun**：只查一个能编译能跑，漏的那个只在 corner case（如导航顶掉激活）爆，编译器不拦。
-2. **各门形状不统一**：EventBus handler 只有 context，命令只有 `ct`，激活/模块是双份；`ActivationContext` 取 token 还要绕 `.Scope`。
-3. **合成负担在开发者侧**：想要“两个都盯”得自写 `CreateLinkedTokenSource`，框架未给应用层现成 helper。
+完整合同见 [取消模型](../architecture/cancellation.md)。
 
-## 4. 补强建议（三选一即可到 9 分）
+## 3. 验收
 
-- `context.GetEffectiveToken()` 类扩展，一键拿 Scope+调用合成后的 token；
-- analyzer 加“双 token 入口必须双查”规则（`AUCGEN` 系列）；
-- 文档铁律化：“入口双查、往下传调用那个”。
-
-满分保留 1 分：待大生产验证（全部门形状统一、千万级调用无泄漏、第三方插件零误用）后再议。
-
-## 5. 是否提请 ADR
-
-- 提请。建议 ADR 标题：《双 token 入口规范（查两个、传调用那个）》，将第 4 节第一项或第三项立为框架约束。
+- Core Lifecycle、MVVM activation、EventBus handler、Data pipeline 和 Presentation outlet 采用统一签名。
+- 模板、fixture、public API baseline 与测试同步。
+- 预取消、Scope 取消、超时、关闭和回滚路径均有确定性测试。

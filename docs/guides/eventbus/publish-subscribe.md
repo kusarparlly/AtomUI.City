@@ -35,8 +35,9 @@ var subscriber = services.GetRequiredService<IEventSubscriber>();
 
 await using var subscription = subscriber.Subscribe<OrderSubmitted>(
     windowScope,
-    context =>
+    (context, cancellationToken) =>
     {
+        cancellationToken.ThrowIfCancellationRequested();
         RefreshOrder(context.Event.OrderId);
         return ValueTask.CompletedTask;
     });

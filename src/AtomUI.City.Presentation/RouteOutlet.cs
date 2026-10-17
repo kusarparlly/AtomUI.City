@@ -16,6 +16,7 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
     private readonly IPresentationFailurePresenter _failurePresenter;
     private readonly VisualLifecycleHub? _lifecycleHub;
     private readonly string? _windowId;
+    private readonly CancellationToken _ownerCancellationToken;
     private readonly BoundedSerialExecutionLane _commitLane;
     private readonly object _stateGate = new();
     private PresentationEntry? _currentEntry;
@@ -51,7 +52,8 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
         IPresentationFailurePresenter? failurePresenter = null,
         PresentationQueueOptions? queueOptions = null,
         VisualLifecycleHub? lifecycleHub = null,
-        string? windowId = null)
+        string? windowId = null,
+        CancellationToken ownerCancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(dispatcher);
@@ -66,6 +68,7 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
         _failurePresenter = failurePresenter ?? new NullPresentationFailurePresenter();
         _lifecycleHub = lifecycleHub;
         _windowId = string.IsNullOrWhiteSpace(windowId) ? null : windowId;
+        _ownerCancellationToken = ownerCancellationToken;
         _commitLane = new BoundedSerialExecutionLane(queueOptions.OutletPendingCapacity);
     }
 
@@ -159,16 +162,21 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
 
         var completion = new TaskCompletionSource<RouteOutletCommitResult>(
             TaskCreationOptions.RunContinuationsAsynchronously);
+        var linkedCancellation = CreateEffectiveCancellation(cancellationToken);
+        var effectiveCancellationToken = linkedCancellation?.Token ??
+            (_ownerCancellationToken.CanBeCanceled ? _ownerCancellationToken : cancellationToken);
         var accepted = false;
         var stopping = false;
 
-        if (cancellationToken.IsCancellationRequested)
+        if (effectiveCancellationToken.IsCancellationRequested)
         {
             _ = CompleteRejectedAdmissionAsync(
                 plan,
                 operationId,
                 stopping: false,
                 callerCanceled: true,
+                effectiveCancellationToken,
+                linkedCancellation,
                 completion);
             return new ValueTask<RouteOutletCommitResult>(completion.Task);
         }
@@ -180,7 +188,12 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
             if (!stopping)
             {
                 accepted = _commitLane.TrySchedule(
-                    () => ExecuteScheduledCommitAsync(plan, operationId, completion));
+                    () => ExecuteScheduledCommitAsync(
+                        plan,
+                        operationId,
+                        effectiveCancellationToken,
+                        linkedCancellation,
+                        completion));
             }
         }
 
@@ -191,11 +204,12 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
                 operationId,
                 stopping,
                 callerCanceled: false,
+                effectiveCancellationToken,
+                linkedCancellation,
                 completion);
         }
 
-        return new ValueTask<RouteOutletCommitResult>(
-            AwaitAcceptedCommitAsync(completion.Task, cancellationToken));
+        return new ValueTask<RouteOutletCommitResult>(completion.Task);
     }
 
     /// <summary>
@@ -255,15 +269,26 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
     private async Task ExecuteScheduledCommitAsync(
         RouteOutletCommitPlan plan,
         long operationId,
+        CancellationToken cancellationToken,
+        CancellationTokenSource? linkedCancellation,
         TaskCompletionSource<RouteOutletCommitResult> completion)
     {
         try
         {
-            completion.TrySetResult(await ExecuteCommitCoreAsync(plan, operationId).ConfigureAwait(false));
+            completion.TrySetResult(
+                await ExecuteCommitCoreAsync(plan, operationId, cancellationToken).ConfigureAwait(false));
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            completion.TrySetCanceled(cancellationToken);
         }
         catch (Exception exception)
         {
             completion.TrySetException(exception);
+        }
+        finally
+        {
+            linkedCancellation?.Dispose();
         }
     }
 
@@ -272,20 +297,26 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
         long operationId,
         bool stopping,
         bool callerCanceled,
+        CancellationToken cancellationToken,
+        CancellationTokenSource? linkedCancellation,
         TaskCompletionSource<RouteOutletCommitResult> completion)
     {
         try
         {
             await DisposeRejectedCandidateAsync(plan, operationId).ConfigureAwait(false);
 
-            var error = stopping || callerCanceled
+            if (callerCanceled)
+            {
+                completion.TrySetCanceled(cancellationToken);
+                return;
+            }
+
+            var error = stopping
                 ? PresentationError.OutletCommitFailed
                 : PresentationError.OutletQueueFull;
-            var message = callerCanceled
-                ? $"Outlet '{Name}' rejected operation '{operationId}' because the caller was already canceled."
-                : stopping
-                    ? $"Outlet '{Name}' is stopping, stopped, or faulted."
-                    : $"Outlet '{Name}' rejected operation '{operationId}' because its pending queue is full.";
+            var message = stopping
+                ? $"Outlet '{Name}' is stopping, stopped, or faulted."
+                : $"Outlet '{Name}' rejected operation '{operationId}' because its pending queue is full.";
 
             if (!stopping && !callerCanceled)
             {
@@ -304,11 +335,23 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
         {
             completion.TrySetException(exception);
         }
+        finally
+        {
+            linkedCancellation?.Dispose();
+        }
+    }
+
+    private CancellationTokenSource? CreateEffectiveCancellation(CancellationToken cancellationToken)
+    {
+        return cancellationToken.CanBeCanceled && _ownerCancellationToken.CanBeCanceled
+            ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _ownerCancellationToken)
+            : null;
     }
 
     private async ValueTask<RouteOutletCommitResult> ExecuteCommitCoreAsync(
         RouteOutletCommitPlan plan,
-        long operationId)
+        long operationId,
+        CancellationToken cancellationToken)
     {
         if (State is RouteOutletState.Stopping or RouteOutletState.Stopped or RouteOutletState.Faulted)
         {
@@ -340,14 +383,14 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
 
         try
         {
-            plan.LifecycleToken.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
             SetState(RouteOutletState.Preparing);
 
             if (previous is not null && !plan.LeaveApproved)
             {
                 stage = "LeaveGuard";
                 var leave = await DeactivationGuard
-                    .CanDeactivateAsync(previous.ViewModel, plan.LifecycleToken)
+                    .CanDeactivateAsync(previous.ViewModel, cancellationToken)
                     .ConfigureAwait(false);
                 if (leave.Status != DeactivationStatus.Allow)
                 {
@@ -360,7 +403,8 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
             if (plan.Operation == RouteOutletOperation.Clear)
             {
                 stage = "FinalCommit";
-                await SetTargetContentAsync(null, plan.LifecycleToken).ConfigureAwait(false);
+                await SetTargetContentAsync(null, cancellationToken).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
                 SetCurrentEntry(null, RouteOutletState.Empty);
                 plan.Release(operationId);
                 await DisposeEntryAfterCommitAsync(previous, operationId).ConfigureAwait(false);
@@ -377,6 +421,7 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
 
             if (ReferenceEquals(previous?.Handle, plan.Handle))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 plan.Release(operationId);
                 SetState(RouteOutletState.Committed);
                 WriteCommitSucceededDiagnostic(plan, operationId, "Reuse");
@@ -410,7 +455,7 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
                         throw;
                     }
                 },
-                plan.LifecycleToken).ConfigureAwait(false);
+                cancellationToken).ConfigureAwait(false);
             var activationScope = new ActivationScope(_diagnostics);
             candidate = new PresentationEntry(
                 operationId,
@@ -428,12 +473,12 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
             {
                 stage = "Activate";
                 await activatable
-                    .ActivateAsync(candidate.ActivationScope, plan.LifecycleToken)
+                    .ActivateAsync(candidate.ActivationScope, cancellationToken)
                     .ConfigureAwait(false);
                 candidate.IsActivated = true;
             }
 
-            plan.LifecycleToken.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
             stage = "FinalCommit";
             plan.TransferToEntry(operationId);
             SetCurrentEntry(candidate, RouteOutletState.Committed);
@@ -453,6 +498,12 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
                     $"Outlet '{Name}' failed during '{stage}' and rollback also failed.",
                     new AggregateException(exception, rollbackFailure),
                     stage).ConfigureAwait(false);
+            }
+
+            if (exception is OperationCanceledException && cancellationToken.IsCancellationRequested)
+            {
+                SetState(previous is null ? RouteOutletState.Empty : RouteOutletState.Committed);
+                throw;
             }
 
             SetState(RouteOutletState.OutOfSync);
@@ -578,13 +629,6 @@ public sealed class RouteOutlet : IRouteOutlet, IAsyncDisposable
             _dispatcher,
             plan);
         await candidate.DisposeAsync().ConfigureAwait(false);
-    }
-
-    private static async Task<RouteOutletCommitResult> AwaitAcceptedCommitAsync(
-        Task<RouteOutletCommitResult> completion,
-        CancellationToken cancellationToken)
-    {
-        return await completion.WaitAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private async ValueTask<RouteOutletCommitResult> FailAsync(

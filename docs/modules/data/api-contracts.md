@@ -131,6 +131,9 @@
 
 ## Cancellation 合同
 
+- `DataRequestContext` 不保存 token；pipeline、handler、transport 和 mapper 的显式末尾参数接收调用方、可选 ParentScope、Host shutdown 与 timeout 合成后的唯一有效令牌。
+- `IDataRequestHandler.InvokeAsync` 和 `DataRequestHandlerDelegate<T>` 是框架回调合同，其末尾 token 不可省略；业务 handler 只传递收到的有效令牌。
+- `IGrpcClientStream.CompleteAsync(waitCancellationToken)` 的参数只取消当前等待；已发布的 stream completion transaction 继续运行。
 - 接收 `CancellationToken` 的 API 必须在 IO、网络、插件代码和 handler 调用前后观察取消。
 - 取消后 pipeline 不得写缓存或确认 optimistic update；应用收到取消/抑制结果后不得提交 State、EventBus 或 UI。
 - 取消结果必须稳定：返回 Cancelled Result 或抛 `OperationCanceledException`，不能混用成功结果。

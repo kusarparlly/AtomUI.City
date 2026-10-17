@@ -42,7 +42,7 @@ public abstract class DogfoodModuleBase : ModuleBase
 
     public override async ValueTask OnApplicationInitializationAsync(
         ApplicationInitializationContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
         cancellationToken.ThrowIfCancellationRequested();
@@ -52,7 +52,7 @@ public abstract class DogfoodModuleBase : ModuleBase
 
     public override async ValueTask OnApplicationShutdownAsync(
         ApplicationShutdownContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(context);
         cancellationToken.ThrowIfCancellationRequested();

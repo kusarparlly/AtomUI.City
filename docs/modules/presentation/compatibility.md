@@ -31,4 +31,6 @@
 
 改变默认值、线程、ownership、取消、提交点、Result/exception、状态终态或关闭可拒绝性均为 breaking change。Deprecated API 必须记录版本、replacement、最早删除版本、迁移方法和 Analyzer diagnostic。
 
+1.0 Preview 取消合同收口移除 `RouteOutletCommitPlan.LifecycleToken` 与 `Replace(..., lifecycleToken)`；`IRouteOutlet.CommitAsync` 成为唯一取消入口。`IPresentationRuntime.StopAsync` 和 `WindowSession.CloseAsync` 的 wait-only 参数改名为 `waitCancellationToken`。
+
 `AUC-PRESENTATION-017` 已落地：Root/Child 只作为显式 lease 角色，不增加 MVVM 基类、全局 Root 单例或反射发现。`ViewModelCompositionOwner`、`ViewModelCompositionLease`、lease identity、owner 边界、异步释放和 leaf-to-root 顺序进入 1.0 Preview 兼容面。

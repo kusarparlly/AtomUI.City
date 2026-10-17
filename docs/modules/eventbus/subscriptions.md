@@ -85,14 +85,14 @@ EventBus 必须能明确回答：
 ```csharp
 public interface IEventHandler<TEvent>
 {
-    ValueTask HandleAsync(EventContext<TEvent> context);
+    ValueTask HandleAsync(EventContext<TEvent> context, CancellationToken cancellationToken);
 }
 
 public interface IEventSubscriber
 {
     IEventSubscription Subscribe<TEvent>(
         LifecycleScope owner,
-        Func<EventContext<TEvent>, ValueTask> handler,
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
         EventSubscriptionOptions? options = null);
 
     IEventSubscription Subscribe<TEvent>(
@@ -106,7 +106,7 @@ public static class EventSubscriberExtensions
     public static IEventSubscription Subscribe<TEvent>(
         this IEventSubscriber subscriber,
         LifecycleScope owner,
-        Action<EventContext<TEvent>> handler,
+        Action<EventContext<TEvent>, CancellationToken> handler,
         EventSubscriptionOptions? options = null);
 }
 ```
@@ -123,7 +123,7 @@ public interface IEventSubscription :
     EventSubscriptionId Id { get; }
     EventSubscriptionState State { get; }
     ValueTask StopAsync(
-        CancellationToken cancellationToken = default);
+        CancellationToken waitCancellationToken = default);
 }
 ```
 

@@ -133,7 +133,7 @@ public abstract class Module
 
     public virtual ValueTask ConfigureContributionsAsync(
         ContributionConfigurationContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         ConfigureContributions(context);
         return ValueTask.CompletedTask;
@@ -143,7 +143,7 @@ public abstract class Module
 
     public virtual ValueTask OnPreApplicationInitializationAsync(
         ApplicationInitializationContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         OnPreApplicationInitialization(context);
         return ValueTask.CompletedTask;
@@ -153,7 +153,7 @@ public abstract class Module
 
     public virtual ValueTask OnApplicationInitializationAsync(
         ApplicationInitializationContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         OnApplicationInitialization(context);
         return ValueTask.CompletedTask;
@@ -163,7 +163,7 @@ public abstract class Module
 
     public virtual ValueTask OnPostApplicationInitializationAsync(
         ApplicationInitializationContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         OnPostApplicationInitialization(context);
         return ValueTask.CompletedTask;
@@ -173,7 +173,7 @@ public abstract class Module
 
     public virtual ValueTask OnApplicationShutdownAsync(
         ApplicationShutdownContext context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         OnApplicationShutdown(context);
         return ValueTask.CompletedTask;

@@ -39,7 +39,7 @@ internal sealed class DogfoodConcurrencyWorkload
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var completed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var handled = 0;
-        using var subscription = eventBus.Subscribe<PressureEvent>(owner, async context =>
+        using var subscription = eventBus.Subscribe<PressureEvent>(owner, async (context, _) =>
         {
             if (context.Event.Sequence == 1)
             {
@@ -93,7 +93,7 @@ internal sealed class DogfoodConcurrencyWorkload
         var handled = 0;
         using var subscription = eventBus.Subscribe<PressureEvent>(
             owner,
-            async _ =>
+            async (_, _) =>
             {
                 var active = Interlocked.Increment(ref current);
                 UpdateMaximum(ref maximum, active);

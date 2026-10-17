@@ -390,7 +390,7 @@ public sealed class EventContractRegistryTests
         var subscribeException = Assert.Throws<InvalidOperationException>(
             () => eventBus.Subscribe<TestEvent>(
                 owner,
-                _ => ValueTask.CompletedTask));
+                (_, _) => ValueTask.CompletedTask));
         var publishException = await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await eventBus.PublishAsync(new TestEvent("unknown")));
         var postException = await Assert.ThrowsAsync<InvalidOperationException>(

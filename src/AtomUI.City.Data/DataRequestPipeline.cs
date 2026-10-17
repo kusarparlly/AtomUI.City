@@ -157,7 +157,7 @@ public sealed class DataRequestPipeline : IDataRequestPipeline, IDisposable
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposed) != 0, this);
         if (!_runtimeGate.TryEnter(out var requestLease, out var shutdownToken))
         {
-            var context = DataRequestContext.Create(request, cancellationToken);
+            var context = DataRequestContext.Create(request);
             var rejected = DataResult<TResponse>.Failed(new DataError(
                 DataErrorKind.PolicyRejected,
                 "The Data runtime is stopping and no longer accepts new requests."));
@@ -231,7 +231,7 @@ public sealed class DataRequestPipeline : IDataRequestPipeline, IDisposable
 
         if (cancellationToken.IsCancellationRequested)
         {
-            var earlyContext = DataRequestContext.Create(request, cancellationToken);
+            var earlyContext = DataRequestContext.Create(request);
             var cancelledResult = DataResult<TResponse>.Cancelled();
             WriteRequestResultDiagnostic(earlyContext, cancelledResult);
 
@@ -241,7 +241,7 @@ public sealed class DataRequestPipeline : IDataRequestPipeline, IDisposable
         using var timeoutCancellation = CreateTimeoutCancellation(resilience, cancellationToken);
         if (!CanUseParentScope(request.ParentScope))
         {
-            var earlyContext = DataRequestContext.Create(request, timeoutCancellation.Token);
+            var earlyContext = DataRequestContext.Create(request);
             var suppressedResult = DataResult<TResponse>.StaleSuppressed();
             WriteStaleSuppressedDiagnostic(earlyContext, suppressedResult);
 
@@ -259,7 +259,7 @@ public sealed class DataRequestPipeline : IDataRequestPipeline, IDisposable
         }
         catch (ObjectDisposedException) when (request.ParentScope is not null)
         {
-            var earlyContext = DataRequestContext.Create(request, timeoutCancellation.Token);
+            var earlyContext = DataRequestContext.Create(request);
             var suppressedResult = DataResult<TResponse>.StaleSuppressed();
             WriteStaleSuppressedDiagnostic(earlyContext, suppressedResult);
 
@@ -268,7 +268,7 @@ public sealed class DataRequestPipeline : IDataRequestPipeline, IDisposable
 
         using var operationCancellationLease = operationCancellation;
         var operationToken = operationCancellation.Token;
-        var context = DataRequestContext.Create(request, operationToken);
+        var context = DataRequestContext.Create(request);
 
         bool isAuthorized;
         try

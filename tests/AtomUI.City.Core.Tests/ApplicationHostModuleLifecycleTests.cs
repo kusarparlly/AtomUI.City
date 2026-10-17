@@ -380,7 +380,7 @@ public sealed class ApplicationHostModuleLifecycleTests
     {
         public override async ValueTask OnApplicationInitializationAsync(
             ApplicationInitializationContext context,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             ModuleRecorder.Record("Async:OnApplicationInitialization.Start");
             await Task.Yield();
@@ -389,7 +389,7 @@ public sealed class ApplicationHostModuleLifecycleTests
 
         public override async ValueTask OnApplicationShutdownAsync(
             ApplicationShutdownContext context,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             ModuleRecorder.Record("Async:OnApplicationShutdown.Start");
             await Task.Yield();

@@ -42,7 +42,7 @@ public sealed class AotMessageHandler : IEventHandler<AotMessage>
 
     public static int LastValue => Volatile.Read(ref _lastValue);
 
-    public ValueTask HandleAsync(EventContext<AotMessage> context)
+    public ValueTask HandleAsync(EventContext<AotMessage> context, CancellationToken cancellationToken)
     {
         Volatile.Write(ref _lastValue, context.Event.Value);
         return ValueTask.CompletedTask;
@@ -53,7 +53,7 @@ public abstract class DogfoodHandler : IEventHandler<AotMessage>
 {
     private static int _handledCount;
     public static int HandledCount => Volatile.Read(ref _handledCount);
-    public ValueTask HandleAsync(EventContext<AotMessage> context)
+    public ValueTask HandleAsync(EventContext<AotMessage> context, CancellationToken cancellationToken)
     {
         Interlocked.Increment(ref _handledCount);
         return ValueTask.CompletedTask;
@@ -170,7 +170,7 @@ internal static class Program
         await using var owner = applicationScope.CreateChild(LifecycleScopeKind.Operation, "dogfood-order-owner");
         var observed = new List<int>();
         var serializedChannel = new EventChannel<AotMessage>("serialized");
-        subscriber.Subscribe(owner, serializedChannel, context =>
+        subscriber.Subscribe(owner, serializedChannel, (context, _) =>
         {
             lock (observed)
             {
@@ -206,7 +206,7 @@ internal static class Program
         await using (var continueOwner = applicationScope.CreateChild(LifecycleScopeKind.Operation, "dogfood-continue"))
         {
             subscriber.Subscribe<AotMessage>(continueOwner, channel,
-                _ => throw new InvalidOperationException("continue"),
+                (_, _) => throw new InvalidOperationException("continue"),
                 EventSubscriptionOptions.Serialized.WithErrorPolicy(EventErrorPolicy.ContinueAndReport));
             var result = await publisher.PublishAsync(channel, new AotMessage(200));
             Ensure(result.FailedCount == 1, "ContinueAndReport did not return the handler failure.");
@@ -216,9 +216,9 @@ internal static class Program
         {
             var laterHandlerCalled = false;
             subscriber.Subscribe<AotMessage>(stopOwner, channel,
-                _ => throw new InvalidOperationException("stop"),
+                (_, _) => throw new InvalidOperationException("stop"),
                 EventSubscriptionOptions.Serialized.WithErrorPolicy(EventErrorPolicy.StopPublication));
-            subscriber.Subscribe<AotMessage>(stopOwner, channel, _ =>
+            subscriber.Subscribe<AotMessage>(stopOwner, channel, (_, _) =>
             {
                 laterHandlerCalled = true;
                 return ValueTask.CompletedTask;
@@ -231,7 +231,7 @@ internal static class Program
         await using (var failOwner = applicationScope.CreateChild(LifecycleScopeKind.Operation, "dogfood-fail"))
         {
             subscriber.Subscribe<AotMessage>(failOwner, channel,
-                _ => throw new InvalidOperationException("fail-publisher"),
+                (_, _) => throw new InvalidOperationException("fail-publisher"),
                 EventSubscriptionOptions.Serialized.WithErrorPolicy(EventErrorPolicy.FailPublisher));
             var failureObserved = false;
             try
@@ -248,7 +248,7 @@ internal static class Program
         await using (var disableOwner = applicationScope.CreateChild(LifecycleScopeKind.Operation, "dogfood-disable"))
         {
             var invocationCount = 0;
-            var subscription = subscriber.Subscribe<AotMessage>(disableOwner, channel, _ =>
+            var subscription = subscriber.Subscribe<AotMessage>(disableOwner, channel, (_, _) =>
             {
                 Interlocked.Increment(ref invocationCount);
                 throw new InvalidOperationException("disable");

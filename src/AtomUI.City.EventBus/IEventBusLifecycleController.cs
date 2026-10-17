@@ -8,7 +8,7 @@ internal interface IEventBusLifecycleController
         LifecycleScope applicationScope,
         CancellationToken cancellationToken = default);
 
-    ValueTask StopAsync(CancellationToken cancellationToken = default);
+    ValueTask StopAsync(CancellationToken waitCancellationToken = default);
 }
 
 internal sealed class EventBusHostManagedMarker;

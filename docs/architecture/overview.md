@@ -28,6 +28,7 @@ AtomUI.City 第一版遵循以下原则：
 - C#-native API：公共 API 应符合 .NET/C# 生态习惯，不刻意引入 TypeScript 或 Rx 风格命名。
 - AOT-first / Source-generator-first：框架设计必须默认考虑 AOT、trimming、启动性能和包体积，优先使用显式注册、强类型 descriptor、构建期 manifest 和 source generator，尽可能避免运行时程序集扫描、反射发现、动态代理和表达式树编译。
 - Optional interop：ReactiveUI、Rx 等生态能力可以作为适配层接入，但不作为默认核心范式。
+- Effective cancellation：框架在边界合成调用方、Scope、关闭和超时取消来源，开发者回调只接收并传递一个 `CancellationToken`。
 
 ## 3. 非目标
 
@@ -202,6 +203,8 @@ Activation Scope 的职责：
 - 管理 ViewModel 激活期间的订阅。
 - 在 ViewModel 停用时统一释放。
 - 避免重复订阅和内存泄漏。
+
+跨模块取消规则见：[取消模型](cancellation.md)。
 
 这一点要求 AtomUI.City 提供自己的 ViewModel 激活模型和作用域释放机制。
 

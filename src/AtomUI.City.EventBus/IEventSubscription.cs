@@ -18,5 +18,5 @@ public interface IEventSubscription : IDisposable, IAsyncDisposable
     /// <summary>
     /// Executes the stop async operation.
     /// </summary>
-    ValueTask StopAsync(CancellationToken cancellationToken = default);
+    ValueTask StopAsync(CancellationToken waitCancellationToken = default);
 }

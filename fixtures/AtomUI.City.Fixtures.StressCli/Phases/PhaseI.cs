@@ -62,65 +62,65 @@ public static class PhaseI
             }
         }
 
-        _ = eventBus.Subscribe<OrderSubmitted>(workflowOwner, async context =>
+        _ = eventBus.Subscribe<OrderSubmitted>(workflowOwner, async (context, handlerCancellationToken) =>
         {
             Observe(context);
             writer.Update(PhaseD.StateCatalog.OrdersRevenue, value => value + context.Event.Price * context.Event.Quantity);
             await eventBus.PublishAsync(
                 new InventoryReserved(context.Event.Sku, context.Event.Quantity),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<InventoryReserved>(workflowOwner, async context =>
+        _ = eventBus.Subscribe<InventoryReserved>(workflowOwner, async (context, handlerCancellationToken) =>
         {
             Observe(context);
             writer.Update(PhaseD.StateCatalog.FulfillmentPending, value => value + 1);
             await eventBus.PublishAsync(
                 new PaymentAuthorized($"order-{chainHits + 1}", $"payment-{chainHits + 1}", context.Event.Amount * 20m),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<PaymentAuthorized>(workflowOwner, async context =>
+        _ = eventBus.Subscribe<PaymentAuthorized>(workflowOwner, async (context, handlerCancellationToken) =>
         {
             Observe(context);
             writer.Update(PhaseD.StateCatalog.PaymentsAuthorized, value => value + context.Event.Amount);
             await eventBus.PublishAsync(
                 new PaymentCaptured(context.Event.PaymentId, context.Event.Amount),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<PaymentCaptured>(workflowOwner, async context =>
+        _ = eventBus.Subscribe<PaymentCaptured>(workflowOwner, async (context, handlerCancellationToken) =>
         {
             Observe(context);
             writer.Update(PhaseD.StateCatalog.PaymentsCaptured, value => value + context.Event.Amount);
             await eventBus.PublishAsync(
                 new FulfillmentPlanned(context.Event.PaymentId, $"plan-{context.Event.PaymentId}"),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<FulfillmentPlanned>(workflowOwner, async context =>
+        _ = eventBus.Subscribe<FulfillmentPlanned>(workflowOwner, async (context, handlerCancellationToken) =>
         {
             Observe(context);
             writer.Update(PhaseD.StateCatalog.FulfillmentPending, value => value - 1);
             writer.Update(PhaseD.StateCatalog.FulfillmentCompleted, value => value + 1);
             await eventBus.PublishAsync(
                 new PickListCreated(context.Event.PlanId, 1),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<PickListCreated>(workflowOwner, async context =>
+        _ = eventBus.Subscribe<PickListCreated>(workflowOwner, async (context, handlerCancellationToken) =>
         {
             Observe(context);
             var quote = provider.GetRequiredService<IShippingQuote>().Quote(context.Event.ItemCount);
             await eventBus.PublishAsync(
                 new ShippingQuoted(context.Event.PlanId, quote),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<ShippingQuoted>(workflowOwner, async context =>
+        _ = eventBus.Subscribe<ShippingQuoted>(workflowOwner, async (context, handlerCancellationToken) =>
         {
             Observe(context);
             writer.Update(PhaseD.StateCatalog.ShippingQuoted, value => value + 1);
             var shipment = provider.GetRequiredService<IShipmentTracker>().Dispatch(context.Event.OrderId);
             await eventBus.PublishAsync(
                 new ShipmentDispatched(context.Event.OrderId, shipment),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<ShipmentDispatched>(workflowOwner, async context =>
+        _ = eventBus.Subscribe<ShipmentDispatched>(workflowOwner, async (context, handlerCancellationToken) =>
         {
             Observe(context);
             writer.Update(PhaseD.StateCatalog.ShippingInTransit, value => value + 1);
@@ -128,9 +128,9 @@ public static class PhaseI
             searchIndex.Index("SKU-0001");
             await eventBus.PublishAsync(
                 new SearchExecuted("0001", searchIndex.Search("0001").Count),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<SearchExecuted>(workflowOwner, async context =>
+        _ = eventBus.Subscribe<SearchExecuted>(workflowOwner, async (context, handlerCancellationToken) =>
         {
             Observe(context);
             writer.Update(PhaseD.StateCatalog.SearchQueries, value => value + 1);
@@ -138,34 +138,34 @@ public static class PhaseI
                 .Recommend(provider.GetRequiredService<ISearchIndex>().Search(context.Event.Term));
             await eventBus.PublishAsync(
                 new RecommendationProduced("operator-soak", recommendation),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<RecommendationProduced>(workflowOwner, async context =>
+        _ = eventBus.Subscribe<RecommendationProduced>(workflowOwner, async (context, handlerCancellationToken) =>
         {
             Observe(context);
             writer.Update(PhaseD.StateCatalog.RecommendationsGenerated, value => value + 1);
             var ticket = provider.GetRequiredService<ISupportDesk>().Open(context.Event.Subject, context.Event.Sku);
             await eventBus.PublishAsync(
                 new SupportTicketOpened(context.Event.Subject, ticket),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<SupportTicketOpened>(workflowOwner, async context =>
+        _ = eventBus.Subscribe<SupportTicketOpened>(workflowOwner, async (context, handlerCancellationToken) =>
         {
             Observe(context);
             writer.Update(PhaseD.StateCatalog.SupportOpenTickets, value => value + 1);
             await eventBus.PublishAsync(
                 new AuditAppended($"support:{context.Event.TicketId}"),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<AuditAppended>(workflowOwner, async context =>
+        _ = eventBus.Subscribe<AuditAppended>(workflowOwner, async (context, handlerCancellationToken) =>
         {
             Observe(context);
             writer.Update(PhaseD.StateCatalog.AuditEntries, value => value + 1);
             await eventBus.PublishAsync(
                 new DashboardUpdated(context.Event.Entry),
-                cancellationToken: context.CancellationToken);
+                cancellationToken: handlerCancellationToken);
         });
-        _ = eventBus.Subscribe<DashboardUpdated>(workflowOwner, context =>
+        _ = eventBus.Subscribe<DashboardUpdated>(workflowOwner, (context, _) =>
         {
             Observe(context);
             writer.Update(PhaseD.StateCatalog.DashboardViews, value => value + 1);

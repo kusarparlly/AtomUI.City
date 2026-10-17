@@ -239,7 +239,7 @@ Builder 的 `Configuration` 只用于 Build 前组合配置源、读取构建期
 
 ```csharp
 Task StartAsync(CancellationToken cancellationToken = default);
-Task StopAsync(CancellationToken cancellationToken = default);
+Task StopAsync(CancellationToken waitCancellationToken = default);
 Task RunAsync(CancellationToken cancellationToken = default);
 IServiceProvider Services { get; }
 IApplicationContext Context { get; }

@@ -100,11 +100,13 @@ internal sealed class EventBusContributionLease : IEventBusContributionLease, IP
     }
 
     public IEventSubscription Subscribe<TEvent>(EventPluginPlane plane,
-        Func<EventContext<TEvent>, ValueTask> handler, EventSubscriptionOptions? options = null) =>
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
+        EventSubscriptionOptions? options = null) =>
         Subscribe(plane, EventChannel<TEvent>.Default, handler, options);
 
     public IEventSubscription Subscribe<TEvent>(EventPluginPlane plane, EventChannel<TEvent> channel,
-        Func<EventContext<TEvent>, ValueTask> handler, EventSubscriptionOptions? options = null)
+        Func<EventContext<TEvent>, CancellationToken, ValueTask> handler,
+        EventSubscriptionOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(handler);
         var subscriber = ValidateAccess<TEvent>(plane, channel, EventPluginAccess.Subscribe);
@@ -156,12 +158,12 @@ internal sealed class EventBusContributionLease : IEventBusContributionLease, IP
     public void Dispose() => ObserveFault(RequestTermination());
     public ValueTask DisposeAsync() => new(RequestTermination());
 
-    public ValueTask StopAsync(CancellationToken cancellationToken = default)
+    public ValueTask StopAsync(CancellationToken waitCancellationToken = default)
     {
         var task = RequestTermination();
-        return !cancellationToken.CanBeCanceled || task.IsCompletedSuccessfully
+        return !waitCancellationToken.CanBeCanceled || task.IsCompletedSuccessfully
             ? new ValueTask(task)
-            : new ValueTask(task.WaitAsync(cancellationToken));
+            : new ValueTask(task.WaitAsync(waitCancellationToken));
     }
 
     private Task RequestTermination()
@@ -580,8 +582,8 @@ internal sealed class EventBusContributionLease : IEventBusContributionLease, IP
         public EventSubscriptionState State => _inner?.State ?? EventSubscriptionState.Disposed;
         public void Dispose() { _inner?.Dispose(); Release(); }
         public async ValueTask DisposeAsync() { try { if (_inner is { } inner) await inner.DisposeAsync().ConfigureAwait(false); } finally { Release(); } }
-        public async ValueTask StopAsync(CancellationToken cancellationToken = default)
-        { try { if (_inner is { } inner) await inner.StopAsync(cancellationToken).ConfigureAwait(false); } finally { Release(); } }
+        public async ValueTask StopAsync(CancellationToken waitCancellationToken = default)
+        { try { if (_inner is { } inner) await inner.StopAsync(waitCancellationToken).ConfigureAwait(false); } finally { Release(); } }
         private void Release()
         {
             _inner = null;

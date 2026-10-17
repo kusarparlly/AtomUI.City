@@ -3,6 +3,18 @@ namespace AtomUI.City.Data.Tests;
 public sealed class DataContractValidationTests
 {
     [Fact]
+    public void RequestHandlerCallbackRequiresExplicitCancellationToken()
+    {
+        var method = typeof(IDataRequestHandler).GetMethod(nameof(IDataRequestHandler.InvokeAsync));
+
+        Assert.NotNull(method);
+        var cancellationToken = Assert.Single(
+            method.GetParameters(),
+            parameter => parameter.ParameterType == typeof(CancellationToken));
+        Assert.False(cancellationToken.IsOptional);
+    }
+
+    [Fact]
     public void RequestRejectsUnknownEnumValues()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
@@ -40,7 +52,7 @@ public sealed class DataContractValidationTests
     public void RequestAndContextItemsSupportDeclaredNullableValues()
     {
         var request = new DataRequest<string>("client", "operation", DataTransportKind.Http);
-        var context = DataRequestContext.Create(request, CancellationToken.None);
+        var context = DataRequestContext.Create(request);
 
         request.Items["nullable"] = null;
         context.Items["nullable"] = null;

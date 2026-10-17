@@ -321,7 +321,7 @@ internal sealed class DogfoodNetworkLabWorkload
                 await response.Content.ReadAsStringAsync(token).ConfigureAwait(false));
         var result = await transport.SendAsync(
             request,
-            DataRequestContext.Create(request, cancellationToken),
+            DataRequestContext.Create(request),
             cancellationToken).ConfigureAwait(false);
         Require(result.Succeeded == succeeded,
             $"HTTP network probe expected success={succeeded}; status={result.Status}, error={result.Error?.Kind}, " +
