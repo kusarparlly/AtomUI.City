@@ -20,6 +20,9 @@
 - 非 Presentation 模块不得直接操作 Avalonia visual tree。
 - 需要 UI 更新的结果必须通过 Presentation dispatcher、State 或 EventBus contract 间接到达 UI。
 - Presentation 的 VisualTree 修改必须在 UI dispatcher 上执行。
+- `IUiDispatcher` 是异步 UI work 的唯一线程裁决者：调用方统一调用 `InvokeAsync` / `PostAsync`，不得先用 `CheckAccess()` 复制 inline/排队分支。`CheckAccess()` 只用于必须同步拒绝错误线程的 API 前置条件。
+- 成功接纳的 dispatcher 回调最多执行一次；返回任务在回调执行完成后才完成，回调异常通过返回任务传播。实现允许 inline，但调用方不得依赖一定 inline 或一定排队。
+- 取消只阻止尚未开始的 work；回调开始后 token 是协作信号。dispatcher/runtime 不可用和回调失败必须是可观察、可诊断的任务失败。
 
 ## 后台任务和取消
 

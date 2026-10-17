@@ -180,10 +180,10 @@ Feature ID: `AUC-MVVM-011`
 Status: Implemented
 Goal: 让绑定到 UI 的异步命令在生命周期由后台串行通道驱动时，仍只在 UI dispatcher 上发布可观察通知。
 Public Contract: `CommandFactory.CreateAsync` 的可选 `notificationDispatcher` 参数。
-Runtime / Build Behavior: 命令业务和 ViewModel 生命周期保持原线程模型；`CanExecuteChanged` 与命令状态 `PropertyChanged` 经 dispatcher 投递。
-Failure Behavior: dispatcher 同步抛错或异步失败记录 `AUCMVVM014`，不得产生未观察 Task 异常。
-Threading / Cancellation: dispatcher 只负责通知；不得把命令执行体、Activation 或 Deactivation 整体搬入 UI 线程。
+Runtime / Build Behavior: 命令业务和 ViewModel 生命周期保持原线程模型；`CanExecuteChanged` 与命令状态 `PropertyChanged` 统一调用 dispatcher `InvokeAsync`，Mvvm 不自行查询 `CheckAccess`。
+Failure Behavior: dispatcher 同步抛错、inline 回调失败或排队回调失败统一记录 `AUCMVVM014`，不得产生未观察 Task 异常或改写命令结果。
+Threading / Cancellation: dispatcher 是通知线程的唯一裁决者；不得把命令执行体、Activation 或 Deactivation 整体搬入 UI 线程。最终状态通知使用 `CancellationToken.None`，不受业务 operation 取消阻断。
 Diagnostics: `AUCMVVM014`。
 Tests: `CommandTests`
-Required Assertions: Activation 状态变化从非 UI 线程到达时，通知先排入 dispatcher，drain 后才交付观察者。
-Acceptance Criteria: Avalonia 等具有线程亲和性的绑定不会因 City 生命周期后台执行而收到跨线程命令通知。
+Required Assertions: Activation 状态变化从非 UI 线程到达时，通知先排入 dispatcher，drain 后才交付观察者；inline 与排队订阅者异常均被诊断且不改变命令结果；Mvvm 不调用 `CheckAccess`。
+Acceptance Criteria: Avalonia 等具有线程亲和性的绑定不会因 City 生命周期后台执行而收到跨线程命令通知，命令结果不再取决于通知发生时的线程。

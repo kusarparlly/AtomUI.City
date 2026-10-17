@@ -666,31 +666,11 @@ public static class CommandFactory
                 return;
             }
 
-            bool hasAccess;
             try
             {
-                hasAccess = dispatcher.CheckAccess();
-            }
-            catch (Exception exception)
-            {
-                _runtime.WriteNotificationFailure(exception);
-                return;
-            }
-
-            if (hasAccess)
-            {
-                notification();
-                return;
-            }
-
-            try
-            {
-                var operation = dispatcher.PostAsync(
-                    _ =>
-                    {
-                        notification();
-                        return ValueTask.CompletedTask;
-                    });
+                var operation = dispatcher.InvokeAsync(
+                    notification,
+                    CancellationToken.None);
                 if (!operation.IsCompletedSuccessfully)
                 {
                     _ = ObserveNotificationAsync(operation);

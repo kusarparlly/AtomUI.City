@@ -34,6 +34,8 @@ Core 包的产品主页固定为上游 `https://github.com/AtomUI/AtomUI.City`�
 
 `IUiDispatcher.InvokeAsync` 使用无 token 的便捷重载和显式 `CancellationToken` 重载，不在多个重载上叠加可选参数。这既保持调用便利，也避免以后增加重载时产生源码绑定歧义。
 
+`IUiDispatcher` 的 Preview 行为由 ADR 0013 冻结：dispatcher 是 inline/排队执行的唯一裁决者；成功接纳的回调最多执行一次；返回任务代表回调完成；回调异常通过任务传播。`CheckAccess` 保留为同步前置条件能力，不得被普通异步调用方用于复制调度和失败分支。
+
 ## 1.0 Preview 命名空间标准化
 
 Core 在 1.0 冻结前完成一次显式 breaking migration，程序集不变，命名空间统一增加 `Core` 层级：

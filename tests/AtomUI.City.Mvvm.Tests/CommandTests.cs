@@ -183,6 +183,135 @@ public sealed class CommandTests
     }
 
     [Fact]
+    public async Task InlineNotificationFailureIsDiagnosedWithoutChangingCommandResult()
+    {
+        var diagnostics = new InMemoryHostDiagnostics();
+        var state = new CommandExecutionState("inline-notification", typeof(SaveViewModel));
+        var dispatcher = new InlineUiDispatcher();
+        var command = CommandFactory.CreateAsync(
+            _ => Task.CompletedTask,
+            state,
+            diagnostics: diagnostics,
+            notificationDispatcher: dispatcher);
+        var observable = Assert.IsAssignableFrom<System.ComponentModel.INotifyPropertyChanged>(command);
+        observable.PropertyChanged += static (_, args) =>
+        {
+            if (args.PropertyName == nameof(IAsyncRelayCommand.IsRunning))
+            {
+                throw new InvalidOperationException("inline-notification-failed");
+            }
+        };
+
+        await command.ExecuteAsync(null);
+
+        Assert.Equal(OperationStatus.Completed, state.LastResult?.Status);
+        Assert.True(dispatcher.InvokeCount >= 2);
+        Assert.Contains(
+            diagnostics.Records,
+            record =>
+                record.Code == MvvmDiagnosticIds.CommandNotificationFailed
+                && record.Context?["commandName"] == "inline-notification"
+                && record.Context["exceptionType"] == typeof(InvalidOperationException).FullName);
+    }
+
+    [Fact]
+    public async Task QueuedNotificationFailureIsDiagnosedWithoutChangingCommandResult()
+    {
+        var diagnostics = new InMemoryHostDiagnostics();
+        var state = new CommandExecutionState("queued-notification", typeof(SaveViewModel));
+        var dispatcher = new QueueingUiDispatcher();
+        var command = CommandFactory.CreateAsync(
+            _ => Task.CompletedTask,
+            state,
+            diagnostics: diagnostics,
+            notificationDispatcher: dispatcher);
+        var observable = Assert.IsAssignableFrom<System.ComponentModel.INotifyPropertyChanged>(command);
+        observable.PropertyChanged += static (_, args) =>
+        {
+            if (args.PropertyName == nameof(IAsyncRelayCommand.IsRunning))
+            {
+                throw new InvalidOperationException("queued-notification-failed");
+            }
+        };
+
+        await command.ExecuteAsync(null);
+
+        Assert.Equal(OperationStatus.Completed, state.LastResult?.Status);
+        Assert.Empty(diagnostics.Records);
+        Assert.True(dispatcher.PendingCount >= 2);
+
+        dispatcher.Drain();
+
+        await WaitUntilAsync(() => diagnostics.Records.Any(
+            record => record.Code == MvvmDiagnosticIds.CommandNotificationFailed));
+
+        Assert.Contains(
+            diagnostics.Records,
+            record =>
+                record.Code == MvvmDiagnosticIds.CommandNotificationFailed
+                && record.Context?["commandName"] == "queued-notification"
+                && record.Context["exceptionType"] == typeof(InvalidOperationException).FullName);
+    }
+
+    [Fact]
+    public async Task NotificationFailureDoesNotReplaceBusinessFailure()
+    {
+        var diagnostics = new InMemoryHostDiagnostics();
+        var state = new CommandExecutionState("failed-notification", typeof(SaveViewModel));
+        var businessFailure = new ApplicationException("business-failed");
+        var command = CommandFactory.CreateAsync(
+            _ => Task.FromException(businessFailure),
+            state,
+            diagnostics: diagnostics,
+            notificationDispatcher: new InlineUiDispatcher());
+        var observable = Assert.IsAssignableFrom<System.ComponentModel.INotifyPropertyChanged>(command);
+        observable.PropertyChanged += static (_, _) =>
+            throw new InvalidOperationException("failure-notification-failed");
+
+        var thrown = await Assert.ThrowsAsync<ApplicationException>(() => command.ExecuteAsync(null));
+
+        Assert.Same(businessFailure, thrown);
+        Assert.Equal(OperationStatus.Failed, state.LastResult?.Status);
+        Assert.Same(businessFailure, state.LastError);
+        Assert.Contains(
+            diagnostics.Records,
+            record => record.Code == MvvmDiagnosticIds.CommandNotificationFailed);
+    }
+
+    [Fact]
+    public async Task NotificationFailureDoesNotReplaceCommandCancellation()
+    {
+        var diagnostics = new InMemoryHostDiagnostics();
+        var state = new CommandExecutionState("canceled-notification", typeof(SaveViewModel));
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var command = CommandFactory.CreateAsync(
+            async cancellationToken =>
+            {
+                started.TrySetResult();
+                await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            },
+            state,
+            diagnostics: diagnostics,
+            notificationDispatcher: new InlineUiDispatcher());
+        var observable = Assert.IsAssignableFrom<System.ComponentModel.INotifyPropertyChanged>(command);
+        observable.PropertyChanged += static (_, _) =>
+            throw new InvalidOperationException("cancellation-notification-failed");
+
+        var execution = command.ExecuteAsync(null);
+        await started.Task;
+
+        var cancelException = Record.Exception(command.Cancel);
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => execution);
+
+        Assert.Null(cancelException);
+        Assert.Equal(OperationStatus.Canceled, state.LastResult?.Status);
+        Assert.Null(state.LastError);
+        Assert.Contains(
+            diagnostics.Records,
+            record => record.Code == MvvmDiagnosticIds.CommandNotificationFailed);
+    }
+
+    [Fact]
     public async Task AsyncCommandRejectsConcurrentExecution()
     {
         var state = new CommandExecutionState("load", typeof(SaveViewModel));
@@ -665,6 +794,20 @@ public sealed class CommandTests
         Assert.Equal(0, calls);
     }
 
+    private static async Task WaitUntilAsync(Func<bool> predicate)
+    {
+        var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(5);
+        while (!predicate())
+        {
+            if (DateTime.UtcNow >= deadline)
+            {
+                throw new TimeoutException("The expected asynchronous condition was not observed.");
+            }
+
+            await Task.Delay(10);
+        }
+    }
+
     private sealed class PumpSynchronizationContext : SynchronizationContext, IDisposable
     {
         private readonly BlockingCollection<(SendOrPostCallback Callback, object? State)> _queue = [];
@@ -742,23 +885,48 @@ public sealed class CommandTests
 
     private sealed class QueueingUiDispatcher : IUiDispatcher
     {
-        private readonly Queue<Func<ValueTask>> _queue = [];
+        private readonly Queue<Action> _queue = [];
 
         public int PendingCount => _queue.Count;
 
-        public bool CheckAccess() => false;
+        public bool CheckAccess() =>
+            throw new InvalidOperationException("Command notification code must not query CheckAccess.");
 
         public ValueTask InvokeAsync(Action callback, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            callback();
-            return ValueTask.CompletedTask;
+            var completion = new TaskCompletionSource();
+            _queue.Enqueue(() =>
+            {
+                try
+                {
+                    callback();
+                    completion.TrySetResult();
+                }
+                catch (Exception exception)
+                {
+                    completion.TrySetException(exception);
+                }
+            });
+            return new ValueTask(completion.Task);
         }
 
         public ValueTask<T> InvokeAsync<T>(Func<T> callback, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return ValueTask.FromResult(callback());
+            var completion = new TaskCompletionSource<T>();
+            _queue.Enqueue(() =>
+            {
+                try
+                {
+                    completion.TrySetResult(callback());
+                }
+                catch (Exception exception)
+                {
+                    completion.TrySetException(exception);
+                }
+            });
+            return new ValueTask<T>(completion.Task);
         }
 
         public ValueTask PostAsync(
@@ -766,15 +934,105 @@ public sealed class CommandTests
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            _queue.Enqueue(() => callback(cancellationToken));
-            return ValueTask.CompletedTask;
+            var completion = new TaskCompletionSource();
+            _queue.Enqueue(() => CompletePostedCallback(callback, cancellationToken, completion));
+            return new ValueTask(completion.Task);
         }
 
         public void Drain()
         {
             while (_queue.TryDequeue(out var callback))
             {
-                callback().GetAwaiter().GetResult();
+                callback();
+            }
+        }
+
+        private static void CompletePostedCallback(
+            Func<CancellationToken, ValueTask> callback,
+            CancellationToken cancellationToken,
+            TaskCompletionSource completion)
+        {
+            try
+            {
+                var operation = callback(cancellationToken);
+                if (operation.IsCompletedSuccessfully)
+                {
+                    completion.TrySetResult();
+                    return;
+                }
+
+                _ = CompletePostedCallbackAsync(operation, completion);
+            }
+            catch (Exception exception)
+            {
+                completion.TrySetException(exception);
+            }
+        }
+
+        private static async Task CompletePostedCallbackAsync(
+            ValueTask operation,
+            TaskCompletionSource completion)
+        {
+            try
+            {
+                await operation.ConfigureAwait(false);
+                completion.TrySetResult();
+            }
+            catch (Exception exception)
+            {
+                completion.TrySetException(exception);
+            }
+        }
+    }
+
+    private sealed class InlineUiDispatcher : IUiDispatcher
+    {
+        public int InvokeCount { get; private set; }
+
+        public bool CheckAccess() =>
+            throw new InvalidOperationException("Command notification code must not query CheckAccess.");
+
+        public ValueTask InvokeAsync(Action callback, CancellationToken cancellationToken)
+        {
+            InvokeCount++;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                callback();
+                return ValueTask.CompletedTask;
+            }
+            catch (Exception exception)
+            {
+                return ValueTask.FromException(exception);
+            }
+        }
+
+        public ValueTask<T> InvokeAsync<T>(Func<T> callback, CancellationToken cancellationToken)
+        {
+            InvokeCount++;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                return ValueTask.FromResult(callback());
+            }
+            catch (Exception exception)
+            {
+                return ValueTask.FromException<T>(exception);
+            }
+        }
+
+        public ValueTask PostAsync(
+            Func<CancellationToken, ValueTask> callback,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                return callback(cancellationToken);
+            }
+            catch (Exception exception)
+            {
+                return ValueTask.FromException(exception);
             }
         }
     }

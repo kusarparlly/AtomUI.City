@@ -10,7 +10,7 @@
 | Lifecycle | LifecycleStage, LifecyclePipeline, LifecycleScope | 阶段、中间件和所有权树。 | 按 stage 稳定执行；leaf-first 释放；异常进入 diagnostics。 |
 | Modularity | ModuleBase, IModule, ModuleDescriptor, ModuleOrigin, DependsOnAttribute, ServiceConfigurationContext, ModuleServiceCollection | 模块声明、依赖、配置阶段和生命周期钩子。 | 配置、服务注册、初始化、关闭严格分阶段；PreConfigure 按模块拓扑顺序执行；配置阶段对象结束后冻结。 |
 | DependencyInjection | ServiceAttribute, ScopedServiceAttribute, ExposeServicesAttribute, dependency marker interfaces | AOT 友好的服务声明。 | 不依赖运行时扫描作为唯一发现方式。 |
-| Threading | IUiDispatcher, UnavailableUiDispatcher | UI 调度抽象。 | Core 不绑定 UI 平台。 |
+| Threading | IUiDispatcher, UnavailableUiDispatcher | UI 调度抽象。 | Core 不绑定 UI 平台；dispatcher 是 inline/排队执行的唯一裁决者。 |
 | Diagnostics | IHostDiagnostics, HostDiagnosticRecord, HostDiagnosticIds | Host 级诊断。 | 现有诊断码保持兼容，目标诊断码新增需迁移。 |
 
 ## 首批冻结 API Cards
@@ -672,16 +672,16 @@
 | Created By | Core 默认注册 unavailable 实现；Presentation 替换真实实现。 |
 | Lifetime | Host 生命周期内有效。 |
 | DI Lifetime | Singleton 或 platform-specific dispatcher lifetime。 |
-| Thread Safety | 后台线程可调用调度 API；实现负责串行化 UI work。 |
+| Thread Safety | 任意线程可调用调度 API；实现负责让回调从 UI 线程开始。成功接纳的回调最多执行一次；调用方不得用 `CheckAccess()` 复制 `InvokeAsync` 的线程分支。 |
 | Disposal | Host Stop 后拒绝新 work；已排队 work 按实现策略取消或 drain。 |
 | Nullability | work delegate 不得为空。 |
-| Cancellation | 取消后不得执行尚未开始的 UI work。 |
-| Failure Behavior | dispatcher unavailable、work exception 或 wrong thread 返回失败 Result 或声明异常。 |
+| Cancellation | 入队或执行前取消不得启动回调；回调开始后 token 仅为协作信号。命令最终状态通知不得复用已经取消的业务 token。 |
+| Failure Behavior | `InvokeAsync` / `PostAsync` 返回任务只在回调执行完成后结束；dispatcher unavailable、runtime 不可用和回调异常通过该任务传播。实现允许 inline，但不能因 inline 改成直接穿透调用方的另一套失败语义。 |
 | Diagnostics | 失败诊断包含 dispatcher type、thread id、operation id。 |
 | Plugin Boundary | 插件 UI work 必须绑定 plugin owner，卸载时取消未完成 work。 |
 | AOT / Trimming | Core 接口不引用 Avalonia/AtomUI 类型。 |
 | Breaking Change Rules | 修改调度、取消、异常或线程识别语义属于 breaking change。 |
-| Tests | `UiDispatcherIntegrationTests` 断言 Core 无 UI 引用和 unavailable 行为。 |
+| Tests | `UiDispatcherIntegrationTests` 断言 Core 无 UI 引用和 unavailable 行为；MVVM `CommandTests` 断言 inline/排队通知失败采用相同隔离语义。 |
 
 ### `UnavailableUiDispatcher`
 
