@@ -17,6 +17,7 @@ Presentation 是 City 业务运行时与 Avalonia 之间的 UI 事务协调层�
 - ViewModel 来自 DI/显式或 generated factory/当前 Entry 复用，不反射猜测构造。
 - commit plan 单次使用，候选所有权明确且所有失败路径释放。
 - 所有 Avalonia 对象访问进入 UI dispatcher；用户业务代码不在框架锁内执行。
+- 绑定到 Avalonia View 的命令默认由 `IUiCommandFactory` 创建；业务代码不逐命令传递 dispatcher。
 - 同 Outlet 和同 Window modal Interaction 使用有界 FIFO；满载拒绝最新请求。
 - 同一 Window 一次关闭事务最多一个可见 confirmation。
 - Bind/Unbind 不伪造 VisualTree 事件，只接受真实 Avalonia 物理回执。
@@ -25,7 +26,7 @@ Presentation 是 City 业务运行时与 Avalonia 之间的 UI 事务协调层�
 
 ## 使用入口
 
-City Host 使用 `UseModule<PresentationModule>()`；独立 DI/测试使用 `AddPresentation()`。Avalonia 初始化完成后调用 `Attach`，Window 在 Show 前调用 `RegisterWindow`。
+City Host 使用 `UseModule<PresentationModule>()`；独立 DI/测试使用 `AddPresentation()`。Avalonia 初始化完成后调用 `Attach`，Window 在 Show 前调用 `RegisterWindow`。ViewModel 注入 `IUiCommandFactory` 创建 UI 绑定命令；CLI/Headless 可继续直接使用 MVVM `CommandFactory`。
 
 ## 文档索引
 
@@ -46,4 +47,4 @@ City Host 使用 `UseModule<PresentationModule>()`；独立 DI/测试使用 `Add
 
 ## 成熟度
 
-`AUC-PRESENTATION-001` 至 `016` 的 Windows 基线已完成 Release Verified；`AUC-PRESENTATION-017` 已实现并通过组合与 Runtime 生命周期模块测试，但在全套发布门禁完成前保持 `Implemented`。Linux/macOS 仍是 build-only experimental，不属于平台发布证明。
+`AUC-PRESENTATION-001` 至 `016` 的 Windows 基线已完成 Release Verified；`AUC-PRESENTATION-017` 与 `018` 已实现并通过对应模块测试，但在全套发布门禁完成前保持 `Implemented`。Linux/macOS 仍是 build-only experimental，不属于平台发布证明。

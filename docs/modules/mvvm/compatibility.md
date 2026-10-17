@@ -32,6 +32,7 @@
 - `IActivationScopeOwner.ActivationStateChanged` 已进入 Preview 二进制兼容面；自定义 owner 必须在 state 或 current scope 变化后发布通知，以保证 owner-bound command 的 `CanExecute` 可观察。
 - `CommandFactory.CreateAsync` 新增可选 `notificationDispatcher`；未传入时保持既有通知线程行为，UI 绑定命令应显式传入 dispatcher。通知投递失败使用新增稳定诊断 `AUCMVVM014`。
 - ADR 0013 将已配置 dispatcher 的通知行为收口为唯一 `InvokeAsync` 路径：Mvvm 不再查询 `CheckAccess`；同步、inline 和排队失败均被隔离并记录 `AUCMVVM014`，不得改变命令业务结果。该 Preview 行为修复不修改公开签名。
+- ADR 0014 不修改 `CommandFactory`：其 dispatcher 继续可选以保持 CLI/Headless 兼容。Presentation 可以提供 dispatcher 必选的上层 UI 工厂，但不得反向引入 MVVM 对 Presentation/Avalonia 的依赖。
 
 ## 数据格式兼容
 

@@ -22,6 +22,7 @@ CLI 或纯 mock 不能代替第 3 和第 5 层。
 | 007/008 | owner revoke、覆盖恢复、active view、字典 UI revoke、局部失败继续 | Resource/Plugin tests |
 | 009/016 | Attach、Show 前注册、named outlet、三类 close、唯一 confirmation、close/stop race | Runtime tests, headless/desktop fixture |
 | 017 | Root/Child 显式 attach、独立链接 Scope、leaf-to-root、部分失败、close/stop race、Outlet 隔离 | ViewModelCompositionTests, Runtime/Window lifecycle tests |
+| 018 | 聚合注册、自定义注册保留、全部 command 重载转发、DI dispatcher/diagnostics 注入、通知失败隔离 | UiCommandFactoryTests, PresentationIndustrialContractTests |
 
 Feature 017 当前只完成 composition unit/contract 与 Runtime stop 的部分证据；nested child、Window close、RouteOutlet 隔离、跨 owner Borrowed 实例和 throwing-diagnostics 失败注入仍为 `Release Validation Pending`。详细清单见 [viewmodel-composition.md](viewmodel-composition.md)。
 

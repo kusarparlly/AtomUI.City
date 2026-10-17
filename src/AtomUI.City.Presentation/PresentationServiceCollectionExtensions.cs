@@ -27,6 +27,10 @@ public static class PresentationServiceCollectionExtensions
         });
         services.AddPresentationRuntime();
         services.AddAvaloniaUiDispatcher();
+        services.TryAddSingleton<IUiCommandFactory>(serviceProvider =>
+            new UiCommandFactory(
+                serviceProvider.GetRequiredService<IUiDispatcher>(),
+                serviceProvider.GetService<IHostDiagnostics>()));
         services.AddViewRegistry();
         services.TryAddSingleton(serviceProvider => new ViewFactory(
             serviceProvider.GetRequiredService<IUiDispatcher>(),

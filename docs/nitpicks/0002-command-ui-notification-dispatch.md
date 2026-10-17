@@ -3,7 +3,7 @@
 - 日期：2026-10-16
 - 范围：`AtomUI.City.Core.Threading`、`AtomUI.City.Mvvm`、`AtomUI.City.Presentation`，以及下游 `AtomBox.Desktop` 组合根
 - 结论：整体分层和依赖方向正确，无需调整架构根基；当前缺口集中在 `City.Mvvm` 命令通知链的运行时一致性、契约完整性和验证闭环。综合 8.0/10（分层边界 9.5，运行时一致性 7.0，API 人体工学 7.5，文档与验证 7.0）。
-- 状态：P0 调度与失败隔离合同已由 [ADR 0013](../decisions/0013-ui-observable-notification-dispatch.md) 裁决并进入施工；UI 默认入口、下游重复抽象和通知合批仍按本文优先级后续处理。
+- 状态：P0 调度与失败隔离合同已由 [ADR 0013](../decisions/0013-ui-observable-notification-dispatch.md) 落地；P1 UI 默认入口已由 [ADR 0014](../decisions/0014-presentation-ui-command-factory.md) 落地；下游重复抽象和通知合批仍按本文优先级后续处理。
 
 ## 1. 背景（核实过的事实，带出处）
 

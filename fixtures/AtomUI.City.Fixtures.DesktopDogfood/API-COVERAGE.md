@@ -107,7 +107,7 @@ Generated attribute/manifest/handler descriptor 由 72 contract 和不少于 144
 
 ## 10. MVVM API 场景
 
-64 个 ViewModel 必须覆盖 `ViewModelBase` notification/dispose，activation context/scope/accessor/state，三类 deactivation contract/guard/result，CommandFactory 同步/异步、CommandExecutionState/Group，OperationScope/Result/Status，Interaction context/result/status，以及 Validation scope/message/event/status。
+64 个 ViewModel 必须覆盖 `ViewModelBase` notification/dispose，activation context/scope/accessor/state，三类 deactivation contract/guard/result；Avalonia 绑定命令统一经 `IUiCommandFactory` 覆盖同步/异步安全入口，自动化故障注入继续覆盖底层 `CommandFactory`；同时覆盖 CommandExecutionState/Group、OperationScope/Result/Status、Interaction context/result/status，以及 Validation scope/message/event/status。
 
 CommunityToolkit 原生命令与属性通知仍可直接使用；Dogfood 同时验证 City wrapper 没有阻止常用 Toolkit 能力。Presentation handler 和 validation target 是组合证据，不改变 MVVM 无 Avalonia 依赖的边界。
 

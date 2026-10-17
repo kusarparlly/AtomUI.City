@@ -11,7 +11,7 @@
 
 ViewModel 获取、DI scope、route prepare、leave/confirm guard、activation/deactivation、诊断组装和非 UI 资源清理必须在线程池/调用线程执行，不得为了方便整体搬到 UI 线程。
 
-绑定到 Avalonia View 的 City async command 必须在组合根通过 `CommandFactory.CreateAsync(..., notificationDispatcher: dispatcher)` 接入 Presentation/Core UI dispatcher。这里只调度 `CanExecuteChanged` 与命令状态属性通知；不能把 ViewModel 生命周期整体包装进 dispatcher。
+绑定到 Avalonia View 的 City command 默认通过 DI 注入的 `IUiCommandFactory` 创建。该入口固定把 Presentation/Core UI dispatcher 交给底层 `CommandFactory`，避免每个 ViewModel 手工传递和遗漏。直接调用 `CommandFactory.CreateAsync(..., notificationDispatcher: dispatcher)` 只作为低级入口保留。这里只调度 `CanExecuteChanged` 与命令状态属性通知；不能把命令业务或 ViewModel 生命周期整体包装进 dispatcher。
 
 Avalonia dispatcher 是命令通知 inline/排队执行的唯一裁决者。Mvvm 始终调用 `InvokeAsync`；dispatcher 在 UI 线程可以 inline，在其他线程排队，但两条路径都必须以“返回任务代表回调完成、回调异常通过任务传播”的合同结束。Command 层观察失败并写 `AUCMVVM014`，Presentation 不自动弹出最终用户错误 UI。
 

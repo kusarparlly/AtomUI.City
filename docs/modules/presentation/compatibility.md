@@ -15,6 +15,7 @@
 - Validation 完全可选且应用拥有规则、文案、回调和样式。
 - plugin UI owner/revoke/unload 顺序。
 - NuGet 包的 net8.0/net10.0 资产以及 Avalonia/Core/Mvvm/Routing/Security/State 依赖边；AtomUI、Localization、fixture、test 和 benchmark 不得进入主包。
+- `IUiCommandFactory` 是 Presentation 的 Preview UI 默认入口；默认实现可保持 internal，但同步/异步/泛型重载、activation/concurrency/exception 参数和 DI dispatcher 注入语义属于兼容面。
 
 ## 不属于 Presentation 兼容面
 
@@ -34,3 +35,5 @@
 1.0 Preview 取消合同收口移除 `RouteOutletCommitPlan.LifecycleToken` 与 `Replace(..., lifecycleToken)`；`IRouteOutlet.CommitAsync` 成为唯一取消入口。`IPresentationRuntime.StopAsync` 和 `WindowSession.CloseAsync` 的 wait-only 参数改名为 `waitCancellationToken`。
 
 `AUC-PRESENTATION-017` 已落地：Root/Child 只作为显式 lease 角色，不增加 MVVM 基类、全局 Root 单例或反射发现。`ViewModelCompositionOwner`、`ViewModelCompositionLease`、lease identity、owner 边界、异步释放和 leaf-to-root 顺序进入 1.0 Preview 兼容面。
+
+ADR 0014 引入双入口：MVVM `CommandFactory` 继续保持 Headless 兼容；Presentation `IUiCommandFactory` 成为 UI 推荐入口。删除 UI 工厂、恢复逐调用 dispatcher 参数或让工厂绕过 DI dispatcher 均属于 breaking change。

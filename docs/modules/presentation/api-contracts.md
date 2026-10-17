@@ -79,6 +79,7 @@ Outlet 失败语义：
 | `GetModalQueueSnapshot` | 每 Window 模态 lane 快照；默认 1 in-flight + 8 pending；满载拒绝最新并返回 `InteractionQueueFull`。 |
 | `ValidationVisualStateBinding.ApplyAsync` | 仅显式调用时把 snapshot 应用到 target；不发现规则、不决定文案/样式；UI target 失败传播。 |
 | `CommandBinding.BindAsync` | 可选自定义 command source bridge；刷新 visual state 在 dispatcher；handle dispose 解除事件。 |
+| `IUiCommandFactory.Create/CreateAsync` | Avalonia ViewModel 的默认命令创建入口；镜像 MVVM 的同步、泛型、activation、并发和异常处理能力；dispatcher 与 diagnostics 由 DI 固定提供，调用方不得逐命令遗漏或替换。异步通知遵循 ADR 0013，命令业务仍不被搬入 UI 线程。 |
 
 ## Visual lifecycle
 
@@ -114,7 +115,7 @@ Outlet 失败语义：
 - Runtime/DI：`PresentationModule`、`PresentationServiceCollectionExtensions`、`IPresentationRuntime`、`PresentationRuntime`、`WindowSession`、`PresentationQueueOptions/Snapshot`。
 - View：`ViewForAttribute`、`ViewDescriptor`、`ViewLookupRequest`、`IViewRegistry/IViewLocator`、`ViewFactory/Context`、`ViewBinder`、`BoundViewHandle`、`IViewModelFactory`、`ViewModelLease`。
 - Outlet/feedback：`IRouteOutlet`、`RouteOutlet`、`RouteOutletCommitPlan/Result`、`IRouteOutletTarget`、`AvaloniaRouteOutletTarget`、`PresentationEntry`、`VisualIdentity`、`VisualLifecycle*`。
-- Interaction/visual state：`IInteractionHandlerRegistry`、`InteractionDispatchContext`、`InteractionHandlerRegistrationOptions`、`CommandBinding`、`ValidationVisualStateBinding` 及其 target/handle/snapshot contracts。
+- Interaction/visual state：`IInteractionHandlerRegistry`、`InteractionDispatchContext`、`InteractionHandlerRegistrationOptions`、`IUiCommandFactory`、`CommandBinding`、`ValidationVisualStateBinding` 及其 target/handle/snapshot contracts。
 - Plugin UI：active view、resource registry/dictionary revoker、plugin unload coordinator 相关 public contracts。
 - Failure/diagnostics：`PresentationException`、`PresentationFailure`、`IPresentationFailurePresenter`、`PresentationDiagnosticIds`。
 

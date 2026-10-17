@@ -4,6 +4,7 @@ using AtomUI.City.Data;
 using AtomUI.City.EventBus;
 using AtomUI.City.Localization;
 using AtomUI.City.Mvvm;
+using AtomUI.City.Presentation;
 using AtomUI.City.Security;
 using AtomUI.City.State;
 using CommunityToolkit.Mvvm.Input;
@@ -41,6 +42,7 @@ internal sealed class DogfoodInteractionViewModel : ViewModelBase
         IAccountSessionManager accountSessions,
         IApplicationStateWriter stateWriter,
         IUiDispatcher dispatcher,
+        IUiCommandFactory commands,
         DogfoodRunLedger ledger)
     {
         _remoteOperations = remoteOperations;
@@ -54,14 +56,14 @@ internal sealed class DogfoodInteractionViewModel : ViewModelBase
         SearchExecution = new CommandExecutionState(
             "Search",
             typeof(DogfoodInteractionViewModel));
-        SearchCommand = CommandFactory.CreateAsync(SearchAsync, SearchExecution);
-        CancelSearchCommand = CommandFactory.Create(SearchCommand.Cancel);
-        ClearCommand = CommandFactory.Create(Clear);
-        ApplyCultureCommand = CommandFactory.CreateAsync(ApplyCultureAsync);
-        SwitchAccountCommand = CommandFactory.CreateAsync(SwitchAccountAsync);
-        RunScenarioCommand = CommandFactory.CreateAsync(RunSelectedScenarioAsync);
-        RunScenarioMatrixCommand = CommandFactory.CreateAsync(RunScenarioMatrixAsync);
-        CancelScenarioCommand = CommandFactory.Create(CancelScenarios);
+        SearchCommand = commands.CreateAsync(SearchAsync, SearchExecution);
+        CancelSearchCommand = commands.Create(SearchCommand.Cancel);
+        ClearCommand = commands.Create(Clear);
+        ApplyCultureCommand = commands.CreateAsync(ApplyCultureAsync);
+        SwitchAccountCommand = commands.CreateAsync(SwitchAccountAsync);
+        RunScenarioCommand = commands.CreateAsync(RunSelectedScenarioAsync);
+        RunScenarioMatrixCommand = commands.CreateAsync(RunScenarioMatrixAsync);
+        CancelScenarioCommand = commands.Create(CancelScenarios);
     }
 
     public IReadOnlyList<string> Cultures { get; } = ["en-US", "zh-CN"];

@@ -1,4 +1,5 @@
 using AtomUI.City.Mvvm;
+using AtomUI.City.Presentation;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AtomUI.City.Fixtures.DesktopDogfood;
@@ -9,11 +10,13 @@ public sealed class DashboardViewModel : ViewModelBase
     private string _activationStatus = "Waiting for activation";
     private string _projectionSample = "Not loaded";
 
-    public DashboardViewModel(DashboardProjectionService projectionService)
+    public DashboardViewModel(
+        DashboardProjectionService projectionService,
+        IUiCommandFactory commands)
     {
         _projectionService = projectionService;
-        RefreshCommand = CommandFactory.CreateAsync(RefreshAsync);
-        ResetCommand = CommandFactory.Create(Reset);
+        RefreshCommand = commands.CreateAsync(RefreshAsync);
+        ResetCommand = commands.Create(Reset);
     }
 
     public IAsyncRelayCommand RefreshCommand { get; }

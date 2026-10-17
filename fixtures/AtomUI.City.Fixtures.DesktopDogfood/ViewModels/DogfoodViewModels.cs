@@ -1,4 +1,5 @@
 using AtomUI.City.Mvvm;
+using AtomUI.City.Presentation;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,9 +10,10 @@ public abstract class DogfoodPageViewModel : ViewModelBase
     private string _activity = "Constructed";
     private int _executionCount;
 
-    protected DogfoodPageViewModel()
+    protected DogfoodPageViewModel(IUiCommandFactory commands)
     {
-        PrimaryCommand = CommandFactory.CreateAsync(ExecutePrimaryAsync);
+        ArgumentNullException.ThrowIfNull(commands);
+        PrimaryCommand = commands.CreateAsync(ExecutePrimaryAsync);
     }
 
     public string PageTitle => GetType().Name.Replace("ViewModel", string.Empty, StringComparison.Ordinal);
@@ -50,9 +52,10 @@ public abstract class DogfoodPageViewModel : ViewModelBase
 
 public abstract class DualCommandDogfoodPageViewModel : DogfoodPageViewModel
 {
-    protected DualCommandDogfoodPageViewModel()
+    protected DualCommandDogfoodPageViewModel(IUiCommandFactory commands)
+        : base(commands)
     {
-        SecondaryCommand = CommandFactory.Create(() => SecondaryExecutionCount++);
+        SecondaryCommand = commands.Create(() => SecondaryExecutionCount++);
     }
 
     public int SecondaryExecutionCount { get; private set; }
@@ -60,70 +63,70 @@ public abstract class DualCommandDogfoodPageViewModel : DogfoodPageViewModel
     public IRelayCommand SecondaryCommand { get; }
 }
 
-public sealed class ShellViewModel : DualCommandDogfoodPageViewModel;
-public sealed class NavigationViewModel : DualCommandDogfoodPageViewModel;
-public sealed class AccountSwitcherViewModel : DualCommandDogfoodPageViewModel;
-public sealed class TenantSwitcherViewModel : DualCommandDogfoodPageViewModel;
-public sealed class ActivityCenterViewModel : DualCommandDogfoodPageViewModel;
-public sealed class InspectorViewModel : DualCommandDogfoodPageViewModel;
-public sealed class GlobalSearchViewModel : DualCommandDogfoodPageViewModel;
-public sealed class WorkspaceViewModel : DualCommandDogfoodPageViewModel;
-public sealed class KpiBoardViewModel : DualCommandDogfoodPageViewModel;
-public sealed class HealthViewModel : DualCommandDogfoodPageViewModel;
-public sealed class AlertsViewModel : DualCommandDogfoodPageViewModel;
-public sealed class RealtimeMonitorViewModel : DualCommandDogfoodPageViewModel;
-public sealed class DiagnosticsSummaryViewModel : DualCommandDogfoodPageViewModel;
-public sealed class ProductListViewModel : DualCommandDogfoodPageViewModel;
-public sealed class ProductDetailsViewModel : DualCommandDogfoodPageViewModel;
-public sealed class ProductEditorViewModel : DualCommandDogfoodPageViewModel;
-public sealed class CategoryTreeViewModel : DualCommandDogfoodPageViewModel;
-public sealed class PricingBoardViewModel : DualCommandDogfoodPageViewModel;
-public sealed class CurrencyEditorViewModel : DualCommandDogfoodPageViewModel;
-public sealed class PromotionListViewModel : DualCommandDogfoodPageViewModel;
-public sealed class PromotionEditorViewModel : DualCommandDogfoodPageViewModel;
-public sealed class InventoryListViewModel : DualCommandDogfoodPageViewModel;
-public sealed class StockDetailsViewModel : DualCommandDogfoodPageViewModel;
-public sealed class WarehouseListViewModel : DualCommandDogfoodPageViewModel;
-public sealed class WarehouseDetailsViewModel : DualCommandDogfoodPageViewModel;
-public sealed class BinAllocationViewModel : DualCommandDogfoodPageViewModel;
-public sealed class TransferEditorViewModel : DualCommandDogfoodPageViewModel;
-public sealed class PurchaseOrderListViewModel : DualCommandDogfoodPageViewModel;
-public sealed class ReceivingViewModel : DualCommandDogfoodPageViewModel;
-public sealed class OrderListViewModel : DualCommandDogfoodPageViewModel;
-public sealed class OrderDetailsViewModel : DualCommandDogfoodPageViewModel;
-public sealed class OrderEditorViewModel : DogfoodPageViewModel;
+public sealed class ShellViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class NavigationViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class AccountSwitcherViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class TenantSwitcherViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class ActivityCenterViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class InspectorViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class GlobalSearchViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class WorkspaceViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class KpiBoardViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class HealthViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class AlertsViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class RealtimeMonitorViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class DiagnosticsSummaryViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class ProductListViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class ProductDetailsViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class ProductEditorViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class CategoryTreeViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class PricingBoardViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class CurrencyEditorViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class PromotionListViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class PromotionEditorViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class InventoryListViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class StockDetailsViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class WarehouseListViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class WarehouseDetailsViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class BinAllocationViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class TransferEditorViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class PurchaseOrderListViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class ReceivingViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class OrderListViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class OrderDetailsViewModel(IUiCommandFactory commands) : DualCommandDogfoodPageViewModel(commands);
+public sealed class OrderEditorViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
 
-public sealed class OrderTimelineViewModel : DogfoodPageViewModel;
-public sealed class InvoiceDetailsViewModel : DogfoodPageViewModel;
-public sealed class TaxPreviewViewModel : DogfoodPageViewModel;
-public sealed class PaymentWizardViewModel : DogfoodPageViewModel;
-public sealed class PaymentReconciliationViewModel : DogfoodPageViewModel;
-public sealed class FulfillmentPlanViewModel : DogfoodPageViewModel;
-public sealed class PickWaveViewModel : DogfoodPageViewModel;
-public sealed class ShipmentListViewModel : DogfoodPageViewModel;
-public sealed class ShipmentDetailsViewModel : DogfoodPageViewModel;
-public sealed class CarrierQuoteViewModel : DogfoodPageViewModel;
-public sealed class ReturnListViewModel : DogfoodPageViewModel;
-public sealed class ReturnWizardViewModel : DogfoodPageViewModel;
-public sealed class RefundReviewViewModel : DogfoodPageViewModel;
-public sealed class CustomerListViewModel : DogfoodPageViewModel;
-public sealed class CustomerDetailsViewModel : DogfoodPageViewModel;
-public sealed class CustomerTimelineViewModel : DogfoodPageViewModel;
-public sealed class RecommendationPanelViewModel : DogfoodPageViewModel;
-public sealed class NotificationCenterViewModel : DogfoodPageViewModel;
-public sealed class SupportQueueViewModel : DogfoodPageViewModel;
-public sealed class SupportConversationViewModel : DogfoodPageViewModel;
-public sealed class SupportComposerViewModel : DogfoodPageViewModel;
-public sealed class ReportCenterViewModel : DogfoodPageViewModel;
-public sealed class ReportDesignerViewModel : DogfoodPageViewModel;
-public sealed class AnalyticsViewModel : DogfoodPageViewModel;
-public sealed class AuditExplorerViewModel : DogfoodPageViewModel;
-public sealed class UserAdminViewModel : DogfoodPageViewModel;
-public sealed class PermissionAdminViewModel : DogfoodPageViewModel;
-public sealed class PolicyAdminViewModel : DogfoodPageViewModel;
-public sealed class SettingsViewModel : DogfoodPageViewModel;
-public sealed class FeatureFlagsViewModel : DogfoodPageViewModel;
-public sealed class FailureConsoleViewModel : DogfoodPageViewModel;
+public sealed class OrderTimelineViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class InvoiceDetailsViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class TaxPreviewViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class PaymentWizardViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class PaymentReconciliationViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class FulfillmentPlanViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class PickWaveViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class ShipmentListViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class ShipmentDetailsViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class CarrierQuoteViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class ReturnListViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class ReturnWizardViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class RefundReviewViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class CustomerListViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class CustomerDetailsViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class CustomerTimelineViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class RecommendationPanelViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class NotificationCenterViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class SupportQueueViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class SupportConversationViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class SupportComposerViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class ReportCenterViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class ReportDesignerViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class AnalyticsViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class AuditExplorerViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class UserAdminViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class PermissionAdminViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class PolicyAdminViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class SettingsViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class FeatureFlagsViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
+public sealed class FailureConsoleViewModel(IUiCommandFactory commands) : DogfoodPageViewModel(commands);
 
 internal static class DogfoodViewModelCatalog
 {

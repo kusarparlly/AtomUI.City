@@ -26,6 +26,7 @@ Routing-Presentation adapter 是调用编排者，Router snapshot 是导航真�
 - Presentation 不含文案、多语言、语言包或 Localization 状态机。
 - MVVM 不感知 Root/Child；Presentation 只通过显式 lease 建立逻辑组合，不反射对象图或 visual tree。
 - Child 使用独立 ActivationScope 并链接父取消；RouteOutlet Entry 与 composition tree 相互隔离。
+- UI command factory 只固定注入 dispatcher/diagnostics 并转发 MVVM 创建参数，不复制命令状态机或接管业务执行线程。
 
 ## 所有权表
 
@@ -58,6 +59,8 @@ Routing-Presentation adapter 是调用编排者，Router snapshot 是导航真�
 公开扩展点只有 DI extension、`PresentationModule`、View attribute/generated registrar、View/Interaction/resource registration、Outlet target 和 failure presenter。新增扩展点必须同时更新 Feature、API card、诊断、测试与兼容性文档。
 
 `AUC-PRESENTATION-017` 完成后，显式 ViewModel composition service/lease 加入上述扩展点；它不允许第三方替换 ownership 状态机。
+
+`AUC-PRESENTATION-018` 增加 `IUiCommandFactory` 作为可替换 DI 扩展点；默认实现保持 internal。替代实现必须继续满足 dispatcher 必选和 MVVM 语义完整转发合同。
 
 ## AOT
 

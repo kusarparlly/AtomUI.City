@@ -139,6 +139,8 @@ Command 需要标准化运行状态：
 
 dispatcher 只负责通知，不负责运行命令业务、解析 `CanExecute`、激活或停用 ViewModel。Mvvm 无条件调用 `InvokeAsync`，不得先调用 `CheckAccess()` 复制 inline/排队分支；dispatcher 是线程裁决的唯一所有者。返回任务表示通知回调已执行完成，Mvvm 必须观察同步抛出、inline 失败和排队后失败，统一记录 `AUCMVVM014`。通知失败不得改变命令业务结果，也不得形成未观察 Task；最终状态通知使用 `CancellationToken.None`，应用层仍负责把正确的 UI dispatcher 传给绑定到视图的命令。
 
+`CommandFactory` 保持 UI 框架无关，因此 dispatcher 参数继续可选。CLI、Headless 和低级测试可直接使用该入口；Presentation/Avalonia ViewModel 默认通过 Presentation 的 `IUiCommandFactory` 创建命令，由组合根固定注入 dispatcher 和 diagnostics。UI 工厂是薄适配，不改变本节任何命令、并发、取消或 activation 语义。
+
 ### 5. 权限和路由联动
 
 Command 可执行状态可以接入：

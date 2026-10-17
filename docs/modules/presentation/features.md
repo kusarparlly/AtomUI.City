@@ -23,6 +23,7 @@
 | AUC-PRESENTATION-015 | Bounded Backpressure and Candidate Ownership | Release Verified | PresentationIndustrialContractTests |
 | AUC-PRESENTATION-016 | Deterministic Window Close Origins and Confirmation | Release Verified | unit close-origin tests, headless fixture, Windows desktop process test |
 | AUC-PRESENTATION-017 | Logical Root and Owned Child ViewModels | Implemented / Release Validation Pending | ViewModelCompositionTests; PresentationRuntimeTests；剩余证据见 viewmodel-composition.md |
+| AUC-PRESENTATION-018 | UI Command Factory Safe Default | Implemented | UiCommandFactoryTests；DesktopDogfood ViewModels |
 
 ## Feature 合同摘要
 
@@ -65,6 +66,10 @@ Presentation 主包不再引用 Localization，不提供 culture revision、文�
 ### 017 ViewModel composition
 
 MVVM 保持无 Root/Child 角色；Presentation 显式把逻辑 Root 附着到 Runtime/Window owner，并以异步 lease 建立 owned Child。Child 使用独立且链接父取消的 ActivationScope，释放 leaf-to-root；不反射扫描、不引入 Root/Child 基类、不把 RouteOutlet Entry 自动纳入组合树。完整合同见 [viewmodel-composition.md](viewmodel-composition.md)。
+
+### 018 UI command factory
+
+Presentation 提供 dispatcher 必选的 `IUiCommandFactory` 作为 Avalonia ViewModel 默认入口。它完整转发 MVVM command 能力，由 DI 固定注入 `IUiDispatcher` 和 `IHostDiagnostics`，不复制命令状态机。底层 `CommandFactory` 继续服务 Headless、CLI、测试和明确承担线程责任的低级代码。完整裁决见 [ADR 0014](../../decisions/0014-presentation-ui-command-factory.md)。
 
 ## 治理门禁
 
