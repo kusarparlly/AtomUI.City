@@ -126,6 +126,7 @@ AtomUI.City.Mvvm.InteractionResultStatus.Completed = 0 -> AtomUI.City.Mvvm.Inter
 AtomUI.City.Mvvm.InteractionResultStatus.Failed = 2 -> AtomUI.City.Mvvm.InteractionResultStatus
 AtomUI.City.Mvvm.InteractionResultStatus.NotHandled = 3 -> AtomUI.City.Mvvm.InteractionResultStatus
 AtomUI.City.Mvvm.MvvmDiagnosticIds
+const AtomUI.City.Mvvm.MvvmDiagnosticIds.ActivationStateNotificationFailed = "AUCMVVM015" -> string!
 AtomUI.City.Mvvm.OperationExecutionResult
 AtomUI.City.Mvvm.OperationExecutionResult.<Clone>$() -> AtomUI.City.Mvvm.OperationExecutionResult!
 AtomUI.City.Mvvm.OperationExecutionResult.Deconstruct(out System.Guid OperationId, out AtomUI.City.Mvvm.OperationStatus Status, out System.TimeSpan Elapsed, out System.Exception? Error) -> void

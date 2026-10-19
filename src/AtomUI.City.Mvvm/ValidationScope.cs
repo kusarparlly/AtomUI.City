@@ -131,7 +131,7 @@ public sealed class ValidationScope : IDisposable
             _ownerScopeId = activationScope.Id;
         }
 
-        activationScope.Add(new DelegateDisposable(Cancel));
+        activationScope.Add(new DelegateDisposable(CancelFromOwner));
     }
 
     /// <summary>
@@ -245,7 +245,7 @@ public sealed class ValidationScope : IDisposable
             args = CaptureChangedEventArgs(string.Empty);
         }
 
-        _diagnostics?.Write(new HostDiagnosticRecord(
+        MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
             MvvmDiagnosticIds.ValidationFailed,
             $"Validation scope failed: {exception.Message}",
             HostDiagnosticSeverity.Error)
@@ -267,10 +267,31 @@ public sealed class ValidationScope : IDisposable
     {
         ThrowIfDisposed();
 
+        CancelCore(ignoreDisposed: false);
+    }
+
+    private void CancelFromOwner()
+    {
+        CancelCore(ignoreDisposed: true);
+    }
+
+    private void CancelCore(bool ignoreDisposed)
+    {
+
         ValidationChangedEventArgs args;
 
         lock (_syncRoot)
         {
+            if (_disposed)
+            {
+                if (ignoreDisposed)
+                {
+                    return;
+                }
+
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+
             _exception = null;
             _status = ValidationStatus.Canceled;
             args = CaptureChangedEventArgs(string.Empty);

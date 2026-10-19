@@ -7,6 +7,7 @@
 - message 可以优化，但 code 含义不能漂移。
 - 重要失败路径必须有诊断、Result 或声明异常。
 - 测试必须断言 code 和至少一个定位字段。
+- `IHostDiagnostics.Write` 是纯观察性出口；即使自定义实现抛异常，也不得覆盖业务异常、回滚状态提交或阻断 Task 完成。
 
 ## 当前源码诊断码
 
@@ -26,6 +27,7 @@
 | `AUCMVVM012` | CommandInactive | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
 | `AUCMVVM013` | CommandExceptionHandlerFailed | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
 | `AUCMVVM014` | CommandNotificationFailed | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
+| `AUCMVVM015` | ActivationStateNotificationFailed | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
 
 ## 上下文 key 合同
 
@@ -43,6 +45,7 @@
 | `AUCMVVM012` | `commandName`、`ownerType`、`activationState`。 |
 | `AUCMVVM013` | `commandName`、`ownerType`、`operationId`、`exceptionType`。 |
 | `AUCMVVM014` | `commandName`、`ownerType`、`dispatcherType`、`exceptionType`。 |
+| `AUCMVVM015` | `viewModelType`、`activationState`、`exceptionType`。 |
 
 ## 产品级必须诊断的失败
 
@@ -54,6 +57,7 @@
 - Validation 逻辑异常：写 `AUCMVVM008`。
 - Activation task 重复/关闭后准入、执行失败或 drain 超时：分别写 `AUCMVVM009-011`。
 - inactive Command、应用异常 handler 失败和命令 UI 通知投递失败：分别写 `AUCMVVM012-014`。
+- ActivationStateChanged 订阅者失败：写 `AUCMVVM015`，继续通知其他订阅者且不回滚生命周期状态。
 - Command/Activation 诊断只输出结构化上下文，不创建或写入任何磁盘日志文件。
 
 ## 上下文字段

@@ -287,6 +287,20 @@ public sealed class ActivationScopeTests
     }
 
     [Fact]
+    public async Task ThrowingDiagnosticsCannotStrandFailedTaskCompletion()
+    {
+        await using var scope = new ActivationScope(new ThrowingHostDiagnostics());
+        var expected = new InvalidOperationException("task-failure");
+
+        var task = scope.StartAsync("failing", _ => Task.FromException(expected));
+        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            task.WaitAsync(TimeSpan.FromSeconds(2)));
+
+        Assert.Same(expected, thrown);
+        Assert.Equal(0, scope.ActiveTaskCount);
+    }
+
+    [Fact]
     public async Task DrainTimeoutIsObservableAndDoesNotClaimTaskTermination()
     {
         var diagnostics = new InMemoryHostDiagnostics();

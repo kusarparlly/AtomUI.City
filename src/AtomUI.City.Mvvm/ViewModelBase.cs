@@ -239,8 +239,22 @@ public abstract class ViewModelBase :
                 return;
             }
 
-            _disposed = true;
             scope = ActivationContext?.Scope;
+        }
+
+        // A synchronous scope disposal can reject asynchronous ownership. Perform
+        // it before committing the ViewModel's terminal state so DisposeAsync can
+        // still recover through the retained activation context.
+        scope?.Dispose();
+
+        lock (_stateSyncRoot)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
             ActivationContext = null;
             _activationState = ActivationState.Disposed;
         }
@@ -248,11 +262,10 @@ public abstract class ViewModelBase :
 
         try
         {
-            scope?.Dispose();
+            OnDisposed();
         }
         finally
         {
-            OnDisposed();
             GC.SuppressFinalize(this);
         }
     }
@@ -430,14 +443,41 @@ public abstract class ViewModelBase :
 
     private void OnActivationStateChanged()
     {
-        ActivationStateChanged?.Invoke(this, EventArgs.Empty);
+        var handlers = ActivationStateChanged;
+        if (handlers is null)
+        {
+            return;
+        }
+
+        foreach (EventHandler handler in handlers.GetInvocationList())
+        {
+            try
+            {
+                handler(this, EventArgs.Empty);
+            }
+            catch (Exception exception)
+            {
+                MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
+                    MvvmDiagnosticIds.ActivationStateNotificationFailed,
+                    $"Activation state observer failed for '{GetType().FullName}': {exception.Message}",
+                    HostDiagnosticSeverity.Error)
+                {
+                    Context = new Dictionary<string, string?>
+                    {
+                        ["viewModelType"] = GetType().FullName,
+                        ["activationState"] = ActivationState.ToString(),
+                        ["exceptionType"] = exception.GetType().FullName,
+                    }
+                });
+            }
+        }
     }
 
     private void WriteActivationScopeCleanupFailedDiagnostic(
         Exception exception,
         ActivationContext context)
     {
-        _diagnostics?.Write(new HostDiagnosticRecord(
+        MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
             MvvmDiagnosticIds.ActivationScopeDisposeFailed,
             $"Activation scope '{context.Scope.Id}' cleanup failed for '{GetType().FullName}': {exception.Message}",
             HostDiagnosticSeverity.Error)
@@ -462,7 +502,7 @@ public abstract class ViewModelBase :
 
     private void WriteActivationFailedDiagnostic(Exception exception, ActivationContext context)
     {
-        _diagnostics?.Write(new HostDiagnosticRecord(
+        MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
             MvvmDiagnosticIds.ActivationFailed,
             $"ViewModel activation failed for '{GetType().FullName}' at stage 'Activating': {exception.Message}",
             HostDiagnosticSeverity.Error)
@@ -478,7 +518,7 @@ public abstract class ViewModelBase :
 
     private void WriteDeactivationFailedDiagnostic(Exception exception)
     {
-        _diagnostics?.Write(new HostDiagnosticRecord(
+        MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
             MvvmDiagnosticIds.DeactivationFailed,
             $"ViewModel deactivation handler failed for '{GetType().FullName}': {exception.Message}",
             HostDiagnosticSeverity.Error)

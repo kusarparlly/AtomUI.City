@@ -474,7 +474,7 @@ public sealed class ActivationScope : IActivationScope
 
     private void WriteTaskRejectedDiagnostic(string taskName, string? taskKey, string reason)
     {
-        _diagnostics?.Write(new HostDiagnosticRecord(
+        MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
             MvvmDiagnosticIds.ActivationTaskRejected,
             $"Activation scope '{Id}' rejected task '{taskName}' ({reason}).",
             HostDiagnosticSeverity.Warning)
@@ -491,7 +491,7 @@ public sealed class ActivationScope : IActivationScope
 
     private void WriteTaskFailedDiagnostic(TrackedTask task, Exception exception)
     {
-        _diagnostics?.Write(new HostDiagnosticRecord(
+        MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
             MvvmDiagnosticIds.ActivationTaskFailed,
             $"Activation task '{task.Name}' in scope '{Id}' failed: {exception.Message}",
             HostDiagnosticSeverity.Error)
@@ -508,7 +508,7 @@ public sealed class ActivationScope : IActivationScope
 
     private void WriteTaskDrainTimedOutDiagnostic()
     {
-        _diagnostics?.Write(new HostDiagnosticRecord(
+        MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
             MvvmDiagnosticIds.ActivationTaskDrainTimedOut,
             $"Activation scope '{Id}' did not drain all tasks within '{_taskDrainTimeout}'.",
             HostDiagnosticSeverity.Error)
@@ -524,7 +524,7 @@ public sealed class ActivationScope : IActivationScope
 
     private void WriteDisposeFailedDiagnostic(Exception exception)
     {
-        _diagnostics?.Write(new HostDiagnosticRecord(
+        MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
             MvvmDiagnosticIds.ActivationScopeDisposeFailed,
             $"Activation scope '{Id}' resource disposal failed: {exception.Message}",
             HostDiagnosticSeverity.Error)

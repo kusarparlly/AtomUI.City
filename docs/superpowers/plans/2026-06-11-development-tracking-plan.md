@@ -5,12 +5,12 @@
 ## 当前结论
 
 - 1.0 总包发布状态：MVVM 结构化任务/Command V2 和 Presentation ViewModel Composition 已实现并通过模块测试与全解决方案 Release 构建，但尚未完成全套发布验证，暂不得发布新候选。
-- 运行时本地候选状态：既有 Build、Core、EventBus、State、MVVM、Routing、Data、Localization、Security、Presentation 候选曾通过隔离本地 NuGet consumer；2026-10-13 新增的 5 个 Feature 尚需重新执行 package consumer 与全套发布门禁。
-- 本轮验证备注：相关 MVVM 测试 `87/87`、Composition/Runtime/CommandBinding 测试 `23/23`、全解决方案 Release 构建零警告零错误；全量测试仍受既有 DTR-13 外部端点重启恢复波动和未生成本地 NuGet 包的 TemplateSmoke 前置条件影响，因此以下 5 项暂不勾选。
-- 全局进度：152/157。
-- 模块 Feature 合同：142/147。
+- 运行时本地候选状态：既有 Build、Core、EventBus、State、MVVM、Routing、Data、Localization、Security、Presentation 候选曾通过隔离本地 NuGet consumer；新增的 6 个 Feature 尚需重新执行 package consumer 与全套发布门禁。
+- 本轮验证备注：MVVM 测试 `106/106`、Presentation 测试 `171/171`、Desktop Dogfood Headless 三组 seed 和全解决方案 Release 构建均通过；构建仍报告既有 `Microsoft.AspNetCore.SignalR.Common 10.0.8` 的 `NU1903`，且本轮未重新执行 package consumer，因此以下 6 项暂不勾选。
+- 全局进度：152/158。
+- 模块 Feature 合同：142/148。
 - 最终发布门禁：10/10。
-- 最近校准日期：2026-10-13。
+- 最近校准日期：2026-10-17。
 
 ## 统计规则
 
@@ -41,7 +41,7 @@
 | Generators | 8 | 0 | 8 | 已完成 |
 | Routing | 12 | 0 | 12 | 已完成 |
 | Presentation | 16 | 1 | 17 | 进行中 |
-| MVVM | 6 | 4 | 10 | 进行中 |
+| MVVM | 6 | 5 | 11 | 进行中 |
 | State | 8 | 0 | 8 | 已完成 |
 | EventBus | 6 | 0 | 6 | 已完成 |
 | PluginSystem | 8 | 0 | 8 | 已完成 |
@@ -145,6 +145,7 @@
 - [ ] AUC-MVVM-008 Typed Commands and CanExecute（Implemented / Release Validation Pending）。验收重点：泛型参数、业务 predicate、通知、取消和 OperationExecutionResult API。
 - [ ] AUC-MVVM-009 Command Concurrency and Activation Ownership（Implemented / Release Validation Pending）。验收重点：Reject/Allow/RejectByKey、原子准入、活动计数、Scope A/B 和 inactive rejection。
 - [ ] AUC-MVVM-010 Command Exception Delivery（Implemented / Release Validation Pending）。验收重点：await 原异常、ICommand handler 恰好一次、取消排除、handler 失败和无磁盘副作用。
+- [ ] AUC-MVVM-011 Command Notification Dispatch（Implemented / Release Validation Pending）。验收重点：Task 先发布后通知、dispatcher 统一交付、通知失败隔离、真实 Avalonia UI 线程和 Headless 同步语义。
 
 ## State
 

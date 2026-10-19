@@ -16,6 +16,7 @@
 | AUC-MVVM-008 | Typed Commands and CanExecute | Implemented | CommandFactory generic overloads, OperationExecutionResult | CommandTests |
 | AUC-MVVM-009 | Command Concurrency and Activation Ownership | Implemented | Command concurrency policy, activation owner contract | CommandTests; ViewModelBaseTests |
 | AUC-MVVM-010 | Command Exception Delivery | Implemented | ICommandExceptionHandler, command exception context | CommandTests |
+| AUC-MVVM-011 | Command Notification Dispatch | Implemented | CommandFactory notification dispatcher | CommandTests; UiCommandFactoryTests |
 
 ## Feature 硬门禁
 
@@ -37,7 +38,7 @@
 ## AUC-MVVM-001 ViewModel Base and Notification
 
 Feature ID: `AUC-MVVM-001`
-Status: Completed
+Status: Implemented
 Goal: 定义框架推荐 ViewModel 基类和属性变更语义。
 Public Contract: ViewModelBase
 Runtime / Build Behavior: 提供属性通知、释放入口和可观测状态；不引用 Avalonia visual。
@@ -51,7 +52,7 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 ## AUC-MVVM-002 Activation and Deactivation
 
 Feature ID: `AUC-MVVM-002`
-Status: Completed
+Status: Implemented
 Goal: 统一 ViewModel 激活、停用、关闭确认和导航中断。
 Public Contract: IActivatable, ICanDeactivate, IConfirmDeactivate, ActivationScope
 Runtime / Build Behavior: ViewModelBase 管理 Constructed、Activating、Active、Deactivating、Deactivated、Disposed；DeactivationGuard 在 Presentation 替换 View 前执行。
@@ -65,7 +66,7 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 ## AUC-MVVM-003 Command Execution
 
 Feature ID: `AUC-MVVM-003`
-Status: Completed
+Status: Implemented
 Goal: 提供 .NET 风格命令执行、CanExecute、并发和错误结果。
 Public Contract: CommandFactory, OperationScope, OperationExecutionResult, CommandExecutionState
 Runtime / Build Behavior: Command 执行进入 OperationScope；同步和异步命令都写入 CommandExecutionState 和 OperationExecutionResult；CanExecute 变化可被 Presentation 绑定。
@@ -79,7 +80,7 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 ## AUC-MVVM-004 Interaction Requests
 
 Feature ID: `AUC-MVVM-004`
-Status: Completed
+Status: Implemented
 Goal: 让 ViewModel 声明 UI 交互请求而不依赖具体 UI。
 Public Contract: Interaction<TRequest, TResult>, InteractionContext<TRequest>, InteractionResult<TResult>
 Runtime / Build Behavior: Interaction 发布 request，由 Presentation 注册 handler；结果回到 ViewModel。
@@ -93,7 +94,7 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 ## AUC-MVVM-005 Validation Model
 
 Feature ID: `AUC-MVVM-005`
-Status: Completed
+Status: Implemented
 Goal: 定义输入验证消息、状态聚合和 Presentation 可绑定合同。
 Public Contract: ValidationScope, ValidationMessage, ValidationStatus
 Runtime / Build Behavior: ValidationScope 聚合 field/global message；ValidationChanged 事件为 Presentation 提供绑定输入。
@@ -121,7 +122,7 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 ## AUC-MVVM-007 Activation-scoped Structured Tasks
 
 Feature ID: `AUC-MVVM-007`
-Status: Implemented
+Status: Completed
 Goal: 让一次 ActivationScope 内的异步工作有可控准入、监控、取消、drain 和唯一 worker 语义。
 Public Contract: `IActivationScope.StartAsync`, `IActivationScope.StartUniqueAsync`, activity snapshot/count, async disposal.
 Runtime / Build Behavior: Scope 在调用用户委托前注册任务；关闭时拒绝新准入、取消、等待任务、再释放资源；unique key 在任务终态后释放。
@@ -135,7 +136,7 @@ Acceptance Criteria: [结构化并发和 Commands V2](structured-concurrency-and
 ## AUC-MVVM-008 Typed Commands and CanExecute
 
 Feature ID: `AUC-MVVM-008`
-Status: Implemented
+Status: Completed
 Goal: 提供同步/异步泛型参数命令、开发者业务谓词、准确通知和无领域歧义的执行结果类型。
 Public Contract: `CommandFactory.Create<T>`, `CommandFactory.CreateAsync<T>`, `OperationExecutionResult`.
 Runtime / Build Behavior: 泛型命令遵守 CommunityToolkit 参数语义；最终 CanExecute 组合业务 predicate、activation 和并发状态。
@@ -149,7 +150,7 @@ Acceptance Criteria: 泛型与非泛型入口行为一致，City 结果不表达
 ## AUC-MVVM-009 Command Concurrency and Activation Ownership
 
 Feature ID: `AUC-MVVM-009`
-Status: Implemented
+Status: Completed
 Goal: 用原子准入实现 Reject、Allow、RejectByKey，并让稳定 Command 对象在每次执行时绑定当前 ActivationScope。
 Public Contract: command concurrency policy/options, activation owner contract, `CommandExecutionState` active count/result snapshot.
 Runtime / Build Behavior: 默认 Reject；RejectByKey 同 key 单飞、不同 key 并行；每次执行解析当前 Scope 并通过 Scope task admission 进入监督。
@@ -163,7 +164,7 @@ Acceptance Criteria: `CanExecute` 仅作提示，执行入口仍能原子保证�
 ## AUC-MVVM-010 Command Exception Delivery
 
 Feature ID: `AUC-MVVM-010`
-Status: Implemented
+Status: Completed
 Goal: 保证命令异常不被静默吞掉，同时把应用展示/持久化策略留在框架外。
 Public Contract: `ICommandExceptionHandler`, command exception context, async CommandFactory exception path.
 Runtime / Build Behavior: awaited `ExecuteAsync` 更新状态和诊断后重抛原异常；`ICommand.Execute` 把原异常恰好一次提交应用 handler。
@@ -177,7 +178,7 @@ Acceptance Criteria: 每个可捕获命令异常都能从调用者、handler 或
 ## AUC-MVVM-011 Command Notification Dispatch
 
 Feature ID: `AUC-MVVM-011`
-Status: Implemented
+Status: Completed
 Goal: 让绑定到 UI 的异步命令在生命周期由后台串行通道驱动时，仍只在 UI dispatcher 上发布可观察通知。
 Public Contract: `CommandFactory.CreateAsync` 的可选 `notificationDispatcher` 参数。
 Runtime / Build Behavior: 命令业务和 ViewModel 生命周期保持原线程模型；`CanExecuteChanged` 与命令状态 `PropertyChanged` 统一调用 dispatcher `InvokeAsync`，Mvvm 不自行查询 `CheckAccess`。

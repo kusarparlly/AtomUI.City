@@ -67,4 +67,9 @@ public static class MvvmDiagnosticIds
     /// A command notification could not be delivered through its configured dispatcher.
     /// </summary>
     public const string CommandNotificationFailed = "AUCMVVM014";
+
+    /// <summary>
+    /// An activation state observer failed while processing a lifecycle notification.
+    /// </summary>
+    public const string ActivationStateNotificationFailed = "AUCMVVM015";
 }

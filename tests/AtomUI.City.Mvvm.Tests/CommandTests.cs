@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Threading.Tasks.Sources;
 using AtomUI.City.Core.Diagnostics;
 using AtomUI.City.Core.Threading;
 using AtomUI.City.Mvvm;
@@ -154,6 +155,153 @@ public sealed class CommandTests
         dispatcher.Drain();
 
         Assert.Equal(1, notifications);
+    }
+
+    [Fact]
+    public async Task ExecutionStateNotificationsAreQueuedForBothStartAndCompletion()
+    {
+        var dispatcher = new QueueingUiDispatcher();
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var propertyNotifications = new List<string?>();
+        var canExecuteNotifications = 0;
+        var command = CommandFactory.CreateAsync(
+            async cancellationToken =>
+            {
+                started.TrySetResult();
+                await release.Task.WaitAsync(cancellationToken);
+            },
+            notificationDispatcher: dispatcher);
+        var observable = Assert.IsAssignableFrom<System.ComponentModel.INotifyPropertyChanged>(command);
+        observable.PropertyChanged += (_, args) => propertyNotifications.Add(args.PropertyName);
+        command.CanExecuteChanged += (_, _) => canExecuteNotifications++;
+
+        var execution = command.ExecuteAsync(null);
+        await started.Task;
+
+        Assert.Empty(propertyNotifications);
+        Assert.Equal(0, canExecuteNotifications);
+        Assert.Equal(1, dispatcher.PendingCount);
+
+        dispatcher.Drain();
+
+        AssertNotificationSet(propertyNotifications, expectedCountPerProperty: 1);
+        Assert.Equal(1, canExecuteNotifications);
+
+        release.TrySetResult();
+        await execution;
+
+        Assert.Equal(1, dispatcher.PendingCount);
+        dispatcher.Drain();
+
+        AssertNotificationSet(propertyNotifications, expectedCountPerProperty: 2);
+        Assert.Equal(2, canExecuteNotifications);
+    }
+
+    [Fact]
+    public async Task HeadlessCommandWithoutDispatcherPublishesStateNotificationsSynchronously()
+    {
+        var callingThreadId = Environment.CurrentManagedThreadId;
+        var notificationThreadIds = new List<int>();
+        var propertyNotifications = new List<string?>();
+        var canExecuteNotifications = 0;
+        var command = CommandFactory.CreateAsync(_ => Task.CompletedTask);
+        var observable = Assert.IsAssignableFrom<System.ComponentModel.INotifyPropertyChanged>(command);
+        observable.PropertyChanged += (_, args) =>
+        {
+            propertyNotifications.Add(args.PropertyName);
+            notificationThreadIds.Add(Environment.CurrentManagedThreadId);
+        };
+        command.CanExecuteChanged += (_, _) =>
+        {
+            canExecuteNotifications++;
+            notificationThreadIds.Add(Environment.CurrentManagedThreadId);
+        };
+
+        await command.ExecuteAsync(null);
+
+        AssertNotificationSet(propertyNotifications, expectedCountPerProperty: 2);
+        Assert.Equal(2, canExecuteNotifications);
+        Assert.All(notificationThreadIds, threadId => Assert.Equal(callingThreadId, threadId));
+    }
+
+    [Fact]
+    public async Task EveryFaultedNotificationValueTaskIsObserved()
+    {
+        var diagnostics = new InMemoryHostDiagnostics();
+        var dispatcher = new ObservedFaultingUiDispatcher();
+        var command = CommandFactory.CreateAsync(
+            _ => Task.CompletedTask,
+            diagnostics: diagnostics,
+            notificationDispatcher: dispatcher);
+
+        await command.ExecuteAsync(null);
+
+        await WaitUntilAsync(() =>
+            dispatcher.SourceCount >= 2 && dispatcher.AllSourcesObserved);
+
+        Assert.True(dispatcher.AllSourcesObserved);
+        Assert.True(diagnostics.Records.Count(
+            record => record.Code == MvvmDiagnosticIds.CommandNotificationFailed) >= 2);
+    }
+
+    [Fact]
+    public async Task ExecutionTaskIsPublishedBeforeEveryPropertyNotification()
+    {
+        var observedTasks = new List<Task?>();
+        var observedCanExecute = new List<bool>();
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var command = CommandFactory.CreateAsync(
+            async cancellationToken =>
+            {
+                started.TrySetResult();
+                await release.Task.WaitAsync(cancellationToken);
+            });
+        var observable = Assert.IsAssignableFrom<System.ComponentModel.INotifyPropertyChanged>(command);
+        observable.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(IAsyncRelayCommand.ExecutionTask))
+            {
+                observedTasks.Add(command.ExecutionTask);
+                observedCanExecute.Add(command.CanExecute(null));
+            }
+        };
+
+        var executionTask = command.ExecuteAsync(null);
+        await started.Task;
+
+        var firstObservedTask = Assert.Single(observedTasks);
+        Assert.Same(executionTask, firstObservedTask);
+        Assert.False(observedCanExecute[0]);
+
+        release.TrySetResult();
+        await executionTask;
+        await WaitUntilAsync(() => observedTasks.Count == 2);
+
+        Assert.Equal(2, observedTasks.Count);
+        Assert.All(observedTasks, observed => Assert.Same(executionTask, observed));
+        Assert.Equal([false, true], observedCanExecute);
+    }
+
+    [Fact]
+    public async Task ThrowingDiagnosticsCannotReplaceCommandFailureOrCommittedState()
+    {
+        var expected = new InvalidOperationException("command-failure");
+        var state = new CommandExecutionState("save", typeof(SaveViewModel));
+        var command = CommandFactory.CreateAsync(
+            _ => Task.FromException(expected),
+            state: state,
+            diagnostics: new ThrowingHostDiagnostics());
+
+        var executionTask = command.ExecuteAsync(null);
+        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            executionTask.WaitAsync(TimeSpan.FromSeconds(2)));
+
+        Assert.Same(expected, thrown);
+        Assert.False(state.IsExecuting);
+        Assert.Equal(OperationStatus.Failed, state.LastResult?.Status);
+        Assert.Same(expected, state.LastError);
     }
 
     [Fact]
@@ -808,6 +956,26 @@ public sealed class CommandTests
         }
     }
 
+    private static void AssertNotificationSet(
+        IEnumerable<string?> propertyNotifications,
+        int expectedCountPerProperty)
+    {
+        var notifications = propertyNotifications.ToArray();
+        Assert.Equal(
+            expectedCountPerProperty,
+            notifications.Count(name => name == nameof(IAsyncRelayCommand.ExecutionTask)));
+        Assert.Equal(
+            expectedCountPerProperty,
+            notifications.Count(name => name == nameof(IAsyncRelayCommand.CanBeCanceled)));
+        Assert.Equal(
+            expectedCountPerProperty,
+            notifications.Count(name => name == nameof(IAsyncRelayCommand.IsCancellationRequested)));
+        Assert.Equal(
+            expectedCountPerProperty,
+            notifications.Count(name => name == nameof(IAsyncRelayCommand.IsRunning)));
+        Assert.Equal(expectedCountPerProperty * 4, notifications.Length);
+    }
+
     private sealed class PumpSynchronizationContext : SynchronizationContext, IDisposable
     {
         private readonly BlockingCollection<(SendOrPostCallback Callback, object? State)> _queue = [];
@@ -1056,6 +1224,65 @@ public sealed class CommandTests
             CancellationToken cancellationToken = default)
         {
             throw new InvalidOperationException("dispatcher-stopped");
+        }
+    }
+
+    private sealed class ObservedFaultingUiDispatcher : IUiDispatcher
+    {
+        private readonly ConcurrentQueue<TrackingFaultedValueTaskSource> _sources = [];
+
+        public int SourceCount => _sources.Count;
+
+        public bool AllSourcesObserved =>
+            !_sources.IsEmpty && _sources.All(source => source.GetResultCount == 1);
+
+        public bool CheckAccess() => false;
+
+        public ValueTask InvokeAsync(Action callback, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var source = new TrackingFaultedValueTaskSource();
+            _sources.Enqueue(source);
+            return source.Operation;
+        }
+
+        public ValueTask<T> InvokeAsync<T>(Func<T> callback, CancellationToken cancellationToken) =>
+            ValueTask.FromException<T>(new InvalidOperationException("notification-failed"));
+
+        public ValueTask PostAsync(
+            Func<CancellationToken, ValueTask> callback,
+            CancellationToken cancellationToken = default) =>
+            ValueTask.FromException(new InvalidOperationException("notification-failed"));
+    }
+
+    private sealed class TrackingFaultedValueTaskSource : IValueTaskSource
+    {
+        private ManualResetValueTaskSourceCore<bool> _source;
+        private int _getResultCount;
+
+        public TrackingFaultedValueTaskSource()
+        {
+            _source.RunContinuationsAsynchronously = true;
+            _source.SetException(new InvalidOperationException("notification-failed"));
+        }
+
+        public int GetResultCount => Volatile.Read(ref _getResultCount);
+
+        public ValueTask Operation => new(this, _source.Version);
+
+        public ValueTaskSourceStatus GetStatus(short token) => _source.GetStatus(token);
+
+        public void OnCompleted(
+            Action<object?> continuation,
+            object? state,
+            short token,
+            ValueTaskSourceOnCompletedFlags flags) =>
+            _source.OnCompleted(continuation, state, token, flags);
+
+        public void GetResult(short token)
+        {
+            Interlocked.Increment(ref _getResultCount);
+            _source.GetResult(token);
         }
     }
 

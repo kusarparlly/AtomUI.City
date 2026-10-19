@@ -186,4 +186,18 @@ public sealed class ValidationScopeTests
 
         Assert.Equal(ValidationStatus.Canceled, validationScope.Status);
     }
+
+    [Fact]
+    public void DisposedValidationScopeDoesNotBreakParentScopeDisposal()
+    {
+        var activationScope = new ActivationScope();
+        var validationScope = new ValidationScope();
+        validationScope.BindTo(activationScope);
+
+        validationScope.Dispose();
+        activationScope.Dispose();
+
+        Assert.True(validationScope.IsDisposed);
+        Assert.True(activationScope.IsDisposed);
+    }
 }

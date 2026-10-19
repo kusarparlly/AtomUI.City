@@ -1,4 +1,5 @@
 using System.Reflection;
+using AtomUI.City.Core.Diagnostics;
 using AtomUI.City.Mvvm;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -159,6 +160,40 @@ public sealed class ViewModelBaseTests
                 ActivationState.Disposed,
             ],
             states);
+    }
+
+    [Fact]
+    public async Task ThrowingActivationStateObserverDoesNotBreakLifecycleOrScopeCleanup()
+    {
+        var diagnostics = new InMemoryHostDiagnostics();
+        var scope = new ActivationScope();
+        var binding = new TestDisposable();
+        var viewModel = new TestViewModel(diagnostics);
+        var observedStates = new List<ActivationState>();
+        scope.Add(binding);
+        viewModel.ActivationStateChanged += (_, _) =>
+            throw new InvalidOperationException("observer-failure");
+        viewModel.ActivationStateChanged += (_, _) =>
+            observedStates.Add(viewModel.ActivationState);
+
+        await viewModel.ActivateAsync(scope);
+        await viewModel.DeactivateAsync();
+
+        Assert.Equal(
+            [
+                ActivationState.Activating,
+                ActivationState.Active,
+                ActivationState.Deactivating,
+                ActivationState.Deactivated,
+            ],
+            observedStates);
+        Assert.True(scope.IsDisposed);
+        Assert.True(binding.IsDisposed);
+        Assert.Equal(ActivationState.Deactivated, viewModel.ActivationState);
+        Assert.Equal(
+            4,
+            diagnostics.Records.Count(record =>
+                record.Code == MvvmDiagnosticIds.ActivationStateNotificationFailed));
     }
 
     [Fact]
@@ -324,6 +359,29 @@ public sealed class ViewModelBaseTests
     }
 
     [Fact]
+    public async Task RejectedSynchronousDisposeRetainsScopeForAsyncRecovery()
+    {
+        var scope = new ActivationScope();
+        var resource = new TestAsyncDisposable();
+        var viewModel = new TestViewModel();
+        scope.AddAsync(resource);
+        await viewModel.ActivateAsync(scope);
+
+        Assert.Throws<InvalidOperationException>(() => viewModel.Dispose());
+
+        Assert.False(viewModel.IsDisposed);
+        Assert.Equal(ActivationState.Active, viewModel.ActivationState);
+        Assert.Same(scope, viewModel.CurrentActivationScope);
+        Assert.False(resource.IsDisposed);
+
+        await viewModel.DisposeAsync();
+
+        Assert.True(viewModel.IsDisposed);
+        Assert.True(scope.IsDisposed);
+        Assert.True(resource.IsDisposed);
+    }
+
+    [Fact]
     public void ActivationScopeAccessorRestoresPreviousScope()
     {
         var accessor = new ActivationScopeAccessor();
@@ -362,6 +420,11 @@ public sealed class ViewModelBaseTests
     public class TestViewModel : ViewModelBase
     {
         private string? _title;
+
+        public TestViewModel(IHostDiagnostics? diagnostics = null)
+            : base(diagnostics)
+        {
+        }
 
         public string? Title => _title;
 
@@ -411,6 +474,17 @@ public sealed class ViewModelBaseTests
         public void Dispose()
         {
             IsDisposed = true;
+        }
+    }
+
+    private sealed class TestAsyncDisposable : IAsyncDisposable
+    {
+        public bool IsDisposed { get; private set; }
+
+        public ValueTask DisposeAsync()
+        {
+            IsDisposed = true;
+            return ValueTask.CompletedTask;
         }
     }
 }

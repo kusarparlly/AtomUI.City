@@ -3,7 +3,7 @@
 - 日期：2026-10-16
 - 范围：`AtomUI.City.Core.Threading`、`AtomUI.City.Mvvm`、`AtomUI.City.Presentation`，以及下游 `AtomBox.Desktop` 组合根
 - 结论：整体分层和依赖方向正确，无需调整架构根基；当前缺口集中在 `City.Mvvm` 命令通知链的运行时一致性、契约完整性和验证闭环。综合 8.0/10（分层边界 9.5，运行时一致性 7.0，API 人体工学 7.5，文档与验证 7.0）。
-- 状态：P0 调度与失败隔离合同已由 [ADR 0013](../decisions/0013-ui-observable-notification-dispatch.md) 落地；P1 UI 默认入口已由 [ADR 0014](../decisions/0014-presentation-ui-command-factory.md) 落地；下游重复抽象和通知合批仍按本文优先级后续处理。
+- 状态：P0 调度与失败隔离合同已由 [ADR 0013](../decisions/0013-ui-observable-notification-dispatch.md) 落地；P1 UI 默认入口已由 [ADR 0014](../decisions/0014-presentation-ui-command-factory.md) 落地；P1 测试状态空间已完成专项收口。仅下游重复抽象和 P2 通知合批仍按本文优先级后续处理。
 
 ## 1. 背景（核实过的事实，带出处）
 
@@ -81,7 +81,9 @@ AtomBox 仍保留了本地 `AtomBox.Desktop.Services.IUiDispatcher`，它只有 
 
 ### 3.5 测试尚未封闭完整状态空间（P1）
 
-现有测试覆盖了“后台来源通知会排队”和“dispatcher 抛错会记诊断”，但还缺少：
+解决状态（2026-10-17）：已关闭。`CommandTests` 现已覆盖四个状态属性在开始/完成阶段的 dispatcher 交付、无 dispatcher 的 Headless 同步语义、每个 faulted `ValueTask` 均被观察，以及完成/失败/取消结果隔离；`UiCommandFactoryTests` 现已覆盖真实 `AvaloniaUiDispatcher` 的后台完成线程切换和 Runtime `Stopped/Faulted` 诊断链。专项新增测试 `6/6`、MVVM 完整测试 `106/106`、Presentation 完整测试 `171/171` 通过。
+
+原审计时的测试只覆盖“后台来源通知会排队”和“dispatcher 抛错会记诊断”，当时缺少：
 
 - `CheckAccess == true` 时订阅者抛异常；
 - 命令开始和完成时所有状态属性都经 dispatcher 交付；
@@ -91,7 +93,7 @@ AtomBox 仍保留了本地 `AtomBox.Desktop.Services.IUiDispatcher`，它只有 
 - 未配置 dispatcher 的 headless 行为保持同步、可预测；
 - 基于真实 Avalonia dispatcher 的最小集成测试。
 
-证据：当前相关测试集中在 `tests/AtomUI.City.Mvvm.Tests/CommandTests.cs:135-180`，尚未覆盖上述分支。
+原证据集中在 `tests/AtomUI.City.Mvvm.Tests/CommandTests.cs:135-180`；上述分支现已由本节解决状态列出的专项测试覆盖。
 
 ### 3.6 通知合并尚未设计，但不是当前正确性阻塞项（P2）
 

@@ -118,7 +118,7 @@ public sealed class Interaction<TRequest, TResult>
         Guid? activationScopeId,
         Exception? exception)
     {
-        _diagnostics?.Write(new HostDiagnosticRecord(
+        MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
             code,
             message,
             severity)

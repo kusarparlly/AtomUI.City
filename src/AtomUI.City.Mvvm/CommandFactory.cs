@@ -208,7 +208,7 @@ public static class CommandFactory
         Exception? exception,
         HostDiagnosticSeverity severity = HostDiagnosticSeverity.Error)
     {
-        diagnostics?.Write(new HostDiagnosticRecord(
+        MvvmDiagnostics.Write(diagnostics, new HostDiagnosticRecord(
             code,
             $"Command '{state.CommandName ?? "<unnamed>"}' on '{state.OwnerType?.FullName ?? "<unknown>"}' finished as {operation.Status}: {exception?.Message ?? "no exception"}.",
             severity)
@@ -363,7 +363,7 @@ public static class CommandFactory
             }
             catch (Exception handlerException)
             {
-                _diagnostics?.Write(new HostDiagnosticRecord(
+                MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
                     MvvmDiagnosticIds.CommandExceptionHandlerFailed,
                     $"Command exception handler failed for '{State.CommandName ?? "<unnamed>"}': {handlerException.Message}",
                     HostDiagnosticSeverity.Error)
@@ -381,7 +381,7 @@ public static class CommandFactory
 
         public void WriteNotificationFailure(Exception exception)
         {
-            _diagnostics?.Write(new HostDiagnosticRecord(
+            MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
                 MvvmDiagnosticIds.CommandNotificationFailed,
                 $"Command notification dispatch failed for '{State.CommandName ?? "<unnamed>"}': {exception.Message}",
                 HostDiagnosticSeverity.Error)
@@ -462,7 +462,7 @@ public static class CommandFactory
         {
             using var operation = OperationScope.Start(CancellationToken.None);
             State.Reject(operation.Reject());
-            _diagnostics?.Write(new HostDiagnosticRecord(
+            MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
                 MvvmDiagnosticIds.CommandInactive,
                 $"Command '{State.CommandName ?? "<unnamed>"}' was rejected because its owner is not active.",
                 HostDiagnosticSeverity.Warning)
@@ -480,7 +480,7 @@ public static class CommandFactory
         {
             using var operation = OperationScope.Start(CancellationToken.None);
             State.Reject(operation.Reject());
-            _diagnostics?.Write(new HostDiagnosticRecord(
+            MvvmDiagnostics.Write(_diagnostics, new HostDiagnosticRecord(
                 diagnosticId,
                 $"Command '{State.CommandName ?? "<unnamed>"}' execution was rejected ({reason}).",
                 HostDiagnosticSeverity.Warning)
@@ -529,15 +529,15 @@ public static class CommandFactory
 
         public void Execute(T? parameter)
         {
-            ExecutionTask = StartExecution(parameter, fromCommandInterface: true);
-            ObserveExecutionTask(ExecutionTask);
+            var executionTask = StartExecution(parameter, fromCommandInterface: true);
+            ObserveExecutionTask(executionTask);
         }
 
         public Task ExecuteAsync(T? parameter)
         {
-            ExecutionTask = StartExecution(parameter, fromCommandInterface: false);
-            ObserveExecutionTask(ExecutionTask);
-            return ExecutionTask;
+            var executionTask = StartExecution(parameter, fromCommandInterface: false);
+            ObserveExecutionTask(executionTask);
+            return executionTask;
         }
 
         bool System.Windows.Input.ICommand.CanExecute(object? parameter) =>
@@ -574,13 +574,42 @@ public static class CommandFactory
                 throw new InvalidOperationException("Could not register command execution.");
             }
 
-            var task = ExecuteCoreAsync(
+            var executionTask = ExecuteCoreAsync(
                 executionId,
                 cancellation,
                 parameter,
                 fromCommandInterface);
+            ExecutionTask = executionTask;
             NotifyStateChanged();
-            return task;
+            ObserveExecutionCompletion(executionTask);
+            return executionTask;
+        }
+
+        private void ObserveExecutionCompletion(Task executionTask)
+        {
+            if (executionTask.IsCompleted)
+            {
+                NotifyStateChanged();
+                return;
+            }
+
+            _ = ObserveExecutionCompletionAsync(executionTask);
+        }
+
+        private async Task ObserveExecutionCompletionAsync(Task executionTask)
+        {
+            try
+            {
+                await executionTask;
+            }
+            catch
+            {
+                // The original task remains the single source of completion state.
+            }
+            finally
+            {
+                NotifyStateChanged();
+            }
         }
 
         private async Task ExecuteCoreAsync(
@@ -605,8 +634,6 @@ public static class CommandFactory
                 {
                     removed.Dispose();
                 }
-
-                NotifyStateChanged();
             }
         }
 
