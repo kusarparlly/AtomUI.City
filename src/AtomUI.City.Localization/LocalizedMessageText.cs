@@ -129,6 +129,8 @@ internal sealed class LocalizedMessageText : ILocalizedText
             return ValueTask.CompletedTask;
         }
 
+        Task predecessor;
+        TaskCompletionSource completion;
         lock (_gate)
         {
             if (_disposed)
@@ -136,10 +138,32 @@ internal sealed class LocalizedMessageText : ILocalizedText
                 return ValueTask.CompletedTask;
             }
 
-            var predecessor = _refreshTail;
-            _refreshTail = RunRefreshAfterAsync(predecessor, cancellationToken);
+            predecessor = _refreshTail;
+            completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            _refreshTail = completion.Task;
+        }
 
-            return new ValueTask(_refreshTail);
+        _ = Task.Run(() => CompleteRefreshAfterAsync(predecessor, cancellationToken, completion));
+        return new ValueTask(completion.Task);
+    }
+
+    private async Task CompleteRefreshAfterAsync(
+        Task predecessor,
+        CancellationToken cancellationToken,
+        TaskCompletionSource completion)
+    {
+        try
+        {
+            await RunRefreshAfterAsync(predecessor, cancellationToken).ConfigureAwait(false);
+            completion.TrySetResult();
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            completion.TrySetCanceled(cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            completion.TrySetException(exception);
         }
     }
 
@@ -147,8 +171,6 @@ internal sealed class LocalizedMessageText : ILocalizedText
         Task predecessor,
         CancellationToken cancellationToken)
     {
-        await Task.Yield();
-
         try
         {
             await predecessor.ConfigureAwait(false);

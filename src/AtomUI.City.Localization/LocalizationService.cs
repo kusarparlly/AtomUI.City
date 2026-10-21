@@ -861,6 +861,7 @@ public sealed class LocalizationService : ILocalizationService
 
         var cacheKey = CreatePackageCacheKey(descriptor);
         Task<LanguagePackageLoadResult> loadTask;
+        TaskCompletionSource<LanguagePackageLoadResult>? loadCompletion = null;
         lock (_packageLoadGate)
         {
             if (IsDisposed)
@@ -878,9 +879,16 @@ public sealed class LocalizationService : ILocalizationService
 
             if (!_packageLoadTasks.TryGetValue(cacheKey, out loadTask!))
             {
-                loadTask = LoadAndCachePackageAsync(descriptor, cacheKey);
+                loadCompletion = new TaskCompletionSource<LanguagePackageLoadResult>(
+                    TaskCreationOptions.RunContinuationsAsynchronously);
+                loadTask = loadCompletion.Task;
                 _packageLoadTasks[cacheKey] = loadTask;
             }
+        }
+
+        if (loadCompletion is not null)
+        {
+            _ = Task.Run(() => LoadAndCachePackageAsync(descriptor, cacheKey, loadCompletion));
         }
 
         try
@@ -893,59 +901,70 @@ public sealed class LocalizationService : ILocalizationService
         }
     }
 
-    private async Task<LanguagePackageLoadResult> LoadAndCachePackageAsync(
+    private async Task LoadAndCachePackageAsync(
         LanguagePackageDescriptor descriptor,
-        (string CultureName, string PackageId) cacheKey)
+        (string CultureName, string PackageId) cacheKey,
+        TaskCompletionSource<LanguagePackageLoadResult> completion)
     {
-        await Task.Yield();
-
-        var loadResult = await LoadPackageCoreAsync(
-                descriptor,
-                _lifetimeToken)
-            .ConfigureAwait(false);
-        LanguagePackage? packageToDispose = null;
-        var packagePublished = false;
-
-        lock (_packageLoadGate)
+        try
         {
-            _packageLoadTasks.Remove(cacheKey);
-            if (loadResult.Succeeded)
-            {
-                if (IsDisposed || !IsDescriptorActive(descriptor))
-                {
-                    packageToDispose = loadResult.Package;
-                    loadResult = IsDisposed
-                        ? LanguagePackageLoadResult.Failed(
-                            new LocalizationError(
-                                LocalizationErrorKind.ServiceDisposed,
-                                "Localization service has been disposed."))
-                        : LanguagePackageLoadResult.Failed(
-                            new LocalizationError(
-                                LocalizationErrorKind.ResourceRevoked,
-                                $"Language package '{descriptor.PackageId}' was revoked while loading."));
-                }
-                else
-                {
-                    if (_loadedPackages.TryGetValue(cacheKey, out var replacedPackage)
-                        && !ReferenceEquals(replacedPackage, loadResult.Package))
-                    {
-                        packageToDispose = replacedPackage;
-                    }
+            var loadResult = await LoadPackageCoreAsync(
+                    descriptor,
+                    _lifetimeToken)
+                .ConfigureAwait(false);
+            LanguagePackage? packageToDispose = null;
+            var packagePublished = false;
 
-                    _loadedPackages[cacheKey] = loadResult.Package!;
-                    _packageCacheVersion++;
-                    packagePublished = true;
+            lock (_packageLoadGate)
+            {
+                _packageLoadTasks.Remove(cacheKey);
+                if (loadResult.Succeeded)
+                {
+                    if (IsDisposed || !IsDescriptorActive(descriptor))
+                    {
+                        packageToDispose = loadResult.Package;
+                        loadResult = IsDisposed
+                            ? LanguagePackageLoadResult.Failed(
+                                new LocalizationError(
+                                    LocalizationErrorKind.ServiceDisposed,
+                                    "Localization service has been disposed."))
+                            : LanguagePackageLoadResult.Failed(
+                                new LocalizationError(
+                                    LocalizationErrorKind.ResourceRevoked,
+                                    $"Language package '{descriptor.PackageId}' was revoked while loading."));
+                    }
+                    else
+                    {
+                        if (_loadedPackages.TryGetValue(cacheKey, out var replacedPackage)
+                            && !ReferenceEquals(replacedPackage, loadResult.Package))
+                        {
+                            packageToDispose = replacedPackage;
+                        }
+
+                        _loadedPackages[cacheKey] = loadResult.Package!;
+                        _packageCacheVersion++;
+                        packagePublished = true;
+                    }
                 }
             }
-        }
 
-        packageToDispose?.Dispose();
-        if (packagePublished)
+            packageToDispose?.Dispose();
+            if (packagePublished)
+            {
+                SynchronizeLoadedPackageState();
+            }
+
+            completion.TrySetResult(loadResult);
+        }
+        catch (Exception exception)
         {
-            SynchronizeLoadedPackageState();
-        }
+            lock (_packageLoadGate)
+            {
+                _packageLoadTasks.Remove(cacheKey);
+            }
 
-        return loadResult;
+            completion.TrySetException(exception);
+        }
     }
 
     private async ValueTask<LanguagePackageLoadResult> LoadPackageCoreAsync(
@@ -1644,6 +1663,8 @@ public sealed class LocalizationService : ILocalizationService
     private Task<T> EnqueueMutationAsync<T>(Func<Task<T>> mutation)
     {
         Task<T> queued;
+        Task predecessor;
+        TaskCompletionSource<T> completion;
         lock (_mutationQueueGate)
         {
             if (IsDisposed)
@@ -1651,20 +1672,40 @@ public sealed class LocalizationService : ILocalizationService
                 return Task.FromException<T>(new ObjectDisposedException(nameof(LocalizationService)));
             }
 
-            var predecessor = _mutationTail;
-            queued = RunMutationAfterAsync(predecessor, mutation);
+            predecessor = _mutationTail;
+            completion = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
+            queued = completion.Task;
             _mutationTail = queued;
         }
 
+        _ = Task.Run(() => CompleteMutationAfterAsync(predecessor, mutation, completion));
         return queued;
+    }
+
+    private async Task CompleteMutationAfterAsync<T>(
+        Task predecessor,
+        Func<Task<T>> mutation,
+        TaskCompletionSource<T> completion)
+    {
+        try
+        {
+            completion.TrySetResult(
+                await RunMutationAfterAsync(predecessor, mutation).ConfigureAwait(false));
+        }
+        catch (OperationCanceledException exception)
+        {
+            completion.TrySetCanceled(exception.CancellationToken);
+        }
+        catch (Exception exception)
+        {
+            completion.TrySetException(exception);
+        }
     }
 
     private async Task<T> RunMutationAfterAsync<T>(
         Task predecessor,
         Func<Task<T>> mutation)
     {
-        await Task.Yield();
-
         try
         {
             await predecessor.ConfigureAwait(false);

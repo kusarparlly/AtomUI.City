@@ -38,4 +38,5 @@
 - 不在 UI 线程同步等待异步操作。
 - 不在 lock 内调用用户 handler、插件代码、dispatcher、transport 或外部 process。
 - mutation queue 使用异步调用链标记识别重入；排队事务之间共享顺序，不共享线程，也不持有 Monitor/Semaphore 等待外部代码。
+- package single-flight、mutation queue 与 localized-text refresh 先在锁内发布共享 completion，再在线程池执行实际异步工作；内部调度不得捕获调用方 `SynchronizationContext`，因此 Host 在非泵送 UI context 上完成同步启动时不会等待一个只能回到该 UI context 的 continuation。
 - 释放顺序从 leaf owner 到 parent owner。

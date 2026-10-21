@@ -132,6 +132,52 @@ public sealed class LocalizationServiceTests
     }
 
     [Fact]
+    public void LocalizationOperationsDoNotCaptureCallerSynchronizationContext()
+    {
+        var zh = Package("Host.zh-CN", "zh-CN", ("Settings.Title", "Settings zh"));
+        var options = new LocalizationOptions
+        {
+            DefaultCulture = CultureInfo.GetCultureInfo("zh-CN"),
+            DefaultUICulture = CultureInfo.GetCultureInfo("zh-CN"),
+        };
+        options.LanguagePackages.Add(zh.Descriptor);
+        using var service = new LocalizationService(
+            options,
+            [new RecordingLanguagePackageProvider(zh)]);
+        LocalizedString? result = null;
+        Exception? failure = null;
+        var thread = new Thread(() =>
+        {
+            SynchronizationContext.SetSynchronizationContext(new NonPumpingSynchronizationContext());
+            try
+            {
+                result = service.GetStringAsync("Settings.Title").AsTask().GetAwaiter().GetResult();
+                using var text = service.CreateTextAsync("Settings.Title").AsTask().GetAwaiter().GetResult();
+                text.RefreshAsync().AsTask().GetAwaiter().GetResult();
+                var cultureResult = service.SetCultureAsync("zh-CN").AsTask().GetAwaiter().GetResult();
+                if (!cultureResult.Succeeded)
+                {
+                    throw new InvalidOperationException(cultureResult.Error?.Message);
+                }
+            }
+            catch (Exception exception)
+            {
+                failure = exception;
+            }
+        })
+        {
+            IsBackground = true,
+        };
+
+        thread.Start();
+
+        Assert.True(thread.Join(TimeSpan.FromSeconds(5)), "Localization operation deadlocked on the caller context.");
+        Assert.Null(failure);
+        Assert.NotNull(result);
+        Assert.Equal("Settings zh", result.Value);
+    }
+
+    [Fact]
     public async Task CancellingOneLookupDoesNotCancelSharedPackageLoad()
     {
         var zh = Package("Host.zh-CN", "zh-CN", ("Settings.Title", "Settings zh"));
@@ -1555,6 +1601,13 @@ public sealed class LocalizationServiceTests
         private static string GetKey(LanguagePackageDescriptor descriptor)
         {
             return $"{descriptor.Culture.Name}|{descriptor.PackageId}";
+        }
+    }
+
+    private sealed class NonPumpingSynchronizationContext : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback d, object? state)
+        {
         }
     }
 }
