@@ -10,7 +10,7 @@
 | --- | --- | --- |
 | Definition | `RouteTemplate`, route attributes, `RouteReference<T>` | immutable parse/bind; invalid declaration fails deterministically |
 | Graph | `RouteDescriptor`, `RouteGraphSnapshot`, `RouteRegistry` | validate candidate then atomically publish; old snapshot remains readable |
-| Navigation | `IRouter`, `NavigationScope`, `NavigationResult` | serialized transaction; failure/cancellation never commits |
+| Navigation | `IRouter`, `NavigationScope`, `NavigationResult`, `NavigationCommitReceipt`, `NavigationRestoreResult` | serialized transaction; failure/cancellation never commits; current commit may be conditionally restored |
 | Pipeline | guards, match policy, resolver, middleware | DI resolved, ordered, cancellable, short-circuitable |
 | Dynamic | `RouteContribution`, `RouteContributionLease` | contribution ownership, extension-point validation, idempotent/retryable revoke |
 | Diagnostics | `RoutingDiagnosticIds` | AUCRT code semantics and context fields are stable |
@@ -31,6 +31,7 @@
 | `NavigateByPathAsync` | same pipeline as typed route | invalid match/binding does not commit | same gate |
 | `NavigateByUriAsync` | path + decoded query + fragment | no matching route returns NotFound | same gate |
 | `BackAsync` / `ForwardAsync` | navigate through journal and record the final committed route after redirects | unavailable returns `CITY-NAVIGATION-JOURNAL-NOT-AVAILABLE`; entries whose route id no longer exists are skipped | journal mutation is inside gate |
+| `IRouter.TryRestoreAsync` | when receipt is still current, atomically restores its previous snapshot and exact journal/graph checkpoint | foreign, stale/superseded, reentrant and disposed scopes return structured rejected/failed results; caller cancellation before admission returns Cancelled | same scope gate; successful restore advances generation and consumes the receipt |
 | `NavigationScope.Router` | returns the same scope as an `IRouter` view | never creates or owns a second router | immutable self-reference |
 | `DisposeAsync` | linearizes admission with disposal, cancels gate waiters/running work, waits external code and returns shared completion | own execution-chain disposal throws; post-dispose admission returns `CITY-NAVIGATION-SCOPE-DISPOSED` | idempotent |
 
@@ -59,6 +60,8 @@
 - `Timeout` must be positive or `Timeout.InfiniteTimeSpan`.
 - Route/parent/contribution/extension-point/outlet identities use ordinal case-sensitive comparison; route parameter names and literal path matching are case-insensitive.
 - `NavigationTargetKind` contains RouteReference, Path, DeepLink and Journal; Journal is emitted internally for Back/Forward admission. `NavigationResultStatus` contains Success, Rejected, Redirected, Cancelled, Failed and NotFound.
+- `NavigationResult.CommitReceipt` is non-null only for a committed Success/Redirected result issued by `NavigationScope`; factory-created or non-committed results do not carry a receipt.
+- `NavigationRestoreResultStatus` contains Restored, Rejected, Cancelled and Failed. `CITY-NAVIGATION-RESTORE-SUPERSEDED` means a later commit/restore already won and must never be overwritten.
 
 ## Graph Validation
 
@@ -71,7 +74,7 @@ Graph build rejects null descriptors, duplicate ids/index routes/extension point
 | Definitions | route attributes, `RouteReference`, `RouteReference<T>`, `RouteExtensionPoint` | declarations are generated at compile time; references are immutable values |
 | Template | `RouteTemplate`, `RouteTemplateSegment`, `RouteMatcher`, `RouteMatch` | immutable structural parsing/matching; no service resolution or policy execution |
 | Graph | `RouteDescriptor`, `RouteMetadataDescriptor`, `ViewModelTargetDescriptor`, `RouteGraphSnapshot`, graph enums/error | immutable copied values; graph transformations return a new version |
-| Navigation | `IRouter`, `NavigationScope`, `NavigationTarget`, `NavigationOptions`, `NavigationResult`, `NavigationSnapshot`, navigation enums/error | scope owns mutable session; targets/results/snapshots are copied read models |
+| Navigation | `IRouter`, `NavigationScope`, `NavigationTarget`, `NavigationOptions`, `NavigationResult`, `NavigationSnapshot`, `NavigationCommitReceipt`, `NavigationRestoreResult`, navigation enums/error | scope owns mutable session and receipt checkpoints; targets/results/snapshots/receipts are read models; only issuing scope may restore |
 | Pipeline | guard/match/resolver/middleware interfaces, contexts and result types | application DI owns components; Routing orders and invokes them outside internal locks |
 | Dynamic | `IRouteGraphProvider`, `IRouteRegistry`, `RouteRegistry`, `RouteContribution`, `RouteContributionLease` | Registry publishes graph; contributor owns and disposes lease |
 | Hosting | `RoutingModule`, `AddRouting`, `RoutingDiagnosticIds` | Registry/provider singleton; router/scope scoped; diagnostics observational |
@@ -81,6 +84,7 @@ Every public type in `src/AtomUI.City.Routing` belongs to one card above. Adding
 ## Ownership and Dispose
 
 - Descriptor, graph, snapshot, result and match objects stay readable indefinitely.
+- A receipt stays readable indefinitely but its restore authority is conditional and normally expires after any later commit/restore; it does not keep ViewModel, View, provider or arbitrary resolver objects alive.
 - `NavigationScope` rejects mutation after Dispose.
 - Lease Dispose is idempotent; a failed revoke resets the lease so dependency order can be corrected and retried.
 - Journal never stores ViewModel, provider, delegate, descriptor, or arbitrary resolver object. Only route identity, string parameters, metadata and safe scalar resolved values are retained; resolver execution is skipped only when the complete resolved-data set was safely retained.

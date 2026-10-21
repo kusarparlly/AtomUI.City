@@ -37,4 +37,16 @@ public static class RoutingDiagnosticIds
     /// Represents the route graph rejected value.
     /// </summary>
     public const string RouteGraphRejected = "AUCRT008";
+    /// <summary>
+    /// Represents a successful receipt-guarded navigation restore.
+    /// </summary>
+    public const string NavigationRestored = "AUCRT009";
+    /// <summary>
+    /// Represents a rejected receipt-guarded navigation restore.
+    /// </summary>
+    public const string NavigationRestoreRejected = "AUCRT010";
+    /// <summary>
+    /// Represents an unexpected receipt-guarded navigation restore failure.
+    /// </summary>
+    public const string NavigationRestoreFailed = "AUCRT011";
 }

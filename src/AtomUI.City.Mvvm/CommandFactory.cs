@@ -62,13 +62,14 @@ public static class CommandFactory
         ArgumentNullException.ThrowIfNull(execute);
 
         var runtime = new AsyncCommandRuntime<object?>(
-            (_, cancellationToken) => execute(cancellationToken),
+            (_, _, cancellationToken) => execute(cancellationToken),
             canExecute: null,
             state ?? new CommandExecutionState(),
             activationOwner: null,
             fixedActivationScope: activationScope,
             CommandConcurrencyPolicy.Reject,
             concurrencyKeySelector: null,
+            executionDomain: null,
             exceptionHandler: null,
             diagnostics,
             notificationDispatcher);
@@ -98,13 +99,53 @@ public static class CommandFactory
         ValidateConcurrency(concurrencyPolicy, concurrencyKeySelector);
 
         var runtime = new AsyncCommandRuntime<object?>(
-            (_, cancellationToken) => execute(cancellationToken),
+            (_, _, cancellationToken) => execute(cancellationToken),
             canExecute is null ? null : _ => canExecute(),
             state ?? new CommandExecutionState(),
             activationOwner,
             fixedActivationScope: null,
             concurrencyPolicy,
             concurrencyKeySelector,
+            executionDomain: null,
+            exceptionHandler,
+            diagnostics,
+            notificationDispatcher);
+
+        return new TrackedAsyncRelayCommand<object?>(runtime);
+    }
+
+    /// <summary>
+    /// Creates an asynchronous command that participates in a shared latest-wins execution domain.
+    /// </summary>
+    public static IAsyncRelayCommand CreateAsync(
+        CommandExecutionDomain executionDomain,
+        Func<CommandExecutionLease, CancellationToken, Task> execute,
+        Func<bool>? canExecute = null,
+        CommandExecutionState? state = null,
+        IActivationScopeOwner? activationOwner = null,
+        CommandConcurrencyPolicy concurrencyPolicy = CommandConcurrencyPolicy.Reject,
+        ICommandExceptionHandler? exceptionHandler = null,
+        IHostDiagnostics? diagnostics = null,
+        IUiDispatcher? notificationDispatcher = null)
+    {
+        ArgumentNullException.ThrowIfNull(executionDomain);
+        ArgumentNullException.ThrowIfNull(execute);
+
+        Func<object?, object?>? concurrencyKeySelector =
+            concurrencyPolicy == CommandConcurrencyPolicy.RejectByKey
+                ? static _ => "command"
+                : null;
+        ValidateConcurrency(concurrencyPolicy, concurrencyKeySelector);
+
+        var runtime = new AsyncCommandRuntime<object?>(
+            (_, lease, cancellationToken) => execute(lease!, cancellationToken),
+            canExecute is null ? null : _ => canExecute(),
+            state ?? new CommandExecutionState(),
+            activationOwner,
+            fixedActivationScope: null,
+            concurrencyPolicy,
+            concurrencyKeySelector,
+            executionDomain,
             exceptionHandler,
             diagnostics,
             notificationDispatcher);
@@ -130,13 +171,49 @@ public static class CommandFactory
         ValidateConcurrency(concurrencyPolicy, concurrencyKeySelector);
 
         var runtime = new AsyncCommandRuntime<T>(
-            execute,
+            (parameter, _, cancellationToken) => execute(parameter, cancellationToken),
             canExecute,
             state ?? new CommandExecutionState(),
             activationOwner,
             fixedActivationScope: null,
             concurrencyPolicy,
             concurrencyKeySelector,
+            executionDomain: null,
+            exceptionHandler,
+            diagnostics,
+            notificationDispatcher);
+
+        return new TrackedAsyncRelayCommand<T>(runtime);
+    }
+
+    /// <summary>
+    /// Creates a typed asynchronous command that participates in a shared latest-wins execution domain.
+    /// </summary>
+    public static IAsyncRelayCommand<T> CreateAsync<T>(
+        CommandExecutionDomain executionDomain,
+        Func<T?, CommandExecutionLease, CancellationToken, Task> execute,
+        Predicate<T?>? canExecute = null,
+        CommandExecutionState? state = null,
+        IActivationScopeOwner? activationOwner = null,
+        CommandConcurrencyPolicy concurrencyPolicy = CommandConcurrencyPolicy.Reject,
+        Func<T?, object?>? concurrencyKeySelector = null,
+        ICommandExceptionHandler? exceptionHandler = null,
+        IHostDiagnostics? diagnostics = null,
+        IUiDispatcher? notificationDispatcher = null)
+    {
+        ArgumentNullException.ThrowIfNull(executionDomain);
+        ArgumentNullException.ThrowIfNull(execute);
+        ValidateConcurrency(concurrencyPolicy, concurrencyKeySelector);
+
+        var runtime = new AsyncCommandRuntime<T>(
+            (parameter, lease, cancellationToken) => execute(parameter, lease!, cancellationToken),
+            canExecute,
+            state ?? new CommandExecutionState(),
+            activationOwner,
+            fixedActivationScope: null,
+            concurrencyPolicy,
+            concurrencyKeySelector,
+            executionDomain,
             exceptionHandler,
             diagnostics,
             notificationDispatcher);
@@ -224,25 +301,27 @@ public static class CommandFactory
 
     private sealed class AsyncCommandRuntime<T>
     {
-        private readonly Func<T?, CancellationToken, Task> _execute;
+        private readonly Func<T?, CommandExecutionLease?, CancellationToken, Task> _execute;
         private readonly Predicate<T?>? _canExecute;
         private readonly IActivationScopeOwner? _activationOwner;
         private readonly IActivationScope? _fixedActivationScope;
         private readonly CommandConcurrencyPolicy _concurrencyPolicy;
         private readonly Func<T?, object?>? _concurrencyKeySelector;
+        private readonly CommandExecutionDomain? _executionDomain;
         private readonly ICommandExceptionHandler? _exceptionHandler;
         private readonly IHostDiagnostics? _diagnostics;
         private readonly IUiDispatcher? _notificationDispatcher;
         private readonly ConcurrencyGate _concurrencyGate = new();
 
         public AsyncCommandRuntime(
-            Func<T?, CancellationToken, Task> execute,
+            Func<T?, CommandExecutionLease?, CancellationToken, Task> execute,
             Predicate<T?>? canExecute,
             CommandExecutionState state,
             IActivationScopeOwner? activationOwner,
             IActivationScope? fixedActivationScope,
             CommandConcurrencyPolicy concurrencyPolicy,
             Func<T?, object?>? concurrencyKeySelector,
+            CommandExecutionDomain? executionDomain,
             ICommandExceptionHandler? exceptionHandler,
             IHostDiagnostics? diagnostics,
             IUiDispatcher? notificationDispatcher)
@@ -254,6 +333,7 @@ public static class CommandFactory
             _fixedActivationScope = fixedActivationScope;
             _concurrencyPolicy = concurrencyPolicy;
             _concurrencyKeySelector = concurrencyKeySelector;
+            _executionDomain = executionDomain;
             _exceptionHandler = exceptionHandler;
             _diagnostics = diagnostics;
             _notificationDispatcher = notificationDispatcher;
@@ -270,6 +350,11 @@ public static class CommandFactory
         public bool CanExecute(T? parameter)
         {
             if (!TryResolveActivationScope(out _))
+            {
+                return false;
+            }
+
+            if (_executionDomain is { IsClosing: true })
             {
                 return false;
             }
@@ -308,7 +393,7 @@ public static class CommandFactory
             {
                 if (activationScope is null)
                 {
-                    await ExecuteAdmittedAsync(parameter, cancellationToken).ConfigureAwait(false);
+                    await ExecuteWithinDomainAsync(parameter, cancellationToken).ConfigureAwait(false);
                     return;
                 }
 
@@ -318,7 +403,7 @@ public static class CommandFactory
                 {
                     executionTask = activationScope.StartAsync(
                         taskName,
-                        token => ExecuteAdmittedAsync(parameter, token),
+                        token => ExecuteWithinDomainAsync(parameter, token),
                         cancellationToken);
                 }
                 catch (InvalidOperationException exception)
@@ -396,7 +481,32 @@ public static class CommandFactory
             });
         }
 
-        private async Task ExecuteAdmittedAsync(T? parameter, CancellationToken cancellationToken)
+        private Task ExecuteWithinDomainAsync(T? parameter, CancellationToken cancellationToken)
+        {
+            if (_executionDomain is null)
+            {
+                return ExecuteAdmittedAsync(parameter, executionLease: null, cancellationToken);
+            }
+
+            try
+            {
+                return _executionDomain.RunLatestAsync(
+                    (lease, domainToken) => ExecuteAdmittedAsync(parameter, lease, domainToken),
+                    cancellationToken);
+            }
+            catch (Exception exception)
+                when ((exception is ObjectDisposedException or InvalidOperationException)
+                    && _executionDomain.IsClosing)
+            {
+                Reject(MvvmDiagnosticIds.CommandRejected, "execution-domain-closing");
+                return Task.CompletedTask;
+            }
+        }
+
+        private async Task ExecuteAdmittedAsync(
+            T? parameter,
+            CommandExecutionLease? executionLease,
+            CancellationToken cancellationToken)
         {
             using var operation = OperationScope.Start(cancellationToken);
             State.Begin(operation.CancellationToken);
@@ -404,8 +514,10 @@ public static class CommandFactory
             try
             {
                 operation.CancellationToken.ThrowIfCancellationRequested();
-                await _execute(parameter, operation.CancellationToken).ConfigureAwait(false);
-                State.Complete(operation.Complete());
+                await _execute(parameter, executionLease, operation.CancellationToken).ConfigureAwait(false);
+                State.Complete(executionLease is { IsCancellationRequested: true }
+                    ? operation.Cancel()
+                    : operation.Complete());
             }
             catch (OperationCanceledException exception)
                 when (operation.CancellationToken.IsCancellationRequested)

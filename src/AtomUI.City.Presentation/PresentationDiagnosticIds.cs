@@ -181,4 +181,20 @@ public static class PresentationDiagnosticIds
     /// Represents a logical ViewModel composition cleanup failure.
     /// </summary>
     public const string ViewModelCompositionCleanupFailed = "AUCPRS046";
+    /// <summary>
+    /// Represents a started Routing-Presentation coordination operation.
+    /// </summary>
+    public const string RoutePresentationCoordinationStarted = "AUCPRS047";
+    /// <summary>
+    /// Represents a successful Routing-Presentation coordination operation.
+    /// </summary>
+    public const string RoutePresentationCoordinationSucceeded = "AUCPRS048";
+    /// <summary>
+    /// Represents a failed or incomplete Routing-Presentation coordination operation.
+    /// </summary>
+    public const string RoutePresentationCoordinationFailed = "AUCPRS049";
+    /// <summary>
+    /// Represents a conditional restore rejected because navigation advanced.
+    /// </summary>
+    public const string RoutePresentationRestoreRejected = "AUCPRS050";
 }

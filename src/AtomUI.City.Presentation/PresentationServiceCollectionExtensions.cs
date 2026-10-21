@@ -1,7 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using AtomUI.City.Core.Diagnostics;
 using AtomUI.City.Core.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AtomUI.City.Presentation;
 
@@ -41,6 +41,15 @@ public static class PresentationServiceCollectionExtensions
             serviceProvider.GetService<VisualLifecycleHub>()));
         services.TryAddSingleton<CommandBinding>();
         services.TryAddSingleton<ValidationVisualStateBinding>();
+        services.TryAddSingleton<RoutePresentationCoordinator>(serviceProvider =>
+        {
+            var diagnostics = serviceProvider.GetService<IHostDiagnostics>();
+            return diagnostics is null
+                ? new RoutePresentationCoordinator()
+                : new RoutePresentationCoordinator(diagnostics);
+        });
+        services.TryAddSingleton<IRoutePresentationCoordinator>(serviceProvider =>
+            serviceProvider.GetRequiredService<RoutePresentationCoordinator>());
         services.AddPresentationInteractionHandlers();
         services.AddPresentationResourceRegistry();
         services.AddActivePluginViewRegistry();

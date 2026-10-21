@@ -44,3 +44,5 @@ ADR 用于记录已经形成约束力的重要决策，包括背景、决策、�
 - [0012-effective-cancellation-token-contract.md](0012-effective-cancellation-token-contract.md)
 - [0013-ui-observable-notification-dispatch.md](0013-ui-observable-notification-dispatch.md)
 - [0014-presentation-ui-command-factory.md](0014-presentation-ui-command-factory.md)
+- [0015-shared-command-execution-domain.md](0015-shared-command-execution-domain.md)
+- [0016-routing-presentation-coordination.md](0016-routing-presentation-coordination.md)

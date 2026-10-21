@@ -17,6 +17,7 @@
 | AUC-MVVM-009 | Command Concurrency and Activation Ownership | Implemented | Command concurrency policy, activation owner contract | CommandTests; ViewModelBaseTests |
 | AUC-MVVM-010 | Command Exception Delivery | Implemented | ICommandExceptionHandler, command exception context | CommandTests |
 | AUC-MVVM-011 | Command Notification Dispatch | Implemented | CommandFactory notification dispatcher | CommandTests; UiCommandFactoryTests |
+| AUC-MVVM-012 | Shared Command Execution Domain | Implemented | CommandExecutionDomain, CommandExecutionLease, CommandFactory domain overloads | CommandTests; UiCommandFactoryTests |
 
 ## Feature 硬门禁
 
@@ -188,3 +189,17 @@ Diagnostics: `AUCMVVM014`。
 Tests: `CommandTests`
 Required Assertions: Activation 状态变化从非 UI 线程到达时，通知先排入 dispatcher，drain 后才交付观察者；inline 与排队订阅者异常均被诊断且不改变命令结果；Mvvm 不调用 `CheckAccess`。
 Acceptance Criteria: Avalonia 等具有线程亲和性的绑定不会因 City 生命周期后台执行而收到跨线程命令通知，命令结果不再取决于通知发生时的线程。
+
+## AUC-MVVM-012 Shared Command Execution Domain
+
+Feature ID: `AUC-MVVM-012`
+Status: Completed
+Goal: 让多个显式加入同一所有权边界的 Command 以 latest-wins 语义快速切换，并共享取消、代际、currentness 和 drain。
+Public Contract: `CommandExecutionDomain`, `CommandExecutionLease`, `CommandFactory.CreateAsync` 的 domain-first 泛型/非泛型重载。
+Runtime / Build Behavior: 新执行原子取得递增 generation 和 current lease，再取消此前 current execution；新执行不等待旧执行退出。单 Command 的 Reject/Allow/RejectByKey 门禁继续独立生效。
+Failure Behavior: domain closing/disposed 后的命令准入映射为 Rejected，不调用用户委托；取消回调失败只记录 `AUCMVVM016`；drain 超时记录 `AUCMVVM017`，不能伪装成已强杀旧执行。
+Threading / Cancellation: 框架锁不跨 await，也不在锁内调用用户委托、取消回调或 diagnostics；domain token 进入 OperationScope，ActivationScope 继续监督外层命令 Task。
+Diagnostics: `AUCMVVM016-017`，上下文包含 domain id、generation、active execution count、timeout 和 exception type 中适用的字段。
+Tests: `CommandTests; UiCommandFactoryTests`
+Required Assertions: 两个 Command 共享 domain 时后发取消前发且立即开始；generation 单调、IsCurrent 准确；不合作旧执行不阻塞新执行；independent domain 隔离；activation stop、dispose/drain、关闭竞态和 throwing diagnostics 均有覆盖。
+Acceptance Criteria: AtomBox/AtomPix 不再为跨 Command latest-wins 重写 CTS/锁/代际所有权；业务提交仍使用应用自己的 version/generation 栅栏；不引入通用 policy engine。

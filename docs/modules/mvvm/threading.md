@@ -14,6 +14,8 @@
 - Interaction 无 handler：返回 `NotHandled`；handler 抛异常返回 `Failed`。
 - Command 默认 `Reject`；可显式选择 `Allow` 或 `RejectByKey`。`CanExecute` 不是准入锁，执行入口必须原子校验。
 - `RejectByKey` 同 key 单飞、不同 key 可并行；key registry 在成功、取消和失败后都必须释放。
+- `CommandExecutionDomain` 是跨 Command 的独立所有权边界，固定使用 latest-wins：新 execution 原子成为 current 后请求取消旧 current execution，并且不等待旧执行退出。它不替代单 Command 的 Reject/Allow/RejectByKey。
+- domain generation/currentness 只保护框架执行身份；业务状态、缓存和 UI 提交仍必须使用应用定义的 version/generation 栅栏。
 
 ## UI 线程规则
 
@@ -33,6 +35,7 @@
 - ActivationScope 只监督通过 `StartAsync` / `StartUniqueAsync` 准入的 Task；不能发现任意游离 `Task.Run`。
 - CPU 工作可以使用 `Task.Run`，但返回 Task 必须被调用方 await 或交给明确 Scope/应用 scheduler。
 - Scope 关闭先拒绝新任务，再取消和 drain；不合作的 Task 只能超时诊断，不能被强杀。
+- Domain 关闭同样先拒绝新准入，再取消全部 active execution 并限时 drain；替换 current 时只发出取消请求，不等待旧执行，因此不合作的旧执行不会阻塞新意图，但仍可能在后台存活到自身结束或 owner shutdown。
 
 ## 死锁规避
 

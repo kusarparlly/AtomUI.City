@@ -4,6 +4,7 @@ using Avalonia.Threading;
 using AtomUI.City.Core.Lifecycle;
 using AtomUI.City.Core.Threading;
 using AtomUI.City.Presentation;
+using AtomUI.City.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.InteropServices;
 
@@ -76,6 +77,38 @@ internal static class Program
                 BoundViewHandle.FromExisting(view, viewModel)));
             Console.WriteLine("stage=outlet-committed");
 
+            await using var coordinatedOutlet = new RouteOutlet(
+                "coordinated",
+                InlineUiDispatcher.Instance,
+                new ConsumerOutletTarget());
+            await using var router = new NavigationScope(RouteGraphSnapshot.Create(
+                [
+                    ConsumerRoute("home"),
+                    ConsumerRoute("settings"),
+                ]));
+            var coordinator = provider.GetRequiredService<IRoutePresentationCoordinator>();
+            var coordinatedHome = await coordinator.NavigateAsync(
+                router,
+                coordinatedOutlet,
+                token => router.NavigateByPathAsync("home", cancellationToken: token),
+                new ConsumerPlanFactory((_, _) => ValueTask.FromResult(
+                    RouteOutletCommitPlan.Replace(
+                        "coordinated",
+                        BoundViewHandle.FromExisting(new ConsumerView(), new ConsumerViewModel())))));
+            var failedCandidateDisposeCount = 0;
+            var coordinatedFailure = await coordinator.NavigateAsync(
+                router,
+                coordinatedOutlet,
+                token => router.NavigateByPathAsync("settings", cancellationToken: token),
+                new ConsumerPlanFactory((_, _) => ValueTask.FromResult(
+                    RouteOutletCommitPlan.Replace(
+                        "wrong-outlet",
+                        BoundViewHandle.FromExisting(
+                            new ConsumerView(),
+                            new ConsumerViewModel(),
+                            () => failedCandidateDisposeCount++)))));
+            Console.WriteLine("stage=coordination-completed");
+
             var interactions = provider.GetRequiredService<IInteractionHandlerRegistry>();
             using var registration = interactions.Register<ConsumerRequest, int>(
                 static (context, _) => ValueTask.FromResult(context.Request.Value + 1));
@@ -84,23 +117,40 @@ internal static class Program
 
             var runtime = provider.GetRequiredService<IPresentationRuntime>();
             runtime.Attach(new Avalonia.Controls.ApplicationLifetimes.ClassicDesktopStyleApplicationLifetime(), applicationScope);
+            var compositionViewModel = new ConsumerCompositionViewModel();
+            var compositionLease = await runtime.ViewModels.AttachRootAsync(
+                "consumer-root",
+                ViewModelLease.EntryOwned(compositionViewModel));
             await runtime.StopAsync();
             Console.WriteLine("stage=runtime-stopped");
 
             if (!commit.Succeeded || !ReferenceEquals(target.Content, view) ||
                 interaction.Status != AtomUI.City.Mvvm.InteractionResultStatus.Completed ||
-                interaction.Value != 42 || runtime.State != PresentationRuntimeState.Stopped)
+                interaction.Value != 42 || runtime.State != PresentationRuntimeState.Stopped ||
+                !coordinatedHome.Succeeded ||
+                coordinatedFailure.Status != RoutePresentationResultStatus.PresentationFailedRouteRestored ||
+                router.CurrentSnapshot.Route.RouteId != "home" ||
+                failedCandidateDisposeCount != 1 ||
+                !compositionLease.IsDisposed || !compositionViewModel.IsDisposed)
             {
                 throw new InvalidOperationException("Presentation package consumer contract failed.");
             }
 
-            Console.WriteLine("PRESENTATION_PACKAGE_CONSUMER_OK view=located outlet=committed interaction=completed runtime=stopped");
+            Console.WriteLine("PRESENTATION_PACKAGE_CONSUMER_OK view=located outlet=committed coordination=restored composition=disposed interaction=completed runtime=stopped");
         }
         catch (Exception exception)
         {
             throw new InvalidOperationException("Presentation package consumer scenario failed.", exception);
         }
     }
+
+    private static RouteDescriptor ConsumerRoute(string id) =>
+        new(
+            id,
+            RouteDefinitionKind.Route,
+            id,
+            new ViewModelTargetDescriptor(typeof(ConsumerViewModel)),
+            parentRouteId: null);
 
     private static void SuppressWindowsErrorDialogs()
     {
@@ -121,6 +171,31 @@ internal sealed record ConsumerRequest(int Value);
 
 internal sealed class ConsumerViewModel;
 
+internal sealed class ConsumerCompositionViewModel : AtomUI.City.Mvvm.IActivatable, IAsyncDisposable
+{
+    public bool IsDisposed { get; private set; }
+
+    public ValueTask ActivateAsync(
+        AtomUI.City.Mvvm.IActivationScope scope,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask DeactivateAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        IsDisposed = true;
+        return ValueTask.CompletedTask;
+    }
+}
+
 internal sealed class ConsumerView;
 
 internal sealed class ConsumerOutletTarget : IRouteOutletTarget
@@ -128,6 +203,16 @@ internal sealed class ConsumerOutletTarget : IRouteOutletTarget
     public object? Content { get; private set; }
 
     public void SetContent(object? content) => Content = content;
+}
+
+internal sealed class ConsumerPlanFactory(
+    Func<RoutePresentationPlanContext, CancellationToken, ValueTask<RouteOutletCommitPlan>> callback)
+    : IRoutePresentationPlanFactory
+{
+    public ValueTask<RouteOutletCommitPlan> CreateAsync(
+        RoutePresentationPlanContext context,
+        CancellationToken cancellationToken = default) =>
+        callback(context, cancellationToken);
 }
 
 internal sealed class InlineUiDispatcher : IUiDispatcher

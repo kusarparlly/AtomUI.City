@@ -2,7 +2,7 @@
 
 ## 定位
 
-RouteOutlet 是 Routing-Presentation adapter 与 Avalonia physical target 之间的单次事务提交边界。Router snapshot 在调用前已提交；Outlet 只返回 Presentation 结果，不更新 Router。
+RouteOutlet 是 Routing-Presentation plan producer 与 Avalonia physical target 之间的单次事务提交边界。Router snapshot 在调用前已提交；Outlet 只返回 Presentation 结果，不更新 Router。需要跨 Router/Outlet 技术协调时由上层 `IRoutePresentationCoordinator` 使用 commit receipt 条件恢复，Outlet 本身保持单一职责。
 
 ## Admission 和所有权
 

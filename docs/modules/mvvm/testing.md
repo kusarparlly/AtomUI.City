@@ -32,8 +32,9 @@
 | AUC-MVVM-009 | Unit/Concurrency | CommandTests; ViewModelBaseTests | 断言 Reject/Allow/RejectByKey、活动计数、原子准入、Scope A/B、activation 通知隔离及同步释放恢复。 | 同 key race、inactive、deactivating、Scope dispose race、订阅者异常、异步资源同步释放误用。 | Implemented / Release Validation Pending |
 | AUC-MVVM-010 | Contract/Failure injection | CommandTests | 断言 await 原异常、ICommand handler 恰好一次、取消排除、诊断故障隔离和无磁盘副作用。 | handler 异常、throwing diagnostics、重复观察、fire-and-forget UI path。 | Implemented / Release Validation Pending |
 | AUC-MVVM-011 | Contract/Platform integration | CommandTests; UiCommandFactoryTests | 断言四个状态属性在开始/完成阶段经 dispatcher 交付、Headless 同步语义、faulted ValueTask 被观察、真实 Avalonia UI 线程交付。 | inline/queued 订阅者异常、Runtime Stopped/Faulted、完成/失败/取消结果隔离。 | Implemented / Release Validation Pending |
+| AUC-MVVM-012 | Unit/Concurrency/Contract | CommandTests; UiCommandFactoryTests; Public API tests; package consumer | 断言跨 Command latest-wins、generation/currentness、立即切换、Operation Canceled、Activation 监督、DI dispatcher 转交和独立 domain 隔离。 | 不合作旧执行、关闭/Dispose 竞态、取消回调失败、drain 超时、throwing diagnostics、domain-first API 漂移。 | Release Verified |
 
-表中 `Status` 是 Feature 的发布成熟度，不只是现有测试是否通过。`AUC-MVVM-007` 至 `011` 已关闭本模块已知的失败注入和平台集成测试缺口，但在全局 package consumer 与发布门禁重新执行前仍保持 `Release Validation Pending`。
+表中 `Status` 是 Feature 的发布成熟度，不只是现有测试是否通过。`AUC-MVVM-007` 至 `011` 仍保持各自既有的 `Release Validation Pending`；不得因同一轮全局回归自动推断它们的专项发布矩阵已闭环。`AUC-MVVM-012` 的发布证据为 MVVM `113/113`、Presentation `171/171`、16 个非平台测试项目 `2224/2224`、10 轮重复竞态测试、Presentation Public API build/pack、API governance `16/16` 及隔离 `win-x64` self-contained package consumer。
 
 ## 当前审计缺口
 

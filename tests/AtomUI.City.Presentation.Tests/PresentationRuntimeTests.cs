@@ -127,6 +127,34 @@ public sealed class PresentationRuntimeTests
     }
 
     [Fact]
+    public async Task RuntimeStopAndExplicitLeaseDisposeShareCompositionCleanup()
+    {
+        await using var application = LifecycleScope.CreateRoot(
+            LifecycleScopeKind.Application,
+            "application");
+        var runtime = new PresentationRuntime();
+        var viewModel = new BlockingCompositionViewModel();
+
+        await runtime.StartAsync(application);
+        var lease = await runtime.ViewModels.AttachRootAsync(
+            "shell",
+            ViewModelLease.EntryOwned(viewModel));
+        var explicitDispose = lease.DisposeAsync().AsTask();
+        await viewModel.DeactivationStarted.Task;
+        var runtimeStop = runtime.StopAsync().AsTask();
+
+        Assert.False(explicitDispose.IsCompleted);
+        Assert.False(runtimeStop.IsCompleted);
+        viewModel.ReleaseDeactivation.TrySetResult();
+        await Task.WhenAll(explicitDispose, runtimeStop);
+
+        Assert.Equal(1, viewModel.DeactivationCount);
+        Assert.Equal(1, viewModel.DisposeCount);
+        Assert.True(lease.IsDisposed);
+        Assert.Equal(PresentationRuntimeState.Stopped, runtime.State);
+    }
+
+    [Fact]
     public async Task ServiceCollectionRegistersPresentationRuntime()
     {
         var services = new ServiceCollection();
@@ -183,6 +211,40 @@ public sealed class PresentationRuntimeTests
         public ValueTask DisposeAsync()
         {
             IsDisposed = true;
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class BlockingCompositionViewModel : IActivatable, IAsyncDisposable
+    {
+        public TaskCompletionSource DeactivationStarted { get; } = new(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public TaskCompletionSource ReleaseDeactivation { get; } = new(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public int DeactivationCount { get; private set; }
+
+        public int DisposeCount { get; private set; }
+
+        public ValueTask ActivateAsync(
+            IActivationScope scope,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return ValueTask.CompletedTask;
+        }
+
+        public async ValueTask DeactivateAsync(CancellationToken cancellationToken)
+        {
+            DeactivationCount++;
+            DeactivationStarted.TrySetResult();
+            await ReleaseDeactivation.Task;
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            DisposeCount++;
             return ValueTask.CompletedTask;
         }
     }

@@ -109,6 +109,29 @@ public sealed class UiCommandFactoryTests
                 },
                 state: typedState);
 
+            await using var domain = new CommandExecutionDomain();
+            var domainState = new CommandExecutionState("domain");
+            CommandExecutionLease? domainLease = null;
+            var domainCommand = factory.CreateAsync(
+                domain,
+                (lease, _) =>
+                {
+                    domainLease = lease;
+                    return Task.CompletedTask;
+                },
+                state: domainState);
+
+            string? domainTypedValue = null;
+            var domainTypedState = new CommandExecutionState("domain-typed");
+            var domainTypedCommand = factory.CreateAsync<string>(
+                domain,
+                (value, _, _) =>
+                {
+                    domainTypedValue = value;
+                    return Task.CompletedTask;
+                },
+                state: domainTypedState);
+
             var beforeFixed = dispatcher.InvokeCount;
             await fixedCommand.ExecuteAsync(null);
             Assert.True(dispatcher.InvokeCount > beforeFixed);
@@ -121,10 +144,22 @@ public sealed class UiCommandFactoryTests
             await typedCommand.ExecuteAsync("typed-value");
             Assert.True(dispatcher.InvokeCount > beforeTyped);
 
+            var beforeDomain = dispatcher.InvokeCount;
+            await domainCommand.ExecuteAsync(null);
+            Assert.True(dispatcher.InvokeCount > beforeDomain);
+
+            var beforeDomainTyped = dispatcher.InvokeCount;
+            await domainTypedCommand.ExecuteAsync("domain-typed-value");
+            Assert.True(dispatcher.InvokeCount > beforeDomainTyped);
+
             Assert.Equal("typed-value", typedValue);
+            Assert.NotNull(domainLease);
+            Assert.Equal("domain-typed-value", domainTypedValue);
             Assert.Equal(OperationStatus.Completed, fixedState.LastResult?.Status);
             Assert.Equal(OperationStatus.Completed, ownerState.LastResult?.Status);
             Assert.Equal(OperationStatus.Completed, typedState.LastResult?.Status);
+            Assert.Equal(OperationStatus.Completed, domainState.LastResult?.Status);
+            Assert.Equal(OperationStatus.Completed, domainTypedState.LastResult?.Status);
 
             await fixedScope.DisposeAsync();
         }
@@ -375,8 +410,29 @@ public sealed class UiCommandFactoryTests
             ICommandExceptionHandler? exceptionHandler = null) =>
             throw new NotSupportedException();
 
+        public IAsyncRelayCommand CreateAsync(
+            CommandExecutionDomain executionDomain,
+            Func<CommandExecutionLease, CancellationToken, Task> execute,
+            Func<bool>? canExecute = null,
+            CommandExecutionState? state = null,
+            IActivationScopeOwner? activationOwner = null,
+            CommandConcurrencyPolicy concurrencyPolicy = CommandConcurrencyPolicy.Reject,
+            ICommandExceptionHandler? exceptionHandler = null) =>
+            throw new NotSupportedException();
+
         public IAsyncRelayCommand<T> CreateAsync<T>(
             Func<T?, CancellationToken, Task> execute,
+            Predicate<T?>? canExecute = null,
+            CommandExecutionState? state = null,
+            IActivationScopeOwner? activationOwner = null,
+            CommandConcurrencyPolicy concurrencyPolicy = CommandConcurrencyPolicy.Reject,
+            Func<T?, object?>? concurrencyKeySelector = null,
+            ICommandExceptionHandler? exceptionHandler = null) =>
+            throw new NotSupportedException();
+
+        public IAsyncRelayCommand<T> CreateAsync<T>(
+            CommandExecutionDomain executionDomain,
+            Func<T?, CommandExecutionLease, CancellationToken, Task> execute,
             Predicate<T?>? canExecute = null,
             CommandExecutionState? state = null,
             IActivationScopeOwner? activationOwner = null,

@@ -191,6 +191,7 @@ public sealed class CommandTests
         release.TrySetResult();
         await execution;
 
+        await WaitUntilAsync(() => dispatcher.PendingCount == 1);
         Assert.Equal(1, dispatcher.PendingCount);
         dispatcher.Drain();
 
@@ -535,6 +536,296 @@ public sealed class CommandTests
 
         Assert.Equal(OperationStatus.Canceled, state.LastResult?.Status);
         Assert.Null(state.LastError);
+    }
+
+    [Fact]
+    public async Task SharedExecutionDomainReplacesCommandAndPublishesGenerationAndCurrentness()
+    {
+        await using var domain = new CommandExecutionDomain();
+        var firstState = new CommandExecutionState("open-file", typeof(SaveViewModel));
+        var secondState = new CommandExecutionState("open-folder", typeof(SaveViewModel));
+        var firstStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var secondStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var secondRelease = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        CommandExecutionLease? firstLease = null;
+        CommandExecutionLease? secondLease = null;
+        var firstCommand = CommandFactory.CreateAsync(
+            domain,
+            async (lease, cancellationToken) =>
+            {
+                firstLease = lease;
+                firstStarted.TrySetResult();
+                await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            },
+            state: firstState);
+        var secondCommand = CommandFactory.CreateAsync(
+            domain,
+            async (lease, cancellationToken) =>
+            {
+                secondLease = lease;
+                secondStarted.TrySetResult();
+                await secondRelease.Task.WaitAsync(cancellationToken);
+            },
+            state: secondState);
+
+        var firstExecution = firstCommand.ExecuteAsync(null);
+        await firstStarted.Task;
+        Assert.True(firstLease!.IsCurrent);
+
+        var secondExecution = secondCommand.ExecuteAsync(null);
+        await secondStarted.Task;
+
+        Assert.Equal(1, firstLease.Generation);
+        Assert.Equal(2, secondLease!.Generation);
+        Assert.Equal(2, domain.CurrentGeneration);
+        Assert.False(firstLease.IsCurrent);
+        Assert.True(secondLease.IsCurrent);
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => firstExecution);
+        Assert.Equal(OperationStatus.Canceled, firstState.LastResult?.Status);
+
+        secondRelease.SetResult();
+        await secondExecution;
+
+        Assert.False(secondLease.IsCurrent);
+        Assert.Equal(OperationStatus.Completed, secondState.LastResult?.Status);
+        Assert.Equal(0, domain.ActiveExecutionCount);
+    }
+
+    [Fact]
+    public async Task SharedExecutionDomainDoesNotWaitForNonCooperativePreviousCommand()
+    {
+        await using var domain = new CommandExecutionDomain();
+        var firstRelease = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var firstStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var secondStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var firstState = new CommandExecutionState("slow", typeof(SaveViewModel));
+        var secondState = new CommandExecutionState("fast", typeof(SaveViewModel));
+        var firstCommand = CommandFactory.CreateAsync(
+            domain,
+            async (_, _) =>
+            {
+                firstStarted.TrySetResult();
+                await firstRelease.Task;
+            },
+            state: firstState);
+        var secondCommand = CommandFactory.CreateAsync(
+            domain,
+            (_, _) =>
+            {
+                secondStarted.TrySetResult();
+                return Task.CompletedTask;
+            },
+            state: secondState);
+
+        var firstExecution = firstCommand.ExecuteAsync(null);
+        await firstStarted.Task;
+        var secondExecution = secondCommand.ExecuteAsync(null);
+
+        await secondStarted.Task.WaitAsync(TimeSpan.FromSeconds(1));
+        await secondExecution;
+        Assert.False(firstExecution.IsCompleted);
+        Assert.Equal(OperationStatus.Completed, secondState.LastResult?.Status);
+
+        firstRelease.SetResult();
+        await firstExecution;
+        Assert.Equal(OperationStatus.Canceled, firstState.LastResult?.Status);
+    }
+
+    [Fact]
+    public async Task ActivationStopCancelsDomainCommandWithoutDisposingReusableDomain()
+    {
+        await using var domain = new CommandExecutionDomain();
+        var scope = new ActivationScope();
+        var owner = new TestActivationOwner(scope);
+        var state = new CommandExecutionState("refresh", typeof(SaveViewModel));
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var command = CommandFactory.CreateAsync(
+            domain,
+            async (_, cancellationToken) =>
+            {
+                started.TrySetResult();
+                await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            },
+            state: state,
+            activationOwner: owner);
+
+        var execution = command.ExecuteAsync(null);
+        await started.Task;
+
+        await scope.DisposeAsync();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => execution);
+
+        Assert.Equal(OperationStatus.Canceled, state.LastResult?.Status);
+        Assert.Equal(0, domain.ActiveExecutionCount);
+        Assert.False(domain.IsClosing);
+    }
+
+    [Fact]
+    public async Task DomainDisposeClosesAdmissionAndDrainsActiveCommand()
+    {
+        var domain = new CommandExecutionDomain(executionDrainTimeout: Timeout.InfiniteTimeSpan);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var state = new CommandExecutionState("load", typeof(SaveViewModel));
+        var command = CommandFactory.CreateAsync(
+            domain,
+            async (_, _) =>
+            {
+                started.TrySetResult();
+                await release.Task;
+            },
+            state: state);
+        var execution = command.ExecuteAsync(null);
+        await started.Task;
+
+        var disposal = domain.DisposeAsync().AsTask();
+
+        Assert.True(domain.IsClosing);
+        Assert.False(domain.IsDisposed);
+        Assert.False(command.CanExecute(null));
+        Assert.False(disposal.IsCompleted);
+
+        release.SetResult();
+        await execution;
+        await disposal;
+
+        Assert.True(domain.IsDisposed);
+        Assert.Equal(OperationStatus.Canceled, state.LastResult?.Status);
+
+        await command.ExecuteAsync(null);
+        Assert.Equal(1, state.RejectedExecutionCount);
+        Assert.Equal(OperationStatus.Rejected, state.LastRejectedResult?.Status);
+        await domain.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task DomainCancellationCallbackFailureIsDiagnosedWithoutBlockingReplacement()
+    {
+        var diagnostics = new InMemoryHostDiagnostics();
+        await using var domain = new CommandExecutionDomain(diagnostics);
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var replacementRan = false;
+        var firstCommand = CommandFactory.CreateAsync(
+            domain,
+            async (_, cancellationToken) =>
+            {
+                var delay = Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+                using var registration = cancellationToken.Register(
+                    static () => throw new InvalidOperationException("cancel-callback"));
+                started.TrySetResult();
+                await delay;
+            });
+        var secondCommand = CommandFactory.CreateAsync(
+            domain,
+            (_, _) =>
+            {
+                replacementRan = true;
+                return Task.CompletedTask;
+            });
+
+        var firstExecution = firstCommand.ExecuteAsync(null);
+        await started.Task;
+        await secondCommand.ExecuteAsync(null);
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => firstExecution);
+        await WaitUntilAsync(() => diagnostics.Records.Any(
+            record => record.Code == MvvmDiagnosticIds.CommandExecutionDomainCancellationFailed));
+
+        Assert.True(replacementRan);
+        Assert.Contains(
+            diagnostics.Records,
+            record =>
+                record.Code == MvvmDiagnosticIds.CommandExecutionDomainCancellationFailed
+                && record.Context?["domainId"] == domain.Id.ToString()
+                && record.Context["generation"] == "1"
+                && record.Context["exceptionType"] == typeof(AggregateException).FullName);
+    }
+
+    [Fact]
+    public async Task DomainDrainTimeoutIsDiagnosedAndThrowingDiagnosticsCannotBreakDisposal()
+    {
+        var diagnostics = new InMemoryHostDiagnostics();
+        var domain = new CommandExecutionDomain(
+            diagnostics,
+            executionDrainTimeout: TimeSpan.FromMilliseconds(100));
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var command = CommandFactory.CreateAsync(
+            domain,
+            async (_, _) =>
+            {
+                started.TrySetResult();
+                await release.Task;
+            });
+        var execution = command.ExecuteAsync(null);
+        await started.Task;
+
+        await domain.DisposeAsync();
+
+        Assert.True(domain.IsDisposed);
+        Assert.Equal(1, domain.ActiveExecutionCount);
+        Assert.Contains(
+            diagnostics.Records,
+            record =>
+                record.Code == MvvmDiagnosticIds.CommandExecutionDomainDrainTimedOut
+                && record.Context?["domainId"] == domain.Id.ToString()
+                && record.Context["activeExecutionCount"] == "1");
+
+        release.SetResult();
+        await execution;
+        await WaitUntilAsync(() => domain.ActiveExecutionCount == 0);
+
+        var throwingDomain = new CommandExecutionDomain(
+            new ThrowingHostDiagnostics(),
+            executionDrainTimeout: TimeSpan.FromMilliseconds(50));
+        var throwingRelease = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var throwingStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var throwingCommand = CommandFactory.CreateAsync(
+            throwingDomain,
+            async (_, _) =>
+            {
+                throwingStarted.TrySetResult();
+                await throwingRelease.Task;
+            });
+        var throwingExecution = throwingCommand.ExecuteAsync(null);
+        await throwingStarted.Task;
+
+        var disposeException = await Record.ExceptionAsync(async () => await throwingDomain.DisposeAsync());
+
+        Assert.Null(disposeException);
+        throwingRelease.SetResult();
+        await throwingExecution;
+    }
+
+    [Fact]
+    public async Task SeparateExecutionDomainsDoNotCancelEachOther()
+    {
+        await using var firstDomain = new CommandExecutionDomain();
+        await using var secondDomain = new CommandExecutionDomain();
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var bothStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var startedCount = 0;
+        Task ExecuteAsync(CommandExecutionLease _, CancellationToken cancellationToken)
+        {
+            if (Interlocked.Increment(ref startedCount) == 2)
+            {
+                bothStarted.TrySetResult();
+            }
+
+            return release.Task.WaitAsync(cancellationToken);
+        }
+
+        var firstCommand = CommandFactory.CreateAsync(firstDomain, ExecuteAsync);
+        var secondCommand = CommandFactory.CreateAsync(secondDomain, ExecuteAsync);
+        var firstExecution = firstCommand.ExecuteAsync(null);
+        var secondExecution = secondCommand.ExecuteAsync(null);
+        await bothStarted.Task;
+
+        Assert.False(firstExecution.IsCompleted);
+        Assert.False(secondExecution.IsCompleted);
+        Assert.True(firstDomain.CurrentGeneration == 1 && secondDomain.CurrentGeneration == 1);
+
+        release.SetResult();
+        await Task.WhenAll(firstExecution, secondExecution);
     }
 
     [Fact]

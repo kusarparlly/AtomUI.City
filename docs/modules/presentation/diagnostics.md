@@ -62,7 +62,11 @@
 | AUCPRS044 | ViewModelCompositionAttached | Info | ownerId, compositionId, parentId, viewModelType, role |
 | AUCPRS045 | ViewModelCompositionRejected | Warning | ownerId, compositionId, parentId, viewModelType, reason |
 | AUCPRS046 | ViewModelCompositionCleanupFailed | Error | ownerId, compositionId, viewModelType, stage, exceptionType |
+| AUCPRS047 | RoutePresentationCoordinationStarted | Info | operationId, outletName |
+| AUCPRS048 | RoutePresentationCoordinationSucceeded | Info | operationId, outletName, navigationId, generation, presentationOperationId |
+| AUCPRS049 | RoutePresentationCoordinationFailed | Warning/Error | operationId, outletName, status, navigationId, generation, restoreStatus, error |
+| AUCPRS050 | RoutePresentationRestoreRejected | Error | operationId, outletName, status, navigationId, generation, restoreStatus |
 
 ## 演进规则
 
-`AUCPRS001-017`、`AUCPRS020-046` 是 1.0 active 集合；018/019 永久 reserved。新增 code 必须同步源码、Feature、API card、compatibility 和断言测试。
+`AUCPRS001-017`、`AUCPRS020-050` 是 1.0 active 集合；018/019 永久 reserved。新增 code 必须同步源码、Feature、API card、compatibility 和断言测试。所有诊断 sink 故障均不得改变 composition 或 coordination 的结构化结果与清理完成性。

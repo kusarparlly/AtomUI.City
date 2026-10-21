@@ -1,6 +1,6 @@
 # AtomUI.City.Presentation ViewModel Composition
 
-状态：Implemented / Release Validation Pending
+状态：Release Verified
 
 Feature ID：`AUC-PRESENTATION-017`
 
@@ -15,8 +15,8 @@ Feature ID：`AUC-PRESENTATION-017`
 - Presentation 提供显式 composition service；调用方使用 owner identity attach Root，并在 Root 下 attach Child。
 - attach 成功返回唯一异步 ownership lease。lease 暴露稳定 identity 和终态只读信息，但不暴露内部可变 children 集合。
 - Root owner 必须属于当前 Runtime 或 WindowSession；跨 Runtime/Window 的 parent/child 组合稳定拒绝。
-- 同一 ViewModel 实例不能同时被两个 composition owner 以 owned 方式 attach。
-- `Borrowed` 对象的最终 Dispose 仍由外部 owner 负责，但其 activation session 必须由 composition lease 完整停用。
+- 同一 ViewModel 实例同一时刻只能属于一个 composition owner；这条单 activation-session 约束同时适用于 owned 与 `Borrowed`。
+- `Borrowed` 对象的最终 Dispose 仍由外部 owner 负责，但其 activation session 必须由 composition lease 完整停用；首个 lease 完整释放后可由另一 owner 再次 attach。
 
 最终 public 类型为 `ViewModelCompositionOwner` 与 `ViewModelCompositionLease`；行为合同不得弱化为同步 `IDisposable` 或反射发现。
 
@@ -73,23 +73,22 @@ Created
 ## 当前测试证据
 
 - Root 正常 attach/activate/dispose；重复 identity、重复 instance 和终态 owner 拒绝。
-- Root/Child 使用独立且链接取消的 Scope，并按 child-before-parent 顺序释放。
-- child cleanup 部分失败仍清理 sibling 和 parent，并聚合异常及诊断。
-- owner cancellation、activation in progress 与显式 lease dispose 的清理路径。
-- Borrowed/owned ViewModel 的最终 Dispose 行为符合 lease ownership。
+- nested child/grandchild 的 structured task drain 与完整 leaf-to-root 顺序。
+- child activation 失败完整回滚，既有 sibling/parent 保持 active，候选 lease 恰好释放一次。
+- owner cancellation、Runtime stop 与显式 lease dispose 共享清理事务；真实 Headless Window close 释放 composition 和独立 Outlet Entry 各恰好一次。
+- child cleanup 部分失败仍清理 sibling 和 parent，并聚合异常及诊断；throwing diagnostics 不改变 attach/cleanup 结果或使共享 task 挂起。
+- Borrowed 与 owned 最终 Dispose 符合 lease ownership；Borrowed 同时只允许一个 owner，首个 lease 释放后可安全转移到另一个 owner。
+- RouteOutlet Entry 与 composition tree 在生命周期和清理路径中保持隔离。
 
-## Release Validation Pending
+## 发布验证证据
 
-以下项目是完成发布验证前必须补齐的证据，不能因代码已经存在而视为已验证：
-
-- nested child/grandchild 的完整 leaf-to-root 顺序，以及多层 child task drain。
-- child activation 失败后对 sibling、parent 和候选 lease 的完整回滚。
-- caller cancellation、Window close、Runtime stop 与显式 lease dispose 的系统性竞态矩阵。
-- RouteOutlet Entry 与 composition tree 在生命周期、取消和清理失败下的隔离。
-- 同一 Borrowed ViewModel 跨 composition owner 并发 attach 的稳定拒绝或明确的多会话合同。
-- throwing diagnostics 不得改变 attach/cleanup 结果、遗失 registry 项或使共享关闭 Task 永久挂起。
+- `ViewModelCompositionTests` 14/14，包含上述 nested、rollback、race、Borrowed 和 diagnostics 失败注入。
+- Presentation Runtime/Headless process 覆盖 Runtime stop、真实 Window close 与 Outlet 隔离。
+- Presentation 全套 188/188（含平台分类测试）；全解决方案非平台门禁 2250/2250。
+- Release net8.0/net10.0 build、724-signature Public API、全解决方案 pack 与无 ProjectReference 的隔离 NuGet consumer 通过。
+- consumer 输出 `composition=disposed`，并与 `coordination=restored`、`runtime=stopped` 在同一候选包链路验证。
 
 ## 完成标准
 
 - Feature、API、Architecture、Lifecycle、Diagnostics、Testing、Compatibility 和 PublicAPI baseline 同步。
-- Unit/contract、上述失败注入、Window close/Runtime stop 集成测试和发布门禁通过后，Feature 状态才可提升为 `Release Verified`。
+- Unit/contract、上述失败注入、Window close/Runtime stop 集成测试和发布门禁必须持续通过；任一合同改变都需要重新执行并更新证据。

@@ -20,7 +20,7 @@ Routing 也不引用 State；resolver/guard 可以通过应用 DI 使用 State�
 
 ## Presentation
 
-Presentation consumes a successful Routing target and owns ViewModel creation, activation, View resolution, dispatcher and VisualTree commit. A Presentation failure is not retroactively part of Routing's already-completed snapshot transaction; orchestration requiring a combined transaction belongs to Presentation.
+Presentation consumes a successful Routing target and owns ViewModel creation, activation, View resolution, dispatcher and VisualTree commit. Low-level `IRouteOutlet.CommitAsync` does not modify Router state。可选的 `IRoutePresentationCoordinator` 在 Presentation 层使用 Routing 的公开 `NavigationCommitReceipt` / `TryRestoreAsync` 合约：Router 先提交，UI 失败时仅在该提交仍为 current 的条件下恢复。route 到 View/ViewModel/lease 的业务映射仍由应用提供。
 
 ## PluginSystem
 

@@ -47,4 +47,11 @@ public interface IRouter
     /// Executes the forward async operation.
     /// </summary>
     ValueTask<NavigationResult> ForwardAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Restores the snapshot and journal checkpoint preceding a commit only while that commit is still current.
+    /// </summary>
+    ValueTask<NavigationRestoreResult> TryRestoreAsync(
+        NavigationCommitReceipt receipt,
+        CancellationToken cancellationToken = default);
 }

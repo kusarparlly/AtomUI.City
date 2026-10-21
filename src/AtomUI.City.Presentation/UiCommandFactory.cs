@@ -44,6 +44,25 @@ internal sealed class UiCommandFactory : IUiCommandFactory
             _dispatcher);
 
     public IAsyncRelayCommand CreateAsync(
+        CommandExecutionDomain executionDomain,
+        Func<CommandExecutionLease, CancellationToken, Task> execute,
+        Func<bool>? canExecute = null,
+        CommandExecutionState? state = null,
+        IActivationScopeOwner? activationOwner = null,
+        CommandConcurrencyPolicy concurrencyPolicy = CommandConcurrencyPolicy.Reject,
+        ICommandExceptionHandler? exceptionHandler = null) =>
+        CommandFactory.CreateAsync(
+            executionDomain,
+            execute,
+            canExecute,
+            state,
+            activationOwner,
+            concurrencyPolicy,
+            exceptionHandler,
+            _diagnostics,
+            _dispatcher);
+
+    public IAsyncRelayCommand CreateAsync(
         Func<CancellationToken, Task> execute,
         Func<bool>? canExecute,
         CommandExecutionState? state = null,
@@ -69,6 +88,27 @@ internal sealed class UiCommandFactory : IUiCommandFactory
         Func<T?, object?>? concurrencyKeySelector = null,
         ICommandExceptionHandler? exceptionHandler = null) =>
         CommandFactory.CreateAsync(
+            execute,
+            canExecute,
+            state,
+            activationOwner,
+            concurrencyPolicy,
+            concurrencyKeySelector,
+            exceptionHandler,
+            _diagnostics,
+            _dispatcher);
+
+    public IAsyncRelayCommand<T> CreateAsync<T>(
+        CommandExecutionDomain executionDomain,
+        Func<T?, CommandExecutionLease, CancellationToken, Task> execute,
+        Predicate<T?>? canExecute = null,
+        CommandExecutionState? state = null,
+        IActivationScopeOwner? activationOwner = null,
+        CommandConcurrencyPolicy concurrencyPolicy = CommandConcurrencyPolicy.Reject,
+        Func<T?, object?>? concurrencyKeySelector = null,
+        ICommandExceptionHandler? exceptionHandler = null) =>
+        CommandFactory.CreateAsync(
+            executionDomain,
             execute,
             canExecute,
             state,

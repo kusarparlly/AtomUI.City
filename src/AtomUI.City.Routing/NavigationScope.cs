@@ -16,6 +16,7 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly object _lifecycleGate = new();
     private readonly CancellationTokenSource _scopeCancellation = new();
+    private readonly object _restoreOwnerToken = new();
     private readonly List<NavigationJournalEntry> _backStack = [];
     private readonly List<NavigationJournalEntry> _forwardStack = [];
     private readonly IRouteGraphProvider _routeGraphProvider;
@@ -26,6 +27,7 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
     private NavigationJournalEntry? _currentJournalEntry;
     private CancellationTokenSource? _runningNavigationCancellation;
     private long _cancelPreviousVersion;
+    private long _commitGeneration;
     private Task? _disposeTask;
     private bool _disposed;
 
@@ -235,6 +237,123 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
             cancellationToken);
     }
 
+    /// <summary>
+    /// Restores the snapshot and journal checkpoint preceding a commit only while that commit is still current.
+    /// </summary>
+    public async ValueTask<NavigationRestoreResult> TryRestoreAsync(
+        NavigationCommitReceipt receipt,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(receipt);
+
+        if (IsCurrentExecutionActive())
+        {
+            return RejectRestore(
+                receipt,
+                "CITY-NAVIGATION-RESTORE-REENTRANT",
+                "Conditional restore cannot run recursively from a navigation execution chain.");
+        }
+
+        var acquiredGate = false;
+        CancellationTokenSource? linkedCancellation = null;
+        try
+        {
+            Task waitTask;
+            lock (_lifecycleGate)
+            {
+                if (_disposed)
+                {
+                    return RejectRestore(
+                        receipt,
+                        "CITY-NAVIGATION-RESTORE-SCOPE-DISPOSED",
+                        "Navigation scope has been disposed.");
+                }
+
+                linkedCancellation = CancellationTokenSource.CreateLinkedTokenSource(
+                    cancellationToken,
+                    _scopeCancellation.Token);
+                waitTask = _gate.WaitAsync(linkedCancellation.Token);
+            }
+
+            try
+            {
+                await waitTask;
+                acquiredGate = true;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return NavigationRestoreResult.Cancelled(receipt, CurrentSnapshot);
+            }
+            catch (OperationCanceledException) when (IsDisposed)
+            {
+                return RejectRestore(
+                    receipt,
+                    "CITY-NAVIGATION-RESTORE-SCOPE-DISPOSED",
+                    "Navigation scope was disposed while conditional restore was waiting.");
+            }
+
+            if (IsDisposed)
+            {
+                return RejectRestore(
+                    receipt,
+                    "CITY-NAVIGATION-RESTORE-SCOPE-DISPOSED",
+                    "Navigation scope was disposed before conditional restore could mutate state.");
+            }
+
+            if (!ReferenceEquals(receipt.OwnerToken, _restoreOwnerToken) ||
+                receipt.RestoreCheckpoint is not NavigationRestoreCheckpoint checkpoint)
+            {
+                return RejectRestore(
+                    receipt,
+                    "CITY-NAVIGATION-RESTORE-FOREIGN-RECEIPT",
+                    "The navigation receipt was issued by a different router.");
+            }
+
+            if (_commitGeneration != receipt.Generation ||
+                !ReferenceEquals(CurrentSnapshot, receipt.Current))
+            {
+                return RejectRestore(
+                    receipt,
+                    "CITY-NAVIGATION-RESTORE-SUPERSEDED",
+                    "The navigation receipt is no longer the current router generation.");
+            }
+
+            var restoreGeneration = checked(_commitGeneration + 1);
+            _backStack.Clear();
+            _backStack.AddRange(checkpoint.BackStack);
+            _forwardStack.Clear();
+            _forwardStack.AddRange(checkpoint.ForwardStack);
+            _currentJournalEntry = checkpoint.CurrentJournalEntry;
+            _currentRouteGraph = checkpoint.RouteGraph;
+            Volatile.Write(ref _currentSnapshot, receipt.Previous);
+            _commitGeneration = restoreGeneration;
+
+            var restored = NavigationRestoreResult.Restored(receipt, receipt.Previous);
+            WriteRestoreDiagnostic(
+                RoutingDiagnosticIds.NavigationRestored,
+                HostDiagnosticSeverity.Info,
+                restored);
+            return restored;
+        }
+        catch (Exception exception)
+        {
+            var failed = NavigationRestoreResult.Failed(receipt, CurrentSnapshot, exception);
+            WriteRestoreDiagnostic(
+                RoutingDiagnosticIds.NavigationRestoreFailed,
+                HostDiagnosticSeverity.Error,
+                failed);
+            return failed;
+        }
+        finally
+        {
+            linkedCancellation?.Dispose();
+            if (acquiredGate)
+            {
+                _gate.Release();
+            }
+        }
+    }
+
     private async ValueTask<NavigationResult> NavigateCoreAsync(
         NavigationTarget target,
         CancellationToken cancellationToken)
@@ -300,7 +419,13 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
 
             cancellationToken.ThrowIfCancellationRequested();
             previousExecution = CurrentExecution.Value;
-            execution = new NavigationExecution(this);
+            execution = new NavigationExecution(
+                this,
+                new NavigationRestoreCheckpoint(
+                    _currentRouteGraph,
+                    _backStack.ToArray(),
+                    _forwardStack.ToArray(),
+                    _currentJournalEntry));
             CurrentExecution.Value = execution;
             WriteNavigationStarted(navigationId, admissionTarget, routeGraph.Version);
             var result = await operation(navigationId, routeGraph, cancellationToken);
@@ -407,12 +532,15 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
 
             if (completedRedirectTarget is not null && result.Status == NavigationResultStatus.Success)
             {
-                return NavigationResult.Redirected(
+                var redirected = NavigationResult.Redirected(
                     navigationId,
                     initialTarget,
                     completedRedirectTarget,
                     result.Route,
                     result.Parameters);
+                return result.CommitReceipt is null
+                    ? redirected
+                    : redirected.WithCommitReceipt(result.CommitReceipt);
             }
 
             return result;
@@ -662,6 +790,16 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
         }
 
         cancellationToken.ThrowIfCancellationRequested();
+        var previousSnapshot = CurrentSnapshot;
+        var restoreCheckpoint = CurrentExecution.Value is { } currentExecution &&
+            ReferenceEquals(currentExecution.Scope, this)
+                ? currentExecution.RestoreCheckpoint
+                : new NavigationRestoreCheckpoint(
+                    _currentRouteGraph,
+                    _backStack.ToArray(),
+                    _forwardStack.ToArray(),
+                    _currentJournalEntry);
+        var commitGeneration = checked(_commitGeneration + 1);
         Volatile.Write(ref _currentSnapshot, prepared.Snapshot);
         _currentRouteGraph = routeGraph;
         RecordJournalEntry(
@@ -670,7 +808,57 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
             target.Options,
             prepared.ReuseKey,
             routeGraph.Version);
-        return completedResult;
+        _commitGeneration = commitGeneration;
+        return completedResult.WithCommitReceipt(new NavigationCommitReceipt(
+            navigationId,
+            commitGeneration,
+            previousSnapshot,
+            prepared.Snapshot,
+            _restoreOwnerToken,
+            restoreCheckpoint));
+    }
+
+    private NavigationRestoreResult RejectRestore(
+        NavigationCommitReceipt receipt,
+        string code,
+        string message)
+    {
+        var rejected = NavigationRestoreResult.Rejected(receipt, CurrentSnapshot, code, message);
+        WriteRestoreDiagnostic(
+            RoutingDiagnosticIds.NavigationRestoreRejected,
+            HostDiagnosticSeverity.Warning,
+            rejected);
+        return rejected;
+    }
+
+    private void WriteRestoreDiagnostic(
+        string diagnosticId,
+        HostDiagnosticSeverity severity,
+        NavigationRestoreResult result)
+    {
+        try
+        {
+            _diagnostics?.Write(new HostDiagnosticRecord(
+                diagnosticId,
+                result.Message ?? $"Navigation generation '{result.Receipt.Generation}' was restored.",
+                severity)
+            {
+                Context = new Dictionary<string, string?>(StringComparer.Ordinal)
+                {
+                    ["navigationId"] = result.Receipt.NavigationId.ToString("D"),
+                    ["generation"] = result.Receipt.Generation.ToString(
+                        System.Globalization.CultureInfo.InvariantCulture),
+                    ["status"] = result.Status.ToString(),
+                    ["code"] = result.Code,
+                    ["currentRoute"] = result.Current.ActiveRoute?.RouteId,
+                    ["error"] = result.Exception?.GetType().FullName,
+                },
+            });
+        }
+        catch
+        {
+            // Diagnostics cannot change restore state or its structured result.
+        }
     }
 
     private async ValueTask<NavigationResult> CompleteNavigationCoreAsync(
@@ -1896,12 +2084,17 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
     {
         private int _active = 1;
 
-        public NavigationExecution(NavigationScope scope)
+        public NavigationExecution(
+            NavigationScope scope,
+            NavigationRestoreCheckpoint restoreCheckpoint)
         {
             Scope = scope;
+            RestoreCheckpoint = restoreCheckpoint;
         }
 
         public NavigationScope Scope { get; }
+
+        public NavigationRestoreCheckpoint RestoreCheckpoint { get; }
 
         public bool IsActive => Volatile.Read(ref _active) == 1;
 
@@ -2031,6 +2224,12 @@ public sealed class NavigationScope : IRouter, IDisposable, IAsyncDisposable
                 float or double or decimal or char or Guid or DateTime or DateTimeOffset or TimeSpan;
         }
     }
+
+    private sealed record NavigationRestoreCheckpoint(
+        RouteGraphSnapshot RouteGraph,
+        NavigationJournalEntry[] BackStack,
+        NavigationJournalEntry[] ForwardStack,
+        NavigationJournalEntry? CurrentJournalEntry);
 
     private sealed class FixedRouteGraphProvider : IRouteGraphProvider
     {

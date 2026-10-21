@@ -13,7 +13,7 @@ Presentation 是 City 业务运行时与 Avalonia 之间的 UI 事务协调层�
 ## 硬性约束
 
 - 主包只强依赖 Avalonia，不强依赖 AtomUI。
-- Router snapshot 是导航真相；Presentation 不解释或补偿导航。
+- Router snapshot 是导航真相；RouteOutlet 不解释或补偿导航；可选 coordinator 只通过公开 receipt 做条件恢复，不回放用户操作。
 - ViewModel 来自 DI/显式或 generated factory/当前 Entry 复用，不反射猜测构造。
 - commit plan 单次使用，候选所有权明确且所有失败路径释放。
 - 所有 Avalonia 对象访问进入 UI dispatcher；用户业务代码不在框架锁内执行。
@@ -26,7 +26,7 @@ Presentation 是 City 业务运行时与 Avalonia 之间的 UI 事务协调层�
 
 ## 使用入口
 
-City Host 使用 `UseModule<PresentationModule>()`；独立 DI/测试使用 `AddPresentation()`。Avalonia 初始化完成后调用 `Attach`，Window 在 Show 前调用 `RegisterWindow`。ViewModel 注入 `IUiCommandFactory` 创建 UI 绑定命令；CLI/Headless 可继续直接使用 MVVM `CommandFactory`。
+City Host 使用 `UseModule<PresentationModule>()`；独立 DI/测试使用 `AddPresentation()`。Avalonia 初始化完成后调用 `Attach`，Window 在 Show 前调用 `RegisterWindow`。ViewModel 注入 `IUiCommandFactory` 创建 UI 绑定命令；CLI/Headless 可继续直接使用 MVVM `CommandFactory`。需要 Router/UI 一致提交时注入 `IRoutePresentationCoordinator`，并由应用实现 `IRoutePresentationPlanFactory`。
 
 ## 文档索引
 
@@ -47,4 +47,4 @@ City Host 使用 `UseModule<PresentationModule>()`；独立 DI/测试使用 `Add
 
 ## 成熟度
 
-`AUC-PRESENTATION-001` 至 `016` 的 Windows 基线已完成 Release Verified；`AUC-PRESENTATION-017` 与 `018` 已实现并通过对应模块测试，但在全套发布门禁完成前保持 `Implemented`。Linux/macOS 仍是 build-only experimental，不属于平台发布证明。
+`AUC-PRESENTATION-001` 至 `019` 已完成 Release Verified（`013` 为 Retired Before 1.0 的保留编号）。`017` 至 `019` 的增量证据包括 composition/coordination 失败注入、真实 Headless Window close、Release 双框架、Public API、全解决方案测试/pack 和隔离 NuGet consumer。Linux/macOS 仍是 build-only experimental，不属于平台发布证明。

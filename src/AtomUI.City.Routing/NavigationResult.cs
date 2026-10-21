@@ -12,7 +12,8 @@ public sealed class NavigationResult
         RouteDescriptor? route,
         IReadOnlyDictionary<string, string> parameters,
         NavigationError? error,
-        NavigationTarget? redirectTarget)
+        NavigationTarget? redirectTarget,
+        NavigationCommitReceipt? commitReceipt = null)
     {
         NavigationId = navigationId;
         Status = status;
@@ -21,6 +22,7 @@ public sealed class NavigationResult
         Parameters = RouteParameters.Copy(parameters);
         Error = error;
         RedirectTarget = redirectTarget;
+        CommitReceipt = commitReceipt;
     }
 
     /// <summary>
@@ -62,6 +64,11 @@ public sealed class NavigationResult
     /// Gets redirect target.
     /// </summary>
     public NavigationTarget? RedirectTarget { get; }
+
+    /// <summary>
+    /// Gets the commit receipt when this result changed the router snapshot.
+    /// </summary>
+    public NavigationCommitReceipt? CommitReceipt { get; }
 
     /// <summary>
     /// Executes the success operation.
@@ -216,5 +223,20 @@ public sealed class NavigationResult
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
             new NavigationError(code, message),
             redirectTarget: null);
+    }
+
+    internal NavigationResult WithCommitReceipt(NavigationCommitReceipt receipt)
+    {
+        ArgumentNullException.ThrowIfNull(receipt);
+
+        return new NavigationResult(
+            NavigationId,
+            Status,
+            Target,
+            ActiveRoute,
+            Parameters,
+            Error,
+            RedirectTarget,
+            receipt);
     }
 }

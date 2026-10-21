@@ -22,8 +22,9 @@
 | AUC-PRESENTATION-014 | Hierarchical Fault Model | Release Verified | failure injection and diagnostics tests |
 | AUC-PRESENTATION-015 | Bounded Backpressure and Candidate Ownership | Release Verified | PresentationIndustrialContractTests |
 | AUC-PRESENTATION-016 | Deterministic Window Close Origins and Confirmation | Release Verified | unit close-origin tests, headless fixture, Windows desktop process test |
-| AUC-PRESENTATION-017 | Logical Root and Owned Child ViewModels | Implemented / Release Validation Pending | ViewModelCompositionTests; PresentationRuntimeTests；剩余证据见 viewmodel-composition.md |
-| AUC-PRESENTATION-018 | UI Command Factory Safe Default | Implemented | UiCommandFactoryTests；DesktopDogfood ViewModels |
+| AUC-PRESENTATION-017 | Logical Root and Owned Child ViewModels | Release Verified | ViewModelCompositionTests 14/14；Runtime/Window race；Headless Window close；isolated package consumer |
+| AUC-PRESENTATION-018 | UI Command Factory Safe Default | Release Verified | UiCommandFactoryTests；DesktopDogfood ViewModels；domain-first overload；Public API/package gates |
+| AUC-PRESENTATION-019 | Routing-Presentation Technical Coordination | Release Verified | RoutePresentationCoordinatorTests 10/10；Routing conditional-restore tests；Public API/package consumer |
 
 ## Feature 合同摘要
 
@@ -69,7 +70,11 @@ MVVM 保持无 Root/Child 角色；Presentation 显式把逻辑 Root 附着到 R
 
 ### 018 UI command factory
 
-Presentation 提供 dispatcher 必选的 `IUiCommandFactory` 作为 Avalonia ViewModel 默认入口。它完整转发 MVVM command 能力，由 DI 固定注入 `IUiDispatcher` 和 `IHostDiagnostics`，不复制命令状态机。底层 `CommandFactory` 继续服务 Headless、CLI、测试和明确承担线程责任的低级代码。完整裁决见 [ADR 0014](../../decisions/0014-presentation-ui-command-factory.md)。
+Presentation 提供 dispatcher 必选的 `IUiCommandFactory` 作为 Avalonia ViewModel 默认入口。它完整转发 MVVM command 能力，包括 [ADR 0015](../../decisions/0015-shared-command-execution-domain.md) 的 domain-first 泛型/非泛型重载；由 DI 固定注入 `IUiDispatcher` 和 `IHostDiagnostics`，不复制命令或 domain 状态机。底层 `CommandFactory` 继续服务 Headless、CLI、测试和明确承担线程责任的低级代码。双入口裁决见 [ADR 0014](../../decisions/0014-presentation-ui-command-factory.md)。
+
+### 019 Routing-Presentation coordinator
+
+Presentation 按 Outlet 实例串行编排 Router commit、应用 plan factory 与 RouteOutlet commit。Router 成功后必须携带 `NavigationCommitReceipt`；plan/Outlet 失败后使用 receipt 条件恢复，后续导航已经推进 generation 时稳定拒绝迟到恢复。应用继续拥有 route 到 ViewModel/View/lease 的映射以及最终用户错误政策。完整裁决见 [ADR 0016](../../decisions/0016-routing-presentation-coordination.md)。
 
 ## 治理门禁
 

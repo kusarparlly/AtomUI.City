@@ -72,4 +72,14 @@ public static class MvvmDiagnosticIds
     /// An activation state observer failed while processing a lifecycle notification.
     /// </summary>
     public const string ActivationStateNotificationFailed = "AUCMVVM015";
+
+    /// <summary>
+    /// A command execution domain cancellation callback failed.
+    /// </summary>
+    public const string CommandExecutionDomainCancellationFailed = "AUCMVVM016";
+
+    /// <summary>
+    /// Command execution domain tasks did not drain within the configured timeout.
+    /// </summary>
+    public const string CommandExecutionDomainDrainTimedOut = "AUCMVVM017";
 }

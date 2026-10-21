@@ -181,6 +181,14 @@ Command 取消不是错误。
 
 Command 必须区分 canceled、failed 和 completed。
 
+### 7.1 跨 Command 的 latest-wins domain
+
+当两个或更多 Command 表达同一工作区中互斥的用户意图时，它们可以显式共享一个 `CommandExecutionDomain`。domain 不替代每个 Command 自身的 `Reject`、`Allow`、`RejectByKey`，只负责跨 Command 的执行所有权：后发执行获得新 generation/current lease，随后取消旧 current execution，并且不等待旧执行结束。
+
+执行体通过 `CommandExecutionLease` 读取 generation、有效 token 和 `IsCurrent`。这些字段用于判断框架执行身份；把加载结果写入业务状态、缓存或 UI 前，应用仍必须检查自己的文档版本、选择版本或其他业务 generation。取消无法回放用户操作，也不能撤销已经发生的外部副作用。
+
+domain 只提供 latest-wins，不提供 queue、priority、retry、debounce 或通用 policy engine。需要同一个 Command 的连续调用互相替换时，该 Command 必须显式选择 `Allow`，否则其默认 `Reject` 会先拒绝第二次调用。
+
 ### 8. 错误策略
 
 | 场景 | 默认处理 |

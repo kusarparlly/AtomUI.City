@@ -17,7 +17,7 @@
 | State | AtomUI.City.Mvvm | ViewModel 经 ActivationScope 绑定 State Reaction 与订阅；ambient StateScope 经 IStateScopeAccessor 串联。 | State -> Mvvm | ActivationScope 释放时级联释放 | Immediate 默认；Queued/Dispatcher 可选 | State 错误走 State 错误策略，不杀死 ViewModel。 | tests/AtomUI.City.Mvvm.Tests |
 | EventBus | AtomUI.City.Mvvm | ViewModel 订阅必须绑定 ActivationScope。 | EventBus -> Mvvm | ActivationScope 释放时退订 | 订阅自带调度策略 | 订阅异常走 EventBus 错误策略。 | tests/AtomUI.City.Mvvm.Tests |
 | Routing | AtomUI.City.Mvvm | Route 离开前调 DeactivationGuard（ICanDeactivate→IConfirmDeactivate）；激活失败中止导航并释放候选 scope。 | Routing -> Mvvm | 候选 scope commit 后 ViewModel 转 Active | 导航事务串行 | 拒绝中止导航；取消返回 Cancel。 | tests/AtomUI.City.Mvvm.Tests |
-| Presentation | AtomUI.City.Mvvm | 创建/解析 ViewModel、注册 Interaction handler（RegisterHandler）、绑定验证状态。 | Presentation -> Mvvm | ActivationScope 生命周期 | UI marshal 由 Presentation 承担 | handler 缺失返回 NotHandled；绑定失败不进入 Active。 | tests/AtomUI.City.Mvvm.Tests |
+| Presentation | AtomUI.City.Mvvm | 创建/解析 ViewModel、注册 Interaction handler（RegisterHandler）、绑定验证状态，并通过 `IUiCommandFactory` 镜像 domain-first Command 创建入口。 | Presentation -> Mvvm | ActivationScope 生命周期；CommandExecutionDomain 由应用/ViewModel owner 持有 | UI marshal 由 Presentation 承担；domain 不改变业务执行线程 | handler 缺失返回 NotHandled；绑定失败不进入 Active；domain closing 准入返回 Rejected。 | tests/AtomUI.City.Mvvm.Tests; tests/AtomUI.City.Presentation.Tests |
 
 ## 集成硬约束
 

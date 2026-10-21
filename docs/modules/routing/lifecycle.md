@@ -6,6 +6,8 @@ Route Graph：`Candidate -> Validated -> Published -> Superseded`。候选验证
 
 单次导航成功路径：`Created -> Waiting -> Matching -> MiddlewareEnter/Guarding -> Resolving -> Prepared -> MiddlewareExit -> Committing -> Success|Redirected`。任一阶段可在 commit 前结束为 Rejected/Cancelled/Failed/NotFound。
 
+条件恢复路径：`ReceiptIssued -> Waiting -> ValidateOwnerAndGeneration -> Restored|Rejected|Cancelled|Failed`。`Restored` 会发布新的 generation，因此同一 receipt 不能再次成功。
+
 这些是行为阶段，不是当前 public enum。`NavigationResultStatus` 是调用完成状态。
 
 ## NavigationScope
@@ -16,6 +18,7 @@ Route Graph：`Candidate -> Validated -> Published -> Superseded`。候选验证
 - `Dispose` 标记停止并发起取消；不等待。
 - `DisposeAsync` 标记停止、取消等待和运行中的事务，并等待用户 Guard/Resolver/Middleware 退出。
 - 重复 `Dispose`/`DisposeAsync` 幂等；Dispose 后新导航返回 `CITY-NAVIGATION-SCOPE-DISPOSED`。
+- receipt 不拥有 scope 生命周期；scope disposed、foreign scope、reentrant chain 或 receipt 已被后续 commit/restore supersede 时，条件恢复不会修改 snapshot/journal。
 
 Routing 不创建 provisional RouteScope 或 ActivationScope。相关生命周期属于 Presentation/MVVM。
 

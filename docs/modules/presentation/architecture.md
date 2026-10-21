@@ -13,7 +13,7 @@ City Host / Application DI
           -> ViewModelLease + BoundViewHandle + ActivationScope + visual subscription
 ```
 
-Routing-Presentation adapter 是调用编排者，Router snapshot 是导航真相。Presentation 只执行 UI 提交，不反向修改 Router。
+Router snapshot 是导航真相，RouteOutlet 只执行 UI 提交且不反向修改 Router。可选 `IRoutePresentationCoordinator` 是技术协调者：应用提供 navigation delegate 与 plan factory；协调器按 Outlet 串行执行 Router commit -> plan -> Outlet commit，并在 UI 未提交时用 commit receipt 请求 Router 条件恢复。
 
 ## 核心不变量
 
@@ -21,7 +21,7 @@ Routing-Presentation adapter 是调用编排者，Router snapshot 是导航真�
 - 一个 Window 内 Outlet 名称唯一；一个 Outlet 同时只有一个 current Entry 和一个 in-flight 事务。
 - commit plan 单次使用，候选始终只有一个 owner，任何终止路径最终到 `Released`。
 - Avalonia 对象只能在 UI dispatcher 访问；用户 guard、activation、deactivation 和 DI 创建不在框架锁内执行。
-- final commit 前可以恢复旧 physical content；final commit 后不得回滚 Router 或新 Entry。
+- Outlet final commit 前可以恢复旧 physical content；Outlet final commit 后不得回滚 Router 或新 Entry。协调器的 Router 条件恢复只发生在 Presentation 未成功提交时，且不得覆盖更新 generation。
 - Bind/Unbind 不伪造 VisualTree 事件；回执必须来自真实 Avalonia 事件并匹配 identity。
 - Presentation 不含文案、多语言、语言包或 Localization 状态机。
 - MVVM 不感知 Root/Child；Presentation 只通过显式 lease 建立逻辑组合，不反射对象图或 visual tree。
@@ -36,6 +36,7 @@ Routing-Presentation adapter 是调用编排者，Router snapshot 是导航真�
 | WindowScope | PresentationRuntime | WindowSession | Window close/Runtime Stop |
 | RouteOutlet | WindowSession | Outlet registration | detach/Window close |
 | commit plan candidate | application adapter | adapter -> Outlet -> Entry | reject/rollback/Entry dispose |
+| route-presentation operation | `IRoutePresentationCoordinator` | per-Outlet serialized gate | both committed / routing not committed / Presentation failure recovery completed |
 | ViewModelLease | IViewModelFactory | PresentationEntry | Entry dispose |
 | BoundViewHandle | ViewBinder/application adapter | PresentationEntry | Entry dispose on UI dispatcher |
 | modal request | caller | per-Window lane after admission | handled/canceled/failed |
@@ -53,6 +54,7 @@ Routing-Presentation adapter 是调用编排者，Router snapshot 是导航真�
 | Window 关闭清理失败 | WindowSession | Faulted |
 | dispatcher/platform bridge 永久不可用 | Runtime | Faulted |
 | post-commit 旧 Entry 清理失败 | 诊断，不回滚新 Entry | Committed |
+| plan factory/Outlet 未提交 | coordination operation | conditional Router restore；迟到恢复稳定拒绝 |
 
 ## 扩展点
 
@@ -61,6 +63,8 @@ Routing-Presentation adapter 是调用编排者，Router snapshot 是导航真�
 `AUC-PRESENTATION-017` 完成后，显式 ViewModel composition service/lease 加入上述扩展点；它不允许第三方替换 ownership 状态机。
 
 `AUC-PRESENTATION-018` 增加 `IUiCommandFactory` 作为可替换 DI 扩展点；默认实现保持 internal。替代实现必须继续满足 dispatcher 必选和 MVVM 语义完整转发合同。
+
+`AUC-PRESENTATION-019` 增加 `IRoutePresentationCoordinator` 与 `IRoutePresentationPlanFactory`。协调器本身可由 DI 替换，但 route -> ViewModel/View/lease 的业务映射、错误等级与用户反馈继续由应用负责。
 
 ## AOT
 

@@ -4,13 +4,13 @@
 
 ## 当前结论
 
-- 1.0 总包发布状态：MVVM 结构化任务/Command V2 和 Presentation ViewModel Composition 已实现并通过模块测试与全解决方案 Release 构建，但尚未完成全套发布验证，暂不得发布新候选。
-- 运行时本地候选状态：既有 Build、Core、EventBus、State、MVVM、Routing、Data、Localization、Security、Presentation 候选曾通过隔离本地 NuGet consumer；新增的 6 个 Feature 尚需重新执行 package consumer 与全套发布门禁。
-- 本轮验证备注：MVVM 测试 `106/106`、Presentation 测试 `171/171`、Desktop Dogfood Headless 三组 seed 和全解决方案 Release 构建均通过；构建仍报告既有 `Microsoft.AspNetCore.SignalR.Common 10.0.8` 的 `NU1903`，且本轮未重新执行 package consumer，因此以下 6 项暂不勾选。
-- 全局进度：152/158。
-- 模块 Feature 合同：142/148。
+- 1.0 总包发布状态：Shared Command Execution Domain、Presentation UI Command Factory、ViewModel Composition、Routing conditional restore 与 Routing-Presentation technical coordinator 已完成发布级验证；既有 MVVM 007-011 与 Templates 007 仍保持未完成，暂不得发布新候选。
+- 运行时本地候选状态：Build、Core、EventBus、State、MVVM、Routing、Data、Localization、Security、Presentation 已重新完成 Release 双框架构建、全套非平台测试、Public API、pack 与隔离 Presentation NuGet consumer；本轮 City 前置能力可以供应用迁移使用。
+- 本轮验证备注：锁定 SDK `10.0.300` 下 Release 全解构建通过，16 个非平台测试项目 `2250/2250`、Routing `177/177`、MVVM `113/113`、Presentation `188/188`（非平台筛选 `187/187`）、Presentation Public API `724` 条签名、API governance `4/4`、全解决方案 pack、Shared Command Execution Domain 10 轮重复竞态测试及隔离 `win-x64` self-contained package consumer 全部通过。consumer 输出 `coordination=restored composition=disposed interaction=completed runtime=stopped`。还原与构建仍报告既有 `Microsoft.AspNetCore.SignalR.Common 10.0.8` 的 `NU1903`。
+- 全局进度：157/163。
+- 模块 Feature 合同：147/153。
 - 最终发布门禁：10/10。
-- 最近校准日期：2026-10-17。
+- 最近校准日期：2026-10-21。
 
 ## 统计规则
 
@@ -39,10 +39,10 @@
 | Testing | 9 | 0 | 9 | 已完成 |
 | Build | 8 | 0 | 8 | 已完成 |
 | Generators | 8 | 0 | 8 | 已完成 |
-| Routing | 12 | 0 | 12 | 已完成 |
-| Presentation | 16 | 1 | 17 | 进行中 |
-| MVVM | 6 | 5 | 11 | 进行中 |
-| State | 8 | 0 | 8 | 已完成 |
+| Routing | 13 | 0 | 13 | 已完成 |
+| Presentation | 19 | 0 | 19 | 已完成 |
+| MVVM | 7 | 5 | 12 | 进行中 |
+| State | 9 | 0 | 9 | 已完成 |
 | EventBus | 6 | 0 | 6 | 已完成 |
 | PluginSystem | 8 | 0 | 8 | 已完成 |
 | Data | 20 | 0 | 20 | 已完成 |
@@ -112,6 +112,7 @@
 - [x] AUC-ROUTING-010 Route Middleware。验收重点：父子嵌套顺序、短路、异常和取消。
 - [x] AUC-ROUTING-011 Host DI and Diagnostics。验收重点：服务生命周期、AUCRT 字段和诊断故障隔离。
 - [x] AUC-ROUTING-012 Routing Test Host Parity。验收重点：Testing host 委托生产 matcher/navigation 实现。
+- [x] AUC-ROUTING-013 Commit Receipt and Conditional Restore（Release Verified）。验收重点：owner/generation、single-use、exact journal checkpoint、redirect receipt、foreign/superseded rejection、取消/释放和诊断隔离。
 
 ## Presentation
 
@@ -131,7 +132,9 @@
 - [x] AUC-PRESENTATION-014 Hierarchical Fault Model。验收重点：Operation/Outlet/Window/Runtime 故障域、失败注入和诊断。
 - [x] AUC-PRESENTATION-015 Bounded Backpressure and Candidate Ownership。验收重点：有界 FIFO、满载拒绝、single owner 和竞态回收。
 - [x] AUC-PRESENTATION-016 Deterministic Window Close Origins and Confirmation。验收重点：三类 close origin、唯一 confirmation、并发事务和真实平台证明。
-- [ ] AUC-PRESENTATION-017 Logical Root and Owned Child ViewModels（Implemented / Release Validation Pending）。验收重点：显式 Root/Child lease、独立链接 Scope、leaf-to-root、部分失败继续和 Outlet 隔离。
+- [x] AUC-PRESENTATION-017 Logical Root and Owned Child ViewModels（Release Verified）。验收重点：显式 Root/Child lease、nested task drain、activation rollback、Window/Runtime/dispose 竞态、Borrowed owner 转移、诊断隔离和 Outlet 隔离。
+- [x] AUC-PRESENTATION-018 UI Command Factory Safe Default（Release Verified）。验收重点：DI dispatcher/diagnostics、同步/异步/泛型/domain-first 重载、通知隔离、Desktop Dogfood 和 Public API。
+- [x] AUC-PRESENTATION-019 Routing-Presentation Technical Coordination（Release Verified）。验收重点：per-Outlet serialization、Router commit receipt、应用 plan factory、Outlet failure recovery、newer-navigation rejection、candidate exactly-once 和隔离 package consumer。
 
 ## MVVM
 
@@ -146,6 +149,7 @@
 - [ ] AUC-MVVM-009 Command Concurrency and Activation Ownership（Implemented / Release Validation Pending）。验收重点：Reject/Allow/RejectByKey、原子准入、活动计数、Scope A/B 和 inactive rejection。
 - [ ] AUC-MVVM-010 Command Exception Delivery（Implemented / Release Validation Pending）。验收重点：await 原异常、ICommand handler 恰好一次、取消排除、handler 失败和无磁盘副作用。
 - [ ] AUC-MVVM-011 Command Notification Dispatch（Implemented / Release Validation Pending）。验收重点：Task 先发布后通知、dispatcher 统一交付、通知失败隔离、真实 Avalonia UI 线程和 Headless 同步语义。
+- [x] AUC-MVVM-012 Shared Command Execution Domain（Release Verified）。验收重点：跨 Command latest-wins、generation/currentness、立即切换、Operation Canceled、Activation 监督、Dispose/drain、诊断隔离、UI 工厂和 Public API baseline。
 
 ## State
 

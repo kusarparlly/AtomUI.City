@@ -20,12 +20,14 @@ AtomUI.City.Mvvm 的架构目标是把模块职责变成可实现、可测试、
 | --- | --- | --- | --- |
 | ViewModelBase | 属性通知、IDisposable 释放入口和 disposed 状态。 | 应用或 DI | Dispose 幂等释放当前 ActivationScope；释放后 mutation 抛 `ObjectDisposedException`。 |
 | ActivationScope | ViewModel 激活边界、取消 token 和诊断 scope id。 | Presentation/MVVM | Deactivate 或 Dispose；重复释放幂等。 |
+| CommandExecutionDomain | 多个显式加入的 Command 的 latest-wins 所有权、generation/currentness、取消和 drain。 | 应用/ViewModel 组合代码 | owner 永久结束时 DisposeAsync；每次 execution 结束即回收自己的 lease/CTS；关闭后拒绝新准入。 |
 | Interaction | ViewModel 请求 UI 交互。 | ViewModel | handler 完成即终；未完成请求随 ActivationScope 释放取消。 |
 
 ## 产品级状态机
 
 - ViewModel: Constructed -> Activating -> Active -> Deactivating -> Deactivated -> Disposed
 - Command: Idle -> Executing -> Completed 或 Failed 或 Canceled 或 Rejected
+- CommandExecutionDomain: Open -> Closing -> Cancelling -> Draining -> Disposed
 
 ## 关键运行流程
 
@@ -40,6 +42,7 @@ AtomUI.City.Mvvm 的架构目标是把模块职责变成可实现、可测试、
 - DeactivationGuard 异常：返回 Failed result，不让业务异常泄漏到 UI。
 - Command 抛异常：OperationExecutionResult Failed；直接 await 重抛原异常，UI ICommand 路径提交应用 handler。
 - Command 并发冲突：OperationExecutionResult Rejected，当前执行不被取消。
+- CommandExecutionDomain 后发执行：旧 current Operation 请求取消并失去 current 身份；新执行立即开始。domain 已关闭时新 Operation Rejected；不合作旧 Task 不会被强杀。
 - Interaction 无 handler：返回 `NotHandled`；handler 抛异常返回 `Failed`。
 
 ## 性能和资源边界

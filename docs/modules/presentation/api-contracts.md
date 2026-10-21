@@ -6,9 +6,9 @@
 
 本文记录 1.0 public API 的用途、前置条件、所有权、失败、取消、并发和释放语义。源码新增 public 类型时必须同步更新本文。
 
-## 已批准、待实现的 ViewModel Composition API
+## ViewModel Composition API
 
-`AUC-PRESENTATION-017` 将增加显式 composition service 和异步 ownership lease：
+`AUC-PRESENTATION-017` 提供显式 composition service 和异步 ownership lease：
 
 - 调用方按 Runtime/Window owner identity attach 一个逻辑 Root，并显式在 parent lease 下 attach Child。
 - Root/Child 是角色而非基类；MVVM public API 不增加 Presentation 角色。
@@ -17,7 +17,7 @@
 - RouteOutlet `PresentationEntry` 不自动加入 composition tree。
 - Window close/Runtime stop 接管遗留 Root lease，按 leaf-to-root 完整清理并聚合失败。
 
-public 类型最终命名需要在实现提交的 API review 中冻结，行为不能弱化为同步 Dispose、反射发现或全局 Root 单例。完整合同见 [viewmodel-composition.md](viewmodel-composition.md)。
+公开类型已冻结为 `ViewModelCompositionOwner` 与 `ViewModelCompositionLease`；行为不能弱化为同步 Dispose、反射发现或全局 Root 单例。完整合同见 [viewmodel-composition.md](viewmodel-composition.md)。
 
 ## 注册与 Runtime
 
@@ -40,6 +40,9 @@ public 类型最终命名需要在实现提交的 API review 中冻结，行为�
 | `ViewFactory.CreateAsync` | 在 UI dispatcher 创建 View；factory 结果必须匹配 descriptor ViewType；取消前不执行 factory。 |
 | `ViewBinder.Bind` | Avalonia View 必须在 UI 线程绑定；设置 DataContext 并返回唯一 BoundViewHandle；失败清理部分绑定。Bind/Unbind 不发布 visual lifecycle。 |
 | `BoundViewHandle.Dispose` | 幂等；由 owning Entry 在 UI dispatcher 释放。`FromExisting` 的自定义 dispose callback 也在该线程执行。 |
+| `ViewModelCompositionOwner.AttachRootAsync` | owner 内 composition id 唯一；同一实例全局同时只允许一个 composition activation owner；先注册 ownership 再 activation，失败完整回滚。 |
+| `ViewModelCompositionLease.AttachChildAsync` | parent 必须 active 且属于同一 owner；child 使用独立且链接取消的 ActivationScope；返回唯一 async lease。 |
+| `ViewModelCompositionLease/Owner.DisposeAsync` | 并发调用共享清理；拒绝新 attach、drain structured tasks、leaf-to-root 停用并按 ownership 释放；单项失败继续且最终聚合。 |
 
 ## Outlet 和 Entry
 
@@ -57,6 +60,17 @@ Outlet 失败语义：
 - rollback、candidate ownership 或 failure presenter 不变量失败使 Outlet `Faulted`。
 - final commit 后旧 Entry 清理失败只诊断，结果仍成功，新 Entry 保持 current。
 - pending 满载返回 `OutletQueueFull`，拒绝最新 plan 并释放候选。
+
+## Routing-Presentation coordination
+
+| API | 合同 |
+| --- | --- |
+| `IRoutePresentationCoordinator.NavigateAsync` | 按 Outlet 实例串行；调用 navigation delegate 后只接受已提交且带 receipt 的结果；Router 未提交时不调用 plan factory；Presentation 成功时不恢复 Router。 |
+| `IRoutePresentationPlanFactory.CreateAsync` | 应用拥有 route -> ViewModel/View/lease 映射；返回前拥有并清理部分候选，成功返回单次 `RouteOutletCommitPlan` 后由协调流程提交所有权。 |
+| `RoutePresentationPlanContext` | 只读提供 committed `NavigationResult`、对应 `NavigationCommitReceipt` 与实际 outlet name。 |
+| `RoutePresentationResult` | 结构化报告 Routing、Presentation、restore 三阶段；`Succeeded` 仅在 Router 与 Outlet 都成功提交时为 true。 |
+
+pre-admission cancellation 不调用 Router/plan。Router commit 后的 plan/Outlet 失败必须用 receipt 请求条件恢复，且恢复不再受 caller token 中断；更新 generation 已获胜时返回 `RestoreRejectedByNewerNavigation`。协调器不回放用户操作、不构造业务 View、不选择错误提示或重试政策。
 
 ## Window
 
@@ -79,7 +93,7 @@ Outlet 失败语义：
 | `GetModalQueueSnapshot` | 每 Window 模态 lane 快照；默认 1 in-flight + 8 pending；满载拒绝最新并返回 `InteractionQueueFull`。 |
 | `ValidationVisualStateBinding.ApplyAsync` | 仅显式调用时把 snapshot 应用到 target；不发现规则、不决定文案/样式；UI target 失败传播。 |
 | `CommandBinding.BindAsync` | 可选自定义 command source bridge；刷新 visual state 在 dispatcher；handle dispose 解除事件。 |
-| `IUiCommandFactory.Create/CreateAsync` | Avalonia ViewModel 的默认命令创建入口；镜像 MVVM 的同步、泛型、activation、并发和异常处理能力；dispatcher 与 diagnostics 由 DI 固定提供，调用方不得逐命令遗漏或替换。异步通知遵循 ADR 0013，命令业务仍不被搬入 UI 线程。 |
+| `IUiCommandFactory.Create/CreateAsync` | Avalonia ViewModel 的默认命令创建入口；镜像 MVVM 的同步、泛型、activation、单 Command 并发、共享 `CommandExecutionDomain` 和异常处理能力；dispatcher 与 diagnostics 由 DI 固定提供，调用方不得逐命令遗漏或替换。异步通知遵循 ADR 0013，命令业务仍不被搬入 UI 线程；domain-first 重载只转发 ADR 0015 语义。 |
 
 ## Visual lifecycle
 
@@ -107,6 +121,7 @@ Outlet 失败语义：
 | `InteractionHandlerScope` | Presentation, Window, Route, Activation |
 | `PresentationFailureLevel` | Operation, Outlet, Window, Runtime |
 | `PresentationError` | 稳定错误分类；queue、ownership、close confirmation 均有独立值。 |
+| `RoutePresentationResultStatus` | Succeeded, RoutingNotCommitted, PresentationFailedRouteRestored, PresentationFailedRouteCommitted, RestoreRejectedByNewerNavigation, StructuralFailure, Cancelled |
 
 内部 `CandidateOwnershipState` 和 bounded lane 状态不是 public enum，但转换规则属于运行时兼容合同。
 
@@ -115,6 +130,8 @@ Outlet 失败语义：
 - Runtime/DI：`PresentationModule`、`PresentationServiceCollectionExtensions`、`IPresentationRuntime`、`PresentationRuntime`、`WindowSession`、`PresentationQueueOptions/Snapshot`。
 - View：`ViewForAttribute`、`ViewDescriptor`、`ViewLookupRequest`、`IViewRegistry/IViewLocator`、`ViewFactory/Context`、`ViewBinder`、`BoundViewHandle`、`IViewModelFactory`、`ViewModelLease`。
 - Outlet/feedback：`IRouteOutlet`、`RouteOutlet`、`RouteOutletCommitPlan/Result`、`IRouteOutletTarget`、`AvaloniaRouteOutletTarget`、`PresentationEntry`、`VisualIdentity`、`VisualLifecycle*`。
+- Routing coordination：`IRoutePresentationCoordinator`、`RoutePresentationCoordinator`、`RoutePresentationNavigation`、`IRoutePresentationPlanFactory`、`RoutePresentationPlanContext`、`RoutePresentationResult/Status`。
+- Composition：`ViewModelCompositionOwner`、`ViewModelCompositionLease`。
 - Interaction/visual state：`IInteractionHandlerRegistry`、`InteractionDispatchContext`、`InteractionHandlerRegistrationOptions`、`IUiCommandFactory`、`CommandBinding`、`ValidationVisualStateBinding` 及其 target/handle/snapshot contracts。
 - Plugin UI：active view、resource registry/dictionary revoker、plugin unload coordinator 相关 public contracts。
 - Failure/diagnostics：`PresentationException`、`PresentationFailure`、`IPresentationFailurePresenter`、`PresentationDiagnosticIds`。
@@ -123,4 +140,4 @@ Outlet 失败语义：
 
 必填引用使用 `ArgumentNullException`，空 identity 使用 `ArgumentException`，未知 enum 使用 `ArgumentOutOfRangeException`。终态 mutating API 返回稳定 Result/PresentationException/ObjectDisposedException。取消不得包装成普通失败，除非 API 的 Result 模型明确使用 Canceled 状态。
 
-Composition API 实现时必须同步加入 Public 类型族、PublicAPI baseline、诊断和 compatibility；Feature 完成前不得把本节目标当作当前二进制能力。
+Composition 与 Routing coordination 已加入 Public 类型族、PublicAPI baseline、诊断和 compatibility；后续改变 ownership、generation、取消、恢复或结构化结果语义必须按 breaking change review。

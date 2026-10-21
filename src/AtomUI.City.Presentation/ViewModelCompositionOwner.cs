@@ -456,7 +456,7 @@ public sealed class ViewModelCompositionOwner : IAsyncDisposable
         object viewModel,
         string reason)
     {
-        _diagnostics?.Write(new HostDiagnosticRecord(
+        WriteDiagnosticSafely(new HostDiagnosticRecord(
             PresentationDiagnosticIds.ViewModelCompositionRejected,
             $"ViewModel composition '{compositionId}' was rejected ({reason}).",
             HostDiagnosticSeverity.Warning)
@@ -486,10 +486,7 @@ public sealed class ViewModelCompositionOwner : IAsyncDisposable
                 AttachedInstances.Add(viewModelLease.Instance, registrations);
             }
 
-            if ((viewModelLease.Ownership != ViewModelOwnership.Borrowed
-                    && registrations.Count != 0)
-                || registrations.Any(static registration =>
-                    registration.Ownership != ViewModelOwnership.Borrowed))
+            if (registrations.Count != 0)
             {
                 if (registrations.Count == 0)
                 {
@@ -499,7 +496,7 @@ public sealed class ViewModelCompositionOwner : IAsyncDisposable
                 return false;
             }
 
-            registrations.Add(new InstanceRegistration(this, viewModelLease.Ownership));
+            registrations.Add(new InstanceRegistration(this));
             return true;
         }
     }
@@ -523,7 +520,7 @@ public sealed class ViewModelCompositionOwner : IAsyncDisposable
 
     private void WriteAttachedDiagnostic(ViewModelCompositionLease lease)
     {
-        _diagnostics?.Write(new HostDiagnosticRecord(
+        WriteDiagnosticSafely(new HostDiagnosticRecord(
             PresentationDiagnosticIds.ViewModelCompositionAttached,
             $"ViewModel composition '{lease.CompositionId}' was attached.",
             HostDiagnosticSeverity.Info)
@@ -544,7 +541,7 @@ public sealed class ViewModelCompositionOwner : IAsyncDisposable
         string stage,
         Exception exception)
     {
-        _diagnostics?.Write(new HostDiagnosticRecord(
+        WriteDiagnosticSafely(new HostDiagnosticRecord(
             PresentationDiagnosticIds.ViewModelCompositionCleanupFailed,
             $"ViewModel composition '{lease.CompositionId}' cleanup failed at '{stage}': {exception.Message}",
             HostDiagnosticSeverity.Error)
@@ -558,6 +555,18 @@ public sealed class ViewModelCompositionOwner : IAsyncDisposable
                 ["exceptionType"] = exception.GetType().FullName,
             }
         });
+    }
+
+    private void WriteDiagnosticSafely(HostDiagnosticRecord record)
+    {
+        try
+        {
+            _diagnostics?.Write(record);
+        }
+        catch
+        {
+            // Diagnostics cannot change composition ownership or lifecycle progress.
+        }
     }
 
     private static void AddFailure(ICollection<Exception> failures, Exception exception)
@@ -575,7 +584,5 @@ public sealed class ViewModelCompositionOwner : IAsyncDisposable
         failures.Add(exception);
     }
 
-    private sealed record InstanceRegistration(
-        ViewModelCompositionOwner Owner,
-        ViewModelOwnership Ownership);
+    private sealed record InstanceRegistration(ViewModelCompositionOwner Owner);
 }

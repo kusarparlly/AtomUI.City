@@ -21,6 +21,7 @@ AtomUI.City.Routing.IRouter.NavigateAsync(AtomUI.City.Routing.RouteReference rou
 AtomUI.City.Routing.IRouter.NavigateAsync<TParameters>(AtomUI.City.Routing.RouteReference<TParameters> route, TParameters parameters, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
 AtomUI.City.Routing.IRouter.NavigateByPathAsync(string! path, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
 AtomUI.City.Routing.IRouter.NavigateByUriAsync(System.Uri! uri, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.IRouter.TryRestoreAsync(AtomUI.City.Routing.NavigationCommitReceipt! receipt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationRestoreResult!>
 AtomUI.City.Routing.IRouteRegistry
 AtomUI.City.Routing.IRouteRegistry.AddContribution(AtomUI.City.Routing.RouteContribution! contribution) -> AtomUI.City.Routing.RouteContributionLease!
 AtomUI.City.Routing.IRouteRegistry.AddContribution(string! contributionId, System.Collections.Generic.IReadOnlyList<AtomUI.City.Routing.RouteDescriptor!>! routes) -> AtomUI.City.Routing.RouteContributionLease!
@@ -33,6 +34,11 @@ AtomUI.City.Routing.NavigationConcurrencyPolicy
 AtomUI.City.Routing.NavigationConcurrencyPolicy.CancelPrevious = 0 -> AtomUI.City.Routing.NavigationConcurrencyPolicy
 AtomUI.City.Routing.NavigationConcurrencyPolicy.Queue = 1 -> AtomUI.City.Routing.NavigationConcurrencyPolicy
 AtomUI.City.Routing.NavigationConcurrencyPolicy.RejectIfBusy = 2 -> AtomUI.City.Routing.NavigationConcurrencyPolicy
+AtomUI.City.Routing.NavigationCommitReceipt
+AtomUI.City.Routing.NavigationCommitReceipt.Current.get -> AtomUI.City.Routing.NavigationSnapshot!
+AtomUI.City.Routing.NavigationCommitReceipt.Generation.get -> long
+AtomUI.City.Routing.NavigationCommitReceipt.NavigationId.get -> System.Guid
+AtomUI.City.Routing.NavigationCommitReceipt.Previous.get -> AtomUI.City.Routing.NavigationSnapshot!
 AtomUI.City.Routing.NavigationError
 AtomUI.City.Routing.NavigationError.<Clone>$() -> AtomUI.City.Routing.NavigationError!
 AtomUI.City.Routing.NavigationError.Code.get -> string!
@@ -71,6 +77,7 @@ AtomUI.City.Routing.NavigationOptions.OutletName.init -> void
 AtomUI.City.Routing.NavigationOptions.Timeout.get -> System.TimeSpan?
 AtomUI.City.Routing.NavigationOptions.Timeout.init -> void
 AtomUI.City.Routing.NavigationResult
+AtomUI.City.Routing.NavigationResult.CommitReceipt.get -> AtomUI.City.Routing.NavigationCommitReceipt?
 AtomUI.City.Routing.NavigationResult.ActiveRoute.get -> AtomUI.City.Routing.RouteDescriptor?
 AtomUI.City.Routing.NavigationResult.Error.get -> AtomUI.City.Routing.NavigationError?
 AtomUI.City.Routing.NavigationResult.NavigationId.get -> System.Guid
@@ -86,6 +93,18 @@ AtomUI.City.Routing.NavigationResultStatus.NotFound = 5 -> AtomUI.City.Routing.N
 AtomUI.City.Routing.NavigationResultStatus.Redirected = 2 -> AtomUI.City.Routing.NavigationResultStatus
 AtomUI.City.Routing.NavigationResultStatus.Rejected = 1 -> AtomUI.City.Routing.NavigationResultStatus
 AtomUI.City.Routing.NavigationResultStatus.Success = 0 -> AtomUI.City.Routing.NavigationResultStatus
+AtomUI.City.Routing.NavigationRestoreResult
+AtomUI.City.Routing.NavigationRestoreResult.Code.get -> string?
+AtomUI.City.Routing.NavigationRestoreResult.Current.get -> AtomUI.City.Routing.NavigationSnapshot!
+AtomUI.City.Routing.NavigationRestoreResult.Exception.get -> System.Exception?
+AtomUI.City.Routing.NavigationRestoreResult.Message.get -> string?
+AtomUI.City.Routing.NavigationRestoreResult.Receipt.get -> AtomUI.City.Routing.NavigationCommitReceipt!
+AtomUI.City.Routing.NavigationRestoreResult.Status.get -> AtomUI.City.Routing.NavigationRestoreResultStatus
+AtomUI.City.Routing.NavigationRestoreResultStatus
+AtomUI.City.Routing.NavigationRestoreResultStatus.Cancelled = 2 -> AtomUI.City.Routing.NavigationRestoreResultStatus
+AtomUI.City.Routing.NavigationRestoreResultStatus.Failed = 3 -> AtomUI.City.Routing.NavigationRestoreResultStatus
+AtomUI.City.Routing.NavigationRestoreResultStatus.Rejected = 1 -> AtomUI.City.Routing.NavigationRestoreResultStatus
+AtomUI.City.Routing.NavigationRestoreResultStatus.Restored = 0 -> AtomUI.City.Routing.NavigationRestoreResultStatus
 AtomUI.City.Routing.NavigationScope
 AtomUI.City.Routing.NavigationScope.BackAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
 AtomUI.City.Routing.NavigationScope.CurrentSnapshot.get -> AtomUI.City.Routing.NavigationSnapshot!
@@ -96,6 +115,7 @@ AtomUI.City.Routing.NavigationScope.NavigateAsync(AtomUI.City.Routing.RouteRefer
 AtomUI.City.Routing.NavigationScope.NavigateAsync<TParameters>(AtomUI.City.Routing.RouteReference<TParameters> route, TParameters parameters, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
 AtomUI.City.Routing.NavigationScope.NavigateByPathAsync(string! path, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
 AtomUI.City.Routing.NavigationScope.NavigateByUriAsync(System.Uri! uri, AtomUI.City.Routing.NavigationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
+AtomUI.City.Routing.NavigationScope.TryRestoreAsync(AtomUI.City.Routing.NavigationCommitReceipt! receipt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationRestoreResult!>
 AtomUI.City.Routing.NavigationScope.NavigationScope(AtomUI.City.Routing.IRouteGraphProvider! routeGraphProvider, System.Func<System.Type!, object?>? serviceResolver = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
 AtomUI.City.Routing.NavigationScope.NavigationScope(AtomUI.City.Routing.RouteGraphSnapshot! routeGraph, System.Func<System.Type!, object?>? serviceResolver = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
 AtomUI.City.Routing.NavigationScope.Router.get -> AtomUI.City.Routing.IRouter!
@@ -359,6 +379,9 @@ AtomUI.City.Routing.ViewModelTargetDescriptor.ViewModelTargetDescriptor(System.T
 AtomUI.City.Routing.ViewModelTargetDescriptor.ViewModelType.get -> System.Type!
 const AtomUI.City.Routing.RoutingDiagnosticIds.NavigationCompleted = "AUCRT002" -> string!
 const AtomUI.City.Routing.RoutingDiagnosticIds.NavigationFailed = "AUCRT003" -> string!
+const AtomUI.City.Routing.RoutingDiagnosticIds.NavigationRestoreFailed = "AUCRT011" -> string!
+const AtomUI.City.Routing.RoutingDiagnosticIds.NavigationRestoreRejected = "AUCRT010" -> string!
+const AtomUI.City.Routing.RoutingDiagnosticIds.NavigationRestored = "AUCRT009" -> string!
 const AtomUI.City.Routing.RoutingDiagnosticIds.NavigationStarted = "AUCRT001" -> string!
 const AtomUI.City.Routing.RoutingDiagnosticIds.PipelineComponentFailed = "AUCRT006" -> string!
 const AtomUI.City.Routing.RoutingDiagnosticIds.PipelineComponentRejected = "AUCRT007" -> string!

@@ -29,6 +29,18 @@ AtomUI.City.Mvvm.ActivationState.Deactivated = 4 -> AtomUI.City.Mvvm.ActivationS
 AtomUI.City.Mvvm.ActivationState.Deactivating = 3 -> AtomUI.City.Mvvm.ActivationState
 AtomUI.City.Mvvm.ActivationState.Disposed = 5 -> AtomUI.City.Mvvm.ActivationState
 AtomUI.City.Mvvm.CommandExecutionState
+AtomUI.City.Mvvm.CommandExecutionDomain
+AtomUI.City.Mvvm.CommandExecutionDomain.ActiveExecutionCount.get -> int
+AtomUI.City.Mvvm.CommandExecutionDomain.CommandExecutionDomain(AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null, System.TimeSpan? executionDrainTimeout = null) -> void
+AtomUI.City.Mvvm.CommandExecutionDomain.CurrentGeneration.get -> long
+AtomUI.City.Mvvm.CommandExecutionDomain.DisposeAsync() -> System.Threading.Tasks.ValueTask
+AtomUI.City.Mvvm.CommandExecutionDomain.Id.get -> System.Guid
+AtomUI.City.Mvvm.CommandExecutionDomain.IsClosing.get -> bool
+AtomUI.City.Mvvm.CommandExecutionDomain.IsDisposed.get -> bool
+AtomUI.City.Mvvm.CommandExecutionLease
+AtomUI.City.Mvvm.CommandExecutionLease.CancellationToken.get -> System.Threading.CancellationToken
+AtomUI.City.Mvvm.CommandExecutionLease.Generation.get -> long
+AtomUI.City.Mvvm.CommandExecutionLease.IsCurrent.get -> bool
 AtomUI.City.Mvvm.CommandExecutionState.ActiveExecutionCount.get -> int
 AtomUI.City.Mvvm.CommandExecutionState.CancellationToken.get -> System.Threading.CancellationToken
 AtomUI.City.Mvvm.CommandExecutionState.CommandExecutionState(string? commandName = null, System.Type? ownerType = null) -> void
@@ -127,6 +139,8 @@ AtomUI.City.Mvvm.InteractionResultStatus.Failed = 2 -> AtomUI.City.Mvvm.Interact
 AtomUI.City.Mvvm.InteractionResultStatus.NotHandled = 3 -> AtomUI.City.Mvvm.InteractionResultStatus
 AtomUI.City.Mvvm.MvvmDiagnosticIds
 const AtomUI.City.Mvvm.MvvmDiagnosticIds.ActivationStateNotificationFailed = "AUCMVVM015" -> string!
+const AtomUI.City.Mvvm.MvvmDiagnosticIds.CommandExecutionDomainCancellationFailed = "AUCMVVM016" -> string!
+const AtomUI.City.Mvvm.MvvmDiagnosticIds.CommandExecutionDomainDrainTimedOut = "AUCMVVM017" -> string!
 AtomUI.City.Mvvm.OperationExecutionResult
 AtomUI.City.Mvvm.OperationExecutionResult.<Clone>$() -> AtomUI.City.Mvvm.OperationExecutionResult!
 AtomUI.City.Mvvm.OperationExecutionResult.Deconstruct(out System.Guid OperationId, out AtomUI.City.Mvvm.OperationStatus Status, out System.TimeSpan Elapsed, out System.Exception? Error) -> void
@@ -239,7 +253,9 @@ static AtomUI.City.Mvvm.CommandFactory.Create(System.Action! execute, System.Fun
 static AtomUI.City.Mvvm.CommandFactory.Create<T>(System.Action<T?>! execute, System.Predicate<T?>? canExecute = null, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> CommunityToolkit.Mvvm.Input.IRelayCommand<T>!
 static AtomUI.City.Mvvm.CommandFactory.CreateAsync(System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! execute, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Mvvm.IActivationScope? activationScope = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null, AtomUI.City.Core.Threading.IUiDispatcher? notificationDispatcher = null) -> CommunityToolkit.Mvvm.Input.IAsyncRelayCommand!
 static AtomUI.City.Mvvm.CommandFactory.CreateAsync(System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! execute, System.Func<bool>? canExecute, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Mvvm.IActivationScopeOwner? activationOwner = null, AtomUI.City.Mvvm.CommandConcurrencyPolicy concurrencyPolicy = AtomUI.City.Mvvm.CommandConcurrencyPolicy.Reject, AtomUI.City.Mvvm.ICommandExceptionHandler? exceptionHandler = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null, AtomUI.City.Core.Threading.IUiDispatcher? notificationDispatcher = null) -> CommunityToolkit.Mvvm.Input.IAsyncRelayCommand!
+static AtomUI.City.Mvvm.CommandFactory.CreateAsync(AtomUI.City.Mvvm.CommandExecutionDomain! executionDomain, System.Func<AtomUI.City.Mvvm.CommandExecutionLease!, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! execute, System.Func<bool>? canExecute = null, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Mvvm.IActivationScopeOwner? activationOwner = null, AtomUI.City.Mvvm.CommandConcurrencyPolicy concurrencyPolicy = AtomUI.City.Mvvm.CommandConcurrencyPolicy.Reject, AtomUI.City.Mvvm.ICommandExceptionHandler? exceptionHandler = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null, AtomUI.City.Core.Threading.IUiDispatcher? notificationDispatcher = null) -> CommunityToolkit.Mvvm.Input.IAsyncRelayCommand!
 static AtomUI.City.Mvvm.CommandFactory.CreateAsync<T>(System.Func<T?, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! execute, System.Predicate<T?>? canExecute = null, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Mvvm.IActivationScopeOwner? activationOwner = null, AtomUI.City.Mvvm.CommandConcurrencyPolicy concurrencyPolicy = AtomUI.City.Mvvm.CommandConcurrencyPolicy.Reject, System.Func<T?, object?>? concurrencyKeySelector = null, AtomUI.City.Mvvm.ICommandExceptionHandler? exceptionHandler = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null, AtomUI.City.Core.Threading.IUiDispatcher? notificationDispatcher = null) -> CommunityToolkit.Mvvm.Input.IAsyncRelayCommand<T>!
+static AtomUI.City.Mvvm.CommandFactory.CreateAsync<T>(AtomUI.City.Mvvm.CommandExecutionDomain! executionDomain, System.Func<T?, AtomUI.City.Mvvm.CommandExecutionLease!, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! execute, System.Predicate<T?>? canExecute = null, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Mvvm.IActivationScopeOwner? activationOwner = null, AtomUI.City.Mvvm.CommandConcurrencyPolicy concurrencyPolicy = AtomUI.City.Mvvm.CommandConcurrencyPolicy.Reject, System.Func<T?, object?>? concurrencyKeySelector = null, AtomUI.City.Mvvm.ICommandExceptionHandler? exceptionHandler = null, AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null, AtomUI.City.Core.Threading.IUiDispatcher? notificationDispatcher = null) -> CommunityToolkit.Mvvm.Input.IAsyncRelayCommand<T>!
 static AtomUI.City.Mvvm.DeactivationGuard.CanDeactivateAsync(object! viewModel, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Mvvm.DeactivationResult!>
 static AtomUI.City.Mvvm.DeactivationResult.Allow() -> AtomUI.City.Mvvm.DeactivationResult!
 static AtomUI.City.Mvvm.DeactivationResult.Cancel(string? reason = null) -> AtomUI.City.Mvvm.DeactivationResult!

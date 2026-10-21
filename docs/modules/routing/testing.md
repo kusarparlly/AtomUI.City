@@ -16,6 +16,7 @@
 | 010 | middleware nesting/short circuit/post-next failure/repeated-next rejection/null result/failure |
 | 011 | repeated AddRouting aggregation, scoped router/singleton registry, captured graph-version AUCRT fields, AUCRT007 classification, broken diagnostic sink isolation |
 | 012 | Testing host delegates to production matcher/navigation behavior |
+| 013 | receipt previous/current snapshots and monotonic generation, single-use restore, exact Push/Replace/Back/Forward journal checkpoint, redirected commit receipt, foreign receipt, newer commit rejection, cancellation/reentrancy/disposal and diagnostic isolation |
 
 ## Required Suites
 
@@ -28,4 +29,4 @@ Tests involving Source Generator compilations run without class-level parallelis
 
 `RoutingAuditRegressionTests`, `RoutingFreezeAuditTests` and `RoutingFinalFreezeTests` directly lock the repair contracts found by repeated four-round audits: delayed commit, per-layer detached/late/repeated middleware next, result correlation, static registration aggregation, full resolver data, pre-cancel isolation, token-correlated cancellation, stale AsyncLocal context, disposal admission, journal rollback/redirect refresh, redirect context/identity, policy fallback order, named outlets, contribution ownership, graph validation/identity and diagnostic attribution/versioning. Generator tests directly cover inherited/indexer/write-only members, ambiguous members, invalid identity/default diagnostics, route-kind validation, open generics, handwritten implementations, multiple definition attributes, stable extension-point references, effective path conflicts, regex boundaries, escaped identifiers, partial deduplication, policy candidates, semantic signatures and LF output.
 
-No UI/headless Avalonia process is required because Routing has no UI dependency. Integration with Presentation must be tested in Presentation.
+No UI/headless Avalonia process is required because Routing has no UI dependency. Receipt-based recovery integration is additionally tested through `RoutePresentationCoordinatorTests` and the isolated Presentation package consumer.

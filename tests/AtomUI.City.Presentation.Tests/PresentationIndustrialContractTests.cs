@@ -19,6 +19,7 @@ public sealed class PresentationIndustrialContractTests
         Assert.NotNull(provider.GetRequiredService<IPresentationRuntime>());
         Assert.NotNull(provider.GetRequiredService<IUiDispatcher>());
         Assert.NotNull(provider.GetRequiredService<IUiCommandFactory>());
+        Assert.NotNull(provider.GetRequiredService<IRoutePresentationCoordinator>());
         Assert.NotNull(provider.GetRequiredService<IViewModelFactory>());
         Assert.NotNull(provider.GetRequiredService<IViewRegistry>());
         Assert.NotNull(provider.GetRequiredService<IViewLocator>());

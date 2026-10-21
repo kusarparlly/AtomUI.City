@@ -20,6 +20,7 @@
 | command concurrency policy | `Reject`（默认）、`Allow`、`RejectByKey`；执行入口原子准入。 |
 | `ICommandExceptionHandler` | `ICommand.Execute` 失败时接收原异常恰好一次；取消排除；handler 失败独立诊断。 |
 | `OperationExecutionResult` | 替换框架 `OperationResult` 名称，只描述执行运行时，不表示领域结果。 |
+| `CommandExecutionDomain` | 多个显式加入的 Command 共享 latest-wins 所有权；新执行取得 generation/current lease 后取消旧执行且不等待旧执行退出。 |
 
 完整准入、生命周期、失败和测试合同见 [structured-concurrency-and-commands-v2.md](structured-concurrency-and-commands-v2.md)。
 
@@ -29,7 +30,7 @@
 | --- | --- | --- | --- |
 | ViewModel Base | ViewModelBase | 属性通知和释放入口。 | 不引用具体 View 或 Avalonia visual。 |
 | Activation | IActivatable, ICanDeactivate, IConfirmDeactivate, ActivationScope, DeactivationGuard | ViewModel 激活和停用。 | 状态机必须可测试，拒绝停用不抛业务异常。 |
-| Command | CommandFactory, OperationScope, OperationExecutionResult | 命令执行和操作结果。 | 异常、取消、并发拒绝必须有稳定结果。 |
+| Command | CommandFactory, CommandExecutionDomain, CommandExecutionLease, OperationScope, OperationExecutionResult | 命令执行、跨命令 latest-wins 所有权和操作结果。 | 异常、取消、并发拒绝必须有稳定结果；domain 不承载业务提交策略。 |
 | Interaction | Interaction<TRequest, TResult> | ViewModel 到 UI 的请求 contract。 | 无 handler 返回 NotHandled，不直接依赖 Presentation 类型。 |
 | Validation | ValidationScope, ValidationMessage, ValidationChangedEventArgs | 验证状态和消息聚合。 | 消息变化可被 Presentation 绑定。 |
 
@@ -45,6 +46,8 @@
 | DeactivationGuard.CanDeactivateAsync | 离开前确认。 | viewModel 不得为 null；可实现 ICanDeactivate 或 IConfirmDeactivate。 | DeactivationResult。 | 拒绝返回 Reject；取消返回 Cancel；异常映射 Failed，不抛业务异常。 | 预取消跳过 viewModel 并返回 Cancel。 | 先执行 ICanDeactivate，Allow 后再执行 IConfirmDeactivate。 |
 | CommandFactory.Create | 创建同步命令。 | execute 不得为 null；canExecute 和 state 可选。 | IRelayCommand。 | execute 异常写入 `OperationExecutionResult` Failed 后重抛原异常。 | 同步 API 无 token。 | 写入 CommandExecutionState；CanExecuteChanged 可通知 Presentation。 |
 | CommandFactory.CreateAsync | 创建异步命令。 | execute 不得为 null；state、activation owner/fixed scope、并发策略、异常 handler 和 notification dispatcher 按重载可选。 | IAsyncRelayCommand / IAsyncRelayCommand<T>。 | 直接 await 写入 Failed 后重抛原异常；`ICommand.Execute` 提交应用 handler；并发冲突映射 Rejected；同步、inline 或排队后的通知失败统一记录 `AUCMVVM014`，不改变命令结果。 | 命令 token 必须传递到 execute，并链接当前 ActivationScope token；UI 可观察通知统一调用配置 dispatcher 的 `InvokeAsync(..., CancellationToken.None)`。 | 默认 Reject；可选 Allow/RejectByKey；owner 重载每次执行解析当前 Scope；`ExecutionTask` 必须在对应属性通知前发布；dispatcher 是通知线程的唯一裁决者，不改变业务执行线程。 |
+| CommandFactory.CreateAsync (domain-first) | 创建显式加入共享 latest-wins domain 的异步命令。 | domain 和 execute 不得为 null；其余 owner、state、单 Command 并发策略、handler、diagnostics/dispatcher 与既有重载一致。 | IAsyncRelayCommand / IAsyncRelayCommand<T>；execute 额外收到框架创建的 `CommandExecutionLease`。 | domain closing/disposed 竞态映射 Rejected，不调用用户委托；被后发执行替换时 Operation 进入 Canceled；业务异常沿用既有异常链路。 | domain lease token 链接命令/Activation token；新执行请求取消旧 current execution，但不等待旧执行退出。 | 单 Command 门禁先于 domain；generation 单调递增；同一时刻只有一个 lease 的 `IsCurrent` 为 true；应用仍负责提交结果前的业务版本检查。 |
+| CommandExecutionDomain.DisposeAsync | 永久关闭共享执行 domain。 | 无；drain timeout 由构造参数配置。 | ValueTask。 | 重复 Dispose 幂等；取消回调失败记录 `AUCMVVM016` 后继续；超时记录 `AUCMVVM017`，不强杀用户任务。 | 关闭准入后请求取消全部 active execution，并等待其完成或达到 timeout。 | 释放期间和释放后的新准入均被拒绝；只读 generation/count/state 可继续查询。 |
 | OperationScope.Start | 创建一次可观测 operation。 | cancellationToken 可为 None。 | OperationScope，包含 Id、Status、Result、Error、Elapsed 和 CancellationToken。 | 外部 token 取消会先标记 Canceled result，再通知 operation token callback。 | OperationScope 持有自己的取消源，并链接外部 token。 | 初始 Status 为 Running；Result 在终态前为 null；Dispose 释放取消源和外部注册。 |
 | OperationScope.Complete/Cancel/Fail/Reject | 结束 operation。 | Fail 的 exception 不得为 null。 | OperationExecutionResult。 | Dispose 后调用抛 `ObjectDisposedException`；Fail 空 exception 抛 `ArgumentNullException`。 | Cancel 先提交 Canceled result，再取消 operation token。 | 首次终态胜出；重复终态返回同一个 OperationExecutionResult，Elapsed 保持稳定。 |
 | OperationScope.Dispose | 释放 operation scope。 | 无。 | void。 | 重复 Dispose 幂等；Dispose 后 mutating API 被拒绝。 | 未终止 operation 在 Dispose 时进入 Canceled 并通知 token callback。 | Dispose 后 Id、Status、Result、Error、Elapsed 仍可读取。 |
@@ -60,6 +63,8 @@
 | `ActivationScopeAccessor` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `ActivationState` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `CommandExecutionState` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `CommandExecutionDomain` | 关键 contract | latest-wins、generation、drain、关闭后行为或默认 timeout 变化必须更新 ADR、本文档和 compatibility。 |
+| `CommandExecutionLease` | 支持类型 | Generation、CancellationToken 或 IsCurrent 语义变化必须更新 ADR、本文档和 compatibility。 |
 | `CommandFactory` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `CommandGroup` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `DeactivationResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
@@ -73,7 +78,7 @@
 | `InteractionContext<TRequest>` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `InteractionResult<TResult>` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `InteractionResultStatus` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `MvvmDiagnosticIds` | 诊断 contract | AUCMVVM001-015 的删除、重命名或语义变化必须更新本文档、diagnostics 和 compatibility。 |
+| `MvvmDiagnosticIds` | 诊断 contract | AUCMVVM001-017 的删除、重命名或语义变化必须更新本文档、diagnostics 和 compatibility。 |
 | `OperationExecutionResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `OperationScope` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `OperationStatus` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
@@ -108,4 +113,4 @@
 
 以下改动必须先更新文档并 review：新增 public 类型或成员；修改异常、Result status、诊断码、默认 options、manifest/schema、generated output、MSBuild property、CLI JSON envelope 或模板变量。
 
-`AUC-MVVM-007` 至 `010` 已通过模块测试证明：同步 Dispose 不等待异步任务；用户回调不在框架锁内；泛型/非泛型命令语义一致；`OperationResult` 重命名已同步 API baseline 和迁移说明。
+`AUC-MVVM-007` 至 `010` 已通过模块测试证明：同步 Dispose 不等待异步任务；用户回调不在框架锁内；泛型/非泛型命令语义一致；`OperationResult` 重命名已同步 API baseline 和迁移说明。`AUC-MVVM-012` 已按 [ADR 0015](../../decisions/0015-shared-command-execution-domain.md) 实现，并通过 MVVM/Presentation 模块测试和 Public API build/pack 门禁；全套 package consumer 与发布门禁仍待执行。

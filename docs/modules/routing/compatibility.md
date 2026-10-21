@@ -11,6 +11,7 @@ Breaking changes include:
 - `RouteGraphError`, `NavigationResultStatus`, `CITY-NAVIGATION-*` or `AUCRT*` semantic changes;
 - guard/resolver/middleware order changes;
 - graph version, contribution lease, journal or Dispose behavior changes;
+- commit receipt owner/generation、条件恢复、superseded rejection 或 checkpoint 完整性变化；
 - DI lifetime changes: Registry singleton, Router/NavigationScope scoped;
 - changing Routing to reference Presentation or Avalonia.
 
@@ -24,8 +25,10 @@ Generation is deterministic, uses LF line endings and is AOT-oriented. Static ro
 
 ## Evolution
 
-New constraints, route kinds, middleware stages, journal payload kinds, diagnostics or plugin policies require a new Feature ID and compatibility review. Documentation cannot claim a capability before API and tests exist.
+New constraints, route kinds, middleware stages, journal payload kinds, receipt/restore semantics, diagnostics or plugin policies require a new Feature ID and compatibility review. Documentation cannot claim a capability before API and tests exist.
 
 ## Pre-1.0 Freeze Decisions
 
 The final Routing audits removed never-produced `NavigationResultStatus.StaleRouteGraph` / `ContributionRevoked` and unused `NavigationTargetKind.Redirect`, made the journal-target factory non-public, and internalized the externally ineffective `NavigationOptions.RestoreState` marker. They also froze policy-candidate-before-fallback ordering, effective full-template conflict validation, cumulative redirect context, per-middleware `next` ownership, committed-route journal identity and disposal/admission linearization. These decisions are part of the frozen 1.0 behavior in `api-contracts.md`.
+
+ADR 0016 adds Preview `NavigationCommitReceipt` and `TryRestoreAsync`. The receipt is deliberately conditional and scope-bound: changing it into unconditional rewind, replaying user pipeline code during restore, or allowing stale receipts to overwrite newer commits would be a breaking semantic change. Routing remains independent of Presentation/Avalonia.

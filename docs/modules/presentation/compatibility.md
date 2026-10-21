@@ -15,12 +15,13 @@
 - Validation 完全可选且应用拥有规则、文案、回调和样式。
 - plugin UI owner/revoke/unload 顺序。
 - NuGet 包的 net8.0/net10.0 资产以及 Avalonia/Core/Mvvm/Routing/Security/State 依赖边；AtomUI、Localization、fixture、test 和 benchmark 不得进入主包。
-- `IUiCommandFactory` 是 Presentation 的 Preview UI 默认入口；默认实现可保持 internal，但同步/异步/泛型重载、activation/concurrency/exception 参数和 DI dispatcher 注入语义属于兼容面。
+- `IUiCommandFactory` 是 Presentation 的 Preview UI 默认入口；默认实现可保持 internal，但同步/异步/泛型/domain-first 重载、activation/concurrency/exception 参数和 DI dispatcher 注入语义属于兼容面。该接口签名已进入 `PublicAPI.Shipped.txt`，`PublicAPI.Unshipped.txt` 保持无待审签名。
+- `IRoutePresentationCoordinator`、plan factory/context/result/status、per-Outlet serialization、receipt-based recovery 与 AUCPRS047-050 是 Preview-frozen 技术协调兼容面。
 
 ## 不属于 Presentation 兼容面
 
 - Localization 的 culture、revision、fallback、文案 key/value 和 language package。
-- 应用自有 Dialog/Toast/Validation UI、Routing-Presentation adapter 业务编排。
+- 应用自有 Dialog/Toast/Validation UI、route 到 View/ViewModel/lease 的业务映射、错误等级与用户反馈政策。
 - roadmap 候选、测试替身内部结构、diagnostic message 文案。
 - Linux/macOS runtime 行为；1.0 仅承诺 build-only experimental。
 
@@ -36,4 +37,6 @@
 
 `AUC-PRESENTATION-017` 已落地：Root/Child 只作为显式 lease 角色，不增加 MVVM 基类、全局 Root 单例或反射发现。`ViewModelCompositionOwner`、`ViewModelCompositionLease`、lease identity、owner 边界、异步释放和 leaf-to-root 顺序进入 1.0 Preview 兼容面。
 
-ADR 0014 引入双入口：MVVM `CommandFactory` 继续保持 Headless 兼容；Presentation `IUiCommandFactory` 成为 UI 推荐入口。删除 UI 工厂、恢复逐调用 dispatcher 参数或让工厂绕过 DI dispatcher 均属于 breaking change。
+ADR 0014 引入双入口：MVVM `CommandFactory` 继续保持 Headless 兼容；Presentation `IUiCommandFactory` 成为 UI 推荐入口。ADR 0015 的 domain-first 泛型/非泛型重载已同步到该接口。删除 UI 工厂或 domain 重载、恢复逐调用 dispatcher 参数、让工厂绕过 DI dispatcher 或复制 domain 状态机均属于 breaking change。
+
+ADR 0016 把重复且易错的 Router commit -> Outlet commit -> conditional restore 提升为可复用技术协调层，但没有吸收应用业务映射。让协调器无条件 rewind、覆盖更新 navigation、回放用户操作、隐式发现 View 或接管错误展示均违反该兼容边界。

@@ -218,6 +218,164 @@ public sealed class ViewModelCompositionTests
         Assert.Empty(owner.Roots);
     }
 
+    [Fact]
+    public async Task NestedChildrenDrainLeafTasksBeforeParentDeactivation()
+    {
+        var events = new List<string>();
+        await using var owner = new ViewModelCompositionOwner("window:main");
+        var root = await owner.AttachRootAsync(
+            "root",
+            ViewModelLease.Borrowed(new TestActivatable("root", events)));
+        var child = await root.AttachChildAsync(
+            "child",
+            ViewModelLease.Borrowed(new TestActivatable("child", events)));
+        var grandchild = await child.AttachChildAsync(
+            "grandchild",
+            ViewModelLease.Borrowed(new TestActivatable("grandchild", events)));
+        var taskStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var grandchildTask = grandchild.ActivationScope.StartAsync(
+            "grandchild-loop",
+            async token =>
+            {
+                taskStarted.TrySetResult();
+                try
+                {
+                    await Task.Delay(Timeout.InfiniteTimeSpan, token);
+                }
+                finally
+                {
+                    events.Add("drain:grandchild");
+                }
+            });
+        await taskStarted.Task;
+
+        await root.DisposeAsync();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => grandchildTask);
+        Assert.True(events.IndexOf("deactivate:grandchild") < events.IndexOf("drain:grandchild"));
+        Assert.True(events.IndexOf("drain:grandchild") < events.IndexOf("deactivate:child"));
+        Assert.True(events.IndexOf("deactivate:child") < events.IndexOf("deactivate:root"));
+        Assert.True(grandchild.IsDisposed);
+        Assert.True(child.IsDisposed);
+        Assert.True(root.IsDisposed);
+    }
+
+    [Fact]
+    public async Task ChildActivationFailureRollsBackCandidateWithoutStoppingSiblingOrParent()
+    {
+        await using var owner = new ViewModelCompositionOwner("window:main");
+        var root = await owner.AttachRootAsync(
+            "root",
+            ViewModelLease.Borrowed(new TestActivatable("root")));
+        var sibling = await root.AttachChildAsync(
+            "sibling",
+            ViewModelLease.Borrowed(new TestActivatable("sibling")));
+        var candidate = new ThrowingActivationViewModel();
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await root.AttachChildAsync(
+                "candidate",
+                ViewModelLease.EntryOwned(candidate)));
+
+        Assert.True(root.IsActive);
+        Assert.True(sibling.IsActive);
+        Assert.True(candidate.IsDisposed);
+        Assert.DoesNotContain(root.Children, child => child.CompositionId == "candidate");
+        Assert.Single(root.Children);
+    }
+
+    [Fact]
+    public async Task ExplicitLeaseAndOwnerDisposeShareOneCleanupTransaction()
+    {
+        var owner = new ViewModelCompositionOwner("window:main");
+        var viewModel = new BlockingDeactivationViewModel();
+        var root = await owner.AttachRootAsync(
+            "root",
+            ViewModelLease.EntryOwned(viewModel));
+
+        var explicitDispose = root.DisposeAsync().AsTask();
+        await viewModel.DeactivationStarted.Task;
+        var ownerDispose = owner.DisposeAsync().AsTask();
+
+        Assert.False(explicitDispose.IsCompleted);
+        Assert.False(ownerDispose.IsCompleted);
+        viewModel.ReleaseDeactivation.TrySetResult();
+        await Task.WhenAll(explicitDispose, ownerDispose);
+
+        Assert.Equal(1, viewModel.DeactivationCount);
+        Assert.Equal(1, viewModel.DisposeCount);
+        Assert.True(root.IsDisposed);
+        Assert.Empty(owner.Roots);
+    }
+
+    [Fact]
+    public async Task ThrowingDiagnosticsCannotChangeAttachOrCleanupResults()
+    {
+        await using var owner = new ViewModelCompositionOwner(
+            "window:main",
+            diagnostics: new ThrowingDiagnostics());
+        var viewModel = new TestActivatable("root")
+        {
+            DeactivationException = new InvalidOperationException("expected cleanup failure"),
+        };
+
+        var root = await owner.AttachRootAsync(
+            "root",
+            ViewModelLease.Borrowed(viewModel));
+        var exception = await Assert.ThrowsAsync<AggregateException>(async () =>
+            await root.DisposeAsync());
+
+        Assert.Contains(
+            exception.Flatten().InnerExceptions,
+            item => item is InvalidOperationException { Message: "expected cleanup failure" });
+        Assert.True(root.IsDisposed);
+        Assert.Empty(owner.Roots);
+    }
+
+    [Fact]
+    public async Task BorrowedInstanceHasOneActivationOwnerAtATimeAndCanMoveAfterRelease()
+    {
+        await using var firstOwner = new ViewModelCompositionOwner("window:first");
+        await using var secondOwner = new ViewModelCompositionOwner("window:second");
+        var viewModel = new TestActivatable("shared");
+        var first = await firstOwner.AttachRootAsync(
+            "root",
+            ViewModelLease.Borrowed(viewModel));
+
+        var rejection = await Assert.ThrowsAsync<PresentationException>(async () =>
+            await secondOwner.AttachRootAsync(
+                "root",
+                ViewModelLease.Borrowed(viewModel)));
+        await first.DisposeAsync();
+        var second = await secondOwner.AttachRootAsync(
+            "root",
+            ViewModelLease.Borrowed(viewModel));
+
+        Assert.Equal(PresentationError.ViewModelCompositionRejected, rejection.Error);
+        Assert.True(second.IsActive);
+    }
+
+    [Fact]
+    public async Task RouteOutletEntryAndCompositionTreeDisposeIndependently()
+    {
+        await using var owner = new ViewModelCompositionOwner("window:main");
+        var root = await owner.AttachRootAsync(
+            "root",
+            ViewModelLease.Borrowed(new TestActivatable("root")));
+        var outlet = new RouteOutlet("primary", new InlineDispatcher());
+        var entryHandle = BoundViewHandle.FromExisting(new object(), new TestActivatable("route"));
+        await outlet.CommitAsync(RouteOutletCommitPlan.Replace("primary", entryHandle));
+
+        await outlet.DisposeAsync();
+
+        Assert.True(entryHandle.IsDisposed);
+        Assert.True(root.IsActive);
+        Assert.False(root.IsDisposed);
+
+        await root.DisposeAsync();
+        Assert.True(root.IsDisposed);
+    }
+
     private sealed class TestActivatable : IActivatable, IAsyncDisposable
     {
         private readonly string _name;
@@ -286,5 +444,86 @@ public sealed class ViewModelCompositionTests
             IsDisposed = true;
             return ValueTask.CompletedTask;
         }
+    }
+
+    private sealed class ThrowingActivationViewModel : IActivatable, IAsyncDisposable
+    {
+        public bool IsDisposed { get; private set; }
+
+        public ValueTask ActivateAsync(IActivationScope scope, CancellationToken cancellationToken) =>
+            throw new InvalidOperationException("activation failed");
+
+        public ValueTask DeactivateAsync(CancellationToken cancellationToken) =>
+            ValueTask.CompletedTask;
+
+        public ValueTask DisposeAsync()
+        {
+            IsDisposed = true;
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class BlockingDeactivationViewModel : IActivatable, IAsyncDisposable
+    {
+        public TaskCompletionSource DeactivationStarted { get; } = new(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public TaskCompletionSource ReleaseDeactivation { get; } = new(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public int DeactivationCount { get; private set; }
+
+        public int DisposeCount { get; private set; }
+
+        public ValueTask ActivateAsync(IActivationScope scope, CancellationToken cancellationToken) =>
+            ValueTask.CompletedTask;
+
+        public async ValueTask DeactivateAsync(CancellationToken cancellationToken)
+        {
+            DeactivationCount++;
+            DeactivationStarted.TrySetResult();
+            await ReleaseDeactivation.Task;
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            DisposeCount++;
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class ThrowingDiagnostics : IHostDiagnostics
+    {
+        public IReadOnlyList<HostDiagnosticRecord> Records => [];
+
+        public void Write(HostDiagnosticRecord record) =>
+            throw new InvalidOperationException("diagnostics failed");
+
+        public void Complete()
+        {
+        }
+    }
+
+    private sealed class InlineDispatcher : AtomUI.City.Core.Threading.IUiDispatcher
+    {
+        public bool CheckAccess() => true;
+
+        public ValueTask InvokeAsync(Action callback, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            callback();
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask<T> InvokeAsync<T>(Func<T> callback, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return ValueTask.FromResult(callback());
+        }
+
+        public ValueTask PostAsync(
+            Func<CancellationToken, ValueTask> callback,
+            CancellationToken cancellationToken = default) =>
+            callback(cancellationToken);
     }
 }

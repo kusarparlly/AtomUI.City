@@ -46,10 +46,35 @@ public interface IUiCommandFactory
         ICommandExceptionHandler? exceptionHandler = null);
 
     /// <summary>
+    /// Creates an asynchronous command that participates in a shared latest-wins execution domain.
+    /// </summary>
+    IAsyncRelayCommand CreateAsync(
+        CommandExecutionDomain executionDomain,
+        Func<CommandExecutionLease, CancellationToken, Task> execute,
+        Func<bool>? canExecute = null,
+        CommandExecutionState? state = null,
+        IActivationScopeOwner? activationOwner = null,
+        CommandConcurrencyPolicy concurrencyPolicy = CommandConcurrencyPolicy.Reject,
+        ICommandExceptionHandler? exceptionHandler = null);
+
+    /// <summary>
     /// Creates a typed asynchronous command that resolves the owner's current activation scope per execution.
     /// </summary>
     IAsyncRelayCommand<T> CreateAsync<T>(
         Func<T?, CancellationToken, Task> execute,
+        Predicate<T?>? canExecute = null,
+        CommandExecutionState? state = null,
+        IActivationScopeOwner? activationOwner = null,
+        CommandConcurrencyPolicy concurrencyPolicy = CommandConcurrencyPolicy.Reject,
+        Func<T?, object?>? concurrencyKeySelector = null,
+        ICommandExceptionHandler? exceptionHandler = null);
+
+    /// <summary>
+    /// Creates a typed asynchronous command that participates in a shared latest-wins execution domain.
+    /// </summary>
+    IAsyncRelayCommand<T> CreateAsync<T>(
+        CommandExecutionDomain executionDomain,
+        Func<T?, CommandExecutionLease, CancellationToken, Task> execute,
         Predicate<T?>? canExecute = null,
         CommandExecutionState? state = null,
         IActivationScopeOwner? activationOwner = null,

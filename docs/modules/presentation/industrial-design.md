@@ -4,7 +4,7 @@
 
 ## 1. 定位
 
-Presentation 是 City 业务运行时与 Avalonia 之间的 UI 事务协调层。Routing 决定已经提交的导航目标，应用的 Routing-Presentation adapter 取得 ViewModel lease、定位并创建 View、完成绑定，再把单次使用的 `RouteOutletCommitPlan` 提交给 Outlet。Presentation 不解释 route，也不修改 Router snapshot 或 journal。
+Presentation 是 City 业务运行时与 Avalonia 之间的 UI 事务协调层。Routing 决定已经提交的导航目标；应用的 plan factory 取得 ViewModel lease、定位并创建 View、完成绑定，再把单次使用的 `RouteOutletCommitPlan` 交给协调流程。低级 RouteOutlet 不解释 route，也不修改 Router snapshot 或 journal；可选 `IRoutePresentationCoordinator` 只通过 Routing 公开 commit receipt，在 Presentation 未提交时请求条件恢复。
 
 Presentation 主包只绑定 Avalonia，不绑定 AtomUI。AtomUI 或其他控件库必须通过应用代码或独立可选适配包接入。
 
@@ -17,6 +17,7 @@ Presentation 负责：
 - ViewModel 获取协议和 ownership lease；实例必须来自 DI、generated factory、应用 factory 或当前 Entry 复用。
 - Activation、deactivation、Interaction 定位、模态排队、可选 Validation visual bridge。
 - 白名单 Avalonia visual 回执、插件 UI contribution 撤销和分层故障诊断。
+- 按 Outlet 串行的 Router commit -> application plan -> Outlet commit 技术协调，以及失败后的 receipt-guarded Router restore。
 
 Presentation 不负责：
 
@@ -24,6 +25,7 @@ Presentation 不负责：
 - 不提供文案查找、语言包、fallback、culture revision、`GetText` 或 `Localized*` binding。应用 ViewModel/业务代码直接使用 Localization；Avalonia Binding 和资源字典由应用决定如何承接。
 - 不建立第二套 Avalonia Binding、事件或 priority 模型，不运行阻塞 IO，不做程序集扫描式 View 发现。
 - 不把 factory 创建的对象写回已经构建的 `IServiceProvider`。
+- 不推断 route 到 View/ViewModel 的业务映射，不回放用户操作，不重建旧 VisualTree/ActivationScope，不决定错误等级、重试或用户提示。
 
 ## 3. 启动和注册
 
@@ -75,7 +77,13 @@ Entry 清理顺序为 deactivate、ActivationScope、visual subscription 与 Bou
 
 `CommitAsync` 可从任意线程调用。只有 Avalonia 对象创建、读取、写入、DataContext、事件订阅和 VisualTree 修改进入 UI dispatcher；DI scope、ViewModel factory、guard、activation/deactivation 和诊断组装不得在 UI 线程或框架锁内执行。使用 Avalonia 原生 priority，不公开 City priority abstraction。
 
-caller token 在入队前可拒绝；入队后只取消调用者等待，不删除已接受事务。plan 的 lifecycle token 可在最终提交前取消事务。Runtime stopping 仍允许已接受事务和清理使用 dispatcher，但拒绝新 Window/Outlet 工作。
+caller token 在 Outlet 入队前可拒绝；入队后的有效 token 仍可在 final commit 前取消事务，Outlet 必须完成 physical rollback 与候选释放后才报告取消。Runtime stopping 仍允许已接受事务和清理使用 dispatcher，但拒绝新 Window/Outlet 工作。
+
+## 6.1 Routing-Presentation 技术协调
+
+`IRoutePresentationCoordinator` 对同一个 `IRouteOutlet` 实例严格串行，对不同 Outlet 允许并行。顺序固定为：调用应用 navigation delegate；确认 Router 结果已提交且携带 receipt；调用应用 plan factory；提交到 Outlet。Router 未提交时不创建 plan。Presentation 成功后不调用 restore。
+
+plan factory 抛异常、Outlet 抛异常或返回失败时，协调器用 `CancellationToken.None` 完成 `TryRestoreAsync(receipt)`，避免 caller cancellation 中断资源一致性恢复。恢复只在 receipt 仍为 Router current generation 时成功；较新导航已提交则返回 `RestoreRejectedByNewerNavigation`，绝不覆盖更新状态。协调器只返回结构化结果和诊断，不弹 UI、不自动重试、不改变应用错误政策。
 
 ## 7. 有界队列
 

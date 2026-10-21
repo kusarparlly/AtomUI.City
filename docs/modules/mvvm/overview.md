@@ -11,6 +11,8 @@
 
 ViewModel 编程模型，提供 activation、command、operation、interaction 和 validation contract。
 
+跨 Command 的共享执行所有权由显式 `CommandExecutionDomain` 提供；它只实现 latest-wins 取消、generation/currentness 和 drain，不包含业务提交策略或通用 command policy engine。
+
 ## 产品级硬性约束
 
 以下约束是本模块实现和 review 的硬门禁，违反任一条都不能标记 Feature 完成。
@@ -73,4 +75,4 @@ AtomUI.City.Mvvm 作为 Host 服务或模块贡献接入 Core 生命周期，必
 
 Verified baseline / Implemented expansion pending release validation
 
-`AUC-MVVM-001` 至 `006` 维持既有 Verified 基线；`AUC-MVVM-007` 至 `010` 已实现并通过模块测试，但在全套发布门禁完成前保持 `Implemented`，不能报告为 `Verified`。单个功能点状态以 [features.md](features.md) 和 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。
+`AUC-MVVM-001` 至 `006` 维持既有 Verified 基线；`AUC-MVVM-007` 至 `012` 已实现并通过模块测试，但在全套 package consumer 与发布门禁完成前保持 `Implemented`，不能报告为 `Verified`。单个功能点状态以 [features.md](features.md) 和 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 为准。

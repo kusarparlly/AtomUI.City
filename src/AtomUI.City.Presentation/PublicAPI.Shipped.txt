@@ -1,4 +1,38 @@
 #nullable enable
+AtomUI.City.Presentation.IRoutePresentationCoordinator
+AtomUI.City.Presentation.IRoutePresentationCoordinator.NavigateAsync(AtomUI.City.Routing.IRouter! router, AtomUI.City.Presentation.IRouteOutlet! outlet, AtomUI.City.Presentation.RoutePresentationNavigation! navigation, AtomUI.City.Presentation.IRoutePresentationPlanFactory! planFactory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.RoutePresentationResult!>
+AtomUI.City.Presentation.IRoutePresentationPlanFactory
+AtomUI.City.Presentation.IRoutePresentationPlanFactory.CreateAsync(AtomUI.City.Presentation.RoutePresentationPlanContext! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.RouteOutletCommitPlan!>
+AtomUI.City.Presentation.RoutePresentationCoordinator
+AtomUI.City.Presentation.RoutePresentationCoordinator.NavigateAsync(AtomUI.City.Routing.IRouter! router, AtomUI.City.Presentation.IRouteOutlet! outlet, AtomUI.City.Presentation.RoutePresentationNavigation! navigation, AtomUI.City.Presentation.IRoutePresentationPlanFactory! planFactory, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Presentation.RoutePresentationResult!>
+AtomUI.City.Presentation.RoutePresentationCoordinator.RoutePresentationCoordinator() -> void
+AtomUI.City.Presentation.RoutePresentationCoordinator.RoutePresentationCoordinator(AtomUI.City.Core.Diagnostics.IHostDiagnostics! diagnostics) -> void
+AtomUI.City.Presentation.RoutePresentationNavigation
+AtomUI.City.Presentation.RoutePresentationPlanContext
+AtomUI.City.Presentation.RoutePresentationPlanContext.Navigation.get -> AtomUI.City.Routing.NavigationResult!
+AtomUI.City.Presentation.RoutePresentationPlanContext.OutletName.get -> string!
+AtomUI.City.Presentation.RoutePresentationPlanContext.Receipt.get -> AtomUI.City.Routing.NavigationCommitReceipt!
+AtomUI.City.Presentation.RoutePresentationResult
+AtomUI.City.Presentation.RoutePresentationResult.Exception.get -> System.Exception?
+AtomUI.City.Presentation.RoutePresentationResult.Message.get -> string?
+AtomUI.City.Presentation.RoutePresentationResult.Navigation.get -> AtomUI.City.Routing.NavigationResult?
+AtomUI.City.Presentation.RoutePresentationResult.Presentation.get -> AtomUI.City.Presentation.RouteOutletCommitResult?
+AtomUI.City.Presentation.RoutePresentationResult.Restore.get -> AtomUI.City.Routing.NavigationRestoreResult?
+AtomUI.City.Presentation.RoutePresentationResult.Status.get -> AtomUI.City.Presentation.RoutePresentationResultStatus
+AtomUI.City.Presentation.RoutePresentationResult.Succeeded.get -> bool
+AtomUI.City.Presentation.RoutePresentationResultStatus
+AtomUI.City.Presentation.RoutePresentationResultStatus.Cancelled = 6 -> AtomUI.City.Presentation.RoutePresentationResultStatus
+AtomUI.City.Presentation.RoutePresentationResultStatus.PresentationFailedRouteCommitted = 3 -> AtomUI.City.Presentation.RoutePresentationResultStatus
+AtomUI.City.Presentation.RoutePresentationResultStatus.PresentationFailedRouteRestored = 2 -> AtomUI.City.Presentation.RoutePresentationResultStatus
+AtomUI.City.Presentation.RoutePresentationResultStatus.RestoreRejectedByNewerNavigation = 4 -> AtomUI.City.Presentation.RoutePresentationResultStatus
+AtomUI.City.Presentation.RoutePresentationResultStatus.RoutingNotCommitted = 1 -> AtomUI.City.Presentation.RoutePresentationResultStatus
+AtomUI.City.Presentation.RoutePresentationResultStatus.StructuralFailure = 5 -> AtomUI.City.Presentation.RoutePresentationResultStatus
+AtomUI.City.Presentation.RoutePresentationResultStatus.Succeeded = 0 -> AtomUI.City.Presentation.RoutePresentationResultStatus
+const AtomUI.City.Presentation.PresentationDiagnosticIds.RoutePresentationCoordinationFailed = "AUCPRS049" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.RoutePresentationCoordinationStarted = "AUCPRS047" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.RoutePresentationCoordinationSucceeded = "AUCPRS048" -> string!
+const AtomUI.City.Presentation.PresentationDiagnosticIds.RoutePresentationRestoreRejected = "AUCPRS050" -> string!
+virtual AtomUI.City.Presentation.RoutePresentationNavigation.Invoke(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Routing.NavigationResult!>
 AtomUI.City.Presentation.ActivePluginView
 AtomUI.City.Presentation.ActivePluginView.ActivePluginView(string! pluginId, AtomUI.City.Presentation.IRouteOutlet! outlet, AtomUI.City.Presentation.BoundViewHandle! handle, string? contributionId = null) -> void
 AtomUI.City.Presentation.ActivePluginView.ContributionId.get -> string?
@@ -681,3 +715,11 @@ AtomUI.City.Presentation.WindowSession.ViewModels.get -> AtomUI.City.Presentatio
 const AtomUI.City.Presentation.PresentationDiagnosticIds.ViewModelCompositionAttached = "AUCPRS044" -> string!
 const AtomUI.City.Presentation.PresentationDiagnosticIds.ViewModelCompositionCleanupFailed = "AUCPRS046" -> string!
 const AtomUI.City.Presentation.PresentationDiagnosticIds.ViewModelCompositionRejected = "AUCPRS045" -> string!
+AtomUI.City.Presentation.IUiCommandFactory
+AtomUI.City.Presentation.IUiCommandFactory.Create(System.Action! execute, System.Func<bool>? canExecute = null, AtomUI.City.Mvvm.CommandExecutionState? state = null) -> CommunityToolkit.Mvvm.Input.IRelayCommand!
+AtomUI.City.Presentation.IUiCommandFactory.Create<T>(System.Action<T?>! execute, System.Predicate<T?>? canExecute = null, AtomUI.City.Mvvm.CommandExecutionState? state = null) -> CommunityToolkit.Mvvm.Input.IRelayCommand<T>!
+AtomUI.City.Presentation.IUiCommandFactory.CreateAsync(System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! execute, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Mvvm.IActivationScope? activationScope = null) -> CommunityToolkit.Mvvm.Input.IAsyncRelayCommand!
+AtomUI.City.Presentation.IUiCommandFactory.CreateAsync(System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! execute, System.Func<bool>? canExecute, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Mvvm.IActivationScopeOwner? activationOwner = null, AtomUI.City.Mvvm.CommandConcurrencyPolicy concurrencyPolicy = AtomUI.City.Mvvm.CommandConcurrencyPolicy.Reject, AtomUI.City.Mvvm.ICommandExceptionHandler? exceptionHandler = null) -> CommunityToolkit.Mvvm.Input.IAsyncRelayCommand!
+AtomUI.City.Presentation.IUiCommandFactory.CreateAsync(AtomUI.City.Mvvm.CommandExecutionDomain! executionDomain, System.Func<AtomUI.City.Mvvm.CommandExecutionLease!, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! execute, System.Func<bool>? canExecute = null, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Mvvm.IActivationScopeOwner? activationOwner = null, AtomUI.City.Mvvm.CommandConcurrencyPolicy concurrencyPolicy = AtomUI.City.Mvvm.CommandConcurrencyPolicy.Reject, AtomUI.City.Mvvm.ICommandExceptionHandler? exceptionHandler = null) -> CommunityToolkit.Mvvm.Input.IAsyncRelayCommand!
+AtomUI.City.Presentation.IUiCommandFactory.CreateAsync<T>(System.Func<T?, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! execute, System.Predicate<T?>? canExecute = null, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Mvvm.IActivationScopeOwner? activationOwner = null, AtomUI.City.Mvvm.CommandConcurrencyPolicy concurrencyPolicy = AtomUI.City.Mvvm.CommandConcurrencyPolicy.Reject, System.Func<T?, object?>? concurrencyKeySelector = null, AtomUI.City.Mvvm.ICommandExceptionHandler? exceptionHandler = null) -> CommunityToolkit.Mvvm.Input.IAsyncRelayCommand<T>!
+AtomUI.City.Presentation.IUiCommandFactory.CreateAsync<T>(AtomUI.City.Mvvm.CommandExecutionDomain! executionDomain, System.Func<T?, AtomUI.City.Mvvm.CommandExecutionLease!, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! execute, System.Predicate<T?>? canExecute = null, AtomUI.City.Mvvm.CommandExecutionState? state = null, AtomUI.City.Mvvm.IActivationScopeOwner? activationOwner = null, AtomUI.City.Mvvm.CommandConcurrencyPolicy concurrencyPolicy = AtomUI.City.Mvvm.CommandConcurrencyPolicy.Reject, System.Func<T?, object?>? concurrencyKeySelector = null, AtomUI.City.Mvvm.ICommandExceptionHandler? exceptionHandler = null) -> CommunityToolkit.Mvvm.Input.IAsyncRelayCommand<T>!

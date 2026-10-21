@@ -18,6 +18,7 @@ Routing 的提交结果是 Route -> ViewModel Target 的不可变描述，不是
 - 每次导航捕获一个 graph snapshot；同一事务中不切换 graph。
 - Guard、Resolver、Middleware（包括 post-`next`）或取消失败时不改变 current snapshot 和 journal。
 - `NavigationScope` 串行提交；`CancelPrevious`、`Queue`、`RejectIfBusy` 行为确定。
+- 每次成功提交生成 scope-bound、generation-bound 的 `NavigationCommitReceipt`；条件恢复只在该提交仍为 current 时恢复提交前 snapshot 与完整 journal checkpoint。
 - 诊断只负责观测，诊断接收器故障不得改变导航或图发布结果。
 - 动态 contribution 必须可撤销；撤销后新导航不能进入已撤销路由。
 - Routing 不引用 Presentation/Avalonia，不创建 ViewModel，不创建 Route DI scope，不操作 VisualTree。
@@ -31,9 +32,10 @@ Routing 的提交结果是 Route -> ViewModel Target 的不可变描述，不是
 - enter/leave guard、match policy、resolver、route middleware。
 - static/dynamic redirect、循环和最大跳数防护。
 - Back/Forward、Push/Replace/Reset、容量裁剪、标量 resolved data 恢复。
+- commit receipt、单次条件恢复和 superseded/foreign receipt 稳定拒绝。
 - `RouteRegistry` 原子 contribution 发布、ExtensionPoint 挂载和专属服务解析边界。
 - `RoutingModule` / `AddRouting` Host DI 集成。
-- `AUCRT001` 至 `AUCRT008` 运行时诊断。
+- `AUCRT001` 至 `AUCRT011` 运行时诊断。
 
 ## 非目标
 

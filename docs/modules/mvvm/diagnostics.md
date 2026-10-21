@@ -28,6 +28,8 @@
 | `AUCMVVM013` | CommandExceptionHandlerFailed | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
 | `AUCMVVM014` | CommandNotificationFailed | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
 | `AUCMVVM015` | ActivationStateNotificationFailed | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
+| `AUCMVVM016` | CommandExecutionDomainCancellationFailed | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
+| `AUCMVVM017` | CommandExecutionDomainDrainTimedOut | `src/AtomUI.City.Mvvm/MvvmDiagnosticIds.cs` |
 
 ## 上下文 key 合同
 
@@ -46,6 +48,8 @@
 | `AUCMVVM013` | `commandName`、`ownerType`、`operationId`、`exceptionType`。 |
 | `AUCMVVM014` | `commandName`、`ownerType`、`dispatcherType`、`exceptionType`。 |
 | `AUCMVVM015` | `viewModelType`、`activationState`、`exceptionType`。 |
+| `AUCMVVM016` | `domainId`、`generation`、`exceptionType`。 |
+| `AUCMVVM017` | `domainId`、`activeExecutionCount`、`timeout`。 |
 
 ## 产品级必须诊断的失败
 
@@ -58,6 +62,7 @@
 - Activation task 重复/关闭后准入、执行失败或 drain 超时：分别写 `AUCMVVM009-011`。
 - inactive Command、应用异常 handler 失败和命令 UI 通知投递失败：分别写 `AUCMVVM012-014`。
 - ActivationStateChanged 订阅者失败：写 `AUCMVVM015`，继续通知其他订阅者且不回滚生命周期状态。
+- CommandExecutionDomain 取消回调失败和 drain 超时：分别写 `AUCMVVM016-017`；不得阻塞后发 Command 准入，也不得报告为已强杀用户代码。
 - Command/Activation 诊断只输出结构化上下文，不创建或写入任何磁盘日志文件。
 
 ## 上下文字段
