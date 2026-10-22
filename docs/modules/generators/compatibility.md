@@ -22,6 +22,9 @@
 - `GeneratorDiagnostics.CreateRoslynDiagnostic` 是 1.0 前新增 diagnostic factory；category、severity、message formatting 和 location fallback 属于兼容行为。
 - `LocalizationMetadata.Diagnostics`、空 attribute 参数/显式未知 enum 的 build diagnostic，以及有 reader diagnostic 时不生成 Localization source 的行为进入 1.0 兼容承诺。
 - `LocalizationRegistrarSourceBuilder` 生成的 `GeneratedLocalizationManifest` 成员、稳定排序和单次 `LanguagePackageRegistry.RegisterRange` 原子注册行为进入 1.0 兼容承诺。
+- EventBus 生成结果中的 `GeneratedEventManifestAttribute`、`EventContractDescriptor.GeneratedShared<TEvent>`、`GeneratedEventHandlerDescriptor.Create<TEvent, THandler>` 语义，跨程序集 generated manifest reachability、稳定排序与 registrar 单次聚合行为进入 1.0 兼容承诺；这些输出仍嵌入 service registrar，不构成独立开发者调用 API。
+- Data 生成结果中的 `GeneratedDataClientManifestAttribute`、`IDataClientDescriptorRegistrar` 实现、稳定 registrar type/hint name、client/operation 排序与 descriptor 字段语义进入 1.0 兼容承诺。
+- EventBus/Data 非法声明当前使用 `AUCGEN005`；code、Error severity、feature category、source location 和“整批不发布不完整输出”行为不可静默漂移。
 - `AUCANL0001` 默认以 Error 阻止非测试 City 项目调用或引用 `BuildServiceProvider`、主动调用 `IServiceProviderFactory<T>.CreateServiceProvider`，以及调用或引用 Microsoft Generic Host 构建/启动入口；诊断 ID、默认 severity、City ApplicationHost、已有 IHost 启动、测试项目和 generated code 豁免属于兼容行为。
 
 ## 数据格式兼容

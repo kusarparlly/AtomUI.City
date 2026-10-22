@@ -15,13 +15,21 @@ internal sealed class CliTestHost : IDisposable
 
     public async ValueTask<CliTestRun> RunAsync(params string[] args)
     {
+        return await RunAsync(CancellationToken.None, args);
+    }
+
+    public async ValueTask<CliTestRun> RunAsync(
+        CancellationToken cancellationToken,
+        params string[] args)
+    {
         var output = new StringWriter();
         var error = new StringWriter();
         var exitCode = await CliApplication.RunAsync(
             args,
             output,
             error,
-            new CliExecutionEnvironment(WorkingDirectory));
+            new CliExecutionEnvironment(WorkingDirectory),
+            cancellationToken);
 
         return new CliTestRun(exitCode, output.ToString(), error.ToString());
     }

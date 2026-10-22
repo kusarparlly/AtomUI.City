@@ -11,6 +11,7 @@
 | Threading Tools | FakeUiDispatcher, DeterministicScheduler | 可控 UI 和异步调度。 | 不依赖固定 delay。 |
 | Generator Kit | SourceGenerationTestCase, GeneratedSourceSnapshot | source generator 测试。 | 输出和 diagnostic 可 snapshot。 |
 | AOT Gate | AotCompatibilityCheck | AOT/trimming 规则检查。 | 禁止模式产生 diagnostic。 |
+| Data Test Doubles | FakeDataConnection, RecordingDataRequestHandler, ScriptedDataCredentialProvider, ScriptedDataTransport 及记录模型 | Data 连接、管线、凭据和传输的确定性测试。 | 不访问真实网络；脚本 FIFO 消费；调用证据可断言。 |
 
 ## 首批冻结 API Cards
 
@@ -292,6 +293,22 @@
 | AOT / Trimming | 只用于测试和 gate。 |
 | Breaking Change Rules | 删除、重命名或改变 layer 语义属于 breaking change。 |
 | Tests | `TestLayerTests` 断言标准名称集合和 feature gate 映射。 |
+
+### Data Test Doubles
+
+以下七个类型共同属于 `AUC-TESTING-010`。Data 模块拥有 `IDataConnection`、`IDataRequestHandler`、`IDataCredentialProvider`、`IRequestResponseTransport` 及结果模型；Testing 模块拥有这些测试实现。该依赖方向不能反转，生产项目不得引用 `AtomUI.City.Testing`。
+
+| Type | Purpose | Ownership / Lifetime | Threading / Cancellation | Failure Behavior | Stability / Tests |
+| --- | --- | --- | --- | --- | --- |
+| `FakeDataConnection` | 以可注入 start/stop 委托模拟 `IDataConnection`，并暴露状态与调用计数。 | 单个 test/test fixture 所有；Created -> Connecting -> Connected -> Disconnecting -> Stopped/Faulted；重复 Stop 在 Stopped 时幂等。 | 计数使用原子读写；生命周期由测试串行驱动；start/stop 前后观察 token。 | 空白 connection id、`DataConnectionOwner.None` 被拒绝；委托异常或取消将状态置为 Faulted 并原样传播。 | Preview；`DataTestDoublesTests`。 |
+| `RecordedDataRequest` | 保存一次 handler 进入或成功退出时的 request、context 与方向标记。 | `RecordingDataRequestHandler` 创建的不可变记录快照。 | 可跨线程读取；不包含独立取消行为。 | `next` 或 before 委托失败时只保留已经发生的进入记录，不伪造退出记录。 | Preview；`DataTestDoublesTests`。 |
+| `RecordingDataRequestHandler` | 实现 `IDataRequestHandler`，记录管线顺序，并可在 `next` 前执行测试委托。 | 单个 pipeline/test 所有；`Records` 每次返回当前队列快照。 | 记录队列支持并发；透传 cancellation token；handler order 由构造参数固定。 | before/next 异常和取消原样传播；只有 `next` 成功返回后才记录退出。 | Preview；`DataTestDoublesTests`。 |
+| `ScriptedDataCredentialProvider` | 以 FIFO 脚本实现 `IDataCredentialProvider`，并记录鉴权上下文。 | 单个 test/test fixture 所有；每次请求最多消费一个脚本响应。 | 响应和请求使用并发队列；调用前观察 token，并把 token 传给脚本委托。 | null 响应/委托被拒绝；队列为空返回 `Unavailable`；脚本异常或取消原样传播。 | Preview；`DataTestDoublesTests`。 |
+| `ScriptedDataInvocation` | 保存 transport 收到的 request、context 和 cancellation token。 | `ScriptedDataTransport` 创建的不可变调用记录。 | 可跨线程读取；token 仅记录调用时传入值。 | 不自行转换或吞掉失败。 | Preview；`DataTestDoublesTests`。 |
+| `ScriptedDataResponse` | 表达 scripted transport 的 Success、Failed、Cancelled 或其他 `DataResultStatus` 响应。 | 测试代码创建的不可变值；工厂方法提供常用状态。 | 可并发共享；无独立取消行为。 | `Failed(null)` 被拒绝；状态到泛型 `DataResult<T>` 的验证与映射由 transport 执行。 | Preview；`DataTestDoublesTests`。 |
+| `ScriptedDataTransport` | 以 FIFO 响应脚本实现 `IRequestResponseTransport`，记录实际消费脚本的调用。 | 单个 test/test fixture 所有；`Invocations` 返回当前队列快照。 | 响应和调用使用并发队列；发送前及脚本完成后观察 token；脚本委托不捕获同步上下文。 | 未配置响应返回 Unknown failure；成功值类型不匹配返回 SerializationError；Cancelled/StaleSuppressed 保留状态；委托异常原样传播。 | Preview；`DataTestDoublesTests`。 |
+
+上述 `ConcurrentQueue` 保证的是排队和快照操作的线程安全，不把这些测试替身提升为生产调度器，也不承诺多个并发调用之间存在超出实际 dequeue 顺序的全局业务顺序。
 
 ## 关键方法合同
 
@@ -945,6 +962,7 @@
 | `DeterministicScheduledWorkItem` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `DisposableTracker` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `ExpectedDiagnostic` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `FakeDataConnection` | Data 测试替身 | 新增、删除、重命名或生命周期行为变化必须更新本文档和 compatibility。 |
 | `FakeUiDispatcher` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `FakeUiWorkItem` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `GeneratedSource` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
@@ -956,10 +974,16 @@
 | `PluginTestHostBuilder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `PluginTestRecord` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `PluginTestState` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `RecordedDataRequest` | Data 测试替身 | 新增、删除、重命名或记录时机变化必须更新本文档和 compatibility。 |
+| `RecordingDataRequestHandler` | Data 测试替身 | 新增、删除、重命名或管线顺序行为变化必须更新本文档和 compatibility。 |
 | `RouteTestDefinition` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `RouteTestMatch` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `RoutingTestHost` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `RoutingTestHostBuilder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `ScriptedDataCredentialProvider` | Data 测试替身 | 新增、删除、重命名或脚本消费行为变化必须更新本文档和 compatibility。 |
+| `ScriptedDataInvocation` | Data 测试替身 | 新增、删除、重命名或记录字段变化必须更新本文档和 compatibility。 |
+| `ScriptedDataResponse` | Data 测试替身 | 新增、删除、重命名或状态映射变化必须更新本文档和 compatibility。 |
+| `ScriptedDataTransport` | Data 测试替身 | 新增、删除、重命名或响应映射变化必须更新本文档和 compatibility。 |
 | `SourceFile` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `SourceGenerationTestCase` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `SourceGenerationTestResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |

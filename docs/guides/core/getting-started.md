@@ -1,13 +1,13 @@
 # 快速开始
 
-本文带你搭建一个最小的、可运行的 Core CLI 应用。完整源码见 [`samples/Quickstart`](./samples/Quickstart/)。
+本文带你搭建一个最小的、可运行的 Core CLI 应用。完整验证工程见 [Core Headless App](../../../fixtures/AtomUI.City.Core.HeadlessApp/)。
 
 ## 1. 准备仓库与 SDK
 
 示例通过**源代码引用**构建，因此先确保已经克隆了 AtomUI.City 仓库，并且本机安装了 .NET 10 SDK。
 
 > **SDK 版本注意**：仓库根目录的 `global.json` 要求 SDK `10.0.300`。如果本机安装的是其它 10.x 版本（例如 `10.0.111`），请在示例项目目录放置一个本地 `global.json`。示例已经提供了
-> [`samples/global.json`](./samples/global.json)：
+> 仓库使用的 SDK 约束见 [根目录 global.json](../../../global.json)：
 >
 > ```json
 > {
@@ -19,7 +19,7 @@
 > }
 > ```
 >
-> `rollForward: latestMajor` 会让 SDK 解析器自行挑选本机已安装的最高 10.x 主版本。**请务必在 `samples` 目录下执行 `dotnet` 命令**，这样本地 `global.json` 才会被拾取（SDK 解析是从**当前工作目录**向上查找，而不是项目文件所在目录）。
+> SDK 解析从当前工作目录向上查找 `global.json`；在仓库根目录执行命令即可使用仓库统一约束。
 
 ## 2. 项目文件
 

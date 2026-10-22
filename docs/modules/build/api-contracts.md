@@ -34,7 +34,7 @@
 | --- | --- | --- |
 | `AtomUI.City.Build.contract.json` | Machine-readable Preview contract | Property、Item、Target、默认值、public/infrastructure 分类或 package asset 的增删改必须先更新设计文档，并由精确一致性测试审阅。 |
 | `AtomUI.City.Build.props/targets` | Public MSBuild contract | 开发者可配置项和可显式调用 Target 属于兼容承诺；`infrastructure` 项只允许包内资产使用，但仍受 baseline 防漂移保护。 |
-| NuGet package layout | Build-only package contract | 不得包含 `lib/`；必须包含 contract、六个 buildTransitive 资产（含 Localization targets）、Generator analyzer 和 Build.Tasks tool。 |
+| NuGet package layout | Build-only package contract | 不得包含 `lib/`；必须包含七个 buildTransitive 资产（contract、props、Build/Application/Plugin/Core.Diagnostics/Localization targets）、Generator analyzer/PDB 和 Build.Tasks tool/PDB。 |
 
 Build 模块当前没有 public CLR 类型。未来如果 IDE、CLI 或第三方工具需要编程式读取 Build 元数据，必须建立独立 Tooling Feature；不得通过恢复一个与真实 `.props/.targets` 重复维护的字符串目录解决。
 

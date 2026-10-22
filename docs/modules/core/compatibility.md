@@ -23,8 +23,11 @@
 ## API 兼容规则
 
 - public 类型、成员、枚举值、attribute 参数和扩展方法默认视为兼容性承诺。
+- `IApplicationHost.HostScope` 的非空具体类型 `LifecycleScope`，以及 `IApplicationHost.ApplicationScope` 的 nullable `LifecycleScope?` 签名和创建时机属于 public compatibility contract；不得通过文档或实现把不存在的 `ILifecycleScope` 重新引入为既有合同。
 - 删除、重命名、改变默认行为、异常类型、Result status 或诊断码语义属于 breaking change。
 - 新增 API 可以 minor 版本发布，但必须有文档、测试和迁移说明。
+- `LifecycleNext` 的无参 `ValueTask` 签名、单次调用所有权和事务结束后过期语义属于 Preview public contract。
+- `ApplicationHostBuilderDiagnosticsExtensions` 与 `ApplicationHostBuilderLifecycleExtensions` 是 public extension container；其扩展方法签名和 builder 绑定/冻结语义属于兼容面。`ApplicationHostBuilder` 本身是 internal 默认实现，不形成可引用 CLR API。
 
 Core 的当前公开签名冻结在 `src/AtomUI.City.Core/PublicAPI.Shipped.txt`。`Microsoft.CodeAnalysis.PublicApiAnalyzers` 在每次编译中拒绝未登记的新 API 和已登记但被删除或改签名的 API；`CS1591` 在 Core 中重新启用并升级为错误。Release 门禁还会构建 `net10.0`/`net8.0` 并通过 SDK package validation 比较兼容目标框架的程序集表面。当前尚无对外发布包，因此首份源码基线就是发布前基线；首次发布后再增加 NuGet baseline package 比较。
 

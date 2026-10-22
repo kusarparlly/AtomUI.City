@@ -81,6 +81,64 @@ Graph build rejects null descriptors, duplicate ids/index routes/extension point
 
 Every public type in `src/AtomUI.City.Routing` belongs to one card above. Adding or changing a public member requires updates to this file, [compatibility.md](compatibility.md), [features.md](features.md), and [testing.md](testing.md).
 
+## 精确 Public API 类型卡
+
+本节为已经进入 Public API baseline、但此前只用类型族概括的类型建立可定位合同。全部类型当前为 `Preview`；精确签名、默认值、enum 值、线程/取消和失败语义受兼容性门禁保护。
+
+### 路由声明 Attribute
+
+所有 route-definition attribute 只在 `[RouteMap]` 标记的类型中构成 Generator 输入。Route Map 必须是 public、top-level、non-generic、static partial class；route method 必须是 public static partial、non-generic、无参数、没有手写实现，并且恰好声明一个 framework route-definition attribute。非法声明输出 Generator diagnostic，不生成不完整 route source；运行时不扫描程序集补缺。
+
+| Type / Feature | Target and purpose | Values / defaults | Failure and generation contract | Tests |
+| --- | --- | --- | --- | --- |
+| `RouteMapAttribute` / 001 | class；标记静态 Route Map 的唯一编译期根；不可重复、不继承。 | 无参数、无运行时状态。 | 非 public、嵌套、泛型、非 static/partial map 由 Generator 拒绝。 | Generator routing tests |
+| `RouteDefinitionAttribute` / 001 | framework route definition 的抽象 metadata base，不是第三方自定义 route-kind 扩展点。 | 保存 Kind、Template、ViewModelType；`Outlet` 默认 `primary`；Id/Parent/ExtensionPoint/Target/localization keys/ReuseKey/ActivationHint 可选。 | Generator 只识别 framework sealed derived attributes；空 identity、未知 kind 和非法 kind-field 组合必须拒绝。 | `RouteDefinitionAttributeTests`, generator routing tests |
+| `RouteDefinitionKind` / 001、002 | 区分 Route、Layout、Index、Group、Redirect、ExtensionPoint。 | enum 数值和语义属于兼容面。 | 未知值在 graph/generator 接纳边界拒绝，不能映射为普通 Route。 | `RouteDefinitionAttributeTests`, `RouteGraphAndMatcherTests` |
+| `RouteAttribute` / 001 | method；声明带 template 和 ViewModel target 的普通可导航 route；不可重复、不继承。 | template 非空白，ViewModel type 非空；公共 metadata 继承 base 默认值。 | Generator 校验 template、target 可访问/closed、method shape 和冲突。 | `RouteDefinitionAttributeTests`, generator routing tests |
+| `LayoutRouteAttribute` / 001 | method；声明具有 ViewModel target 的 layout 节点；不可重复、不继承。 | ViewModel type 必填；自身 template 为 null；outlet 默认 `primary`。 | 缺 target、非法 parent/method shape 或不可构造 target 由 Generator/graph 拒绝。 | `RouteDefinitionAttributeTests`, generator routing tests |
+| `IndexRouteAttribute` / 001 | method；声明 parent 下的 index target；不可重复、不继承。 | ViewModel type 必填；自身 template 为 null；outlet 默认 `primary`。 | 无合法 parent、重复 index、非法 target/method shape 时拒绝。 | `RouteDefinitionAttributeTests`, generator routing tests |
+| `RouteGroupAttribute` / 001 | method；声明只参与层次和 template 组合、不直接导航到 ViewModel 的 group。 | template 非空白；ViewModelType 为 null。 | 非法 template、parent/cycle 或把 group 当可导航 target 时拒绝。 | `RouteDefinitionAttributeTests`, graph/generator tests |
+| `RedirectRouteAttribute` / 001、005 | method；声明静态 redirect source。 | template 非空白；`Target` 通过公共 metadata 指定，ViewModelType 为 null。 | Target 缺失、未知、循环或指向不可导航节点时 Generator/graph 失败。 | `RouteDefinitionAttributeTests`, redirect tests |
+| `RouteExtensionPointAttribute` / 001、007 | method；声明动态贡献允许挂载的稳定 extension-point identity。 | extensionPoint 非空白并写入 `ExtensionPoint`；无 template/ViewModel。 | 重复、空白或无效 mount/identity 由 Generator/graph/registry 拒绝。 | `RouteDefinitionAttributeTests`, `RouteRegistryTests` |
+| `RouteGuardsAttribute` / 005 | method；按声明顺序提供 enter/leave guard types；不可重复、不继承。 | 构造数组防御复制并只读暴露。 | null 数组立即失败；null/open/abstract/不可访问或未实现 guard contract 的元素由 Generator 拒绝。 | Generator routing tests, `RouteGuardTests` |
+| `RouteMatchPoliciesAttribute` / 005 | method；按声明顺序提供 async match policy types。 | 构造数组防御复制并只读暴露。 | 非 concrete closed `IRouteMatchPolicy`、不可访问或不可构造类型由 Generator/graph 拒绝。 | Generator routing tests, policy tests |
+| `RouteResolversAttribute` / 009 | method；按声明顺序提供 resolver types。 | 构造数组防御复制并只读暴露。 | 非 concrete closed `IRouteResolver`、不可访问或不可构造类型由 Generator/graph 拒绝。 | Generator routing tests, `RouteResolverAndDiagnosticsTests` |
+| `RouteMiddlewareAttribute` / 010 | method；按声明顺序提供 route middleware types。 | 构造数组防御复制并只读暴露。 | 非 concrete closed `IRouteNavigationMiddleware`、不可访问或不可构造类型由 Generator/graph 拒绝。 | Generator routing tests, `RouteMiddlewareTests` |
+| `QueryAttribute` / 001、003 | property/field；把 typed parameter member 绑定到 URI query；不可重复、可继承。 | 空白 name 规范化为 null，Generator 此时使用 member name。 | 不可读/不可写、ambiguous、indexer 或不支持的 member/type 由 Generator 拒绝。 | Generator routing tests, parameter tests |
+| `FragmentAttribute` / 001、003 | property/field；把 typed parameter member 绑定到 URI fragment；不可重复、可继承。 | 空白 name 规范化为 null，Generator 此时使用固定 key `fragment`。 | 非法 member/type 或 ambiguous binding 由 Generator 拒绝。 | Generator routing tests, deep-link tests |
+
+### Navigation、历史与匹配模型
+
+| Type / Feature | Purpose / ownership | Behavior | Failure / concurrency | Tests |
+| --- | --- | --- | --- | --- |
+| `NavigationMode` / 004、008 | 选择 journal commit 形态：Push 追加、Replace 替换 current、Reset 清空后建立 current。 | options 值随单次 transaction 读取，不拥有资源。 | 未知值返回 `CITY-NAVIGATION-OPTIONS-INVALID`，不提交 snapshot/journal。 | `NavigationAdvancedContractTests`, `NavigationScopeTests` |
+| `NavigationHistoryBehavior` / 008 | 选择 Record、Skip 或 ReplaceCurrent 的历史策略。 | Record 按 mode 写入，Skip 不增加历史，ReplaceCurrent 替换当前 journal entry。 | 未知值在 admission validation 拒绝。 | `NavigationAdvancedContractTests` |
+| `NavigationConcurrencyPolicy` / 004 | 选择 CancelPrevious、Queue、RejectIfBusy。 | scope gate 拥有排队和取消；调用方不直接操作内部 transaction。 | 未知值拒绝；Queue 按 admission 顺序，RejectIfBusy 不进入 pipeline，CancelPrevious 只取消被替代 transaction。 | `NavigationAdvancedContractTests`, `NavigationScopeTests` |
+| `NavigationError` / 004、014 | `NavigationResult` 的不可变结构化 code/message/optional exception payload。 | 无释放责任，可在结果终态后读取；Exception 只作诊断上下文。 | Result factory/transaction 决定稳定 code；读取线程安全，不以 message 文案作程序分支。 | Navigation result/failure tests |
+| `RouteMatchStatus` / 003 | 结构化区分 Success 与 NotFound。 | enum 值是兼容面；match model 不执行 async policy。 | 未知值不得由 matcher 产生。 | `RouteGraphAndMatcherTests` |
+| `RouteTemplateSegmentKind` / 001、003 | 区分 Literal、Parameter、CatchAll segment。 | segment/template 是不可变读取模型。 | parser 拒绝未知/非法 segment 语法；CatchAll 的位置和 constraint 规则由 template contract 管理。 | `RouteTemplateTests` |
+
+### Guard、Match、Resolver 与 Middleware
+
+这些上下文和结果是单次 navigation transaction 的只读快照，不拥有 DI component、provider 或 scope；参数集合均为防御复制。应用组件由 DI 创建，Routing 在内部锁外调用，并传递唯一有效 cancellation token。
+
+| Type / Feature | Purpose / lifetime | Result / next contract | Failure / concurrency | Tests |
+| --- | --- | --- | --- | --- |
+| `RouteGuardContext` / 005 | 向 enter/leave guard 提供 navigationId、target、route、current snapshot 和只读 parameters。 | 只在当前 guard invocation 有效；不得缓存为跨导航状态。 | null target/route/snapshot/parameters 立即失败；取消通过 guard 方法 token 表达。 | `RouteGuardTests`, parameter boundary tests |
+| `RouteGuardResultStatus` / 005 | Allow、Reject、Redirect、Cancel、Failed 的稳定分类。 | 由 `RouteGuardResult` factory 建立匹配 payload。 | 未知或 status/payload 不一致的结果不得进入 commit。 | `RouteGuardTests`, final freeze tests |
+| `RouteMatchPolicyContext` / 005 | 向同结构候选的 async policy 提供 navigationId、target、candidate route 和 current snapshot。 | 单次候选评估只读上下文。 | null 输入立即失败；false 跳过当前 candidate，不代表全局 NotFound 前已尝试后续候选。 | policy/fallback tests |
+| `RouteResolveResult` / 009 | 报告 Success data、NotFound、Redirect、Cancelled 或 Failed。 | Success data 防御复制为 ordinal read-only dictionary；其他状态使用稳定 code/target/error payload。 | redirect target、failed code/message 必须有效；非成功短路 commit；resolver token 相关取消与普通 component failure 区分。 | `RouteResolverAndDiagnosticsTests`, audit regression tests |
+| `RouteResolveResultStatus` / 009 | Success、NotFound、Redirect、Cancelled、Failed 的稳定分类。 | 与 `RouteResolveResult` factory/payload 一一对应。 | 未知状态不得被 transaction 静默当作 Success。 | Resolver tests |
+| `RouteNavigationMiddlewareContext` / 010 | 向 middleware 提供 navigationId、target、selected route、current snapshot 和只读 parameters。 | 仅在当前 middleware invocation/transaction 内有效。 | null 输入失败；不得持有用于迟到提交。 | `RouteMiddlewareTests`, freeze/final-freeze tests |
+| `RouteNavigationDelegate` / 010 | 表示当前 middleware 的无参数 next boundary；target/context/token 已由 transaction 闭包固定。 | 可以 `await next()` 或 `return next()`；最多调用一次，只能在 middleware 返回前取得调用所有权。 | 重复、迟到、保存后调用或 fire-and-forget 不能授权 commit；已启动下游被 transaction 收拢观察。 | `RouteMiddlewareTests`, audit/freeze tests |
+| `IRouteNavigationMiddleware` / 010 | 应用实现的 navigation pipeline component。 | 可 short-circuit 返回自己的当前-operation result；调用 next 时必须遵守独立 boundary。 | foreign/null result、post-next failure、token-correlated cancellation 和 detached next 均按 pipeline 合同失败且不提交。 | `RouteMiddlewareTests`, `RoutingAuditRegressionTests`, `RoutingFinalFreezeTests` |
+
+### DI 入口
+
+| Type / Feature | Purpose / ownership | Lifetime | Failure / idempotency | Tests |
+| --- | --- | --- | --- | --- |
+| `RoutingServiceCollectionExtensions` / 011 | `AddRouting` 注册静态 descriptors、Registry/GraphProvider 和 scoped Router；由应用或 `RoutingModule` 在 Build 前调用。 | Registry/GraphProvider 为同一 singleton；`NavigationScope`/`IRouter` 为同一 scoped instance；输入 route 数组防御复制。 | 不构建临时 provider；无 routes 的重复调用幂等，有 routes 的重复调用按所有 `StaticRouteRegistration` 聚合；候选 graph 在首次 registry 解析时整体验证，非法输入不发布部分图。 | `RouteRegistryTests`, `RoutingAuditRegressionTests`, DI contract tests |
+
 ## Ownership and Dispose
 
 - Descriptor, graph, snapshot, result and match objects stay readable indefinitely.

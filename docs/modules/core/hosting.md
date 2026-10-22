@@ -243,9 +243,13 @@ Task StopAsync(CancellationToken waitCancellationToken = default);
 Task RunAsync(CancellationToken cancellationToken = default);
 IServiceProvider Services { get; }
 IApplicationContext Context { get; }
-ILifecycleScope HostScope { get; }
-ILifecycleScope ApplicationScope { get; }
+LifecycleScope HostScope { get; }
+LifecycleScope? ApplicationScope { get; }
 ```
+
+`HostScope` 由 `Build()` 创建并且始终非空，是整个 Host 生命周期树的根；调用方可以读取或创建符合所有权规则的 child，但不能代替 Host 终止它。
+
+`ApplicationScope` 只有在 `StartAsync()` 的运行期启动事务创建成功后才非空。在 Created、Stop-before-Start，以及启动尚未创建该 Scope 的阶段，它必须为 `null`。Scope 一旦创建，停止或释放后属性可以继续返回同一实例，以便诊断其最终 `State`；因此调用方不得把“非 null”解释成“应用仍在运行”，也不得缓存该 Scope 绕过 Host 生命周期。Module initialization context 只会收到已经创建且处于 Running 的非空实例。
 
 #### ApplicationContext
 

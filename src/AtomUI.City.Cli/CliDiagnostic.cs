@@ -26,18 +26,32 @@ internal sealed record CliDiagnostic(
     public int? Position { get; init; }
 
     /// <summary>
+    /// Gets the framework module associated with this diagnostic.
+    /// </summary>
+    public string? Module { get; init; }
+
+    /// <summary>
+    /// Gets the feature identifier associated with this diagnostic.
+    /// </summary>
+    public string? FeatureId { get; init; }
+
+    /// <summary>
     /// Executes the error operation.
     /// </summary>
     public static CliDiagnostic Error(
         string code,
         string message,
         string? target = null,
-        int? position = null)
+        int? position = null,
+        string? module = null,
+        string? featureId = null)
     {
         return new CliDiagnostic(code, message, "Error")
         {
             Target = target,
             Position = position,
+            Module = module,
+            FeatureId = featureId,
         };
     }
 }

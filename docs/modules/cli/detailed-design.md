@@ -124,7 +124,7 @@ atomui city
   doctor
   explain <diagnostic-code>
 
-  plan <operation>
+  plan generate module|page|test|config|localization <name>
   apply <plan-file>
 ```
 
@@ -147,8 +147,10 @@ atomui city
 
 ```bash
 atomui city plan generate page Orders/List --route /orders --json
-atomui city apply .city/plans/2026-06-11-generate-page.json
+atomui city apply .city/plans/generate-page-4f9c31a2e7d0.json --yes
 ```
+
+第一版 `AUC-CLI-009` 只包装五类非插件 `generate`，且只允许 workspace 内 UTF-8 文本文件 `create`；不执行任意命令，不 update/delete/move，不接受第三方 plan。plan schema、文件上限、路径安全、workspace 锁、staging/journal、重复 apply 和 rollback 终态以 [AI 集成设计](ai-integration.md) 为准。
 
 AI 友好能力详见：[AI 集成设计](ai-integration.md)。
 
@@ -211,8 +213,8 @@ atomui city tests check --json
 
 规则：
 
-- `docs check` 检查文档先行、模块文档、链接、测试矩阵。
-- `tests check` 检查功能点单元测试、释放断言和替代测试说明。
+- `docs check` 第一版只检查 AtomUI.City framework profile 中可确定验证的必要文档、链接、Feature identity、测试矩阵映射和禁用占位标记。
+- `tests check` 第一版只检查测试项目、Feature 引用的测试类型、Test Type 和专项测试静态证据；不执行测试，也不声称自动证明释放、取消或异常断言充分。
 - 缺少文档或测试不自动修复，只输出诊断和建议动作。
 
 详细规则见：[文档和测试门禁命令设计](docs-and-tests-gates.md)。
@@ -250,7 +252,7 @@ atomui city plugin inspect com.company.sales --json
 
 规则：
 
-- install/update 支持 plan/apply。
+- plugin install/update 的 plan/apply 属于 PluginSystem 后续 Feature，不得复用或绕过第一版 `AUC-CLI-009` 的 generation-only adapter。
 - 不能覆盖运行中插件目录。
 - `UnloadPending` 时输出 pending 操作和原因。
 - CLI 不直接执行插件业务代码。
@@ -281,11 +283,13 @@ CLI 错误输出必须稳定。
 | command parsing | Unit | CliCommandTestHost | 参数、默认值、非法参数。 |
 | JSON output | Unit | CliOutputAssertions | schema、diagnostics、exit code。 |
 | plan/apply | Unit/Integration | CliPlanTestHost | dry-run、plan 文件、apply、rollback。 |
+| explain catalog | Unit/Contract | CliExplainTests | 全目录覆盖、唯一性、已知/未知 code、离线并发查询。 |
+| .NET Tool package | Build/Pack/PackageConsumer | CliToolPackageTests / package-consumer gate | pack、隔离安装、真实 `atomui` shim、成功/失败进程和清理。 |
 | generate commands | CLI/Template smoke | TemplateSmokeTestHost | module、page、plugin、test。 |
 | build commands | CLI/Build integration | BuildTestHost | build、pack、publish 透传 diagnostics。 |
 | plugin commands | CLI/Plugin integration | PluginTestHost | install、update、disable、UnloadPending。 |
-| docs check | Unit | DocsGateAssertions | 缺文档、缺测试矩阵。 |
-| tests check | Unit | TestsGateAssertions | 缺单测、缺释放断言。 |
+| docs check | Unit/Contract | CliGovernanceGateTests | 缺必要文档、断链、Feature identity、缺测试矩阵和禁用占位标记。 |
+| tests check | Unit/Contract | CliGovernanceGateTests | 缺测试项目/测试类型、Feature 映射冲突、非法 Test Type 和专项证据缺失。 |
 | non-interactive | Unit | CliCommandTestHost | 不 prompt、exit code 稳定。 |
 
 完整测试规则见：[诊断和测试设计](diagnostics-and-testing.md)。

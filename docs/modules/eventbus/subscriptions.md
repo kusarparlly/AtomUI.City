@@ -39,7 +39,7 @@
 
 | Feature ID | 相关能力 | 测试文件 |
 | --- | --- | --- |
-| AUC-EVENTBUS-002 | Subscription Ownership & Lifecycle | EventSubscriptionLifecycleTests |
+| AUC-EVENTBUS-002 | Subscription Ownership & Lifecycle | EventSubscriptionTests |
 | AUC-EVENTBUS-004 | Dispatch & Failure Policy | EventDispatchAndFailurePolicyTests |
 | AUC-EVENTBUS-006 | DI & Host Lifecycle | EventBusHostIntegrationTests |
 | AUC-EVENTBUS-008 | Generated Event Catalog & NativeAOT | EventBusGeneratorTests; EventBusNativeAotProcessTests |

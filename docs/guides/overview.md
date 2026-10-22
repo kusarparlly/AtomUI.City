@@ -42,7 +42,7 @@
 
 本指南中的模式来自三类持续验证资产：
 
-- [`docs/guides/core/samples`](core/samples/)：最小 CLI 与 Todo CLI；
+- [Core MVP fixture](../../fixtures/AtomUI.City.Core.Mvp/)：多模块 CLI 与组合验证；
 - [`AtomUI.City.CoreEventBus.DogfoodApp`](../../fixtures/AtomUI.City.CoreEventBus.DogfoodApp/README.md)：Core 与 EventBus 的组合验证；
 - [`AtomUI.City.Fixtures.DesktopDogfood`](../../fixtures/AtomUI.City.Fixtures.DesktopDogfood/README.md)：桌面端多模块、跨能力、并发和释放验证。
 

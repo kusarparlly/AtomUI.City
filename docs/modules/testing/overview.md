@@ -40,6 +40,10 @@
 
 Testing 可以创建可控 Host，但生产 Host 不得依赖 Testing 包。
 
+## 与 Data 的关系
+
+Data 定义连接、请求管线、凭据和传输的运行时合同；Testing 通过 `AUC-TESTING-010` 提供 Fake、Recording 和 Scripted 测试实现。依赖方向固定为 `Data contracts -> Testing implementations -> test project`，生产模块不得反向引用 Testing。
+
 ## 与 PluginSystem 的关系
 
 插件可以通过 manifest 或 Host 共享 contract 贡献本模块能力；所有插件来源对象必须绑定 plugin owner 并可撤销。

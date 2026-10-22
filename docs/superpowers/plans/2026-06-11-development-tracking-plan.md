@@ -36,9 +36,9 @@
 | 模块 | 完成 | 未完成 | 总数 | 当前状态 |
 | --- | ---: | ---: | ---: | --- |
 | Core | 7 | 0 | 7 | 已完成 |
-| Testing | 9 | 0 | 9 | 已完成 |
+| Testing | 10 | 0 | 10 | 已完成 |
 | Build | 8 | 0 | 8 | 已完成 |
-| Generators | 8 | 0 | 8 | 已完成 |
+| Generators | 10 | 0 | 10 | 已完成 |
 | Routing | 13 | 0 | 13 | 已完成 |
 | Presentation | 19 | 0 | 19 | 已完成 |
 | MVVM | 7 | 5 | 12 | 进行中 |
@@ -48,7 +48,7 @@
 | Data | 20 | 0 | 20 | 已完成 |
 | Localization | 8 | 0 | 8 | 已完成 |
 | Security | 9 | 0 | 9 | 已完成 |
-| CLI | 7 | 0 | 7 | 已完成 |
+| CLI | 7 | 4 | 11 | 进行中 |
 | Templates | 10 | 0 | 10 | 已完成 |
 | Release Gates | 10 | 0 | 10 | 已完成 |
 
@@ -73,6 +73,7 @@
 - [x] AUC-TESTING-007 Source Generation Kit。验收重点：generated source snapshot、diagnostics、references。
 - [x] AUC-TESTING-008 AOT Check。验收重点：反射扫描、dynamic code、trimming 风险诊断。
 - [x] AUC-TESTING-009 Test Layers。验收重点：Unit/Contract/Integration/Platform/Dogfood 分层标记。
+- [x] AUC-TESTING-010 Data Test Doubles。验收重点：Data connection/pipeline/credential/transport 的 FIFO 脚本、调用记录、失败映射和取消传播。
 
 文档一致性债务（2026-10-14）：`state-testing.md` 和 `detailed-design.md` 曾把 `StateTestStore`、状态记录器、computed/snapshot 断言及 `UseStateTesting` 写成现有能力，但它们没有 Feature ID、源码实现或 public API。文档已明确标记为目标设计；若决定交付，必须先建立新 Feature、API、失败行为和测试矩阵，不能仅凭旧设计段落宣称已实现。
 
@@ -97,6 +98,8 @@
 - [x] AUC-GENERATORS-006 Localization Manifest。验收重点：culture、resource、fallback、空 attribute 参数、未知 enum、重复 key 诊断和原子 registrar。
 - [x] AUC-GENERATORS-007 Presentation View Manifest。验收重点：ViewFor、constructor、registrar source 和诊断。
 - [x] AUC-GENERATORS-008 Diagnostics。验收重点：diagnostic id、severity、message args 和 source location。
+- [x] AUC-GENERATORS-009 EventBus Contract and Handler Manifest。验收重点：owner 与闭合共享对象图校验、contract/channel/handler 静态注册、跨程序集 generated manifest reachability、确定性输出和失败时整批阻断。
+- [x] AUC-GENERATORS-010 Data Client Descriptor Manifest。验收重点：client/operation 元数据、继承 operation、稳定 registrar/manifest、强类型 descriptor、非法签名和重复 id 诊断。
 
 ## Routing
 
@@ -238,6 +241,10 @@
 - [x] AUC-CLI-005 AI-Friendly Envelope。验收重点：schema、纯 JSON、artifact 列表、suggested commands、retryable 语义。
 - [x] AUC-CLI-006 Non-Interactive and CI Mode。验收重点：CI、non-interactive、stdin unavailable、需要确认时失败。
 - [x] AUC-CLI-007 Generation Commands。验收重点：真实生成、dry-run、冲突、取消、回滚和产物可构建。
+- [x] AUC-CLI-008 Repository Governance Gates（Completed）。第一版验证 AtomUI.City framework profile 中可确定检查的文档结构、链接、Feature/Test matrix 和静态测试证据；真实仓库正向门禁及失败/取消/只读测试已落地。
+- [x] AUC-CLI-009 Plan and Apply Transaction（Completed）。第一版包装五类非插件 generation、只创建 workspace 内 UTF-8 文本文件；严格 Plan 1.0、路径/哈希、独占锁、staging/journal、幂等重放、取消和 commit/rollback 终态均已实现。
+- [x] AUC-CLI-010 Diagnostic Explain Catalog（Completed）。CLI 产生或明确透传的诊断码已进入 immutable catalog，并覆盖 canonical code、已知/未知失败、建议/链接、并发只读和纯离线查询。
+- [x] AUC-CLI-011 .NET Tool Packaging and Distribution（Completed）。`AtomUI.City.Cli`/`atomui` 已通过 Release candidate pack、隔离本地源/cache/tool-path 安装和真实成功/失败进程验收。
 
 ## Templates
 

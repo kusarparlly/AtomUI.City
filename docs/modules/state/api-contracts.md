@@ -43,6 +43,7 @@
 | StateCollectionSnapshotEntry<TKey,TItem> constructor / init | 创建集合快照条目并保护 init 边界。 | key 不得为 null；itemVersion 必须大于等于 0。 | StateCollectionSnapshotEntry<TKey,TItem>。 | key 为 null 抛 `ArgumentNullException`；itemVersion 小于 0 抛 `ArgumentOutOfRangeException`。 | 无。 | record init 属性不得绕过集合快照条目边界。 |
 | StateCollectionChange<TKey,TItem> constructor / init | 创建集合变更记录并保护 init 边界。 | kind 必须为已定义枚举；key 不得为 null；collectionVersion/itemVersion 必须大于等于 0。 | StateCollectionChange<TKey,TItem>。 | 未知 kind、负 collectionVersion 或负 itemVersion 抛 `ArgumentOutOfRangeException`；key 为 null 抛 `ArgumentNullException`。 | 无。 | record init 属性不得绕过集合变更边界。 |
 | StateCollectionChangedEventArgs<TKey,TItem> constructor | 创建集合变更事件参数。 | change 不得为 null；changes 不得为 null、空列表或包含 null 项。 | StateCollectionChangedEventArgs<TKey,TItem>。 | single change 为 null 抛 `ArgumentNullException`；changes 为 null 抛 `ArgumentNullException`；空列表或包含 null 项抛 `ArgumentException`。 | 无。 | `Version` 取最后一条 change 的 collection version；changes 创建后不可变。 |
+| StateCollectionObservation<TKey,TItem> | 表达 `IStateCollection.Observe` 的初始快照或后续变更。 | 仅由 collection 内部工厂创建；TKey 必须 `notnull`。 | `IsInitial`、`Version`、nullable `Snapshot` 和只读 `Changes`。 | 初始通知固定携带 Snapshot 和空 Changes；变更通知固定携带 null Snapshot 和非空变更批；调用方不能构造矛盾状态。 | 无。 | immutable observation；注册边界保证初始通知恰好一次，后续按 collection version FIFO。 |
 | WritableState<T> constructor | 创建单值状态。 | initialValue；comparer、diagnostics、stateName 和 access 可选。 | WritableState<T>。 | 未知 access 抛 `ArgumentOutOfRangeException`；空 stateName 使用 value type name 作为诊断名称。 | 无。 | access policy 固定在实例生命周期内；ApplicationStateRegistry 必须把 StateDefinition access 传入 WritableState。 |
 
 ## Public 类型覆盖
@@ -73,6 +74,7 @@
 | `StateCollectionChange<TKey, TItem>` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `StateCollectionChangeKind` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `StateCollectionChangedEventArgs<TKey, TItem>` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `StateCollectionObservation<TKey, TItem>` | 关键 observation contract | IsInitial、Snapshot/Changes 互斥关系、Version 或初始/后续交付语义变化必须更新本文档和 compatibility。 |
 | `StateCollectionSnapshot<TKey, TItem>` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `StateCollectionSnapshotEntry<TKey, TItem>` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `StateDefinition` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |

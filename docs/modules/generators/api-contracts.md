@@ -11,8 +11,10 @@
 | API Family | 关键类型 | 职责 | 硬性行为 |
 | --- | --- | --- | --- |
 | Tooling Entry | AtomUICityIncrementalGenerator, BuildServiceProviderUsageAnalyzer | Roslyn incremental generator 与 analyzer 激活入口。 | 必须能从 analyzer 包发现并实例化；不引用运行时包；不构成第三方扩展 SDK。 |
-| Metadata Readers | ModuleMetadataReader, ServiceRegistrationMetadataReader, RouteMetadataReader, PluginMetadataReader, LocalizationMetadataReader, PresentationViewMetadataReader | 从 syntax/semantic model 读取声明。 | reader 不做业务生成；非法声明输出 diagnostic metadata；`LocalizationMetadata.Diagnostics` 保存 attribute 读取阶段错误。 |
+| Metadata Readers | ModuleMetadataReader, ServiceRegistrationMetadataReader, RouteMetadataReader, PluginMetadataReader, LocalizationMetadataReader, PresentationViewMetadataReader, EventMetadataReader, DataClientMetadataReader | 从 syntax/semantic model 读取声明。 | reader 不做运行时业务；非法声明输出 diagnostic metadata；`LocalizationMetadata.Diagnostics` 保存 attribute 读取阶段错误；EventBus/Data metadata 只能由主 incremental pipeline 发布。 |
 | Manifest Builders | ModuleDependencyGraphBuilder, ServiceRegistrationManifestBuilder, RouteManifestBuilder, PluginManifestBuilder, LocalizationManifestBuilder, PresentationViewManifestBuilder | 校验 metadata 并生成 manifest result。 | result 不可变；排序确定；失败不生成不完整 success manifest。 |
+| EventBus Generation Pipeline | EventMetadataReader, EventGenerationManifest, ServiceRegistrarSourceBuilder | 校验事件 contract、channel、handler 与 owner 并把静态注册语句合入 service registrar。 | 非法事件声明阻断该批 registrar；跨程序集 contract 必须具备可达 generated manifest；不得用运行时扫描补缺。 |
+| Data Generation Pipeline | DataClientMetadataReader, DataClientGenerationMetadata, DataClientRegistrarSourceBuilder | 校验 Data client/operation 并生成 descriptor registrar。 | 非法 client 或重复 id 阻断该 compilation 的 Data registrar；继承 operation 与 policy metadata 必须确定性保留。 |
 | Source Builders | ModuleRegistrarSourceBuilder, ServiceRegistrarSourceBuilder, DataClientRegistrarSourceBuilder, RouteSourceBuilder, LocalizationRegistrarSourceBuilder, PresentationViewRegistrarSourceBuilder | 生成 C# 注册和强类型入口代码。 | hint name 稳定；生成代码不依赖 runtime reflection；公开声明只能来自 reviewed visibility allowlist；Localization registrar 通过单次 `RegisterRange` 原子注册 manifest。 |
 | Diagnostics | GeneratorDiagnosticIds, GeneratorDiagnostics, GeneratorDiagnosticDefinition | 编译期诊断定义和创建。 | diagnostic id、severity、category 和 message args 稳定。 |
 
@@ -24,6 +26,7 @@
 | --- | --- | --- |
 | Module registrar 与 `Register` | `public` | 引用方程序集的 generated registrar 必须能够静态串联依赖程序集 registrar；应用代码不直接调用。 |
 | Service registrar 与 `Register` | `public` | 引用方程序集必须能够按 registrar type 聚合依赖程序集服务；应用代码不直接调用。 |
+| Service registrar 上的 `GeneratedEventManifestAttribute` 与 EventBus 注册语句 | registrar 保持 `public`；注册语句是实现体 | 引用程序集通过 manifest 静态确认 contract 可达性并串联 registrar；不新增供开发者调用的 EventBus generated API。 |
 | Data client registrar 与 `Register` | `public` | 应用或组合层通过 `RegisterGenerated<TRegistrar>` 显式装载声明程序集 descriptor。 |
 | 声明方 Route Map partial 类型和方法 | 保持用户声明的 `public` | Generator 只补齐用户定义的强类型 route API。 |
 | `GeneratedRoutingRouteManifest` | `public` | 应用或组合层显式取得 route descriptors/snapshot。 |
@@ -49,6 +52,9 @@
 | LocalizationMetadataReader.Read | 读取 assembly-level Localization attributes。 | Compilation。 | `LocalizationMetadata`，含 packages、resources 和 reader diagnostics。 | 空 package id/culture/resource key/package reference 产生 diagnostic metadata，不得静默丢弃声明；显式未知 enum 原值交由 manifest builder 拒绝。 | 由 CompilationProvider 控制。 | 无共享 mutable cache；有 reader diagnostic 时主 pipeline 不生成 Localization source。 |
 | LocalizationRegistrarSourceBuilder.Build | 生成 Localization manifest、key 和 registrar source。 | 成功的 LocalizationManifest。 | C# source text。 | failed manifest 不得调用；运行时任一注册冲突由生成入口抛 `InvalidOperationException`，Registry 保持整批未发布。 | 纯 CPU。 | source ordering 稳定；registrar 单次调用 `RegisterRange`。 |
 | PresentationViewRegistrarSourceBuilder.Build | 生成 view registrar source。 | PresentationViewManifest。 | Generated source text 和 hint name。 | manifest failed 时不得生成 registrar source。 | 纯 CPU。 | hint name 和 source ordering 稳定。 |
+| EventMetadataReader.Read | 读取事件 contract、channel 或 handler 声明。 | INamedTypeSymbol。 | EventGenerationCandidate 或 null。 | 非法 owner、schema、channel、handler 或共享对象图写入 candidate issues；主 pipeline 转换为 diagnostic 并阻断输出。 | 由 syntax provider 控制。 | 无共享 mutable cache；同一 symbol 产生稳定 metadata。 |
+| DataClientMetadataReader.TryRead | 读取 Data client 及其直接和继承 operation。 | INamedTypeSymbol。 | DataClientGenerationMetadata 或 null。 | 非法 client、operation 签名、返回形态或 policy 写入 issues；主 pipeline 转换为 diagnostic 并阻断输出。 | 由 syntax provider 控制。 | 无共享 mutable cache；operation 枚举与输出排序稳定。 |
+| DataClientRegistrarSourceBuilder.Build | 生成 Data manifest attribute、registrar 与 descriptor 注册代码。 | assembly name、已验证 client metadata。 | C# source text。 | 空 assembly name 或 null collection 拒绝；存在 validation issue 的 metadata 不得传入。 | 纯 CPU。 | registrar 名称含规范化 assembly name 与稳定 hash；client/operation 稳定排序。 |
 | GeneratorDiagnostics.CreateRoslynDiagnostic | 创建 Roslyn diagnostic。 | feature、generator diagnostic、location、message args。 | Diagnostic。 | 参数数量不匹配按 Roslyn Diagnostic 格式化规则稳定失败。 | 同步 API 无 token。 | diagnostic definition 不可变，可并发读取。 |
 
 ## Tooling Entry 与 Internal Pipeline 类型覆盖
@@ -124,6 +130,16 @@
 | `RouteManifestRoute` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
 | `RouteMapMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
 | `RouteMetadataReader` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `EventMetadataReader` | InternalContract | EventBus 输入规则可演进；generated manifest、diagnostic、排序或 reachability 行为变化必须更新本文档和 compatibility。 |
+| `EventGenerationCandidate` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `EventGenerationManifest` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `GeneratedEventContractMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `GeneratedEventChannelMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `GeneratedEventHandlerMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `DataClientMetadataReader` | InternalContract | Data 输入规则可演进；generated descriptor、diagnostic 或排序变化必须更新本文档和 compatibility。 |
+| `DataClientGenerationMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `DataOperationGenerationMetadata` | InternalContract | 实现可演进；外部可观察行为变化必须更新本文档和 compatibility。 |
+| `DataClientRegistrarSourceBuilder` | InternalContract | registrar type/hint name、manifest attribute、公开成员或 descriptor 排序变化必须更新本文档和 compatibility。 |
 
 ## Nullability 和参数规则
 

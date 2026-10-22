@@ -30,6 +30,8 @@
 | AUC-GENERATORS-006 | Generator | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationManifestBuilderTests; LocalizationMetadataReaderTests | 断言 culture、resource、fallback、稳定 key、单次 `RegisterRange` 原子 registrar 和重复 key 诊断。 | 空 attribute 参数、culture 非法、显式未知 enum、重复 key、resource 缺失输出 diagnostic 且不生成 Localization source。 | Implemented |
 | AUC-GENERATORS-007 | Generator | PresentationViewManifestBuilderTests; PresentationViewRegistrarSourceBuilderTests | 断言 ViewFor、constructor、registrar source 和诊断。 | 构造函数不明确、ViewModel 缺失、重复 mapping 输出 diagnostic。 | Implemented |
 | AUC-GENERATORS-008 | Generator | GeneratorDiagnosticTests | 断言 diagnostic id、severity、message args 和 source location。 | id 复用、severity 漂移、缺少 location 必须测试失败。 | Implemented |
+| AUC-GENERATORS-009 | Generator | EventBusGeneratorTests; GeneratedSourceVisibilityTests; GeneratorNamingTests | 断言 contract/channel/handler metadata、稳定 EventBus feature/hint naming、generated manifest、跨程序集 reachability、registrar 单次聚合、可编译输出与 public surface 白名单。 | 重复 contract id、非法 owner/policy/handler、缺失或未生成 manifest 的 contract、开放/外部/可变共享对象图必须输出 `AUCGEN005` 且阻断 EventBus registrar 内容。 | Implemented |
+| AUC-GENERATORS-010 | Generator | AtomUICityIncrementalGeneratorDataTests; GeneratedSourceVisibilityTests; GeneratorNamingTests | 断言强类型 Data descriptor、manifest attribute、稳定 registrar/hint naming、tuple、继承 operation、可编译输出与 public surface 白名单。 | 重复 client id、非法签名/policy/return、泛型容器和 Mutation cache 必须输出 `AUCGEN005` 且不生成 Data registrar。 | Implemented |
 
 ## 缺口处理
 

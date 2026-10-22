@@ -26,6 +26,8 @@
 - `EventSubscriptionState` 的稳定值为 `Created=0`、`Active=1`、`Quiescing=2`、`Draining=3`、`Disposed=4`、`Faulted=5`；timeout 不形成独立永久状态。
 - `IEventContractRegistry` 的 shared-only 配置期注册、Default ALC 身份校验、冻结快照、精确 id/type 查询、重复 contract id/type 拒绝，以及冻结后未知 contract 拒绝进入 1.0 兼容承诺；DI 创建 EventBus 前必须汇入 collected descriptors、冻结并核验映射。
 - `EventContractAttribute`、`EventChannelAttribute`、`EventHandlerAttribute`、`GeneratedEventManifestAttribute.CurrentVersion`、`GeneratedEventHandlerDescriptor`，以及 `EventContractDescriptor.SchemaVersion/SchemaFingerprint` 进入 1.0 兼容边界。修改 attribute 构造参数或默认值、generated registrar 形状、manifest version 或 fingerprint canonicalization 都属于显式 schema 变更。
+- `EventPayloadDiagnosticProjectorDescriptor`、`EventPluginAccessRule` 和 `ThreadPoolEventBackgroundScheduler` 是 Preview public support types；投影擦除、access/schema range 和 ExecutionContext 抑制语义变化必须同步 API 合同与测试。
+- `AtomUI.City.Generated.GeneratedModularityModuleRegistrar_*` 的 public visibility 只用于跨程序集 generated catalog 装载，不授予开发者手工调用合同；稳定的是 registrar identity/manifest 协议和每程序集唯一聚合规则，而不是允许业务源码引用生成类名。
 - generated handler 的 `TEvent` 必须通过本地/引用 generated catalog 编译期门禁；实际选中 Module 的 handler/contract 闭包必须在 Host Build 阶段成立。把上述失败延迟到 Host Start 或放宽为仅检查 CLR type/attribute 属于兼容性和安全边界变化。
 - `PluginPrivate` descriptor 只接受 collectible non-default ALC 类型且不能进入 Shared Registry；`EventBus.EventContractRejected` 及其 `eventType`、`channel`、`operation` context 进入 1.0 兼容承诺。
 - 插件可访问的 Shared contract 必须来自 generated closed-object-graph proof；白名单由稳定 scalar、contract-local enum/immutable DTO 及递归安全的 `Nullable<T>`、`ImmutableArray<T>`、`KeyValuePair<TKey,TValue>` 构成。扩大或收紧白名单、改变 proof 生成规则或允许手工 descriptor 获得插件 capability 属于兼容性变更。

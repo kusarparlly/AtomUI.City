@@ -67,14 +67,14 @@
 | Breaking Change Rules | 删除入口、修改默认 options 或改变异常类型属于 breaking change。 |
 | Tests | `ApplicationHostBuilderTests` 断言 builder 独立、默认 options、非法参数。 |
 
-### `ApplicationHostBuilder`
+### internal `ApplicationHostBuilder`
 
 | Field | Contract |
 | --- | --- |
 | Type | `ApplicationHostBuilder` |
 | Namespace | `AtomUI.City.Core.Hosting` |
 | Assembly | `AtomUI.City.Core` |
-| Stability | Preview |
+| Stability | Internal implementation；不属于 public compatibility surface |
 | Feature | AUC-CORE-001 |
 | Purpose | 收集 options、services、modules、configuration 和 lifecycle middleware，并构建 Host。 |
 | Owner | Application startup caller |
@@ -89,10 +89,10 @@
 | Diagnostics | Build 成功写 `AUCHOST001`；Build 失败写结构化失败诊断；每个回滚清理异常写 `AUCHOST109`，Module Dispose 同时写 `AUCHOST106`。 |
 | Plugin Boundary | 插件不能写 Host root builder；插件模块只能通过 PluginSystem 贡献。 |
 | AOT / Trimming | 默认只消费显式注册或 generated manifest，不把运行时扫描作为唯一路径。 |
-| Breaking Change Rules | 修改冻结时机、默认 services、module graph 规则或 Build 失败策略属于 breaking change。 |
+| Breaking Change Rules | 类型名和具体实现不是 public 承诺；通过 `IApplicationHostBuilder` 可观察的冻结时机、默认 services、module graph 规则或 Build 失败策略仍属于 breaking change。 |
 | Tests | `ApplicationHostBuilderTests` 断言冻结、重复 Build、无效 options、诊断上下文。 |
 
-`ApplicationHostBuilder` 和 `IApplicationHostBuilder` 不公开可变 `IServiceCollection`。Root DI 的应用级配置只能通过 `ConfigureServices` 登记；Build 内部和模块上下文持有的 service collection 不得泄漏为长期可写引用。
+开发者通过 public `IApplicationHostBuilder` 使用构建能力；internal `ApplicationHostBuilder` 是默认实现。两者均不公开可变 `IServiceCollection`。Root DI 的应用级配置只能通过 `ConfigureServices` 登记；Build 内部和模块上下文持有的 service collection 不得泄漏为长期可写引用。
 
 ### `IApplicationHost`
 
@@ -107,10 +107,12 @@
 | Owner | Application root owner |
 | Created By | `ApplicationHostBuilder.Build`。 |
 | Lifetime | Created -> Starting -> Running -> Stopping -> Stopped -> Disposed；失败进入 Faulted 后必须可 Stop/Dispose。 |
+| `HostScope` | 类型为非空 `LifecycleScope`；由 `Build()` 创建，是 Host 生命周期树根。Host 独占 Stop/Dispose 所有权，调用方不得主动终止。 |
+| `ApplicationScope` | 类型为 `LifecycleScope?`；在 Created、Stop-before-Start 和启动事务尚未创建它时为 null。创建后与 Module initialization context 中的实例相同；停止或释放后可以继续返回该实例，其 `State` 而非非空性表示最终状态。 |
 | DI Lifetime | Root object；不作为普通 scoped service 创建。 |
 | Thread Safety | lifecycle transaction Task 在 lock 内先发布、在 lock 外执行；`StartAsync` 并发调用必须串行或拒绝；`StopAsync` 并发调用合并为同一停止事务；查询上下文可并发读取。 |
 | Disposal | `Dispose` 和 `DisposeAsync` 幂等；Dispose 后 mutating API 失败，immutable context 可读取。 |
-| Nullability | `CancellationToken` 可为默认值；返回值不得为空。 |
+| Nullability | `CancellationToken` 可为默认值；`Services`、`Context`、`HostScope` 和返回 Task 不得为空；`ApplicationScope` 按上述生命周期明确允许为空。 |
 | Cancellation | `StartAsync(cancellationToken)` 的首次调用令牌驱动启动事务；middleware 和 terminal 只接收框架合成后的单一有效令牌。`StopAsync(waitCancellationToken)` 的令牌只影响当前等待，不跳过最小清理。 |
 | Failure Behavior | middleware、module initialization 或 shutdown 失败进入 diagnostics；Start 回滚成功时原样抛出主异常，回滚失败时完成全部最低清理后抛出以主异常为第一项的有序 `AggregateException`；启动取消且回滚失败时任务为 Faulted 聚合而不是 Canceled；Host 状态必须稳定；进入 Stopped 后再次 Start，以及同一 Host lifecycle 调用链中的 Start/Stop/Dispose 公共 API 重入，抛 `InvalidOperationException`。 |
 | Diagnostics | Start/Stop 写 `AUCHOST002`、`AUCHOST003` 和失败诊断。 |
@@ -146,6 +148,30 @@
 
 公开字段固定为：`ApplicationId`、`ApplicationInstanceId`、`ApplicationName`、`ApplicationVersion`、`EnvironmentName`、`ContentRootPath`、`AppDataPath`、`StartupArguments`。Context 不得暴露 `Configuration`、`Services`、Scope、Diagnostics、Host state 或 `Properties`。
 
+### `ApplicationHostBuilderDiagnosticsExtensions`
+
+| Field | Contract |
+| --- | --- |
+| Type | `ApplicationHostBuilderDiagnosticsExtensions` |
+| Namespace / Assembly | `AtomUI.City.Core.Diagnostics` / `AtomUI.City.Core` |
+| Stability / Feature | Preview / AUC-CORE-006 |
+| Purpose | 通过 `GetBuildDiagnostics(IApplicationHostBuilder)` 暴露与该 builder 绑定的构建期 diagnostics，而不公开默认 builder 实现。 |
+| Ownership / Lifetime | 每个 builder 唯一实例；由 Core 的弱引用 store 持有，builder 不再可达后可回收。 |
+| Threading / Failure | diagnostics 自身遵循 `IHostDiagnostics` 并发合同；builder 为 null 抛 `ArgumentNullException`；不得创建第二套 Host diagnostics。 |
+| Compatibility / Tests | 扩展方法名称、返回接口和 builder 绑定语义属于 Preview public contract；由 `HostDiagnosticsTests` 与 builder tests 覆盖。 |
+
+### `ApplicationHostBuilderLifecycleExtensions`
+
+| Field | Contract |
+| --- | --- |
+| Type | `ApplicationHostBuilderLifecycleExtensions` |
+| Namespace / Assembly | `AtomUI.City.Core.Lifecycle` / `AtomUI.City.Core` |
+| Stability / Feature | Preview / AUC-CORE-002 |
+| Purpose | 通过 `ConfigureLifecycle(IApplicationHostBuilder, Action<LifecyclePipelineBuilder>)` 在 Build 前登记 lifecycle pipeline 配置。 |
+| Ownership / Lifetime | 配置与 builder 一一绑定；Build 时冻结并按登记顺序形成不可变 pipeline。 |
+| Threading / Failure | 配置阶段不保证并发写；builder/configure 为 null 使用标准参数异常；Build 后登记由 builder 冻结合同拒绝。 |
+| Compatibility / Tests | 方法签名、登记顺序和冻结语义属于 Preview public contract；由 `LifecycleMiddlewarePipelineTests` 与 builder freeze tests 覆盖。 |
+
 ### `LifecyclePipeline`
 
 | Field | Contract |
@@ -170,6 +196,20 @@
 | AOT / Trimming | middleware 来源优先显式注册或 generated manifest。 |
 | Breaking Change Rules | 修改 stage 顺序、同 stage 排序、异常聚合或取消语义属于 breaking change。 |
 | Tests | `LifecycleMiddlewarePipelineTests` 断言 stage 顺序、同 stage 顺序、直接返回/正常 await、fire-and-forget 收拢拒绝、过期调用、并发单所有权、异常和取消路径。 |
+
+### `LifecycleNext`
+
+| Field | Contract |
+| --- | --- |
+| Type | `LifecycleNext` (`public delegate ValueTask LifecycleNext()`) |
+| Namespace / Assembly | `AtomUI.City.Core.Lifecycle` / `AtomUI.City.Core` |
+| Stability / Feature | Preview / AUC-CORE-002 |
+| Purpose | 把当前 lifecycle middleware 与同一执行事务中的下游 continuation 连接起来。 |
+| Ownership / Lifetime | 每次 middleware invocation 获得一个独立 delegate；只能在该 invocation 未完成时调用一次。不得缓存、逃逸或在事务结束后调用。 |
+| Threading | 单次调用权通过原子状态保护；并发调用最多一个进入下游，其余稳定失败。 |
+| Cancellation | 不自行携带第二个 token；下游继续使用 pipeline 传入 middleware 的显式 token。 |
+| Failure Behavior | 重复调用或事务完成后调用返回 faulted `ValueTask`，抛 `InvalidOperationException`；fire-and-forget 调用会被 pipeline 收拢并以合同失败报告。 |
+| Compatibility / Tests | delegate 签名、单调用所有权和过期行为属于 Preview public contract；`LifecycleMiddlewarePipelineTests` 覆盖正常 await、直接 return、重复、并发和逃逸。 |
 
 ### `LifecycleScope`
 
@@ -728,10 +768,10 @@ Diagnostics: Build 前不写诊断。
 Tests: ApplicationHostBuilderTests。
 ```
 
-### `ApplicationHostBuilder.ConfigureServices`
+### `IApplicationHostBuilder.ConfigureServices`
 
 ```text
-Method: ApplicationHostBuilder.ConfigureServices
+Method: IApplicationHostBuilder.ConfigureServices
 Feature: AUC-CORE-001
 Purpose: 在 Build 前登记应用级最终服务配置。
 Parameters: configureServices 不能为 null。
@@ -746,10 +786,10 @@ Diagnostics: delegate 导致 Build 失败时，失败诊断的 stage 为 UserSer
 Tests: ApplicationHostBuilderTests。
 ```
 
-### `ApplicationHostBuilder.ConfigureHost`
+### `IApplicationHostBuilder.ConfigureHost`
 
 ```text
-Method: ApplicationHostBuilder.ConfigureHost
+Method: IApplicationHostBuilder.ConfigureHost
 Feature: AUC-CORE-001
 Purpose: 在 Build 前注册 host options 修改。
 Parameters: configureOptions 不能为 null。
@@ -782,10 +822,10 @@ Diagnostics: 配置或容器构建失败沿用 HostBuildFailed，stage 为 Servi
 Tests: ApplicationHostBuilderTests。
 ```
 
-### `ApplicationHostBuilder.Build`
+### `IApplicationHostBuilder.Build`
 
 ```text
-Method: ApplicationHostBuilder.Build
+Method: IApplicationHostBuilder.Build
 Feature: AUC-CORE-001
 Purpose: 冻结 builder，配置 modules，构建 root provider，并创建 Host。
 Parameters: 无。
@@ -986,7 +1026,10 @@ Tests: ApplicationHostModuleLifecycleTests。
 | `IApplicationContext` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `IApplicationHost` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `IApplicationHostBuilder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `ApplicationHostBuilderDiagnosticsExtensions` | 支持类型 | GetBuildDiagnostics 的返回接口、每 builder 所有权或 diagnostics 绑定语义变化必须更新本文档和 compatibility。 |
+| `ApplicationHostBuilderLifecycleExtensions` | 支持类型 | ConfigureLifecycle 的登记顺序、冻结或失败行为变化必须更新本文档和 compatibility。 |
 | `LifecycleContext` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `LifecycleNext` | 关键 delegate | 签名、单调用权、逃逸或过期行为变化必须更新本文档和 compatibility。 |
 | `LifecyclePipeline` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `LifecyclePipelineBuilder` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `LifecycleScope` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |

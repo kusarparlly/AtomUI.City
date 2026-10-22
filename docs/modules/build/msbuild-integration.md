@@ -108,17 +108,21 @@ tools/
 
 | 属性 | 默认值 | 说明 |
 |---|---|---|
-| `AtomUICityOutputRoot` | `output` | 框架输出根目录。 |
+| `AtomUICityOutputRoot` | `$(MSBuildProjectDirectory)/output` | 框架输出根目录。 |
 | `AtomUICityGenerateManifests` | `true` | 是否生成 manifest。 |
 | `AtomUICityValidateManifests` | `true` | 是否校验 manifest。 |
+| `AtomUICityManifestIntermediateOutputPath` | `$(IntermediateOutputPath)AtomUI.City/manifests/` | manifest 中间输出目录。 |
 | `AtomUICityEnableAnalyzers` | `true` | 是否启用 analyzer。 |
 | `AtomUICitySourceGenerationMode` | `Strict` | `Strict`、`Compatible`、`Off`。 |
 | `AtomUICityStrictAot` | `false` | 是否启用严格 AOT 检查。 |
 | `AtomUICityPackagePlugin` | `false` | 是否打包插件。 |
 | `AtomUICityPackageApplication` | `false` | 是否打包应用。 |
-| `AtomUICityPluginProfile` | 空 | 插件兼容 profile。 |
 | `AtomUICityBuildDiagnosticsLevel` | `Normal` | 诊断详细程度。 |
-| `AtomUICityApplicationId` | `AssemblyName` | application manifest 稳定身份。 |
+| `AtomUICityBuildDiagnosticsOutputPath` | `$(IntermediateOutputPath)AtomUI.City/diagnostics/` | 构建诊断输出目录。 |
+| `AtomUICityBuildIntegrationLoaded` | `true` | 供项目评估和工具确认 City buildTransitive 已加载；不作为用户功能开关。 |
+| `AtomUICityApplicationId` | `$(AssemblyName)` | application manifest 稳定身份。 |
+| `AtomUICityApplicationPublishOutputPath` | `$(AtomUICityOutputRoot)/publish/apps/$(AtomUICityApplicationId)/$(Configuration)/$(TargetFramework)$(_AtomUICityApplicationRidSegment)` | 应用发布输出目录；RID segment 由 Build 内部计算。 |
+| `AtomUICityApplicationManifestOutputPath` | `$(AtomUICityApplicationPublishOutputPath)/atomui-city/application.manifest.json` | application manifest 输出路径。 |
 | `AtomUICityCompileResx` | `true` | 是否把约定目录中的 RESX 编译为 City locpack。 |
 | `AtomUICityLocalizationIntermediateOutputPath` | `$(MSBuildProjectExtensionsPath)AtomUI.City/localization/$(Configuration)/$(TargetFramework)/` | 生成 locpack 与 attribute source 的配置/目标框架隔离中间目录。 |
 
@@ -126,21 +130,31 @@ tools/
 
 ### 4. 插件属性
 
-插件属性沿用 PluginSystem 设计：
+插件属性属于 Build 包当前公开的 MSBuild Preview 合同；PluginSystem 本身尚未完成不改变这些属性在 machine-readable contract 中的事实状态：
 
-- `AtomUICityPlugin`
-- `AtomUICityPluginId`
-- `AtomUICityPluginVersion`
-- `AtomUICityPluginPublisher`
-- `AtomUICityPluginDisplayNameKey`
-- `AtomUICityPluginDescriptionKey`
-- `AtomUICityMinHostVersion`
-- `AtomUICityMaxHostVersion`
-- `AtomUICityPluginApiVersion`
-- `AtomUICityPluginUnloadable`
-- `AtomUICityPluginNativeAotCompatible`
-- `AtomUICityPluginResourceMode`
-- `AtomUICityPackageAsPlugin`
+| 属性 | 默认值 |
+|---|---|
+| `AtomUICityPlugin` | 未设置 |
+| `AtomUICityPluginId` | 未设置 |
+| `AtomUICityPluginVersion` | `$(Version)` |
+| `AtomUICityPluginPublisher` | 未设置 |
+| `AtomUICityPluginDisplayNameKey` | `$(AtomUICityPluginId)` |
+| `AtomUICityPluginDescriptionKey` | 未设置 |
+| `AtomUICityMinHostVersion` | 未设置 |
+| `AtomUICityMaxHostVersion` | 未设置 |
+| `AtomUICityPluginApiVersion` | `1.0` |
+| `AtomUICityPluginProfile` | `$(AtomUICityPluginApiVersion)-stable` |
+| `AtomUICityPluginUnloadable` | `true` |
+| `AtomUICityPluginNativeAotCompatible` | `false` |
+| `AtomUICityPluginResourceMode` | `Both` |
+| `AtomUICityPackageAsPlugin` | 未设置 |
+| `AtomUICityPluginGenerateManifest` | `true` |
+| `AtomUICityPluginValidateManifest` | `true` |
+| `AtomUICityPluginDevelopmentMode` | `false` |
+| `AtomUICityPluginManifestOutputPath` | `$(IntermediateOutputPath)AtomUI.City/plugin/atomui-city/plugin.json` |
+| `AtomUICityPluginContractOutputPath` | `$(IntermediateOutputPath)AtomUI.City/plugin/atomui-city/manifests/contracts.json` |
+| `AtomUICityPluginPackageOutputPath` | `$(AtomUICityOutputRoot)/packages/plugins` |
+| `AtomUICityPluginDevelopmentCachePath` | `$(AtomUICityOutputRoot)/development/plugins` |
 
 属性名使用 `AtomUICity` 前缀是为了避免和普通 MSBuild 属性冲突。
 
@@ -164,14 +178,18 @@ tools/
 | Target | 说明 |
 |---|---|
 | `GenerateAtomUICityManifests` | 生成模块和应用级 manifest。 |
+| `GenerateAtomUICityContributionManifests` | 生成 contribution manifest。 |
 | `ValidateAtomUICityManifests` | 校验 manifest。 |
 | `GenerateAtomUICityPluginManifest` | 生成插件 `plugin.json`。 |
+| `ValidateAtomUICityPluginManifest` | 校验插件 manifest。 |
 | `ValidateAtomUICityPluginPackage` | 校验插件包布局。 |
 | `PackAtomUICityPlugin` | 生成插件 NuGet 包。 |
+| `InstallAtomUICityPluginToLocalCache` | 把开发插件安装到本地开发缓存。 |
 | `PublishAtomUICityApplication` | 发布应用。 |
 | `ValidateAtomUICityAotCompatibility` | AOT/trimming 兼容检查。 |
 | `WriteAtomUICityBuildDiagnostics` | 写入构建诊断。 |
 | `CleanAtomUICityOutput` | 清理框架输出。 |
+| `CleanAtomUICityPluginArtifacts` | 清理插件中间产物与包产物。 |
 | `CompileAtomUICityResx` | 在资源分流前把 RESX 编译为 embedded locpack 与 generated attribute source。 |
 
 ### 7. Target 顺序

@@ -15,6 +15,8 @@ Breaking changes include:
 - DI lifetime changes: Registry singleton, Router/NavigationScope scoped;
 - changing Routing to reference Presentation or Avalonia.
 
+下列此前仅以类型族概括的公开面现已建立精确 Preview API 卡，并纳入相同 breaking-change 规则：Route Map/definition/behavior/parameter attributes；`NavigationMode`、`NavigationHistoryBehavior`、`NavigationConcurrencyPolicy`、`NavigationError`；match/template enum；guard/match/resolver contexts and results；route middleware interface/context/delegate；`RoutingServiceCollectionExtensions`。改变 AttributeUsage、构造参数、默认 `primary` outlet、Generator 接纳规则、enum 语义、next 所有权、DI lifetime 或重复注册聚合行为都必须先完成兼容性 review。
+
 ## Generated Output
 
 Generation is deterministic, uses LF line endings and is AOT-oriented. Static route discovery is compile-time only. A route map must be a non-generic top-level public static partial class; route methods must be non-generic public static partial parameterless definitions without handwritten implementations, with exactly one definition attribute and the required return type. Generated ViewModel and behavior references must be closed types.

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="../AtomUI.City.Build/AtomUI.City.Build.csproj" />
+    <!-- PackAsTool embeds direct project outputs; keep Core explicit because PluginSystem depends on it at runtime. -->
     <ProjectReference Include="../AtomUI.City.Core/AtomUI.City.Core.csproj" />
     <ProjectReference Include="../AtomUI.City.PluginSystem/AtomUI.City.PluginSystem.csproj" />
     <ProjectReference Include="../AtomUI.City.Templates/AtomUI.City.Templates.csproj" />
@@ -10,6 +10,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>$(AtomUICityDevelopTargetFramework)</TargetFramework>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>atomui</ToolCommandName>
   </PropertyGroup>
 
 </Project>

@@ -4,7 +4,7 @@
 
 ## Feature 索引
 
-| ID | Feature | 状态 | 主要证据 |
+| Feature ID | Feature | 状态 | 主要证据 |
 | --- | --- | --- | --- |
 | AUC-PRESENTATION-001 | Avalonia UI Dispatcher Bridge | Release Verified | AvaloniaUiDispatcherTests, platform tests |
 | AUC-PRESENTATION-002 | Exact View Registry and Locator | Release Verified | ViewLocatorTests, generator tests |

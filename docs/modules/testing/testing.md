@@ -29,6 +29,7 @@
 | AUC-TESTING-007 | Unit | SourceGenerationTestKitTests | 断言 generated source snapshot、diagnostics、references。 | 编译失败、输出变化、diagnostic 缺失可断言。 | Required |
 | AUC-TESTING-008 | Unit | AotCompatibilityCheckTests | 断言反射扫描、dynamic code、trimming 风险诊断。 | 禁止模式未识别或误报必须测试。 | Required |
 | AUC-TESTING-009 | Unit | TestLayerTests | 断言 Unit/Contract/Integration/Platform/Dogfood 分层标记。 | 测试缺少 layer 或 layer 非法时门禁失败。 | Required |
+| AUC-TESTING-010 | Unit / Contract | DataTestDoublesTests | 断言 FIFO 响应、invocation/credential/handler records、连接 lifecycle/count 和 Data result 映射。 | 空脚本、取消、委托异常、非法 owner/kind、响应类型不匹配。 | Implemented；failure-path 扩展仍为持续门禁 |
 
 ## 缺口处理
 

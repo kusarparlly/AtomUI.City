@@ -15,6 +15,7 @@
 | AUC-TESTING-007 | Source Generation Kit | Implemented | SourceGenerationTestCase, GeneratedSourceSnapshot | SourceGenerationTestKitTests |
 | AUC-TESTING-008 | AOT Check | Implemented | AotCompatibilityCheck, AotCompatibilityDiagnostic | AotCompatibilityCheckTests |
 | AUC-TESTING-009 | Test Layers | Implemented | TestLayerAttribute, TestLayerNames | TestLayerTests |
+| AUC-TESTING-010 | Data Test Doubles | Implemented | FakeDataConnection, RecordedDataRequest, RecordingDataRequestHandler, ScriptedDataCredentialProvider, ScriptedDataInvocation, ScriptedDataResponse, ScriptedDataTransport | DataTestDoublesTests |
 
 ## Feature 硬门禁
 
@@ -157,3 +158,17 @@ Diagnostics: diagnostic 必须包含 test type 和 expected layer。
 Tests: `TestLayerTests`
 Required Assertions: 断言 Unit/Contract/Integration/Platform/Dogfood 分层标记。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+
+## AUC-TESTING-010 Data Test Doubles
+
+Feature ID: `AUC-TESTING-010`
+Status: Implemented
+Goal: 为 Data 连接、请求管线、凭据获取和传输提供无需真实网络、凭据服务或长连接的确定性测试替身。
+Public Contract: FakeDataConnection, RecordedDataRequest, RecordingDataRequestHandler, ScriptedDataCredentialProvider, ScriptedDataInvocation, ScriptedDataResponse, ScriptedDataTransport
+Runtime / Build Behavior: Data 定义运行时接口和结果模型，Testing 实现测试专用 fake/recorder/scripted queue；响应和凭据按 FIFO 消费，并通过只读快照暴露调用记录。
+Failure Behavior: 空脚本返回明确的 unavailable/failed 结果；响应类型不匹配返回 serialization failure；委托异常和取消原样传播；非法 connection owner 和未知 transport kind 在构造边界被拒绝。
+Threading / Cancellation: 脚本队列与记录队列支持并发入队和快照读取；传入 token 在委托边界前后被观察。`FakeDataConnection` 用于由单个测试所有者驱动的确定性生命周期，不承诺模拟生产连接的并发生命周期事务。
+Diagnostics: 不写入生产 Host diagnostics；通过 state、count、request/invocation/handler records 和 `DataResult` 暴露可断言证据。
+Tests: `DataTestDoublesTests`
+Required Assertions: 断言响应顺序、请求/凭据/handler 记录、连接计数与幂等停止，并覆盖空脚本、取消、委托异常和响应类型不匹配。
+Acceptance Criteria: 生产项目不引用 Testing；测试替身准确实现 Data public contract，所有排队、记录、失败与取消行为均可确定性断言。

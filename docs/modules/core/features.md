@@ -6,7 +6,7 @@
 
 | Feature ID | 名称 | 状态 | 公开合同 | 主测试 |
 | --- | --- | --- | --- | --- |
-| AUC-CORE-001 | Application Host Builder | Verified | ApplicationHostBuilder, ApplicationHostOptions, IApplicationHostBuilder, IApplicationContext | ApplicationHostBuilderTests; ApplicationHostRuntimeTests; ApplicationHostIndustrialLifecycleTests |
+| AUC-CORE-001 | Application Host Builder | Verified | ApplicationHost, ApplicationHostOptions, IApplicationHostBuilder, IApplicationHost, IApplicationContext；internal implementation: ApplicationHostBuilder | ApplicationHostBuilderTests; ApplicationHostRuntimeTests; ApplicationHostIndustrialLifecycleTests |
 | AUC-CORE-002 | Lifecycle Pipeline | Verified | LifecyclePipeline, LifecyclePipelineBuilder, LifecycleStage | ApplicationHostRuntimeTests; LifecycleMiddlewarePipelineTests; ApplicationHostIndustrialLifecycleTests; CoreHeadlessProcessTests |
 | AUC-CORE-003 | Lifecycle Scope Tree | Verified | LifecycleScope, LifecycleScopeKind, LifecycleScopeState | LifecycleScopeTreeTests |
 | AUC-CORE-004 | Module Contract | Verified | ModuleBase, IModule, ModuleDescriptor, ModuleOrigin, DependsOnAttribute, ServiceConfigurationContext | ModuleBaseTests; ModuleDescriptorTests; ApplicationHostModuleLifecycleTests; ApplicationHostIndustrialLifecycleTests |
@@ -40,7 +40,8 @@ Feature ID: `AUC-CORE-001`
 Status: Verified
 Default ServiceProvider 配置：应用可以通过 `UseDefaultServiceProvider` 注册有序的 `ServiceProviderOptions` 回调。回调随 Builder 一起冻结，并在 `HostApplicationBuilder.Build` 前应用到由 Generic Host 持有的唯一 `DefaultServiceProviderFactory`；未使用该 API 时保持 Generic Host 默认行为。
 Goal: 构建 Host、冻结注册入口、创建不可变应用实例描述符。
-Public Contract: ApplicationHostBuilder, ApplicationHostOptions, IApplicationHostBuilder, IApplicationContext
+Public Contract: ApplicationHost, ApplicationHostOptions, IApplicationHostBuilder, IApplicationHost, IApplicationContext
+Internal Contract: ApplicationHostBuilder（`ApplicationHost.CreateBuilder` 返回的默认实现，不属于 CLR public surface）
 Runtime / Build Behavior: 验证应用身份、版本和路径，构建 Host，递归冻结所有通过 Builder 逃逸的 Configuration mutation handle，并在 Build 阶段一次性创建 IApplicationContext。
 Failure Behavior: Build 成功或失败后继续注册、通过已捕获 section/child/root/provider 修改配置或主动 Reload 均失败；重复 Build 行为明确；缺失 ApplicationId、无法解析版本或非法 ApplicationName/路径时 Build 失败并写 AUCHOST101；回滚清理失败不阻止其他资源释放，原始 Build 异常与全部 cleanup failure 聚合返回并写 AUCHOST109；异步模块清理不得因调用线程的非 pumping `SynchronizationContext` 死锁。
 Threading / Cancellation: 遵守 [threading.md](threading.md)；Build 失败后的异步清理必须从默认线程池调度器启动并同步观察；涉及异步、IO、dispatcher、plugin、connection、process 或 generator 的操作必须显式处理 cancellation。

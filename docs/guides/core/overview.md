@@ -4,8 +4,8 @@
 
 Core 是 AtomUI.City 中处于代码冻结、被视为生产级（industrial-grade）的模块，因此这些指南**只覆盖已冻结的功能**（范围见第一篇文章《[功能范围](./overview.md)》“冻结范围”一节）。
 
-> 本指南的示例代码基于 **源代码引用（ProjectReference）** 而非 NuGet 包——因为 AtomUI.City.City 尚未发布到 NuGet。示例位于
-> [`docs/guides/core/samples/`](./samples/)，全部经过编译与运行验证。
+> 本指南的验证工程基于 **源代码引用（ProjectReference）**；可执行资产位于
+> [Core MVP fixture](../../../fixtures/AtomUI.City.Core.Mvp/)，并经过编译与运行验证。
 
 ## 目标读者与前提
 

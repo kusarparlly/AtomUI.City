@@ -17,6 +17,8 @@
 - NuGet 包的 net8.0/net10.0 资产以及 Avalonia/Core/Mvvm/Routing/Security/State 依赖边；AtomUI、Localization、fixture、test 和 benchmark 不得进入主包。
 - `IUiCommandFactory` 是 Presentation 的 Preview UI 默认入口；默认实现可保持 internal，但同步/异步/泛型/domain-first 重载、activation/concurrency/exception 参数和 DI dispatcher 注入语义属于兼容面。该接口签名已进入 `PublicAPI.Shipped.txt`，`PublicAPI.Unshipped.txt` 保持无待审签名。
 - `IRoutePresentationCoordinator`、plan factory/context/result/status、per-Outlet serialization、receipt-based recovery 与 AUCPRS047-050 是 Preview-frozen 技术协调兼容面。
+- `ViewFactoryContext`、`ViewModelAcquisitionRequest`、`RouteOutletCommitResult`、`RouteOutletProperties`、Command/Validation/Visual lifecycle 的公开伴随模型和七个 DI extension container 已进入 Preview-frozen public surface；即使它们无独立 Feature，也不能绕过 Public API review 改名、删除或改变线程/所有权语义。
+- active plugin view、Presentation resource lease/contribution/dictionary revocation 以及 unload request/error/result/coordinator 是 Presentation-owned plugin-facing compatibility contract；它们不承诺 PluginSystem 的 load context、依赖解析或完整 unload 已实现。
 
 ## 不属于 Presentation 兼容面
 

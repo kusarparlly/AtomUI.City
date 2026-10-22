@@ -23,6 +23,15 @@
 
 `AUCGEN001` 在 1.0 Preview 中保留但不公开定义。原 `DynamicDiscoveryNotAllowed` 从未有对应输入和触发链；运行时动态发现未来作为独立 Feature 实现时，必须重新评审诊断合同。
 
+## Feature 诊断归属
+
+| Feature | Category | 当前失败码 | 阻断行为 |
+| --- | --- | --- | --- |
+| EventBus generation | `AtomUI.City.Generators.EventBus` | `AUCGEN005` | 任一 contract、channel、handler、owner、共享对象图或跨程序集 manifest 输入非法时，不得发布包含不完整 EventBus metadata 的 service registrar。 |
+| Data generation | `AtomUI.City.Generators.Data` | `AUCGEN005` | 任一 client/operation 输入非法或 client id 重复时，不得生成该 compilation 的 Data registrar。 |
+
+EventBus 与 Data 当前复用 `InvalidManifestInput` 是既有公开诊断合同；不得仅因内部 reader 重构改变 code、默认 severity、feature category 或 source location。若未来需要更细诊断码，必须先更新 compatibility、测试与迁移说明。
+
 ## 产品级必须诊断的失败
 
 - 输入非法：拒绝执行并输出诊断。

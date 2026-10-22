@@ -1,6 +1,6 @@
 # 创建应用
 
-本文说明如何构建一个真实的 Core CLI 应用：从 `ApplicationHost` 起步，把命令行参数接入 DI，注册一个 `IHostedService` 执行命令并干净地退出。完整源码见 [`samples/TodoCli`](./samples/TodoCli/)。
+本文说明如何构建一个真实的 Core CLI 应用：从 `ApplicationHost` 起步，把命令行参数接入 DI，注册一个 `IHostedService` 执行命令并干净地退出。完整验证工程见 [Core MVP CLI](../../../fixtures/AtomUI.City.Core.Mvp/AtomUI.City.Core.MvpCli/)。
 
 ## 1. 宿主概览
 

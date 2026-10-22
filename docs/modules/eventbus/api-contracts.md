@@ -214,6 +214,15 @@ Timeout 或调用方取消只结束当前等待，不形成永久 `StopTimedOut`
 | `EventContractDescriptor.GeneratedShared<TEvent>` | 供生成 registrar 创建已通过封闭对象图验证的 Shared descriptor。 | 仅由 City generated registrar 调用；schema version/fingerprint 合法。 | 带内部 generated graph proof 的 descriptor。 | 输入边界与 Shared 相同。 | 无。 | 标记为 EditorBrowsable.Never；只有该 proof 的 descriptor 可授予插件 Shared capability，普通 Shared/AddEventContract 仍限 Application Plane。 |
 | EventContractId constructor | 创建稳定事件 contract id。 | value 非 null、非空白、不得包含首尾空白或控制字符。 | EventContractId。 | value 为 null 抛 `ArgumentNullException`；空白、包含首尾空白或控制字符抛 `ArgumentException`。 | 无。 | 创建结果不可变。 |
 
+### Previously undocumented public support types
+
+| Type | Purpose | Ownership / Lifetime | Threading / Cancellation | Failure Behavior | Stability / Tests |
+| --- | --- | --- | --- | --- | --- |
+| `EventPayloadDiagnosticProjectorDescriptor` | 把强类型 `IEventPayloadDiagnosticProjector<TEvent>` 擦除为 DI 和 EventBus 可消费的 descriptor，同时保留精确 EventType。 | 由应用组合根通过 `Create<TEvent>` 创建并作为 singleton descriptor 注册；不拥有 projector 的释放。 | 构建后只读；实际 projector 调用发生在 EventBus 诊断路径。 | null projector 被拒绝；projector 返回 null 或投影失败由 EventBus 隔离为 diagnostics write failure，不替换发布结果。 | Preview；payload projection 与 diagnostics tests。 |
+| `EventPluginAccessRule` | 声明插件在指定 shared ContractId/channel 上的 Publish、Subscribe 或双向权限及 schema version 范围。 | `EventBusContributionRequest` 持有的不可变值；随 contribution lease 生命周期使用。 | 可并发读取；无取消语义。 | default ContractId、非法 channel、None/未知 access bit、非正或倒置 schema range 在构造时失败。 | Preview plugin-facing contract；PluginSystem 实际集成仍按本轮排除边界保持 pending。 |
+| `ThreadPoolEventBackgroundScheduler` | `IEventBackgroundScheduler` 的默认实现，把 Background delivery 调度到 ThreadPool，并抑制 publisher `ExecutionContext` 流入。 | EventBus DI singleton；不创建无界 worker 或第二套队列。 | 调度前观察 token，向 callback 传递同一 token，并等待 callback 真实完成。 | null callback 使用标准参数异常；callback 异常和取消原样返回 EventBus delivery policy。 | Preview；dispatch/background scheduler tests。 |
+| `AtomUI.City.Generated.GeneratedModularityModuleRegistrar_*` | 生成器产生的跨程序集模块启动桥；把 EventBus module/service/event descriptor 注册到 Core generated catalog。当前程序集 baseline 名称为 `GeneratedModularityModuleRegistrar_AtomUI_City_EventBus_9DC40369`。 | 编译器/Host loader 所有；每个程序集至多一个稳定 registrar，由 generated manifest 引用。 | Build/Host 启动期同步注册；不承载运行期可变状态或取消。 | manifest/registrar identity 不一致、版本未知或重复 registrar 在编译期、Build 或 catalog validation 失败。 | public 仅因跨程序集生成/装载要求；不是普通开发者调用 API，不应手工实例化或依赖 hash 名称。 |
+
 ## Public 类型覆盖
 
 | Type | 分类 | Review 规则 |
@@ -233,15 +242,18 @@ Timeout 或调用方取消只结束当前等待，不形成永久 `StopTimedOut`
 | `EventBusDiagnosticsOptions` | 支持类型 | Trace 采样与 payload 投影默认值的变化必须显式记录。 |
 | `EventBusRuntimeOptions` | 关键 contract | runtime 总量默认值、合法边界和达到上限时的拒绝语义必须更新本文档和 compatibility。 |
 | `EventPayloadDiagnosticSnapshot` / `IEventPayloadDiagnosticProjector<TEvent>` | 支持类型 | 只承载有界字符串快照，不得放宽为任意对象。 |
+| `EventPayloadDiagnosticProjectorDescriptor` | generated/DI support | EventType、Create<TEvent> 或投影失败隔离语义变化必须更新本文档和 compatibility。 |
 | `EventChannelOptions` | 关键 contract | Capacity、policy 和默认值变化必须更新本文档和 compatibility。 |
 | `EventDispatchPolicy` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `EventDispatchMode` | 支持类型 | Post/InlineIfAllowed 的稳定值和 UI 重入行为变化必须更新本文档和 compatibility。 |
 | `EventDeliveryStatus` | 关键 contract | Succeeded/Failed/Canceled/TimedOut/Skipped 的分类和计数变化必须更新本文档和 compatibility。 |
 | `EventBusDispatchOptions` / `IEventBackgroundScheduler` | 关键 contract | 默认并发上限、边界、调度完成和 ExecutionContext 行为变化必须更新本文档和 compatibility。 |
+| `ThreadPoolEventBackgroundScheduler` | 默认支持类型 | ThreadPool、ExecutionContext、异常或取消传播行为变化必须更新本文档和 compatibility。 |
 | `EventErrorPolicy` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `EventPostResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `EventPublicationRejectedException` | 支持类型 | EventId、ContractId 和拒绝传播方式变化必须更新本文档和 compatibility。 |
 | `EventPluginQuotas` | 关键跨模块 contract | 数量配额、DrainTimeout 默认值/合法边界及总 deadline 语义变化必须更新本文档和 compatibility。 |
+| `EventPluginAccessRule` | 关键跨模块 contract | access bit、channel identity 或 schema version range 变化必须更新本文档和 compatibility。 |
 | `EventPluginDrainTimeoutException` | 关键跨模块 contract | PluginId、deadline 和活动计数快照字段或传播方式变化必须更新本文档和 compatibility。 |
 | `EventPublishOptions` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `EventPublishResult` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
@@ -258,6 +270,7 @@ Timeout 或调用方取消只结束当前等待，不形成永久 `StopTimedOut`
 | `IEventSubscription` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `InMemoryEventBus` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `InMemoryEventContractRegistry` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `AtomUI.City.Generated.GeneratedModularityModuleRegistrar_*` | generated bridge | public visibility 仅服务跨程序集加载；registrar 命名、manifest identity 或单实例聚合规则变化必须更新 Generators/EventBus/Core 合同。 |
 
 ## Nullability 和参数规则
 

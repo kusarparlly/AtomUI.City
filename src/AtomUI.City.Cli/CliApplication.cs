@@ -30,6 +30,9 @@ public static class CliApplication
         "atomui city plugin inspect <Path>",
         "atomui city docs check",
         "atomui city tests check",
+        "atomui city plan generate <kind> <name>",
+        "atomui city apply <plan-file> --yes",
+        "atomui city explain <diagnostic-code>",
     ];
 
     /// <summary>
@@ -42,7 +45,15 @@ public static class CliApplication
         CliExecutionEnvironment? environment = null,
         CancellationToken cancellationToken = default)
     {
-        return await RunAsync(args, output, error, environment, cancellationToken, ProcessRunner.RunAsync).ConfigureAwait(false);
+        return await RunCoreAsync(
+                args,
+                Console.In,
+                output,
+                error,
+                environment,
+                cancellationToken,
+                ProcessRunner.RunAsync)
+            .ConfigureAwait(false);
     }
 
     internal static async ValueTask<int> RunAsync(
@@ -53,7 +64,48 @@ public static class CliApplication
         CancellationToken cancellationToken,
         Func<DotnetInvocation, CancellationToken, ValueTask<ProcessRunResult>> processRunner)
     {
+        return await RunCoreAsync(
+                args,
+                Console.In,
+                output,
+                error,
+                environment,
+                cancellationToken,
+                processRunner)
+            .ConfigureAwait(false);
+    }
+
+    internal static async ValueTask<int> RunAsync(
+        string[] args,
+        TextReader input,
+        TextWriter output,
+        TextWriter error,
+        CliExecutionEnvironment? environment,
+        CancellationToken cancellationToken,
+        Func<DotnetInvocation, CancellationToken, ValueTask<ProcessRunResult>> processRunner)
+    {
+        return await RunCoreAsync(
+                args,
+                input,
+                output,
+                error,
+                environment,
+                cancellationToken,
+                processRunner)
+            .ConfigureAwait(false);
+    }
+
+    private static async ValueTask<int> RunCoreAsync(
+        string[] args,
+        TextReader input,
+        TextWriter output,
+        TextWriter error,
+        CliExecutionEnvironment? environment,
+        CancellationToken cancellationToken,
+        Func<DotnetInvocation, CancellationToken, ValueTask<ProcessRunResult>> processRunner)
+    {
         ArgumentNullException.ThrowIfNull(args);
+        ArgumentNullException.ThrowIfNull(input);
         ArgumentNullException.ThrowIfNull(output);
         ArgumentNullException.ThrowIfNull(error);
         ArgumentNullException.ThrowIfNull(processRunner);
@@ -113,13 +165,23 @@ public static class CliApplication
                 .ConfigureAwait(false);
         }
 
-        return await DispatchAsync(commandLine, executionEnvironment, output, cancellationToken, processRunner).ConfigureAwait(false);
+        return await DispatchAsync(
+                commandLine,
+                executionEnvironment,
+                input,
+                output,
+                error,
+                cancellationToken,
+                processRunner)
+            .ConfigureAwait(false);
     }
 
     private static async ValueTask<int> DispatchAsync(
         CliCommandLine commandLine,
         CliExecutionEnvironment environment,
+        TextReader input,
         TextWriter output,
+        TextWriter error,
         CancellationToken cancellationToken,
         Func<DotnetInvocation, CancellationToken, ValueTask<ProcessRunResult>> processRunner)
     {
@@ -134,11 +196,11 @@ public static class CliApplication
             "build" or "test" or "pack" or "publish" => await DotnetCommandAsync(command, commandLine, environment, output, cancellationToken, processRunner).ConfigureAwait(false),
             "inspect" => await InspectAsync(commandLine, environment, output).ConfigureAwait(false),
             "plugin" => await PluginAsync(commandLine, environment, output, cancellationToken).ConfigureAwait(false),
-            "docs" when positionals.Count > 2 && positionals[2] == "check" => await GateCheckAsync("docs", commandLine, environment, output).ConfigureAwait(false),
-            "tests" when positionals.Count > 2 && positionals[2] == "check" => await GateCheckAsync("tests", commandLine, environment, output).ConfigureAwait(false),
-            "explain" => await ExplainAsync(commandLine, output).ConfigureAwait(false),
-            "plan" => await GenericPlanAsync(commandLine, output).ConfigureAwait(false),
-            "apply" => await ApplyAsync(commandLine, environment, output).ConfigureAwait(false),
+            "docs" when positionals.Count > 2 && positionals[2] == "check" => await GateCheckAsync("docs", commandLine, environment, output, cancellationToken).ConfigureAwait(false),
+            "tests" when positionals.Count > 2 && positionals[2] == "check" => await GateCheckAsync("tests", commandLine, environment, output, cancellationToken).ConfigureAwait(false),
+            "explain" => await ExplainAsync(commandLine, output, cancellationToken).ConfigureAwait(false),
+            "plan" => await GenericPlanAsync(commandLine, environment, output, cancellationToken).ConfigureAwait(false),
+            "apply" => await ApplyAsync(commandLine, environment, input, output, error, cancellationToken).ConfigureAwait(false),
             _ => await WriteAsync(
                     output,
                     commandLine,
@@ -1214,44 +1276,241 @@ public static class CliApplication
         string gate,
         CliCommandLine commandLine,
         CliExecutionEnvironment environment,
-        TextWriter output)
+        TextWriter output,
+        CancellationToken cancellationToken)
     {
-        var path = Path.Combine(environment.WorkingDirectory, gate == "docs" ? "docs" : "tests");
+        var command = $"atomui city {gate} check";
+        var result = await FrameworkGovernanceGate
+            .EvaluateAsync(gate, environment.WorkingDirectory, cancellationToken)
+            .ConfigureAwait(false);
+        var data = new Dictionary<string, object?>
+        {
+            ["gate"] = gate,
+            ["ruleSetId"] = FrameworkGovernanceGate.RuleSetId,
+            ["ruleSetVersion"] = FrameworkGovernanceGate.RuleSetVersion,
+            ["root"] = result.Root is null ? null : ".",
+            ["workingDirectory"] = result.WorkingDirectory,
+            ["checkedFiles"] = result.CheckedFiles,
+            ["errorCount"] = result.ErrorCount,
+            ["warningCount"] = result.WarningCount,
+        };
+
         return await WriteAsync(
                 output,
                 commandLine,
-                $"atomui city {gate} check",
-                CliEnvelope.Succeeded(
-                    $"atomui city {gate} check",
-                    new Dictionary<string, object?> { ["path"] = path, ["exists"] = Directory.Exists(path) }))
+                command,
+                result.Succeeded
+                    ? CliEnvelope.Succeeded(command, data)
+                    : CliEnvelope.FailedWithData(
+                        command,
+                        CliExitCodes.Failure,
+                        data,
+                        result.Diagnostics.ToArray()))
             .ConfigureAwait(false);
     }
 
-    private static async ValueTask<int> ExplainAsync(CliCommandLine commandLine, TextWriter output)
+    private static async ValueTask<int> ExplainAsync(
+        CliCommandLine commandLine,
+        TextWriter output,
+        CancellationToken cancellationToken)
     {
-        var code = commandLine.Positionals.Count > 2 ? commandLine.Positionals[2] : "AUCCLI0000";
-        var data = new Dictionary<string, object?>
+        const string command = "atomui city explain";
+        cancellationToken.ThrowIfCancellationRequested();
+        if (commandLine.Positionals.Count <= 2 ||
+            string.IsNullOrWhiteSpace(commandLine.Positionals[2]))
         {
-            ["code"] = code,
-            ["reason"] = "See AtomUI.City CLI diagnostics documentation.",
-            ["suggestedAction"] = "Run the command with --json --pretty for structured diagnostics.",
-        };
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.Failed(
+                        command,
+                        CliExitCodes.ArgumentError,
+                        CliDiagnostic.Error("AUCCLI0801", "A diagnostic code is required.", "diagnostic-code")))
+                .ConfigureAwait(false);
+        }
 
-        return await WriteAsync(output, commandLine, "atomui city explain", CliEnvelope.Succeeded("atomui city explain", data)).ConfigureAwait(false);
+        var code = commandLine.Positionals[2].Trim();
+        try
+        {
+            if (!DiagnosticExplanationCatalog.TryGet(code, out var explanation))
+            {
+                var fallback = DiagnosticExplanationCatalog.UnknownCodeFallback(code);
+                return await WriteAsync(
+                        output,
+                        commandLine,
+                        command,
+                        CliEnvelope.FailedWithData(
+                            command,
+                            CliExitCodes.ArgumentError,
+                            fallback,
+                            CliDiagnostic.Error("AUCCLI0802", $"Diagnostic code '{code}' is unknown.", code)))
+                    .ConfigureAwait(false);
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.Succeeded(command, explanation))
+                .ConfigureAwait(false);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.Failed(
+                        command,
+                        CliExitCodes.Failure,
+                        CliDiagnostic.Error("AUCCLI0803", exception.Message, code)))
+                .ConfigureAwait(false);
+        }
     }
 
-    private static async ValueTask<int> GenericPlanAsync(CliCommandLine commandLine, TextWriter output)
+    private static async ValueTask<int> GenericPlanAsync(
+        CliCommandLine commandLine,
+        CliExecutionEnvironment environment,
+        TextWriter output,
+        CancellationToken cancellationToken)
     {
-        var command = "atomui " + string.Join(' ', commandLine.Positionals);
+        const string command = "atomui city plan generate";
+        var operation = commandLine.Positionals.Count > 2 ? commandLine.Positionals[2] : null;
+        var requestedKind = commandLine.Positionals.Count > 3 ? commandLine.Positionals[3] : null;
+        var name = commandLine.Positionals.Count > 4 ? commandLine.Positionals[4] : null;
+        if (operation is null || requestedKind is null || string.IsNullOrWhiteSpace(name))
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.Failed(
+                        command,
+                        CliExitCodes.ArgumentError,
+                        CliDiagnostic.Error(
+                            "AUCCLI0701",
+                            "Plan requires 'generate', a supported generation kind, and a name.",
+                            operation ?? requestedKind ?? name)))
+                .ConfigureAwait(false);
+        }
+
+        if (operation != "generate" || !TryResolveGenerationKind(requestedKind, out var kind))
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.Failed(
+                        command,
+                        CliExitCodes.ArgumentError,
+                        CliDiagnostic.Error(
+                            "AUCCLI0702",
+                            "Only plan generate module|page|test|config|localization is supported.",
+                            operation != "generate" ? operation : requestedKind)))
+                .ConfigureAwait(false);
+        }
+
+        string workspaceRoot;
+        try
+        {
+            workspaceRoot = Path.GetFullPath(
+                commandLine.GetOptionValue("--output") ?? environment.WorkingDirectory,
+                environment.WorkingDirectory);
+        }
+        catch (Exception exception) when (exception is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.Failed(
+                        command,
+                        CliExitCodes.Failure,
+                        CliDiagnostic.Error("AUCCLI0703", "The plan workspace path is invalid.", exception.Message)))
+                .ConfigureAwait(false);
+        }
+
+        var projectResolution = ResolveGenerationProject(
+            workspaceRoot,
+            commandLine.GetOptionValue("--project"));
+        if (!projectResolution.Succeeded)
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.FailedWithData(
+                        command,
+                        CliExitCodes.ArgumentError,
+                        new Dictionary<string, object?>
+                        {
+                            ["workingDirectory"] = environment.WorkingDirectory,
+                            ["workspaceRoot"] = workspaceRoot,
+                            ["candidates"] = projectResolution.Candidates,
+                        },
+                        CliDiagnostic.Error("AUCCLI0503", projectResolution.Message!, commandLine.GetOptionValue("--project"))))
+                .ConfigureAwait(false);
+        }
+
+        var options = new GenerationTemplateOptions
+        {
+            Kind = kind,
+            Name = name,
+            ProjectName = projectResolution.ProjectName!,
+            RootNamespace = commandLine.GetOptionValue("--namespace") ??
+                ReadRootNamespace(projectResolution.ProjectPath!) ??
+                projectResolution.ProjectName!,
+            OutputPath = workspaceRoot,
+            RoutePath = commandLine.GetOptionValue("--route"),
+            Cultures = SplitOptionValues(commandLine.GetOptionValue("--culture"), ["en-US", "zh-CN"]),
+            ModuleDependencies = SplitOptionValues(commandLine.GetOptionValue("--depends-on"), []),
+            IncludeTests = !commandLine.HasOption("--no-tests"),
+            ReloadableConfiguration = commandLine.HasOption("--reloadable"),
+        };
+        var optionDiagnostics = options.Validate();
+        if (optionDiagnostics.Count > 0)
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.Failed(
+                        command,
+                        CliExitCodes.ArgumentError,
+                        optionDiagnostics.Select(ToCliGenerationDiagnostic).ToArray()))
+                .ConfigureAwait(false);
+        }
+
+        var result = await PlanApplyTransaction
+            .CreateAsync(options, workspaceRoot, cancellationToken)
+            .ConfigureAwait(false);
+        if (!result.Success)
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.Failed(
+                        command,
+                        GetPlanExitCode(result.Diagnostics),
+                        result.Diagnostics.ToArray()))
+                .ConfigureAwait(false);
+        }
+
+        var artifacts = result.Plan!.Changes
+            .Select(static change => new { type = change.Type, path = change.Path })
+            .Cast<object>()
+            .ToArray();
         var data = new Dictionary<string, object?>
         {
-            ["plan"] = new
-            {
-                schemaVersion = "1.0",
-                operationId = "cli-plan",
-                command,
-                changes = Array.Empty<object>(),
-            },
+            ["operationId"] = result.Plan.OperationId,
+            ["planFile"] = result.PlanFile,
+            ["planDigest"] = result.PlanDigest,
+            ["plan"] = result.Plan,
+            ["artifacts"] = artifacts,
+            ["changedFiles"] = Array.Empty<string>(),
         };
 
         return await WriteAsync(output, commandLine, command, CliEnvelope.Succeeded(command, data)).ConfigureAwait(false);
@@ -1320,18 +1579,101 @@ public static class CliApplication
     private static async ValueTask<int> ApplyAsync(
         CliCommandLine commandLine,
         CliExecutionEnvironment environment,
-        TextWriter output)
+        TextReader input,
+        TextWriter output,
+        TextWriter error,
+        CancellationToken cancellationToken)
     {
         var command = "atomui city apply";
         var planFile = commandLine.Positionals.Count > 2 ? commandLine.Positionals[2] : string.Empty;
-        if (RequiresExplicitConfirmation(commandLine, environment))
+        if (!commandLine.HasOption("--yes"))
         {
-            return await WriteConfirmationRequiredAsync(commandLine, output, command, environment).ConfigureAwait(false);
+            if (environment.IsNonInteractive)
+            {
+                return await WriteConfirmationRequiredAsync(commandLine, output, command, environment).ConfigureAwait(false);
+            }
+
+            await error.WriteAsync("Apply this plan? Type 'yes' to continue: ").ConfigureAwait(false);
+            await error.FlushAsync(cancellationToken).ConfigureAwait(false);
+            string? confirmation;
+            try
+            {
+                confirmation = await input.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return await WriteAsync(
+                        output,
+                        commandLine,
+                        command,
+                        CliEnvelope.Failed(
+                            command,
+                            CliExitCodes.Failure,
+                            CliDiagnostic.Error(
+                                "AUCCLI0714",
+                                "Plan apply was cancelled while awaiting confirmation.",
+                                "confirmation")))
+                    .ConfigureAwait(false);
+            }
+
+            if (!string.Equals(confirmation, "yes", StringComparison.OrdinalIgnoreCase))
+            {
+                return await WriteAsync(
+                        output,
+                        commandLine,
+                        command,
+                        CliEnvelope.FailedWithData(
+                            command,
+                            CliExitCodes.ArgumentError,
+                            new Dictionary<string, object?>
+                            {
+                                ["environment"] = CreateEnvironmentData(environment),
+                                ["requiredConfirmation"] = "yes",
+                            },
+                            CliDiagnostic.Error(
+                                "AUCCLI0401",
+                                "Plan apply was not confirmed; no workspace changes were made.",
+                                "confirmation")))
+                    .ConfigureAwait(false);
+            }
         }
 
-        var data = new Dictionary<string, object?> { ["planFile"] = planFile };
+        var result = await PlanApplyTransaction
+            .ApplyAsync(planFile, environment.WorkingDirectory, cancellationToken)
+            .ConfigureAwait(false);
+        var data = new Dictionary<string, object?>
+        {
+            ["operationId"] = result.OperationId,
+            ["planFile"] = result.PlanFile ?? planFile,
+            ["planDigest"] = result.PlanDigest,
+            ["transactionState"] = result.TransactionState,
+            ["changedFiles"] = result.ChangedFiles,
+        };
+
+        if (!result.Success)
+        {
+            return await WriteAsync(
+                    output,
+                    commandLine,
+                    command,
+                    CliEnvelope.FailedWithData(
+                        command,
+                        GetPlanExitCode(result.Diagnostics),
+                        data,
+                        result.Diagnostics.ToArray()))
+                .ConfigureAwait(false);
+        }
 
         return await WriteAsync(output, commandLine, command, CliEnvelope.Succeeded(command, data)).ConfigureAwait(false);
+    }
+
+    private static int GetPlanExitCode(IReadOnlyList<CliDiagnostic> diagnostics)
+    {
+        return diagnostics.Any(static diagnostic =>
+            diagnostic.Code is "AUCCLI0701" or "AUCCLI0702" or "AUCCLI0707" or "AUCCLI0708" or "AUCCLI0709" ||
+            diagnostic.Code.StartsWith("AUCTPL2", StringComparison.Ordinal))
+            ? CliExitCodes.ArgumentError
+            : CliExitCodes.Failure;
     }
 
     private static bool RequiresExplicitConfirmation(

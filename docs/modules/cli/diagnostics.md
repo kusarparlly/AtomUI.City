@@ -41,6 +41,67 @@
 
 模板验证与事务失败保持原始 `AUCTPL...` code，不包装成新的 CLI code。
 
+## Repository Governance Gates 诊断码
+
+以下 code 由 `AUC-CLI-008` 生产 evaluator 实现并由 contract tests 固定：
+
+| Planned Code | Name | Required Context |
+| --- | --- | --- |
+| `AUCCLI0601` | GovernanceWorkspaceNotRecognized | `path` |
+| `AUCCLI0602` | DocumentationRootMissing | `path` |
+| `AUCCLI0603` | RequiredDocumentMissing | `path`, `module` |
+| `AUCCLI0604` | DocumentationLinkInvalid | `path`, `position`, `target` |
+| `AUCCLI0605` | FeatureIdentityInvalid | `path`, `position`, `featureId` |
+| `AUCCLI0606` | FeatureIdentityDuplicate | `path`, `position`, `featureId` |
+| `AUCCLI0607` | FeatureTestMatrixMissing | `path`, `module`, `featureId` |
+| `AUCCLI0608` | DocumentationPlaceholderFound | `path`, `position` |
+| `AUCCLI0609` | TestRootOrProjectMissing | `path`, `module` |
+| `AUCCLI0610` | FeatureTestEvidenceMissing | `path`, `module`, `featureId` |
+| `AUCCLI0611` | FeatureTestEvidenceInconsistent | `path`, `module`, `featureId` |
+| `AUCCLI0612` | TestTypeInvalid | `path`, `featureId`, `testType` |
+| `AUCCLI0613` | SpecializedTestEvidenceMissing | `path`, `featureId`, `testType` |
+| `AUCCLI0614` | TestLayerInvalid | `path`, `position`, `testType` |
+| `AUCCLI0615` | GovernanceFileReadFailed | `path`, `operation` |
+| `AUCCLI0616` | GovernanceCheckCancelled | `path`, `operation` |
+
+`AUCCLI0201` 已稳定表示 `DotnetCommandFailed`，不得再用于文档或测试门禁失败。读取失败与取消是不同故障，禁止合并为同一个诊断语义。
+
+## Plan / Apply 诊断码
+
+以下 code 由 `AUC-CLI-009` 的 Plan 1.0 与 create-only transaction 实现：
+
+| Planned Code | Name | Exit Class | Required Context |
+| --- | --- | --- | --- |
+| `AUCCLI0701` | PlanArgumentsRequired | ArgumentError | `operation` |
+| `AUCCLI0702` | PlanOperationUnsupported | ArgumentError | `operation`, `kind` |
+| `AUCCLI0703` | PlanWorkspaceInvalid | Failure | `path`, `reason` |
+| `AUCCLI0704` | PlanPathInvalid | Failure | `path`, `reason` |
+| `AUCCLI0705` | PlanWriteFailed | Failure | `planFile`, `operationId`, `stage` |
+| `AUCCLI0706` | PlanFileReadFailed | Failure | `planFile`, `reason` |
+| `AUCCLI0707` | PlanSchemaInvalid | ArgumentError | `planFile`, `schemaVersion`, `reason` |
+| `AUCCLI0708` | PlanWorkspaceMismatch | ArgumentError | `planFile`, `expectedWorkspaceId`, `actualWorkspaceId` |
+| `AUCCLI0709` | PlanIntegrityInvalid | ArgumentError | `operationId`, `changeId`, `expectedHash`, `actualHash` |
+| `AUCCLI0710` | ApplyPreconditionConflict | Failure | `operationId`, `path`, `expectedState`, `actualState` |
+| `AUCCLI0711` | ApplyLockUnavailable | Failure | `operationId`, `path` |
+| `AUCCLI0712` | ApplyCommitFailed | Failure | `operationId`, `path`, `stage` |
+| `AUCCLI0713` | ApplyRollbackFailed | Failure | `operationId`, `path`, `originalFailure`, `rollbackFailure` |
+| `AUCCLI0714` | PlanApplyCancelled | Failure | `operationId`, `stage`, `transactionState` |
+| `AUCCLI0715` | PlanPreviewCleanupFailed | Failure | `operationId`, `temporaryPath`, `stage` |
+
+模板自身拒绝 generation 输入时保留原始 `AUCTPL...` code。若 commit 与 rollback 同时失败，envelope 必须同时包含 `AUCCLI0712` 和一个或多个 `AUCCLI0713`，不能用 rollback failure 覆盖原始故障。
+
+## Explain Catalog 诊断码
+
+以下 code 由 `AUC-CLI-010` immutable explanation catalog 实现：
+
+| Planned Code | Name | Exit Class | Required Context |
+| --- | --- | --- | --- |
+| `AUCCLI0801` | DiagnosticCodeRequired | ArgumentError | `argument` |
+| `AUCCLI0802` | DiagnosticCodeUnknown | ArgumentError | `code` |
+| `AUCCLI0803` | DiagnosticCatalogInvalid | Failure | `code`, `reason` |
+
+`AUCCLI0802` 必须具有不依赖动态目录查找的静态 fallback 说明。目录重复、空 required field、未知 severity 或非法链接均属于 `AUCCLI0803`，并由 contract test 阻止进入发布产物。
+
 ## 产品级必须诊断的失败
 
 - 输入非法：拒绝执行并输出诊断。

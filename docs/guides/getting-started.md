@@ -103,6 +103,6 @@ builder
 - 取消 token 能传递到应用自己的异步任务；
 - `await using` 不被省略。
 
-可直接运行的最小工程见 [Core Quickstart](core/samples/Quickstart/)；完整 CLI 结构见 [Core TodoCli](core/samples/TodoCli/)。
+可直接运行的最小工程见 [Core Headless App](../../fixtures/AtomUI.City.Core.HeadlessApp/)；多模块 CLI 结构见 [Core MVP](../../fixtures/AtomUI.City.Core.Mvp/)。
 
 下一步：[组织应用与模块](application-structure.md)。

@@ -46,6 +46,8 @@ flowchart LR
 | 插件 manifest 缺少 required metadata | 输出 plugin diagnostic。 | PluginManifestBuilderTests |
 | presentation view 构造函数不明确 | 输出 view diagnostic，不生成注册代码。 | PresentationViewManifestBuilderTests |
 | localization resource 重复 key | 输出 localization diagnostic。 | LocalizationManifestBuilderTests |
+| EventBus contract/handler 非法或跨程序集 contract 无 generated manifest | 输出 `AUCGEN005`，不生成包含不完整事件注册的 service registrar。 | EventBusGeneratorTests |
+| Data client id 重复或 operation 签名/policy 非法 | 输出 `AUCGEN005`，不生成 Data registrar。 | AtomUICityIncrementalGeneratorDataTests |
 
 ## 性能和资源边界
 

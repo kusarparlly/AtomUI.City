@@ -189,6 +189,8 @@ Command 必须区分 canceled、failed 和 completed。
 
 domain 只提供 latest-wins，不提供 queue、priority、retry、debounce 或通用 policy engine。需要同一个 Command 的连续调用互相替换时，该 Command 必须显式选择 `Allow`，否则其默认 `Reject` 会先拒绝第二次调用。
 
+单 Command 准入由 public `CommandConcurrencyPolicy` 固定：`Reject=0`、`Allow=1`、`RejectByKey=2`。未知值在创建 Command 时拒绝；`RejectByKey` 必须同时提供 key selector。该枚举的数值和默认 `Reject` 属于公开兼容性合同。
+
 ### 8. 错误策略
 
 | 场景 | 默认处理 |
@@ -197,6 +199,8 @@ domain 只提供 latest-wins，不提供 queue、priority、retry、debounce 或
 | Execute 抛异常 | Operation failed，不杀死 ViewModel。 |
 | Execute 被取消 | Operation canceled，不作为失败统计。 |
 | CompositeCommand 子命令失败 | 聚合结果，继续策略由 command policy 决定。 |
+
+非 awaitable `ICommand.Execute` 路径通过 `ICommandExceptionHandler` 接收 public `CommandExceptionContext`。Context 只包含原始 Exception、nullable CommandName、nullable OwnerType 和 OperationId；框架对一次失败最多调用 handler 一次，取消不进入该路径，handler 自身失败只写 `AUCMVVM013`。
 
 ### 9. AOT / Source Generator
 

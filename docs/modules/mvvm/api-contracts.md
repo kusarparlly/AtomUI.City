@@ -54,6 +54,30 @@
 | Interaction.RequestAsync | 请求 UI interaction。 | request 为 TRequest；handler 通过 ActivationScope 可选绑定。 | InteractionResult<TResult>。 | 无 handler 返回 NotHandled；handler 异常返回 Failed。 | 取消后不提交 handler result。 | 每次调用独立 InteractionContext，包含 request id、request type、handler type 和 scope id。 |
 | ValidationScope.SetMessages / BindTo | 替换字段验证消息并可绑定 ActivationScope。 | field key 可为空表示 global；messages 不得含 null；activationScope 不得为 null。 | void；状态通过 Status 读取。 | Dispose 后 mutation 抛 `ObjectDisposedException`；空 messages 清理 field；重复 message 去重；ValidationScope 先释放后，父 ActivationScope 关闭必须幂等。 | 父 ActivationScope 关闭时把尚存活的 ValidationScope 置为 Canceled。 | 提交后触发 ValidationChanged，事件包含 field key、Status、Errors、Messages 和 owner scope id。 |
 
+### `CommandConcurrencyPolicy`
+
+| Field | Contract |
+| --- | --- |
+| Type | `CommandConcurrencyPolicy` |
+| Stability / Feature | Preview / AUC-MVVM-003、AUC-MVVM-012 |
+| Purpose | 为单个异步 Command 定义原子准入策略；它与跨 Command 的 latest-wins `CommandExecutionDomain` 分层。 |
+| Values | `Reject=0`：任一执行 active 时拒绝；`Allow=1`：允许独立并发；`RejectByKey=2`：只拒绝同一开发者 key。 |
+| Validation | 未知枚举值立即抛 `ArgumentOutOfRangeException`；`RejectByKey` 缺少 `concurrencyKeySelector` 抛 `ArgumentNullException`。 |
+| Concurrency | 检查与占有 active count/key 在同一 gate 内原子完成；执行终结时释放占有。默认值固定为 `Reject`。 |
+| Compatibility / Tests | 数值、默认值、准入与 key 释放语义属于 Preview public contract；`CommandTests` 覆盖 Reject、Allow、RejectByKey 和非法输入。 |
+
+### `CommandExceptionContext`
+
+| Field | Contract |
+| --- | --- |
+| Type | `CommandExceptionContext` |
+| Stability / Feature | Preview / AUC-MVVM-003 |
+| Purpose | 向 `ICommandExceptionHandler` 传递 `ICommand.Execute` 路径中的原始异常和非秘密命令身份。 |
+| Fields | `Exception`、nullable `CommandName`、nullable `OwnerType`、`OperationId`；框架创建时 Exception 是原始业务异常，OperationId 优先来自执行异常数据。 |
+| Ownership / Lifetime | 每次异常处理创建的不可变 record；handler 不应长期持有命令或 ViewModel 引用。 |
+| Cancellation / Failure | handler 使用独立显式 token；业务取消不进入 exception handler。handler 自身失败被 `AUCMVVM013` 隔离和诊断，不替换原命令结果，也不二次调用 handler。 |
+| Compatibility / Tests | 字段及“原始异常恰好一次”语义属于 Preview public contract；`CommandTests` 覆盖 ICommand.Execute、handler failure 与 cancellation exclusion。 |
+
 ## Public 类型覆盖
 
 | Type | 分类 | Review 规则 |
@@ -65,6 +89,8 @@
 | `CommandExecutionState` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `CommandExecutionDomain` | 关键 contract | latest-wins、generation、drain、关闭后行为或默认 timeout 变化必须更新 ADR、本文档和 compatibility。 |
 | `CommandExecutionLease` | 支持类型 | Generation、CancellationToken 或 IsCurrent 语义变化必须更新 ADR、本文档和 compatibility。 |
+| `CommandConcurrencyPolicy` | 关键 contract | 枚举数值、默认准入、key 行为或非法值验证变化必须更新本文档和 compatibility。 |
+| `CommandExceptionContext` | 支持类型 | 字段、原始异常身份或 handler 交付语义变化必须更新本文档和 compatibility。 |
 | `CommandFactory` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `CommandGroup` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `DeactivationResult` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |

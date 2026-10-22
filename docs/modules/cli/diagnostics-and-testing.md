@@ -43,6 +43,10 @@
 | AUC-CLI-005 | AI Envelope | CliCommandArchitectureTests |
 | AUC-CLI-006 | Non-Interactive and CI Mode | CliCommandArchitectureTests |
 | AUC-CLI-007 | Generation Commands | CliGenerationCommandTests |
+| AUC-CLI-008 | Repository Governance Gates | CliGovernanceGateTests |
+| AUC-CLI-009 | Plan and Apply Transaction | CliPlanApplyTests |
+| AUC-CLI-010 | Diagnostic Explain Catalog | CliExplainTests |
+| AUC-CLI-011 | .NET Tool Packaging and Distribution | CliToolPackageTests / package-consumer gate |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -103,12 +107,15 @@ Testing 包应支持：
 
 必须覆盖：
 
-- plan 生成。
-- dry-run 不写文件。
-- apply 写文件。
-- apply schema 校验。
-- apply 文件冲突。
-- rollback 信息存在。
+- 五类 generation plan 生成、隔离 preview root 在成功/失败/取消后的清理、Plan 1.0 round-trip 和稳定 operation id/digest。
+- plan 只写 `.city/plans`，不写业务文件。
+- 严格 schema、4 MiB/256 changes/单项 1 MiB 上限、内容 hash 和 workspace identity。
+- 绝对路径、`..`、设备路径、symlink/reparse escape、重复路径和目标文件系统大小写冲突。
+- workspace 独占锁、staging/journal、preflight 后竞争和成功 commit。
+- completed journal 重放成功 no-op，其他既存目标冲突。
+- preflight/staging 取消、commit 临界区延迟取消、commit failure 完整 rollback。
+- rollback hash 不匹配时不删除外部变更，并同时报告原始与 rollback failure。
+- plan 内容不能触发 shell、程序集加载、网络访问或范围外操作。
 
 ### 6. Non-interactive 测试
 
@@ -128,9 +135,10 @@ Testing 包应支持：
 | build | CLI/Build | Build diagnostics 透传。 |
 | plugin | CLI/Plugin | install dry-run、UnloadPending。 |
 | inspect | Unit/CLI | 只读 JSON。 |
-| docs check | Unit | 缺文档和缺矩阵。 |
-| tests check | Unit | 缺单测和释放断言。 |
-| explain | Unit | 已知和未知 code。 |
+| docs check | Unit/Contract | framework profile 的必要文档、链接、Feature identity、测试矩阵和禁用占位标记。 |
+| tests check | Unit/Contract | 测试项目/类型、Feature 映射、Test Type 和专项测试静态证据；不自动判断断言充分性。 |
+| explain | Unit/Contract | 全目录覆盖/唯一性、已知/未知 code、大小写 canonicalization、字段/链接合法性、并发与纯离线查询。 |
+| .NET Tool package | Build/Pack/PackageConsumer | package metadata、隔离 local feed/cache/tool-path 安装、真实 `atomui city` 成功/失败进程、无 ProjectReference 和无全局残留。 |
 
 ### 8. 测试隔离
 

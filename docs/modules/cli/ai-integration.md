@@ -43,6 +43,9 @@
 | AUC-CLI-005 | AI Envelope | CliCommandArchitectureTests |
 | AUC-CLI-006 | Non-Interactive and CI Mode | CliCommandArchitectureTests |
 | AUC-CLI-007 | Generation Commands | CliGenerationCommandTests |
+| AUC-CLI-008 | Repository Governance Gates | CliGovernanceGateTests |
+| AUC-CLI-009 | Plan and Apply Transaction | CliPlanApplyTests |
+| AUC-CLI-010 | Diagnostic Explain Catalog | CliExplainTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -113,42 +116,107 @@ AI 友好不是增加聊天能力，而是让命令输出、计划、诊断和�
 
 ### 4. Plan / Apply
 
-复杂操作支持：
+本节是 `AUC-CLI-009` 的规范来源。第一版把已有非插件 generation 分成“生成并保存计划”和“校验后执行计划”两步：
 
 ```bash
 atomui city plan generate page Orders/List --route /orders --json
-atomui city apply .city/plans/2026-06-11-generate-page.json
+atomui city apply .city/plans/generate-page-4f9c31a2e7d0.json --yes --json
 ```
 
-Plan 文件包含：
+#### 4.1 第一版能力边界
+
+| 允许 | 明确拒绝 |
+|---|---|
+| `generate module`、`page`、`test`、`config`、`localization` | `new app`、plugin install/update/remove、build/test/pack/publish |
+| UTF-8 文本文件 `create` | update、delete、move、二进制文件 |
+| City 自身 Templates 作为唯一受支持 producer | 第三方 producer 无兼容保证；任意 command/shell/script 一律拒绝 |
+| workspace 内 `.city/plans` 文件 | stdin、URL、workspace 外或符号链接逃逸的 plan/target |
+
+`plan` 可以创建 `.city/plans` 和 plan 文件，但不得创建、覆盖或删除业务文件。`generate --dry-run` 继续用于即时预览；可持久化、可重放的 plan 只能由本命令生成。
+
+Templates 当前公开 `TemplatePlan` 只描述变更路径，不携带生成内容。第一版不得复制模板实现或为 CLI 扩大 Templates public API；plan handler 必须在系统 temp 下的专属 `AtomUI.City.Cli/preview/<random-id>` 创建本次唯一 preview root，使用现有 `GenerationTemplateRenderer.Render` 生成预览，从成功结果声明的 changes 精确读取 UTF-8 内容，然后在写 plan 前清理整个 preview root。递归清理前必须重新解析并证明目标仍位于专属 preview base、不是 base 自身且不是 symlink/reparse escape，禁止对未验证路径执行删除。模板失败原样返回 `AUCTPL...`；成功、失败和取消都必须尝试清理，清理失败返回 `AUCCLI0715` 且不得持久化 plan。
+
+#### 4.2 Plan 1.0 Schema
+
+第一版只接受 `schemaVersion` 精确为 `1.0`。未知字段、缺失字段、重复属性、重复目标和未知枚举值均拒绝，不能静默忽略或降级。
 
 ```json
 {
   "schemaVersion": "1.0",
-  "operationId": "2026-06-11-generate-page",
+  "operationId": "generate-page-4f9c31a2e7d0",
+  "workspaceId": "sha256:7ac4...",
   "command": "atomui city generate page",
-  "inputs": {},
+  "inputs": {
+    "kind": "page",
+    "name": "Orders/List",
+    "route": "/orders"
+  },
   "changes": [
     {
+      "changeId": "change-0001",
       "type": "create",
-      "path": "src/App/Routes/Orders/ListViewModel.cs"
+      "path": "src/App/Routes/Orders/ListViewModel.cs",
+      "expectedState": "absent",
+      "encoding": "utf-8",
+      "content": "namespace App.Routes.Orders;\n",
+      "contentSha256": "sha256:2fd4..."
     }
   ],
-  "buildTargets": [],
+  "buildTargets": ["src/App/App.csproj"],
   "testTargets": [],
   "docsRequired": [],
   "risks": [],
-  "rollback": []
+  "rollback": [
+    {
+      "changeId": "change-0001",
+      "action": "delete-if-content-hash-matches"
+    }
+  ]
 }
 ```
 
-规则：
+字段合同：
 
-- Plan 生成不修改业务文件。
-- Apply 必须校验 plan schema。
-- Apply 前检查文件是否被外部修改。
-- Apply 结果输出 diagnostics。
-- destructive 操作必须有 rollback 描述。
+- `operationId` 使用 `generate-<kind>-<canonical-operation-payload-sha256 前 12 位小写十六进制>`；canonical operation payload 包含 workspaceId、command、规范化 inputs、changes 与验证目标，但明确排除 operationId 本身，避免循环计算。相同 workspace 快照、规范化输入和模板输出必须得到相同 id。
+- `workspaceId` 是规范化绝对 workspace root 的 SHA-256，不暴露绝对路径；第一版 plan 不可跨 workspace 或移动后重放。
+- `command` 必须是受支持的 canonical command identity，不作为 shell 文本执行；`inputs` 只传给对应的内部 generation adapter。
+- `path` 使用 `/`、相对 workspace root、不得为空、绝对化、包含 `.`/`..`、设备路径、NUL，或经过 symlink/reparse point 逃出 root；重复与大小写碰撞按目标文件系统的 path comparison 语义判断。
+- `content` 是将要写入的完整 Unicode 文本；应用时按无 BOM UTF-8 编码，换行保持 plan 中内容，不做平台转换。
+- `contentSha256` 对上述 UTF-8 bytes 计算；apply 必须重算并匹配。`expectedState` 第一版只能为 `absent`。
+- `rollback` 必须与每个 change 一一对应；第一版唯一 action 为 `delete-if-content-hash-matches`。
+- `changes` 最多 256 项，单项 UTF-8 content 最多 1 MiB，整个 plan UTF-8 文件最多 4 MiB；超限必须失败，不能截断。
+- plan 使用固定 schema property 顺序、稳定数组顺序、LF 和无 BOM UTF-8 序列化；plan digest 对完整 plan bytes 计算，用于 journal 和重复 apply 身份判断。
+
+Plan 1.0 的 hash 用于一致性、竞争和幂等判断，不是数字签名，也不证明 producer 身份。Apply 始终把文件视为不可信输入；第一版不承诺第三方 producer 兼容，但不能仅凭 producer 声明放宽任何校验。
+
+Plan 文件原子写入 `.city/plans/<operationId>.json`。同名且 bytes 相同可以复用；同名但内容不同视为完整性故障，禁止覆盖。
+
+#### 4.3 Apply 安全与事务
+
+Apply 必须按以下顺序执行：
+
+1. 识别 workspace，验证 plan file 位于该 workspace 的 `.city/plans`，并应用大小上限。
+2. 将 JSON 作为不可信输入严格解析；验证 schema、operationId、workspaceId、所有 path、枚举、数量、content hash 和 rollback 对应关系。
+3. 获取 `.city/transactions/apply.lock` 的 workspace 级独占文件锁；不排队等待，锁冲突快速失败。
+4. 对全部 change 做 preflight：目标必须不存在，父路径不得通过 symlink/reparse point 逃出 workspace；任一失败时不创建业务文件。
+5. 在 `.city/transactions/<operationId>/staging` 写入全部内容并复核 hash，持久化 journal 后才进入 commit。
+6. commit 只把 staging 文件原子移动到仍然不存在的目标；目标在 preflight 后出现也必须冲突，禁止覆盖。
+7. 任一 commit 失败时，按逆序删除本事务已创建且 hash 仍匹配的文件；不匹配的文件不得删除，并记录 rollback failure。
+8. 全部成功后把 journal 标记为 `completed`，输出实际 `changedFiles`。相同 operationId 和 plan digest 的 completed journal 再次 apply 返回成功 no-op；digest 不同或没有可信 completed journal 时，既存目标仍然失败。
+
+Apply 不能加载程序集、调用 shell、执行 plan 中的 command 字符串或访问网络。交互模式必须在 commit 前确认；CI、`--non-interactive` 或 stdin 不可用时必须提供 `--yes`，否则沿用 `AUCCLI0401`。
+
+#### 4.4 取消与终态
+
+- plan 在模板 preview、目录 IO 和写 plan 前后观察 cancellation；取消不留下临时 plan，并且必须清理本次专属 preview root 后才返回。
+- apply 在读取、校验、preflight 和 staging 阶段立即响应 cancellation 并清理 staging。
+- commit 开始后进入不可中断临界区：记录取消请求，但必须先完成 commit 或 rollback，工作区稳定后再返回取消失败。
+- 原始 apply failure 与 rollback failure 必须聚合进入同一失败 envelope；不得因回滚异常覆盖原始故障。
+- 所有失败输出 diagnostics 和非零 exit code；不存在“未执行却 success”或“部分提交却 success”。
+
+#### 4.5 输出合同
+
+Plan 成功的 `data` 至少包含 `operationId`、workspace-relative `planFile`、`planDigest` 和完整 `plan`；`artifacts` 列出计划目标但 `changedFiles` 为空。Apply 成功的 `data` 至少包含 `operationId`、`planFile`、`planDigest`、`transactionState`（`completed` 或 `already-completed`）；`changedFiles` 只列本次实际创建的文件。
 
 ### 5. Inspect
 
@@ -169,14 +237,15 @@ atomui city doctor --json
 atomui city explain AUCCLI0201 --json
 ```
 
-`explain` 输出：
+`explain` 属于 `AUC-CLI-010`，是版本化诊断目录查询，不是自由文本搜索：
 
-- diagnostic code。
-- 触发原因。
-- 严重级别。
-- 修复建议。
-- 相关文档。
-- 相关命令。
+- 第一版覆盖 CLI 当前能够产生的 `AUCCLI...`，以及 CLI 明确原样透传的 `AUCTPL...`、`AUCPLG...` code。
+- 输入去除首尾空白后使用 ordinal ignore-case 匹配，输出 canonical uppercase code。
+- 已知 code 输出 `code`、`severity`、`summary`、`cause`、`suggestedActions`、`documentationLinks`、`relatedCommands` 和 `ownerModule`。
+- 缺少 code 返回 `AUCCLI0801` 和 ArgumentError；未知 code 返回 `AUCCLI0802` 和 ArgumentError，不能返回通用 success 文本。
+- 目录是编译进 CLI 的 immutable 数据，不在运行时读取 Markdown、扫描程序集、启动插件或访问网络。
+- 每个 code 必须恰有一个条目；重复、空字段、未知 severity 或不受信链接产生 `AUCCLI0803`，并作为构建/contract test 阻断项。文档链接只允许 workspace-relative 文档路径，或 host 为 `atomui.net`、其子域名、`github.com/AtomUI` 的 HTTPS URL。
+- `AUCCLI0802` 必须有静态 fallback 解释，未知 code 处理不得递归依赖一次可能失败的目录查找。
 
 ### 7. Agent 调用边界
 
@@ -201,8 +270,8 @@ CLI 不应该：
 | 功能点 | 测试类型 | 必测场景 |
 |---|---|---|
 | JSON envelope | Unit | 成功和失败输出结构。 |
-| plan schema | Unit | 必填字段、非法 schema。 |
+| plan schema | Unit/Contract | 完整 round-trip、严格字段、大小上限、未知 schema、hash、重复目标和路径逃逸。 |
 | dry-run | Unit/CLI | 不写文件。 |
-| apply | CLI | 校验 plan、写文件、输出诊断。 |
+| apply | CLI/Integration | preflight、锁、staging、commit、重复 apply、竞争、取消、完整 rollback 和 rollback failure。 |
 | inspect | Unit/CLI | 只读、结构化输出。 |
-| explain | Unit | code、建议、文档链接。 |
+| explain | Unit/Contract | 全目录覆盖/唯一性、已知/未知 code、大小写、建议、文档链接、并发和纯离线读取。 |

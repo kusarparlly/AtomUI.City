@@ -32,16 +32,16 @@
 | AUC-DATA-008 | Unit | DataResultTests; DataDiagnosticsTests | 断言 result 不混用 success/error，invalid error metadata 被拒绝，诊断码格式唯一且内存 recorder 有界。 | unknown exception、cancelled、timeout、invalid error kind、blank error message、诊断溢出。 | Completed |
 | AUC-DATA-009 | Unit | DataRegistrationTests | 断言默认服务、重复注册和 pre-registration override。 | 重复注册、override、缺失 credential provider。 | Completed |
 | AUC-DATA-010 | RuntimeLifecycle | DataHostIntegrationTests; DataConnectionLifecycleTests | 断言 Host stop 关闭连接、拒绝后续请求与注册、显式逆序、并发事务、重入保护和失败隔离。 | shutdown、并发 stop、取消、部分失败。 | Completed |
-| AUC-DATA-011 | Contract; RuntimeLifecycle | DataStreamingTests; DataDogfoodTests | 官方 gRPC unary/channel/server/client/bidi stream、metadata、deadline、owner、backpressure、并发 dispose/write。 | cancel、protocol error、owner stop、并发 complete/dispose。 | Completed |
-| AUC-DATA-012 | Contract; RuntimeLifecycle | DataDogfoodTests | 官方 HubConnection、push、subscription、真实断线 reconnect、token/account switch 和 handler 重入 stop。 | close、reconnect、owner stop、handler reentry。 | Completed |
-| AUC-DATA-013 | Concurrency | DataConcurrencyTests | 六种策略的确定性顺序、抑制、取消和 keyed isolation。 | race、queue full/cancel、duplicate mutation。 | Completed |
-| AUC-DATA-014 | Unit; Concurrency | DataResilienceTests | circuit breaker、半开探针取消恢复、cache/fallback ordering、rate limit 和 operation/client/global 策略作用域。 | open circuit、abandoned probe、fallback failure、credential short-circuit、rate rejected。 | Completed |
-| AUC-DATA-015 | Unit; Concurrency; PluginLifecycle | DataCacheConsistencyTests; DataPluginLifecycleTests | canonical identity、TTL、operation/mutation/principal/permission/plugin/route/version 失效和跨失效 stale write suppression。 | unsupported invalidator、TTL/invalidation race、identity collision。 | Completed |
-| AUC-DATA-016 | Generator; AOT | AtomUICityIncrementalGeneratorDataTests; DataClientDescriptorTests; Data AOT fixture | descriptor、继承 operation、generated catalog 原子注册、确定性输出和 NativeAOT publish/run。 | invalid metadata、duplicate identity、partial registration、unsupported signature。 | Completed |
+| AUC-DATA-011 | Contract/RuntimeLifecycle | DataStreamingTests; DataDogfoodTests | 官方 gRPC unary/channel/server/client/bidi stream、metadata、deadline、owner、backpressure、并发 dispose/write。 | cancel、protocol error、owner stop、并发 complete/dispose。 | Completed |
+| AUC-DATA-012 | Contract/RuntimeLifecycle | DataDogfoodTests | 官方 HubConnection、push、subscription、真实断线 reconnect、token/account switch 和 handler 重入 stop。 | close、reconnect、owner stop、handler reentry。 | Completed |
+| AUC-DATA-013 | Unit/RuntimeLifecycle | DataConcurrencyTests | 六种策略的确定性顺序、抑制、取消和 keyed isolation。 | race、queue full/cancel、duplicate mutation。 | Completed |
+| AUC-DATA-014 | Unit/RuntimeLifecycle | DataResilienceTests | circuit breaker、半开探针取消恢复、cache/fallback ordering、rate limit 和 operation/client/global 策略作用域。 | open circuit、abandoned probe、fallback failure、credential short-circuit、rate rejected。 | Completed |
+| AUC-DATA-015 | Unit/RuntimeLifecycle/PluginLifecycle | DataCacheConsistencyTests; DataPluginLifecycleTests | canonical identity、TTL、operation/mutation/principal/permission/plugin/route/version 失效和跨失效 stale write suppression。 | unsupported invalidator、TTL/invalidation race、identity collision。 | Completed |
+| AUC-DATA-016 | Generator/RuntimeLifecycle | AtomUICityIncrementalGeneratorDataTests; DataClientDescriptorTests | descriptor、继承 operation、generated catalog 原子注册、确定性输出和 NativeAOT publish/run。 | invalid metadata、duplicate identity、partial registration、unsupported signature。 | Completed |
 | AUC-DATA-017 | PluginLifecycle | DataPluginLifecycleTests | 插件贡献拒绝、撤销、取消并等待在途 operation、清理和 unload-ready lease。 | cancellation-ignoring request、self-revoking handler、revoked origin cache bypass、connection cleanup。 | Completed |
-| AUC-DATA-018 | Contract; RuntimeLifecycle | DataLargePayloadTests; DataDogfoodTests | 流式 IO、进度、range/resume、声明长度完整性、取消、临时文件和内存上限。 | partial file、progress failure、range/length mismatch。 | Completed |
-| AUC-DATA-019 | Unit; PluginLifecycle | DataRequestHandlerTests; DataPluginLifecycleTests | handler 顺序、单次 continuation、capability、扩展异常映射和撤销。 | denied capability、handler/source/authorizer failure、double next、direct-pipeline bypass。 | Completed |
-| AUC-DATA-020 | Dogfood; Headless | DataTestDoublesTests; DataDogfoodTests | Testing doubles 与真实本地 HTTP/gRPC/SignalR 压力场景。 | WebSocket fault/reconnect、high concurrency、reentrant stop。 | Completed |
+| AUC-DATA-018 | Contract/RuntimeLifecycle | DataLargePayloadTests; DataDogfoodTests | 流式 IO、进度、range/resume、声明长度完整性、取消、临时文件和内存上限。 | partial file、progress failure、range/length mismatch。 | Completed |
+| AUC-DATA-019 | Unit/PluginLifecycle | DataRequestHandlerTests; DataPluginLifecycleTests | handler 顺序、单次 continuation、capability、扩展异常映射和撤销。 | denied capability、handler/source/authorizer failure、double next、direct-pipeline bypass。 | Completed |
+| AUC-DATA-020 | Dogfood/RuntimeLifecycle | DataTestDoublesTests; DataDogfoodTests | Testing doubles 与真实本地 HTTP/gRPC/SignalR 压力场景。 | WebSocket fault/reconnect、high concurrency、reentrant stop。 | Completed |
 
 ## 缺口处理
 

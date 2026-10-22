@@ -13,6 +13,9 @@
 - 输入非法：拒绝执行并输出诊断。
 - 执行失败：返回失败 result 或 gate failure。
 - 输出不符合 contract：测试失败。
+- `AUC-CLI-009` 对同一 workspace 使用 `.city/transactions/apply.lock` 文件锁；锁已占用时快速失败，不在进程内 semaphore 后无限等待。
+- plan 计算可以跨 workspace 并发；同一 workspace 的 apply 必须串行。目标在 preflight 后出现属于竞争冲突，禁止覆盖。
+- explain catalog 初始化后不可变，可由多个命令调用并发读取。
 
 ## UI 线程规则
 
@@ -25,6 +28,7 @@
 - IO、网络、子进程、编译分析、插件扫描、缓存清理、streaming 和 handler 调用必须可取消。
 - 取消后不得提交后续状态、缓存、事件、UI 或 generated output。
 - 长生命周期后台任务必须绑定 owner；owner 释放时取消。
+- apply 的 preflight/staging 可取消；commit 开始后延迟取消，必须先完成 commit 或 rollback，再以稳定 transaction state 返回。
 
 ## 死锁规避
 

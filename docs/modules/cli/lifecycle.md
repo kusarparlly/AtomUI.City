@@ -10,6 +10,8 @@ CLI 默认不启动桌面 Host；只创建工程、调用构建、检查插件�
 
 - Created -> Executing -> Completed 或 Failed
 - Failure -> Diagnostics 或 non-zero gate result
+- Apply transaction: Created -> Validating -> Locked -> Staging -> Committing -> Completed；失败进入 RollingBack -> RolledBack 或 RollbackFailed。
+- completed journal + 相同 plan digest 的重复 apply 直接进入 Completed/no-op；不得重复写文件。
 
 ## 生命周期流程
 
@@ -24,6 +26,7 @@ CLI 默认不启动桌面 Host；只创建工程、调用构建、检查插件�
 - 命令退出前必须结束子进程或按 cancellation kill。
 - JSON envelope 在退出前完整写出。
 - 非交互模式不等待输入。
+- apply 退出前必须释放 workspace lock；临时 staging 在成功或完整回滚后清理，journal 保留最终状态和 plan digest。
 
 ## 插件动态变更行为
 
@@ -35,6 +38,7 @@ CLI 默认不启动桌面 Host；只创建工程、调用构建、检查插件�
 - 输入非法：拒绝执行并输出诊断。
 - 执行失败：返回失败 result 或 gate failure。
 - 输出不符合 contract：测试失败。
+- apply 原始失败与 rollback failure 同时保留；RollbackFailed 不能伪装成普通 RolledBack 或 success。
 
 ## 生命周期测试要求
 

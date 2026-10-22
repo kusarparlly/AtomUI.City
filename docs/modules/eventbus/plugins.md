@@ -36,7 +36,7 @@
 
 | Feature ID | 相关能力 | 测试文件 |
 | --- | --- | --- |
-| AUC-EVENTBUS-002 | Subscription Ownership & Lifecycle | EventSubscriptionLifecycleTests |
+| AUC-EVENTBUS-002 | Subscription Ownership & Lifecycle | EventSubscriptionTests |
 | AUC-EVENTBUS-003 | Contract Identity & Registry | EventContractRegistryTests |
 | AUC-EVENTBUS-005 | Diagnostics & Observability | EventDiagnosticsTests |
 | AUC-EVENTBUS-007 | Bounded Channel Runtime | EventChannelRuntimeTests |

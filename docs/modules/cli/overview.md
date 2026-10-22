@@ -1,7 +1,7 @@
 # AtomUI.City.Cli
 
 文档等级：Level 2
-成熟度：Verified
+成熟度：Implemented
 执行边界：Command process boundary
 程序集：`AtomUI.City.Cli`
 源码：`src/AtomUI.City.Cli`
@@ -66,6 +66,6 @@ CLI 默认不启动桌面 Host；只创建工程、调用构建、检查插件�
 
 ## 当前成熟度状态
 
-Verified
+Implemented
 
-当前 7 个已登记 Feature 均已完成。非插件 generation 已通过命令合同、事务回滚、并发和真实生成产物 restore/build/test 门禁；plugin generation 随 PluginSystem 后续迭代处理，不属于 `AUC-CLI-007`。
+`AUC-CLI-001` 至 `011` 已完成第一版实现与对应测试。Repository Governance Gates 已在真实 framework workspace 上通过；Plan/Apply 已具备 create-only 安全事务、幂等重放和回滚；Explain 使用 immutable catalog；CLI 已作为命令 `atomui` 的独立 .NET Tool 通过隔离安装与真实成功/失败进程验收。plugin generation 随 PluginSystem 后续迭代处理，不属于 `AUC-CLI-007` 或 `009`。

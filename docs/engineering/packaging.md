@@ -26,14 +26,17 @@
 - Runtime 包不包含测试资产。
 - Build 包可以包含 buildTransitive assets。
 - Generator/Analyzer 作为 build/analyzer 资产进入应用项目，不进入 runtime 主链路。
+- CLI 以独立 .NET Tool 包 `AtomUI.City.Cli` 分发，固定 `PackAsTool=true`、`ToolCommandName=atomui` 和统一 City package version；第一版 tool TFM 为 `net10.0`。
+- 应用 `PackageReference` 不安装 CLI、不修改 PATH，也不要求应用 runtime 引用 CLI；仓库与 CI 使用 local tool manifest 固定精确版本。
 
 候选包不得只通过仓库内 `ProjectReference` 验证。Windows 本地候选版必须运行：
 
 ```powershell
 ./engineering/check-local-package-consumer.ps1 -Configuration Release
+./engineering/check-cli-tool-package-consumer.ps1 -Configuration Release
 ```
 
-该门禁使用唯一的 `1.0.0-local-gate` 版本、独立 package cache 和本次生成的本地 NuGet 源；第三方依赖允许从用户缓存或 NuGet.org 恢复，但 `AtomUI.City.*` 必须来自候选本地源。门禁不会向任何远端源发布包。
+第一条门禁验证 runtime/Build 候选包；第二条门禁把 `AtomUI.City.Cli` 安装到隔离 tool-path，并通过真实 `atomui` 进程验证成功与失败路径。两者均使用独立 package cache 和本次生成的本地 NuGet 源；第三方依赖允许从用户缓存或 NuGet.org 恢复，但 `AtomUI.City.*` 必须来自候选本地源。门禁不会向任何远端源发布包。
 
 ## 4. 插件包规则
 
@@ -69,5 +72,5 @@
 | Build package | Pack test | buildTransitive assets 正确。 |
 | isolated consumer | Package/Integration | 无 `ProjectReference`，候选包来源可追踪，`net8.0`/`net10.0` 可编译且当前运行时目标可执行。 |
 | Template package | Template smoke | 模板可安装并生成项目。 |
-| CLI package | Tool smoke | `atomui city` 可执行。 |
+| CLI package | Tool package consumer | 从本地候选 feed 和独立 cache 安装到临时 tool-path，真实执行 `atomui city doctor --json` 及稳定失败命令；不得依赖 ProjectReference、远端 City 候选包或全局 tool 状态。 |
 | Plugin package | Package layout test | one main assembly 和 plugin.json 有效。 |

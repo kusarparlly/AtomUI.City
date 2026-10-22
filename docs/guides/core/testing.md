@@ -1,6 +1,6 @@
 # 测试
 
-Core CLI 应用推荐两层测试：**纯逻辑单测**（快速、无需宿主）与 **CLI 进程级集成测试**（真实启动宿主、验证生成器与 DI）。配套示例见 [`samples/TodoCli.Tests`](./samples/TodoCli.Tests/)。
+Core CLI 应用推荐两层测试：**纯逻辑单测**（快速、无需宿主）与 **CLI 进程级集成测试**（真实启动宿主、验证生成器与 DI）。配套证据见 [Core tests](../../../tests/AtomUI.City.Core.Tests/)。
 
 ## 1. 为什么要两层
 

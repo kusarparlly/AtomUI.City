@@ -129,15 +129,19 @@ public sealed class CliCommandArchitectureTests
     }
 
     [Fact]
-    public async Task NonInteractiveApplyWithYesDoesNotFailConfirmation()
+    public async Task NonInteractiveApplyWithYesPassesConfirmationAndValidatesPlan()
     {
         using var host = new CliTestHost();
 
         var run = await host.RunAsync("city", "apply", "plan.json", "--non-interactive", "--yes", "--json");
 
-        Assert.Equal(0, run.ExitCode);
+        Assert.Equal(1, run.ExitCode);
         using var json = run.ReadJson();
-        Assert.True(json.RootElement.GetProperty("success").GetBoolean());
+        Assert.False(json.RootElement.GetProperty("success").GetBoolean());
+        Assert.Equal("AUCCLI0704", json.RootElement.GetProperty("diagnostics")[0].GetProperty("code").GetString());
+        Assert.DoesNotContain(
+            json.RootElement.GetProperty("diagnostics").EnumerateArray(),
+            static diagnostic => diagnostic.GetProperty("code").GetString() == "AUCCLI0401");
     }
 
     [Fact]

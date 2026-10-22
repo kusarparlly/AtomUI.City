@@ -202,10 +202,19 @@ internal sealed class CliEnvelope
         object data,
         IReadOnlyList<object?> artifacts)
     {
-        var explicitChangedFiles = ExtractStringList(data, "changedFiles");
-        if (explicitChangedFiles.Count > 0)
+        if (TryGetDataValue(data, "changedFiles", out var explicitValue))
         {
-            return explicitChangedFiles;
+            if (explicitValue is null or string ||
+                explicitValue is not System.Collections.IEnumerable explicitEnumerable)
+            {
+                return [];
+            }
+
+            return Array.AsReadOnly(
+                explicitEnumerable
+                    .Cast<object?>()
+                    .OfType<string>()
+                    .ToArray());
         }
 
         return Array.AsReadOnly(

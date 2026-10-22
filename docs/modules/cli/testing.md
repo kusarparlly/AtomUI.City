@@ -27,7 +27,11 @@
 | AUC-CLI-004 | Unit | CliInspectDoctorPluginTests | 断言合法插件、manifest 缺失、版本非法、layout 错误和 JSON diagnostics。 | 缺 path 返回 `AUCCLI0302`；manifest 缺失、版本非法和 layout 错误输出 PluginSystem diagnostics 且不加载插件 assembly。 | Completed |
 | AUC-CLI-005 | Unit | CliCommandArchitectureTests | 断言 schema、纯 JSON、artifact 列表、suggested commands、retryable 语义。 | JSON envelope 缺少 AI 字段、普通日志混入 JSON、artifact 未提升、retryable 语义错误必须失败。 | Completed |
 | AUC-CLI-006 | Unit | CliCommandArchitectureTests | 断言 CI、non-interactive、stdin unavailable、需要确认时失败。 | `--non-interactive`、`--ci` 或 stdin unavailable 下需要确认且缺少 `--yes` 返回 `AUCCLI0401`，不能等待 stdin。 | Completed |
-| AUC-CLI-007 | Unit/TemplateSmoke/Build | CliGenerationCommandTests, GenerationTemplateRendererTests | 五类真实生成、dry-run、project 推导、artifacts、产物 build/test。 | 缺参、plugin/未知 kind、多项目歧义、变量非法、冲突、取消、IO 失败和回滚。 | Completed |
+| AUC-CLI-007 | Unit/TemplateSmoke | CliGenerationCommandTests; GenerationTemplateRendererTests | 五类真实生成、dry-run、project 推导、artifacts、产物 build/test。 | 缺参、plugin/未知 kind、多项目歧义、变量非法、冲突、取消、IO 失败和回滚。 | Completed |
+| AUC-CLI-008 | Unit/Contract | CliGovernanceGateTests | framework workspace discovery、rule-set identity、必要文档、链接、Feature/Test matrix 映射、测试项目/类型、Test Type、专项证据、workspace-relative JSON、exit code、取消和只读。 | 无法识别工作区、目录/文件缺失、断链、Feature ID 非法或重复、测试证据缺失、非法 Test Type 和扫描读取失败稳定失败。 | Completed |
+| AUC-CLI-009 | Unit/Contract/FrameworkIntegration | CliPlanApplyTests | 五类 plan、隔离 preview/清理、Plan 1.0 round-trip、确定性 id/digest、plan 不写业务文件、workspace 锁、staging/journal、成功/重复 apply、JSON changedFiles。 | preview 失败/取消/清理失败、非范围 operation、plan 缺失/超限/未知字段/schema、路径/链接逃逸、重复/大小写冲突、workspace/hash mismatch、目标竞争、取消、commit/rollback 双失败。 | Completed |
+| AUC-CLI-010 | Unit/Contract | CliExplainTests | CLI 可产生/透传 code 的目录覆盖与唯一性、canonical code、完整字段、Text/JSON、并发纯离线查询。 | 缺参、未知 code、重复 code、非法 severity/链接和取消。 | Completed |
+| AUC-CLI-011 | Contract | CliToolPackageTests | tool metadata/version、command shim、隔离本地 feed/cache/tool-path 安装和真实成功/失败进程。 | 普通 Exe package、错误 command、缺 runtime asset、意外 Build runtime dependency、全局状态污染或只能通过 ProjectReference 运行均失败。 | Completed |
 
 ## 缺口处理
 

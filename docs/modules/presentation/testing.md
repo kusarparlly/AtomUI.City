@@ -10,20 +10,29 @@
 
 CLI 或纯 mock 不能代替第 3 和第 5 层。
 
-## Feature 测试矩阵
+## 测试矩阵
 
-| Feature | 必须覆盖 | 主要测试 |
-| --- | --- | --- |
-| 001 | inline/background dispatch、取消、callback failure、stopping cleanup | AvaloniaUiDispatcherTests, PlatformIntegrationTests |
-| 002/003/012 | exact key、override/revoke、factory type、UI binding、generator output | ViewLocatorTests, ViewBindingTests, generator Presentation tests |
-| 004/010/014/015 | FIFO、queue full、plan reuse、rollback、post-commit cleanup、async lease、Faulted | RouteOutletTests, PresentationIndustrialContractTests |
-| 005 | Bind 不伪造、真实 attach/detach、identity 过滤、迟到事件、handler failure | ViewBindingTests, VisualFeedbackTests, headless/desktop fixture |
-| 006/011 | scope resolution、modal FIFO、跨 Window 并行、capacity、cancel/revoke、optional validation | Interaction/Validation tests |
-| 007/008 | owner revoke、覆盖恢复、active view、字典 UI revoke、局部失败继续 | Resource/Plugin tests |
-| 009/016 | Attach、Show 前注册、named outlet、三类 close、唯一 confirmation、close/stop race | Runtime tests, headless/desktop fixture |
-| 017 | Root/Child 显式 attach、独立链接 Scope、leaf-to-root、部分失败、close/stop race、Outlet 隔离 | ViewModelCompositionTests, Runtime/Window lifecycle tests |
-| 018 | 聚合注册、自定义注册保留、全部 command 重载（含 domain-first 泛型/非泛型）转发、DI dispatcher/diagnostics 注入、通知失败隔离 | UiCommandFactoryTests, PresentationIndustrialContractTests |
-| 019 | 成功协调、Router 不提交、不创建 plan、plan/Outlet 失败恢复、stopped Outlet、候选 exactly-once、pre/post-commit cancellation、较新导航拒绝迟到恢复、同 Outlet 串行、诊断隔离 | RoutePresentationCoordinatorTests, Routing NavigationCommitReceiptTests, package consumer |
+| Feature ID | Test Type | Test File | Required Assertions | Failure Paths | Status |
+| --- | --- | --- | --- | --- | --- |
+| AUC-PRESENTATION-001 | Unit/PlatformIntegration | AvaloniaUiDispatcherTests; PresentationPlatformIntegrationTests | inline/background dispatch、取消、callback failure 和 stopping cleanup。 | dispatcher 不可用、callback 失败和取消。 | Release Verified |
+| AUC-PRESENTATION-002 | Unit/Generator | ViewLocatorTests; AtomUICityIncrementalGeneratorPresentationTests | exact key、override/revoke、generator output 和确定性 lookup。 | 缺失、重复和歧义 mapping。 | Release Verified |
+| AUC-PRESENTATION-003 | Unit/PlatformIntegration | ViewBindingTests | factory type、DataContext、真实 attach/detach 和释放。 | factory/binding/dispatcher 失败。 | Release Verified |
+| AUC-PRESENTATION-004 | Unit/RuntimeLifecycle | RouteOutletTests | FIFO、plan reuse、commit、rollback 和 post-commit cleanup。 | queue full、commit/rollback 和 cleanup 失败。 | Release Verified |
+| AUC-PRESENTATION-005 | Unit/PlatformIntegration | ViewBindingTests; VisualFeedbackTests | Bind 不伪造、identity 过滤、迟到事件和真实 visual feedback。 | handler failure、错误 identity 和释放后事件。 | Release Verified |
+| AUC-PRESENTATION-006 | Unit/Contract | PresentationInteractionHandlerTests; ValidationVisualStateBindingTests | scope resolution、interaction 和 optional validation。 | handler 缺失、取消、revoke 和 validation adapter 失败。 | Release Verified |
+| AUC-PRESENTATION-007 | Unit/RuntimeLifecycle | PresentationResourceRegistryTests; PresentationResourceDictionaryRevokerTests | owner revoke、覆盖恢复、字典 UI revoke 和局部失败继续。 | revoke 竞争和局部清理失败。 | Release Verified |
+| AUC-PRESENTATION-008 | Unit/PluginLifecycle | ActivePluginViewRegistryTests; PresentationPluginUnloadCoordinatorTests | active view 清理、插件 owner revoke 和卸载协调。 | active view、延迟清理和 unload failure。 | Release Verified |
+| AUC-PRESENTATION-009 | RuntimeLifecycle/PlatformIntegration | PresentationRuntimeTests; PresentationHeadlessProcessTests; PresentationDesktopProcessTests | Attach、Show 前注册、named outlet 和 Window 生命周期。 | attach/show/close/stop 竞争。 | Release Verified |
+| AUC-PRESENTATION-010 | Unit/RuntimeLifecycle | ViewModelFactoryTests; RouteOutletTests | ViewModel acquisition、ownership、scope 和 Outlet commit。 | factory、ownership 和释放失败。 | Release Verified |
+| AUC-PRESENTATION-011 | Unit/RuntimeLifecycle | PresentationInteractionHandlerTests | modal FIFO、跨 Window 并行、capacity 和 cancel/revoke。 | queue full、取消、handler/revoke 失败。 | Release Verified |
+| AUC-PRESENTATION-012 | Unit/Generator | ViewLocatorTests; AtomUICityIncrementalGeneratorPresentationTests | layered override、revoke 和 generated registration。 | 优先级、冲突和恢复失败。 | Release Verified |
+| AUC-PRESENTATION-013 | Contract | PresentationResourceRegistryTests | Retired identity 保留且不重新进入运行时合同。 | 编号复用或重新暴露。 | Retired Before 1.0 |
+| AUC-PRESENTATION-014 | Unit/RuntimeLifecycle | PresentationIndustrialContractTests | hierarchical fault、Faulted 和恢复边界。 | 普通故障升级、不变量失败和诊断失败。 | Release Verified |
+| AUC-PRESENTATION-015 | Unit/RuntimeLifecycle | PresentationIndustrialContractTests | bounded admission、candidate ownership、FIFO 和 exactly-once。 | queue full、候选泄漏和所有权重复。 | Release Verified |
+| AUC-PRESENTATION-016 | RuntimeLifecycle/PlatformIntegration | PresentationRuntimeTests; PresentationDesktopProcessTests | close origins、唯一 confirmation 和 close/stop race。 | 重复确认、拒绝关闭和并发停止。 | Release Verified |
+| AUC-PRESENTATION-017 | Unit/RuntimeLifecycle | ViewModelCompositionTests; PresentationRuntimeTests | Root/Child attach、独立 Scope、leaf-to-root、部分失败和 Outlet 隔离。 | ownership 转移、close/stop race 和释放失败。 | Release Verified |
+| AUC-PRESENTATION-018 | Unit/Contract | UiCommandFactoryTests; PresentationIndustrialContractTests | 聚合注册、重载转发、DI 注入和通知失败隔离。 | 自定义注册覆盖、参数丢失和 diagnostics failure。 | Release Verified |
+| AUC-PRESENTATION-019 | FrameworkIntegration/RuntimeLifecycle | RoutePresentationCoordinatorTests | Router/Outlet 协调、恢复、exactly-once、取消、串行和诊断隔离。 | plan/Outlet 失败、stopped Outlet、迟到恢复和竞争。 | Release Verified |
 
 Feature 017 的 nested child/task drain、activation rollback、显式 dispose 与 Runtime stop 竞态、真实 Headless Window close、RouteOutlet 隔离、Borrowed 跨 owner 独占/转移及 throwing-diagnostics 已进入可重复测试。详细证据见 [viewmodel-composition.md](viewmodel-composition.md)。
 
@@ -86,3 +95,11 @@ Windows 发布候选的统一入口是：
 ## 失败注入
 
 必须覆盖 lookup/create/bind、guard/confirm、activation/deactivation、dispatcher、temporary attach/restore、old Entry cleanup、failure presenter、Window cleanup、plugin revoke、queue overflow、plan factory failure、Router conditional restore rejection 和 throwing diagnostics。测试断言状态、Result、diagnostic code、关键 context、当前 UI 与所有权释放。
+
+## Public API 合同覆盖
+
+- DI 扩展入口由 `AvaloniaUiDispatcherTests`、`PresentationInteractionHandlerTests`、`PresentationRuntimeTests`、`ViewLocatorTests`、`ActivePluginViewRegistryTests`、`PresentationResourceRegistryTests` 和 `PresentationPluginUnloadCoordinatorTests` 证明 `TryAdd`、同实例映射和重复注册行为。
+- `ViewFactoryContext`、`ViewModelAcquisitionRequest`、`RouteOutletCommitResult`、`RouteOutletProperties`、`ICommandBindingHandle`、`UiCommandState`、`ValidationVisualStateSnapshot` 与 null failure presenter 由 View/Outlet/Command/Validation unit tests 及 Headless/Desktop fixtures 覆盖。
+- `VisualLifecycleEvent`、`VisualLifecycleEventKind`、`VisualLifecycleSubscriptionOptions` 和 `UiStateFeedbackKind/Policy` 由 `VisualFeedbackTests`、`ViewBindingTests` 与真实 visual tree fixtures 覆盖。
+- active view、resource contribution/lease/dictionary revocation 和 unload request/error/result/coordinator 是 Presentation-owned plugin-facing contract；其测试只证明 Presentation cleanup，不作为 PluginSystem 已完成的证据。
+- 文档和 Public API baseline 必须对每个公开类型保留可定位的精确类型名；只写通配类型族不能替代 API 卡。

@@ -27,6 +27,7 @@
 - `StateDispatchPolicy` 的 `Immediate=0`、`Queued=1`、`Dispatcher=2`、`Background=3` 枚举值，以及不可用 dispatcher 失败被诊断隔离且不回滚已提交状态进入 1.0 兼容承诺。
 - `StateSnapshot` 和 `StateSnapshotEntry` 的不可变 entries、version/schema 边界、Persisted 过滤、restore 诊断、owner/plugin/type/schema 校验和 Transient restore 拒绝进入 1.0 兼容承诺。
 - `StateCollection<TKey,TItem>` 的 collection version、item version、快照不可变、无变化不通知、Dispose 幂等、Dispose 后读 API 可用、mutation/restore/subscription API 拒绝，以及 `StateCollectionChange`、`StateCollectionSnapshot` 和 `StateCollectionChangedEventArgs` 的 null、空列表、未知 change kind 与负 version 边界进入 1.0 兼容承诺。
+- `StateCollectionObservation<TKey,TItem>` 的 `IsInitial`、`Version`、nullable `Snapshot`、只读 `Changes` 以及“初始时 Snapshot/空 Changes，变更时 null Snapshot/变更批”的互斥关系属于 Preview public compatibility surface。
 - `StateDiagnosticIds` 的 `AUCSTA001` 到 `AUCSTA011` code、severity 语义和稳定定位 context key 进入 1.0 兼容承诺。
 - `Changed` 是同步 CLR event，先于可调度的 `OnChange` subscriptions；`OnChange` 返回 `IStateSubscription` 并承担调度与 Scope 生命周期语义。
 - `Dispatcher` subscription 使用非阻塞投递，不允许同步等待 UI callback。

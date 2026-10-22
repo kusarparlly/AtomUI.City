@@ -14,6 +14,8 @@
 | AUC-GENERATORS-006 | Localization Manifest | 已实现并通过产品合同测试 | Internal: LocalizationMetadataReader, LocalizationManifestBuilder, LocalizationRegistrarSourceBuilder | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationManifestBuilderTests; LocalizationMetadataReaderTests |
 | AUC-GENERATORS-007 | Presentation View Manifest | 已实现并通过产品合同测试 | Internal: PresentationViewMetadataReader, PresentationViewManifestBuilder | PresentationViewManifestBuilderTests; PresentationViewRegistrarSourceBuilderTests |
 | AUC-GENERATORS-008 | Diagnostics | 已实现并通过产品合同测试 | Public Tooling Entry: BuildServiceProviderUsageAnalyzer; Internal: GeneratorDiagnosticIds, GeneratorDiagnostics | GeneratorDiagnosticTests |
+| AUC-GENERATORS-009 | EventBus Contract and Handler Manifest | 已实现并通过产品合同测试 | Internal: EventMetadataReader, EventGenerationManifest; Generated Output: service registrar 中的 EventBus manifest | EventBusGeneratorTests; GeneratedSourceVisibilityTests |
+| AUC-GENERATORS-010 | Data Client Descriptor Manifest | 已实现并通过产品合同测试 | Internal: DataClientMetadataReader, DataClientGenerationMetadata, DataClientRegistrarSourceBuilder; Generated Output: data client registrar | AtomUICityIncrementalGeneratorDataTests; GeneratedSourceVisibilityTests |
 
 ## Feature 硬门禁
 
@@ -144,3 +146,33 @@ Diagnostics: diagnostic 定义自身必须可枚举验证。
 Tests: `GeneratorDiagnosticTests`
 Required Assertions: 断言 diagnostic id、severity、message args 和 source location。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
+
+## AUC-GENERATORS-009 EventBus Contract and Handler Manifest
+
+Feature ID: `AUC-GENERATORS-009`
+Status: 已实现并通过产品合同测试
+Goal: 在编译期把 EventBus contract、channel 与 handler 声明转换为 AOT 友好的静态注册代码，运行时不扫描程序集发现事件元数据。
+Internal Contract: EventMetadataReader, EventGenerationCandidate, EventGenerationManifest, GeneratedEventContractMetadata, GeneratedEventChannelMetadata, GeneratedEventHandlerMetadata
+Generated Output Contract: EventBus 注册语句随当前程序集的 `GeneratedServiceRegistrar_*` 输出；存在事件清单时写入 `GeneratedEventManifestAttribute`，并生成 `EventContractDescriptor.GeneratedShared<TEvent>` 与 `GeneratedEventHandlerDescriptor.Create<TEvent, THandler>` 注册语句。引用程序集的 registrar 按稳定 registrar type 聚合且只聚合一次。
+Runtime / Build Behavior: 读取 `EventContractAttribute`、`EventChannelAttribute`、`EventHandlerAttribute` 与 `IEventHandler<TEvent>`；验证 owner 位于声明程序集并实现 `IModule`，验证 contract id/schema/channel/handler policy、唯一 public constructor、共享事件闭合不可变对象图、跨程序集 generated manifest 可达性及当前 compilation 内 contract id 唯一性；输出按稳定键排序。
+Failure Behavior: 非法 owner、重复 contract id/channel、未知 enum、非法容量/并发/超时、不可构造 handler、缺失或不可达的 generated contract、开放或可变共享对象图统一输出 `AUCGEN005`，且不得生成包含不完整 EventBus 注册的 service registrar。
+Threading / Cancellation: 纯编译期 CPU；不启动线程或后台任务，Roslyn compilation 生命周期负责取消和失效。
+Diagnostics: diagnostic category 使用 `AtomUI.City.Generators.EventBus`，定位到声明 syntax；当前非法 manifest 输入使用稳定码 `AUCGEN005`。
+Tests: `EventBusGeneratorTests; GeneratedSourceVisibilityTests; GeneratorNamingTests`
+Required Assertions: 断言 contract/channel/handler 全量元数据、重复 id、无 contract handler、跨程序集 generated manifest reachability、未生成 manifest 的引用拒绝、对象图 allowlist、registrar 单次聚合、可编译输出和 generated public surface 白名单。
+Acceptance Criteria: EventBus attribute 声明能够生成确定、可编译、无运行时扫描的注册代码；任一非法声明必须在编译期阻断该批 EventBus 输出。
+
+## AUC-GENERATORS-010 Data Client Descriptor Manifest
+
+Feature ID: `AUC-GENERATORS-010`
+Status: 已实现并通过产品合同测试
+Goal: 在编译期把 Data client 与 operation 声明转换为强类型 descriptor registrar，运行时不扫描程序集发现 Data client。
+Internal Contract: DataClientMetadataReader, DataClientGenerationMetadata, DataOperationGenerationMetadata, DataClientRegistrarSourceBuilder
+Generated Output Contract: 为声明程序集生成稳定命名的 public sealed `GeneratedDataClientRegistrar_*`，实现 `IDataClientDescriptorRegistrar`；程序集通过 `GeneratedDataClientManifestAttribute` 指向 registrar；`Register` 向 `DataClientDescriptorCatalog` 注册按 client id 和 operation name 稳定排序的 descriptor。
+Runtime / Build Behavior: 读取 `DataClientAttribute` 与 `DataOperationAttribute`，包含继承接口中的 operation；保留 transport、version、request/response type、access/concurrency policy、timeout、retry、cache 与 authentication policy；支持约定内的 `DataResult<T>`、异步包装和 `IDataStream<T>` 返回形态。
+Failure Behavior: 非 public/泛型或嵌套于泛型类型的 client、空或重复 client id、未知 transport/policy、非法 operation 签名或返回值、重复 operation name、负超时/重试、Mutation cache、空认证策略统一输出 `AUCGEN005`，且该 compilation 不生成 Data registrar。
+Threading / Cancellation: 纯编译期 CPU；不启动线程或后台任务，Roslyn compilation 生命周期负责取消和失效。
+Diagnostics: diagnostic category 使用 `AtomUI.City.Generators.Data`，定位到 client 声明；当前非法 manifest 输入使用稳定码 `AUCGEN005`。
+Tests: `AtomUICityIncrementalGeneratorDataTests; GeneratedSourceVisibilityTests; GeneratorNamingTests`
+Required Assertions: 断言强类型 descriptor、manifest attribute、稳定 registrar/hint name、重复 client id、签名和 policy 拒绝、tuple type reference、泛型容器拒绝、继承 operation、可编译输出及 generated public surface 白名单。
+Acceptance Criteria: Data attribute 声明能够生成确定、可编译、无运行时扫描的 descriptor registrar；任一非法声明必须在编译期阻断该批 Data 输出。

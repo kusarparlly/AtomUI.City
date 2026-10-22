@@ -43,6 +43,10 @@
 | AUC-CLI-005 | AI Envelope | CliCommandArchitectureTests |
 | AUC-CLI-006 | Non-Interactive and CI Mode | CliCommandArchitectureTests |
 | AUC-CLI-007 | Generation Commands | CliGenerationCommandTests |
+| AUC-CLI-008 | Repository Governance Gates | CliGovernanceGateTests |
+| AUC-CLI-009 | Plan and Apply Transaction | CliPlanApplyTests |
+| AUC-CLI-010 | Diagnostic Explain Catalog | CliExplainTests |
+| AUC-CLI-011 | .NET Tool Packaging and Distribution | CliToolPackageTests / package-consumer gate |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -70,6 +74,19 @@
 ```bash
 atomui city <command>
 ```
+
+该入口来自独立 NuGet .NET Tool 包 `AtomUI.City.Cli`，不是应用 `PackageReference` 自动提供的命令：
+
+```bash
+dotnet tool install --global AtomUI.City.Cli --version <version>
+atomui city doctor --json
+
+dotnet new tool-manifest
+dotnet tool install AtomUI.City.Cli --version <version>
+dotnet tool run atomui city doctor --json
+```
+
+全局安装适合开发机交互使用；仓库、CI 和可复现构建应提交 local tool manifest 并固定精确版本。第一版工具运行时为 .NET 10，这与被操作应用可以目标为 net8.0 或 net10.0 是两个独立概念。
 
 ### 2. 命名规则
 
@@ -114,9 +131,16 @@ atomui city
   tests check
   doctor
   explain <diagnostic-code>
-  plan <operation>
+  plan generate module|page|test|config|localization <name>
   apply <plan-file>
 ```
+
+第一版命令边界：
+
+- `plan` 只接受 `generate module|page|test|config|localization`；它不是任意命令包装器。
+- `apply` 只接受当前 workspace `.city/plans` 下由 City 生成的 Plan 1.0，并且只执行 UTF-8 文本文件 `create`。
+- `explain` 只查询 CLI 能产生或透传的版本化诊断目录；未知 code 必须失败。
+- 精确 schema、事务、安全和诊断行为见 [AI 集成设计](ai-integration.md)。
 
 ### 4. 通用选项
 

@@ -9,14 +9,14 @@ EventBus Application Plane 已完成实现与模块级验证；Plugin Plane 的 
 | Feature ID | 名称 | 阶段 | 状态 | Contract Family | 主测试族 |
 | --- | --- | --- | --- | --- | --- |
 | AUC-EVENTBUS-001 | Typed Publication | Application Plane MVP | Verified | IEventPublisher, EventPublishOptions, EventContext, EventPublishResult, EventPostResult | EventPublicationTests |
-| AUC-EVENTBUS-002 | Subscription Ownership & Lifecycle | Application Plane MVP | EventBus Contract Verified / PluginSystem Integration Pending | IEventSubscriber, IEventHandler, IEventSubscription, subscription state/options/descriptor | EventSubscriptionLifecycleTests |
+| AUC-EVENTBUS-002 | Subscription Ownership & Lifecycle | Application Plane MVP | EventBus Contract Verified / PluginSystem Integration Pending | IEventSubscriber, IEventHandler, IEventSubscription, subscription state/options/descriptor | EventSubscriptionTests |
 | AUC-EVENTBUS-003 | Contract Identity & Registry | Application Plane MVP | Verified | EventContractId, EventContractDescriptor, EventContractPlane, IEventContractRegistry | EventContractRegistryTests |
 | AUC-EVENTBUS-004 | Dispatch & Failure Policy | Application Plane MVP | Verified | dispatch target/mode, delivery result, error and timeout policy | EventDispatchAndFailurePolicyTests |
 | AUC-EVENTBUS-005 | Diagnostics & Observability | Application Plane MVP | Verified | EventDiagnosticIds, diagnostic context, metrics and safe payload projection | EventDiagnosticsTests |
 | AUC-EVENTBUS-006 | DI & Host Lifecycle | Application Plane MVP | Verified | AddEventBus, EventBus module/options, internal lifecycle control plane | EventBusHostIntegrationTests |
 | AUC-EVENTBUS-007 | Bounded Channel Runtime | Application Plane MVP | Verified | EventChannel, channel options, execution/concurrency/backpressure policy | EventChannelRuntimeTests |
 | AUC-EVENTBUS-008 | Generated Event Catalog & NativeAOT | Application Plane MVP | Verified | event attributes, generated registrar/manifest/descriptors/invokers | EventBusGeneratorTests; EventBusNativeAotProcessTests |
-| AUC-EVENTBUS-009 | Plugin Event Planes | Plugin Integration Phase | EventBus Contract Verified / PluginSystem Integration Pending | shared/private plane, capability, EventBus contribution controller and domain lease | EventBusPluginContractTests; EventBusPluginLifecycleTests |
+| AUC-EVENTBUS-009 | Plugin Event Planes | Plugin Integration Phase | EventBus Contract Verified / PluginSystem Integration Pending | shared/private plane, capability, EventBus contribution controller and domain lease | EventBusPluginContractTests；PluginSystem lifecycle suite pending |
 
 ## 完成口径
 
@@ -63,7 +63,7 @@ Goal: 把每个 handler 的所有权、创建上下文、停止、drain 和释�
 Contract Family: `IEventSubscriber`、`IEventHandler<TEvent>`、`IEventSubscription`、subscription state/options/descriptor。
 Design Coverage: 每条订阅只有一个 owner；静态/DI 订阅由框架绑定 ApplicationScope，Application Plane 动态订阅显式绑定 LifecycleScope，插件订阅绑定 EventBus 领域 ContributionLease；第一版强引用；定义 Created、Active、Quiescing、Draining、Disposed、Faulted 和唯一终止事务。
 Failure Coverage: null/stopped owner、owner/EventBus stop 与注册提交竞争、in-flight handler、等待取消或 drain timeout、handler 创建/释放失败、重复及并发 Stop/Dispose/owner cancellation。
-Primary Tests: `EventSubscriptionLifecycleTests`。
+Primary Tests: `EventSubscriptionTests`。
 
 ## AUC-EVENTBUS-003 Contract Identity & Registry
 
