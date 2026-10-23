@@ -1,19 +1,19 @@
 #nullable enable
-AtomUI.City.Testing.AotCompatibilityCheck
-AtomUI.City.Testing.AotCompatibilityCheck.Evaluate(System.Collections.Generic.IEnumerable<AtomUI.City.Testing.SourceFile!>! sources, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Testing.AotCompatibilityDiagnostic!>!
-AtomUI.City.Testing.AotCompatibilityCheck.ForbidDefaultAotPatterns() -> AtomUI.City.Testing.AotCompatibilityCheck!
-AtomUI.City.Testing.AotCompatibilityCheck.ForbidPattern(string! diagnosticId, string! pattern) -> AtomUI.City.Testing.AotCompatibilityCheck!
-AtomUI.City.Testing.AotCompatibilityDiagnostic
-AtomUI.City.Testing.AotCompatibilityDiagnostic.<Clone>$() -> AtomUI.City.Testing.AotCompatibilityDiagnostic!
-AtomUI.City.Testing.AotCompatibilityDiagnostic.AotCompatibilityDiagnostic(string! Id, string! SourcePath, string! Message) -> void
-AtomUI.City.Testing.AotCompatibilityDiagnostic.Deconstruct(out string! Id, out string! SourcePath, out string! Message) -> void
-AtomUI.City.Testing.AotCompatibilityDiagnostic.Equals(AtomUI.City.Testing.AotCompatibilityDiagnostic? other) -> bool
-AtomUI.City.Testing.AotCompatibilityDiagnostic.Id.get -> string!
-AtomUI.City.Testing.AotCompatibilityDiagnostic.Id.init -> void
-AtomUI.City.Testing.AotCompatibilityDiagnostic.Message.get -> string!
-AtomUI.City.Testing.AotCompatibilityDiagnostic.Message.init -> void
-AtomUI.City.Testing.AotCompatibilityDiagnostic.SourcePath.get -> string!
-AtomUI.City.Testing.AotCompatibilityDiagnostic.SourcePath.init -> void
+AtomUI.City.Testing.AotSourcePatternCheck
+AtomUI.City.Testing.AotSourcePatternCheck.Evaluate(System.Collections.Generic.IEnumerable<AtomUI.City.Testing.SourceFile!>! sources, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Collections.Generic.IReadOnlyList<AtomUI.City.Testing.AotSourcePatternDiagnostic!>!
+AtomUI.City.Testing.AotSourcePatternCheck.ForbidDefaultAotRiskPatterns() -> AtomUI.City.Testing.AotSourcePatternCheck!
+AtomUI.City.Testing.AotSourcePatternCheck.ForbidPattern(string! diagnosticId, string! pattern) -> AtomUI.City.Testing.AotSourcePatternCheck!
+AtomUI.City.Testing.AotSourcePatternDiagnostic
+AtomUI.City.Testing.AotSourcePatternDiagnostic.<Clone>$() -> AtomUI.City.Testing.AotSourcePatternDiagnostic!
+AtomUI.City.Testing.AotSourcePatternDiagnostic.AotSourcePatternDiagnostic(string! Id, string! SourcePath, string! Message) -> void
+AtomUI.City.Testing.AotSourcePatternDiagnostic.Deconstruct(out string! Id, out string! SourcePath, out string! Message) -> void
+AtomUI.City.Testing.AotSourcePatternDiagnostic.Equals(AtomUI.City.Testing.AotSourcePatternDiagnostic? other) -> bool
+AtomUI.City.Testing.AotSourcePatternDiagnostic.Id.get -> string!
+AtomUI.City.Testing.AotSourcePatternDiagnostic.Id.init -> void
+AtomUI.City.Testing.AotSourcePatternDiagnostic.Message.get -> string!
+AtomUI.City.Testing.AotSourcePatternDiagnostic.Message.init -> void
+AtomUI.City.Testing.AotSourcePatternDiagnostic.SourcePath.get -> string!
+AtomUI.City.Testing.AotSourcePatternDiagnostic.SourcePath.init -> void
 AtomUI.City.Testing.DeterministicScheduledWorkItem
 AtomUI.City.Testing.DeterministicScheduledWorkItem.Cancel() -> void
 AtomUI.City.Testing.DeterministicScheduledWorkItem.DueAt.get -> System.DateTimeOffset
@@ -290,9 +290,9 @@ const AtomUI.City.Testing.TestLayerNames.PluginLifecycle = "PluginLifecycle" -> 
 const AtomUI.City.Testing.TestLayerNames.RuntimeLifecycle = "RuntimeLifecycle" -> string!
 const AtomUI.City.Testing.TestLayerNames.TemplateSmoke = "TemplateSmoke" -> string!
 const AtomUI.City.Testing.TestLayerNames.Unit = "Unit" -> string!
-override AtomUI.City.Testing.AotCompatibilityDiagnostic.Equals(object? obj) -> bool
-override AtomUI.City.Testing.AotCompatibilityDiagnostic.GetHashCode() -> int
-override AtomUI.City.Testing.AotCompatibilityDiagnostic.ToString() -> string!
+override AtomUI.City.Testing.AotSourcePatternDiagnostic.Equals(object? obj) -> bool
+override AtomUI.City.Testing.AotSourcePatternDiagnostic.GetHashCode() -> int
+override AtomUI.City.Testing.AotSourcePatternDiagnostic.ToString() -> string!
 override AtomUI.City.Testing.ExpectedDiagnostic.Equals(object? obj) -> bool
 override AtomUI.City.Testing.ExpectedDiagnostic.GetHashCode() -> int
 override AtomUI.City.Testing.ExpectedDiagnostic.ToString() -> string!
@@ -320,9 +320,9 @@ override AtomUI.City.Testing.SourceFile.ToString() -> string!
 override AtomUI.City.Testing.TestDiagnosticEntry.Equals(object? obj) -> bool
 override AtomUI.City.Testing.TestDiagnosticEntry.GetHashCode() -> int
 override AtomUI.City.Testing.TestDiagnosticEntry.ToString() -> string!
-static AtomUI.City.Testing.AotCompatibilityCheck.Create() -> AtomUI.City.Testing.AotCompatibilityCheck!
-static AtomUI.City.Testing.AotCompatibilityDiagnostic.operator !=(AtomUI.City.Testing.AotCompatibilityDiagnostic? left, AtomUI.City.Testing.AotCompatibilityDiagnostic? right) -> bool
-static AtomUI.City.Testing.AotCompatibilityDiagnostic.operator ==(AtomUI.City.Testing.AotCompatibilityDiagnostic? left, AtomUI.City.Testing.AotCompatibilityDiagnostic? right) -> bool
+static AtomUI.City.Testing.AotSourcePatternCheck.Create() -> AtomUI.City.Testing.AotSourcePatternCheck!
+static AtomUI.City.Testing.AotSourcePatternDiagnostic.operator !=(AtomUI.City.Testing.AotSourcePatternDiagnostic? left, AtomUI.City.Testing.AotSourcePatternDiagnostic? right) -> bool
+static AtomUI.City.Testing.AotSourcePatternDiagnostic.operator ==(AtomUI.City.Testing.AotSourcePatternDiagnostic? left, AtomUI.City.Testing.AotSourcePatternDiagnostic? right) -> bool
 static AtomUI.City.Testing.ExpectedDiagnostic.operator !=(AtomUI.City.Testing.ExpectedDiagnostic? left, AtomUI.City.Testing.ExpectedDiagnostic? right) -> bool
 static AtomUI.City.Testing.ExpectedDiagnostic.operator ==(AtomUI.City.Testing.ExpectedDiagnostic? left, AtomUI.City.Testing.ExpectedDiagnostic? right) -> bool
 static AtomUI.City.Testing.GeneratedSource.operator !=(AtomUI.City.Testing.GeneratedSource? left, AtomUI.City.Testing.GeneratedSource? right) -> bool

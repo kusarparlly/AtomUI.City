@@ -2,12 +2,12 @@ using AtomUI.City.Testing;
 
 namespace AtomUI.City.Testing.Tests;
 
-public sealed class AotCompatibilityCheckTests
+public sealed class AotSourcePatternCheckTests
 {
     [Fact]
-    public void EvaluateReportsForbiddenRuntimeReflectionPatterns()
+    public void EvaluateReportsConfiguredOrdinalPattern()
     {
-        var check = AotCompatibilityCheck
+        var check = AotSourcePatternCheck
             .Create()
             .ForbidPattern("AOT001", "Assembly.GetTypes");
 
@@ -25,23 +25,24 @@ public sealed class AotCompatibilityCheckTests
     }
 
     [Fact]
-    public void EvaluateReturnsNoDiagnosticsWhenSourcesAvoidForbiddenPatterns()
+    public void EvaluateReturnsNoDiagnosticsWhenSourcesAvoidConfiguredPattern()
     {
-        var check = AotCompatibilityCheck
+        var check = AotSourcePatternCheck
             .Create()
             .ForbidPattern("AOT001", "Assembly.GetTypes");
 
-        var diagnostics = check.Evaluate([new SourceFile("StaticManifest.cs", "var manifest = StaticManifest.Instance;")]);
+        var diagnostics = check.Evaluate(
+            [new SourceFile("StaticManifest.cs", "var manifest = StaticManifest.Instance;")]);
 
         Assert.Empty(diagnostics);
     }
 
     [Fact]
-    public void ForbidDefaultAotPatternsReportsReflectionActivatorAndDynamicCode()
+    public void ForbidDefaultAotRiskPatternsReportsThreeHeuristicPatterns()
     {
-        var check = AotCompatibilityCheck
+        var check = AotSourcePatternCheck
             .Create()
-            .ForbidDefaultAotPatterns();
+            .ForbidDefaultAotRiskPatterns();
 
         var diagnostics = check.Evaluate(
             [
@@ -56,12 +57,43 @@ public sealed class AotCompatibilityCheckTests
     }
 
     [Fact]
+    public void DuplicateRuleRegistrationIsIdempotent()
+    {
+        var check = AotSourcePatternCheck
+            .Create()
+            .ForbidPattern("AOT001", "Assembly.GetTypes")
+            .ForbidPattern("AOT001", "Assembly.GetTypes");
+
+        var diagnostics = check.Evaluate(
+            [new SourceFile("Reflection.cs", "var types = assembly.Assembly.GetTypes();")]);
+
+        Assert.Single(diagnostics);
+    }
+
+    [Fact]
+    public void TextLintHasExplicitFalsePositiveAndFalseNegativeBoundary()
+    {
+        var check = AotSourcePatternCheck
+            .Create()
+            .ForbidDefaultAotRiskPatterns();
+
+        var diagnostics = check.Evaluate(
+            [
+                new SourceFile("Comment.cs", "// Assembly.GetTypes is intentionally documented here."),
+                new SourceFile("AliasedReflection.cs", "var method = typeof(Assembly).GetMethod(\"GetTypes\");"),
+            ]);
+
+        Assert.Contains(diagnostics, diagnostic => diagnostic.SourcePath == "Comment.cs");
+        Assert.DoesNotContain(diagnostics, diagnostic => diagnostic.SourcePath == "AliasedReflection.cs");
+    }
+
+    [Fact]
     public async Task EvaluateObservesCancellationToken()
     {
         using var cancellation = new CancellationTokenSource();
         await cancellation.CancelAsync();
 
-        var check = AotCompatibilityCheck
+        var check = AotSourcePatternCheck
             .Create()
             .ForbidPattern("AOT001", "Assembly.GetTypes");
 
@@ -73,15 +105,15 @@ public sealed class AotCompatibilityCheckTests
     [Fact]
     public void EvaluateDiagnosticsRejectExternalListMutation()
     {
-        var check = AotCompatibilityCheck
+        var check = AotSourcePatternCheck
             .Create()
             .ForbidPattern("AOT001", "Assembly.GetTypes");
 
         var diagnostics = check.Evaluate(
             [new SourceFile("ModuleScanner.cs", "var types = assembly.Assembly.GetTypes();")]);
-        var exposedDiagnostics = Assert.IsAssignableFrom<IList<AotCompatibilityDiagnostic>>(diagnostics);
+        var exposedDiagnostics = Assert.IsAssignableFrom<IList<AotSourcePatternDiagnostic>>(diagnostics);
 
-        Assert.Throws<NotSupportedException>(() => exposedDiagnostics[0] = new AotCompatibilityDiagnostic(
+        Assert.Throws<NotSupportedException>(() => exposedDiagnostics[0] = new AotSourcePatternDiagnostic(
             "AOT999",
             "Changed.cs",
             "Changed"));

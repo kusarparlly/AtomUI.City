@@ -28,7 +28,8 @@
 
 | API Family | 关键类型 | 职责 | 硬性行为 |
 | --- | --- | --- | --- |
-| ViewModel Base | ViewModelBase | 属性通知和释放入口。 | 不引用具体 View 或 Avalonia visual。 |
+| ViewModel Base | ViewModelBase | City 自有属性通知、生命周期和释放入口。 | 不引用具体 View/Avalonia visual，也不公开继承 CommunityToolkit 具体基类。 |
+| Generated Validation | ValidatingViewModelBase | `INotifyDataErrorInfo`、错误集合以及 generated validation 调度入口。 | 仅验证型 ViewModel 显式继承；不运行时反射发现属性或 Attribute。 |
 | Activation | IActivatable, ICanDeactivate, IConfirmDeactivate, ActivationScope, DeactivationGuard | ViewModel 激活和停用。 | 状态机必须可测试，拒绝停用不抛业务异常。 |
 | Command | CommandFactory, CommandExecutionDomain, CommandExecutionLease, OperationScope, OperationExecutionResult | 命令执行、跨命令 latest-wins 所有权和操作结果。 | 异常、取消、并发拒绝必须有稳定结果；domain 不承载业务提交策略。 |
 | Interaction | Interaction<TRequest, TResult> | ViewModel 到 UI 的请求 contract。 | 无 handler 返回 NotHandled，不直接依赖 Presentation 类型。 |
@@ -39,6 +40,8 @@
 | Method | Purpose | Parameters | Return | Failure Behavior | Cancellation | Concurrency / Idempotency |
 | --- | --- | --- | --- | --- | --- | --- |
 | ViewModelBase.SetProperty | 更新属性并触发通知。 | propertyName 必须稳定且非空白，比较器可选。 | bool 表示是否变化。 | Dispose 后抛 `ObjectDisposedException`；空白 propertyName 抛 `ArgumentException`。 | 同步 API 无 token。 | 相等值不重复通知；调用线程发布通知，UI marshal 由 Presentation 负责。 |
+| ValidatingViewModelBase.SetProperty(validate) | 更新属性，并在值改变后进入该属性的 generated validator。 | field、value、validate、稳定 propertyName；类型必须具有可生成规则或无规则。 | bool 表示属性是否变化；错误通过 `INotifyDataErrorInfo` 查询。 | 未生成/不支持的验证声明在编译期失败；运行时规则异常提交 Failed/诊断，不伪装为普通 Invalid。 | 同步 Attribute 规则无 token；异步业务验证使用 ValidationScope。 | 同一 mutation 只提交一次最终错误快照；事件在状态提交后、框架锁外发布。 |
+| ValidatingViewModelBase.ValidateAllProperties | 执行 Generator 已知的全部属性规则。 | 无。 | void；结果经 HasErrors/GetErrors 读取。 | 无 generated rule 时成功 no-op；规则异常进入 Failed/诊断。 | 同步 API 无 token。 | 属性顺序和同一属性规则顺序由 Generator 确定且 byte-stable。 |
 | Interaction<TRequest, TResult>.RegisterHandler | 注册 Interaction handler。 | handler 不得为 null；activationScope 可选。 | IDisposable（随 ActivationScope 释放或手动解除）。 | handler 为 null 抛 `ArgumentNullException`；scope 已释放时立即释放 handler。 | handler 持 activationScope token，停用时取消。 | 多 handler 时最后注册者优先（last-wins）；释放后不再接收请求。 |
 | ViewModelBase.Dispose | 释放 ViewModel 生命周期资源。 | 无。 | void。 | 重复 Dispose 幂等；当前 ActivationScope 含异步任务或资源时，同步释放在提交 Disposed 前抛 `InvalidOperationException`，并保留 ActivationContext 供 `DisposeAsync` 恢复。 | 同步 API 无 token。 | 成功后进入 Disposed 终态，后续 mutation 被拒绝；**不执行 Deactivating/OnDeactivatedAsync 钩子**——需要停用语义时先调 DeactivateAsync 再 Dispose。 |
 | ViewModelBase.ActivateAsync | 激活 ViewModel。 | ActivationContext 不得为 null；scope 不得为 null；调用方 token 可选。 | ValueTask。 | 激活异常不进入 Active，释放 ActivationScope，并在 exception data 写入 ViewModel type、scope id 和 stage。 | 调用方 token 与 ActivationScope token 由基类合成为唯一有效令牌；预取消释放候选 scope 后抛 `OperationCanceledException`。 | Active 状态下重复 Activate 幂等返回。 |
@@ -113,6 +116,7 @@
 | `ValidationChangedEventArgs` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `ValidationStatus` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `ViewModelBase` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `ValidatingViewModelBase` | 关键 contract（Designed） | 继承边界、INotifyDataErrorInfo、错误提交、generated hook 或 Dispose 后行为变化必须更新 ADR、本文档和 compatibility。 |
 
 ## Nullability 和参数规则
 

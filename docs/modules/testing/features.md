@@ -13,7 +13,7 @@
 | AUC-TESTING-005 | Plugin Test Host | Implemented | PluginTestHost, PluginTestHostBuilder | PluginTestHostTests |
 | AUC-TESTING-006 | Routing Test Host | Implemented | RoutingTestHost, RoutingTestHostBuilder | RoutingTestHostTests |
 | AUC-TESTING-007 | Source Generation Kit | Implemented | SourceGenerationTestCase, GeneratedSourceSnapshot | SourceGenerationTestKitTests |
-| AUC-TESTING-008 | AOT Check | Implemented | AotCompatibilityCheck, AotCompatibilityDiagnostic | AotCompatibilityCheckTests |
+| AUC-TESTING-008 | AOT Source Pattern Lint | Implemented | AotSourcePatternCheck, AotSourcePatternDiagnostic | AotSourcePatternCheckTests |
 | AUC-TESTING-009 | Test Layers | Implemented | TestLayerAttribute, TestLayerNames | TestLayerTests |
 | AUC-TESTING-010 | Data Test Doubles | Implemented | FakeDataConnection, RecordedDataRequest, RecordingDataRequestHandler, ScriptedDataCredentialProvider, ScriptedDataInvocation, ScriptedDataResponse, ScriptedDataTransport | DataTestDoublesTests |
 
@@ -131,18 +131,18 @@ Tests: `SourceGenerationTestKitTests`
 Required Assertions: 断言 generated source snapshot、diagnostics、references。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
 
-## AUC-TESTING-008 AOT Check
+## AUC-TESTING-008 AOT Source Pattern Lint
 
 Feature ID: `AUC-TESTING-008`
 Status: Implemented
-Goal: 提供 AOT/trimming 风险检查工具。
-Public Contract: AotCompatibilityCheck, AotCompatibilityDiagnostic
-Runtime / Build Behavior: 检查 runtime reflection scan、dynamic code、unbounded Activator 等禁止模式。
-Failure Behavior: 禁止模式未识别或误报必须测试。
+Goal: 提供快速、可配置的源码文本风险模式 lint，不承担 NativeAOT 兼容性证明。
+Public Contract: AotSourcePatternCheck, AotSourcePatternDiagnostic
+Runtime / Build Behavior: `ForbidPattern` 登记 ordinal source substring，`ForbidDefaultAotRiskPatterns` 预置 runtime reflection scan、unbounded Activator 和 dynamic code 三个启发式模式，`Evaluate` 只扫描调用方显式提供的 `SourceFile.Text`。它不解析 C# 语义、不运行 linker/analyzer、不检查引用包，也不执行 publish/run。
+Failure Behavior: 命中模式返回 diagnostic；注释/字符串可能产生假阳性，别名、封装调用、依赖程序集和未登记风险可能产生假阴性。结果不得命名或解释为 AOT-compatible。
 Threading / Cancellation: 文件/metadata 扫描可取消。
 Diagnostics: diagnostic 必须包含 rule id 和 symbol。
-Tests: `AotCompatibilityCheckTests`
-Required Assertions: 断言反射扫描、dynamic code、trimming 风险诊断。
+Tests: `AotSourcePatternCheckTests`
+Required Assertions: 断言 ordinal pattern、默认三模式、重复规则、取消、显式假阳性/假阴性边界，并断言文档和 API 不把 lint 结果升级为 AOT 证明。真实兼容性由 `AtomUICityStrictAot` 与 NativeAOT publish/run 承担。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
 
 ## AUC-TESTING-009 Test Layers

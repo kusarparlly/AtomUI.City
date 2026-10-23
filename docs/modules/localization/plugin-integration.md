@@ -77,7 +77,7 @@
 
 - Localization manifest。
 - Language package descriptor。
-- Assembly language package。
+- 插件 assembly 中已嵌入的 locpack（assembly 必须先由 PluginSystem 加载）。
 - File locpack。
 - Route title key。
 - Command text key。
@@ -112,9 +112,9 @@ Plugin stopping
 -> PluginSystem release its contribution/view leases
 ```
 
-### 5. Assembly 卸载
+### 5. Assembly 所有权与卸载
 
-插件语言包 assembly 必须随插件卸载。
+Localization 不加载插件 assembly。PluginSystem 先加载插件，插件再以 `SourceAssembly` descriptor 贡献 embedded locpack；停用时 Localization 必须先撤销 descriptor、清理 package 和释放 assembly 引用，随后 PluginSystem 才能卸载其 AssemblyLoadContext。独立更新的语言内容应使用纯数据 `.locpack`。
 
 禁止：
 

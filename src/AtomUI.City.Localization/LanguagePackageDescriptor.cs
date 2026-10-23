@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Collections.ObjectModel;
 using System.Reflection;
-using System.Runtime.Loader;
 
 namespace AtomUI.City.Localization;
 
@@ -106,11 +105,6 @@ public sealed class LanguagePackageDescriptor
     /// Gets or sets contribution id.
     /// </summary>
     public string? ContributionId { get; init; }
-
-    /// <summary>
-    /// Gets or sets load context.
-    /// </summary>
-    public AssemblyLoadContext? LoadContext { get; init; }
 
     /// <summary>
     /// Represents the in memory resources value.

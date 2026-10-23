@@ -11,4 +11,5 @@ internal enum GeneratorFeature
     Localization,
     PluginSystem,
     Data,
+    Mvvm,
 }

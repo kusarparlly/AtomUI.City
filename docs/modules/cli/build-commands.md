@@ -65,6 +65,8 @@
 
 Build 命令负责调用 `AtomUI.City.Build` 定义的 MSBuild targets，不在 CLI 内重新实现构建逻辑。
 
+这里的所有权属于被构建的目标项目：目标应用或插件通过 `PackageReference` 引入 `AtomUI.City.Build`，CLI 只启动该项目的 `dotnet build`、`pack` 或 `publish` 进程并透传参数、诊断和退出码。`AtomUI.City.Cli` 自身不得通过 `ProjectReference` 或运行时依赖引入这个纯构建资产包，否则会把应用的 `buildTransitive` 规则错误应用到 CLI 工具自身。
+
 ### 2. 命令
 
 ```bash

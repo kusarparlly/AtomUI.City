@@ -40,6 +40,7 @@
     { "name": "AtomUICityPluginUnloadable", "visibility": "public", "default": "true" },
     { "name": "AtomUICityPluginValidateManifest", "visibility": "public", "default": "true" },
     { "name": "AtomUICityPluginVersion", "visibility": "public", "default": "$(Version)" },
+    { "name": "AtomUICityRuntimeProject", "visibility": "public", "default": "$(_AtomUICityDetectedRuntimeProject)" },
     { "name": "AtomUICitySourceGenerationMode", "visibility": "public", "default": "Strict" },
     { "name": "AtomUICityStrictAot", "visibility": "public", "default": "false" },
     { "name": "AtomUICityValidateManifests", "visibility": "public", "default": "true" }

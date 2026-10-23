@@ -35,8 +35,35 @@ public sealed class EngineeringGateTests
 
         Assert.Contains("dotnet restore AtomUICity.slnx", workflow, StringComparison.Ordinal);
         Assert.Contains("bash engineering/check-release.sh --no-restore", workflow, StringComparison.Ordinal);
+        Assert.Contains("nativeaot-runtime-matrix", workflow, StringComparison.Ordinal);
+        Assert.Contains("check-native-aot-runtime-matrix.ps1", workflow, StringComparison.Ordinal);
         Assert.Contains("presentation-windows-release", workflow, StringComparison.Ordinal);
         Assert.Contains("check-presentation-release.ps1", workflow, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void NativeAotRuntimeMatrixPublishesAndRunsBothSupportedFrameworks()
+    {
+        var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
+        var scriptPath = Path.Combine(
+            repositoryRoot,
+            EngineeringScriptsDirectoryName,
+            "check-native-aot-runtime-matrix.ps1");
+        var fixturePath = Path.Combine(
+            repositoryRoot,
+            "fixtures",
+            "AtomUI.City.NativeAot.RuntimeMatrix",
+            "AtomUI.City.NativeAot.RuntimeMatrix.csproj");
+
+        Assert.True(File.Exists(scriptPath), "Expected a persistent NativeAOT runtime matrix gate.");
+        Assert.True(File.Exists(fixturePath), "Expected a persistent NativeAOT runtime matrix fixture.");
+
+        var script = File.ReadAllText(scriptPath);
+        Assert.Contains("net8.0", script, StringComparison.Ordinal);
+        Assert.Contains("net10.0", script, StringComparison.Ordinal);
+        Assert.Contains("AtomUICityRuntimeMatrixPublishAot=true", script, StringComparison.Ordinal);
+        Assert.Contains("CITY_NATIVEAOT_RUNTIME_MATRIX_OK", script, StringComparison.Ordinal);
+        Assert.Contains("ConvertFrom-Json", script, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -333,6 +360,8 @@ public sealed class EngineeringGateTests
         Assert.Contains("PackageReference Include=\"AtomUI.City.Core\"", project, StringComparison.Ordinal);
         Assert.Contains("PackageReference Include=\"AtomUI.City.EventBus\"", project, StringComparison.Ordinal);
         Assert.Contains("UseModule<ConsumerModule>", program, StringComparison.Ordinal);
+        Assert.Contains("CancellationToken cancellationToken", program, StringComparison.Ordinal);
+        Assert.Contains("cancellationToken.ThrowIfCancellationRequested()", program, StringComparison.Ordinal);
         Assert.Contains("PublishAsync", program, StringComparison.Ordinal);
         Assert.Contains("PostAsync", program, StringComparison.Ordinal);
         Assert.Contains("StopAsync", program, StringComparison.Ordinal);

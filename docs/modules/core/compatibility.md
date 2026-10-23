@@ -11,6 +11,7 @@
 ## 模块兼容性硬边界
 
 - Core 不允许引用 Avalonia、AtomUI、Roslyn、CLI、Templates 或 Testing 生产程序集。
+- Core runtime assembly 不保留仅供测试使用的 factory、branch、backdoor 或反射辅助代码。原 `ModuleRegistry.CreateForTesting` internal test hook 已迁移到 Core.Tests；不得通过 suppression、DAM 或兼容转发重新引入发货程序集。
 - ApplicationHostBuilder Build 成功或失败后必须冻结服务注册入口及所有通过 Builder 逃逸的 Configuration mutation handle；`Sources`/`Properties.IsReadOnly` 必须同步反映冻结状态。补齐递归 section/child/root/provider Guard 与只读状态报告属于执行既有冻结合同的缺陷修复。
 - LifecyclePipeline stage 顺序必须稳定，同一 stage 内 middleware 顺序必须稳定。
 - LifecycleScope Parent Stop 必须把快照后正常完成的 child Dispose 视为已清理，并通过 child Stop transaction 保留真实 failure；该内部 handoff 不放宽公开 Stop-after-Dispose 合同。

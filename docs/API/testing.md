@@ -56,7 +56,7 @@ Assert.True(called);
 | `SourceGenerationTestCase` | 在内存 compilation 中运行 generator |
 | `GeneratedSourceSnapshot` | 规范化并稳定排序生成源码 |
 | `SourceGenerationTestResult` | 同时暴露 generator 与 compilation diagnostics |
-| `AotCompatibilityCheck` | 检查运行时扫描、dynamic code 和反射风险模式 |
+| `AotSourcePatternCheck` | 对显式源码文本执行启发式 AOT 风险 pattern lint；通过不代表 NativeAOT compatible |
 
 ## Data 测试替身
 

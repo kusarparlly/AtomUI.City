@@ -10,7 +10,7 @@
 | AUC-LOCALIZATION-002 | Language Package Provider | Completed | ILanguagePackageProvider, LanguagePackageDescriptor, LanguagePackageRegistry | LanguagePackageProviderTests |
 | AUC-LOCALIZATION-003 | Lazy Package Loading | Completed | LocalizationService, LanguagePackageLoadResult | LocalizationServiceTests |
 | AUC-LOCALIZATION-004 | Lookup and Missing Key Fallback | Completed | LocalizedString, LocalizedText, LocalizationResult | LocalizationServiceTests |
-| AUC-LOCALIZATION-005 | Assembly Language Packages | Completed | AssemblyLanguagePackageProvider, LanguagePackageAttribute | LanguagePackageProviderTests; LocalizationDeclarationAttributeTests |
+| AUC-LOCALIZATION-005 | Statically Linked Assembly Language Packages | Verified | AssemblyLanguagePackageProvider, LanguagePackageAttribute | LanguagePackageProviderTests; LocalizationDeclarationAttributeTests; NativeAOT Runtime Matrix |
 | AUC-LOCALIZATION-006 | Optional Application Refresh Hook | Completed | IPresentationLocalizationBridge, LocalizedTextChangedEventArgs | LocalizationServiceTests |
 | AUC-LOCALIZATION-007 | Plugin Package Revocation | Completed | ILocalizationService, ResourceScope, LanguagePackageProviderKind | LocalizationServiceTests |
 | AUC-LOCALIZATION-008 | Generated Localization Manifest | Completed | LanguagePackageAttribute, LocalizedResourceAttribute, generated manifest | AtomUICityIncrementalGeneratorLocalizationTests; LocalizationManifestBuilderTests |
@@ -22,7 +22,7 @@
 | --- | --- |
 | 语言包按当前 culture 和 fallback chain 懒加载，不在启动时全量加载。 | 必须有实现、测试或工程门禁证据。 |
 | 每种语言自己的语言包独立缓存、独立诊断、独立撤销。 | 必须有实现、测试或工程门禁证据。 |
-| 语言包可以来自 Host、模块、插件或独立 assembly，但都必须有 owner。 | 必须有实现、测试或工程门禁证据。 |
+| 语言包可以来自 Host、模块、插件、已加载 assembly 或纯数据 `.locpack`，但都必须有 owner；Localization 不按路径动态加载托管程序集。 | 必须有实现、测试或工程门禁证据。 |
 | 缺失 key 必须诊断并走 fallback，不允许静默返回空字符串。 | 必须有实现、测试或工程门禁证据。 |
 
 ## Feature 实现合同
@@ -92,15 +92,15 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 ## AUC-LOCALIZATION-005 Assembly Language Packages
 
 Feature ID: `AUC-LOCALIZATION-005`
-Status: Completed
-Goal: 支持语言包放在独立 assembly 并运行时加载。
+Status: Verified
+Goal: 支持从静态链接或已经由 owner 加载的 assembly 读取 embedded locpack，同时保持默认 Localization 路径 NativeAOT-safe。
 Public Contract: AssemblyLanguagePackageProvider, LanguagePackageAttribute, LocalizedResourceAttribute
-Runtime / Build Behavior: assembly provider 通过 `Discover(Assembly)` 读取 `LanguagePackageAttribute` 并生成 assembly descriptor；descriptor 记录原 assembly 的 AssemblyLoadContext、path、resource base name、fallback culture、version、checksum 和 contribution id，随后在同一 ALC 加载 embedded locpack，禁止把 collectible plugin package 加入 Default ALC。
-Failure Behavior: assembly load 失败、资源缺失和 locpack 格式错误只影响该 package；owner revoke 后相同 owner 不可重新注册已发现 descriptor。
-Threading / Cancellation: assembly load 可以在后台线程；加载完成后通过 service 发布。
+Runtime / Build Behavior: Generator 生成的 assembly descriptor 直接持有声明程序集 `SourceAssembly`；provider 只从该已知 assembly 读取 embedded locpack，不扫描应用、不根据路径加载 DLL。`Discover(Assembly)` 仅是显式 CoreCLR 兼容入口，不进入默认启动链路。插件程序集必须先由 PluginSystem/owner 加载，再把该 assembly 作为 `SourceAssembly` 贡献；可更新的外部语言包使用纯数据 `.locpack`。
+Failure Behavior: `ProviderKind.Assembly` descriptor 缺少 `SourceAssembly`、资源缺失或 locpack 格式错误只影响该 package，并返回稳定失败；不得回退到 `Location` 或 Default ALC 动态装载。owner revoke 后相同 owner 不可重新注册已发现 descriptor。
+Threading / Cancellation: embedded locpack 读取可以在后台线程；加载完成后通过 service 发布。
 Diagnostics: assembly package diagnostics 必须包含 assembly name、resource name 和 culture。
 Tests: `LanguagePackageProviderTests; LocalizationDeclarationAttributeTests`
-Required Assertions: 断言独立 assembly、属性声明、资源读取、缺失资源和 unload owner。
+Required Assertions: 断言静态/已加载 `SourceAssembly`、属性声明、资源读取、缺少 SourceAssembly、缺失资源、owner revoke，以及默认 `AddLocalization()` 在双 TFM NativeAOT 下 publish/run；断言任何 assembly path descriptor 都不会触发动态 DLL 加载。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
 
 ## AUC-LOCALIZATION-006 Optional Application Refresh Hook

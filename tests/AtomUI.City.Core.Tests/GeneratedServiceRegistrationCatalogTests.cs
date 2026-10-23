@@ -176,7 +176,7 @@ public sealed class GeneratedServiceRegistrationCatalogTests
     [Fact]
     public async Task GeneratedServicesRunBetweenPreConfigureAndConfigure()
     {
-        var registry = ModuleRegistry.CreateForTesting([typeof(OrderModule)]);
+        var registry = ModuleRegistryTestFactory.Create([typeof(OrderModule)]);
         var services = new ServiceCollection();
         var order = new List<string>();
         OrderModule.Order = order;

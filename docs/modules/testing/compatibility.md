@@ -18,6 +18,7 @@
 - `AUC-TESTING-010` 的七个 Data test doubles 由 Testing 包拥有兼容性责任；Data 文档中的测试需求不能替代这些 public 类型的 API 合同。
 - scripted response/credential 的 FIFO 消费、空队列结果、`DataResultStatus` 映射、记录快照字段和 `FakeDataConnection` 状态/计数语义均属于 Preview 兼容面；变更必须同步 Feature、API 卡与 `DataTestDoublesTests`。
 - Data 测试替身不得进入生产依赖图；未来新增 Data contract 时，应由 Testing 增量提供测试实现，不能让 Data 反向引用 Testing。
+- Preview API `AotCompatibilityCheck` / `AotCompatibilityDiagnostic` 已分别更名为 `AotSourcePatternCheck` / `AotSourcePatternDiagnostic`，`ForbidDefaultAotPatterns` 已更名为 `ForbidDefaultAotRiskPatterns`。这是对既有 ordinal string scan 原意的命名纠正，不改变 pattern matching 算法；旧名称不再作为公开 API 或 AOT gate。真实兼容性由 Build strict analyzer 和 NativeAOT publish/run 负责。
 
 ## 数据格式兼容
 

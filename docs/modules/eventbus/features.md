@@ -12,7 +12,7 @@ EventBus Application Plane 已完成实现与模块级验证；Plugin Plane 的 
 | AUC-EVENTBUS-002 | Subscription Ownership & Lifecycle | Application Plane MVP | EventBus Contract Verified / PluginSystem Integration Pending | IEventSubscriber, IEventHandler, IEventSubscription, subscription state/options/descriptor | EventSubscriptionTests |
 | AUC-EVENTBUS-003 | Contract Identity & Registry | Application Plane MVP | Verified | EventContractId, EventContractDescriptor, EventContractPlane, IEventContractRegistry | EventContractRegistryTests |
 | AUC-EVENTBUS-004 | Dispatch & Failure Policy | Application Plane MVP | Verified | dispatch target/mode, delivery result, error and timeout policy | EventDispatchAndFailurePolicyTests |
-| AUC-EVENTBUS-005 | Diagnostics & Observability | Application Plane MVP | Verified | EventDiagnosticIds, diagnostic context, metrics and safe payload projection | EventDiagnosticsTests |
+| AUC-EVENTBUS-005 | Diagnostics & Observability | Application Plane MVP | Verified | EventDiagnosticIds, diagnostic context, metrics and safe payload projection | EventDiagnosticsTests; EventBusNativeAotProcessTests |
 | AUC-EVENTBUS-006 | DI & Host Lifecycle | Application Plane MVP | Verified | AddEventBus, EventBus module/options, internal lifecycle control plane | EventBusHostIntegrationTests |
 | AUC-EVENTBUS-007 | Bounded Channel Runtime | Application Plane MVP | Verified | EventChannel, channel options, execution/concurrency/backpressure policy | EventChannelRuntimeTests |
 | AUC-EVENTBUS-008 | Generated Event Catalog & NativeAOT | Application Plane MVP | Verified | event attributes, generated registrar/manifest/descriptors/invokers | EventBusGeneratorTests; EventBusNativeAotProcessTests |
@@ -91,9 +91,9 @@ Feature ID: `AUC-EVENTBUS-005`
 Status: Verified
 Goal: 用稳定诊断和指标重建 publication、delivery、subscription、channel 与插件因果链。
 Contract Family: `EventDiagnosticIds`、EventBus diagnostic context、metrics snapshot、safe payload projector。
-Design Coverage: EventId、CorrelationId、CausationId、ContractId、SubscriptionId、owner、channel、partition、policy 和 duration。
+Design Coverage: EventId、CorrelationId、CausationId、ContractId、SubscriptionId、owner、channel、partition、policy 和 duration；`AddEventPayloadDiagnosticProjector<TEvent,TProjector>` 必须把 DI 所需的 public-constructor 可达性要求传播给 NativeAOT linker，不得要求应用额外编写 linker descriptor。
 Failure Coverage: 诊断 sink 不可用、payload/exception 持有插件对象、限流、丢弃、超时和卸载残留。
-Primary Tests: `EventDiagnosticsTests`。
+Primary Tests: `EventDiagnosticsTests`、`EventBusNativeAotProcessTests`；NativeAOT fixture 必须通过公开注册入口注册一个带 DI 构造依赖的 projector，并在双 TFM 原生进程中完成解析和投影。
 
 ## AUC-EVENTBUS-006 DI & Host Lifecycle
 

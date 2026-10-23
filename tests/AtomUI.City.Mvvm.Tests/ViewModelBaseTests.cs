@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.ComponentModel;
 using AtomUI.City.Core.Diagnostics;
 using AtomUI.City.Mvvm;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -112,7 +113,9 @@ public sealed class ViewModelBaseTests
 
         Assert.Equal(1, viewModel.ActivatedCount);
         Assert.Equal(1, viewModel.DeactivatedCount);
-        Assert.IsAssignableFrom<ObservableValidator>(viewModel);
+        Assert.IsAssignableFrom<INotifyPropertyChanged>(viewModel);
+        Assert.IsAssignableFrom<INotifyPropertyChanging>(viewModel);
+        Assert.IsNotAssignableFrom<ObservableValidator>(viewModel);
     }
 
     [Fact]

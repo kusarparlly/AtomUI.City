@@ -13,12 +13,15 @@ AtomUI.City.Mvvm 的架构目标是把模块职责变成可实现、可测试、
 - Interaction 只表达请求，UI 展示由 Presentation handler 完成。
 - Command 状态支持完成、取消、异常和并发拒绝结果。
 - ViewModel 生命周期必须能被 Routing 和 Presentation 组合使用。
+- 普通 ViewModel 不携带验证状态；验证型 ViewModel 显式继承 `ValidatingViewModelBase`。
+- public ViewModel 基类不暴露 CommunityToolkit 的具体基类，验证不得运行时反射发现规则。
 
 ## 核心概念和所有权
 
 | 概念 | 职责 | 创建者 | 释放/失效规则 |
 | --- | --- | --- | --- |
 | ViewModelBase | 属性通知、IDisposable 释放入口和 disposed 状态。 | 应用或 DI | Dispose 幂等释放当前 ActivationScope；释放后 mutation 抛 `ObjectDisposedException`。 |
+| ValidatingViewModelBase | `INotifyDataErrorInfo`、生成式同步验证和错误集合所有权。 | 应用或 DI | 随 ViewModel 释放；Dispose 后拒绝 mutation，已提交错误只允许只读查询。 |
 | ActivationScope | ViewModel 激活边界、取消 token 和诊断 scope id。 | Presentation/MVVM | Deactivate 或 Dispose；重复释放幂等。 |
 | CommandExecutionDomain | 多个显式加入的 Command 的 latest-wins 所有权、generation/currentness、取消和 drain。 | 应用/ViewModel 组合代码 | owner 永久结束时 DisposeAsync；每次 execution 结束即回收自己的 lease/CTS；关闭后拒绝新准入。 |
 | Interaction | ViewModel 请求 UI 交互。 | ViewModel | handler 完成即终；未完成请求随 ActivationScope 释放取消。 |
@@ -72,3 +75,5 @@ flowchart LR
 - 运行时发现能力优先通过 source generator 或 manifest。
 - 产品实现不得把运行时反射扫描作为唯一发现机制。
 - 生成输出和 manifest 必须稳定排序，便于 snapshot test 和增量构建。
+- DataAnnotations 只在编译期读取；运行时通过生成代码直接进入属性规则。
+- Strict AOT 不允许未知验证 Attribute、按字符串查找方法或 `ObservableValidator` fallback。

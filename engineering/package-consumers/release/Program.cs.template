@@ -34,8 +34,11 @@ public sealed class ConsumerEventHandler : IEventHandler<ConsumerEvent>
 
     public static Task<int> WaitAsync() => Delivery.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
-    public ValueTask HandleAsync(EventContext<ConsumerEvent> context)
+    public ValueTask HandleAsync(
+        EventContext<ConsumerEvent> context,
+        CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         Delivery.TrySetResult(context.Event.Value);
         return ValueTask.CompletedTask;
     }

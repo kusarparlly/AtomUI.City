@@ -85,8 +85,8 @@ Localization manifest
 
 - Culture-first lazy loading：懒加载以当前 culture 的语言包为单位，不按单个 key 零散加载。
 - Manifest-only startup：启动只加载 manifest，不加载所有语言包。
-- Assembly package capable：普通 .NET 运行时支持语言包独立 assembly 动态加载。
-- AOT compatible：Native AOT 模式使用 file-based locpack provider，不依赖动态 assembly loading。
+- Assembly package capable：支持从静态链接或已经由 owner 加载的 assembly 读取 embedded locpack；Localization 不动态加载程序集。
+- AOT compatible：默认 embedded、file 和 in-memory provider 组合均不依赖动态 assembly loading。
 - UI integration：文化变化可通过应用或独立 UI 适配包实现的可选 bridge 同步到 AtomUI/Avalonia。
 - Transactional culture switch：文化切换必须先准备并校验 package，再提交状态；提交前失败或调用方取消保留旧状态。可选 application-owned bridge 位于提交后，改由 service lifetime token 完成本次刷新；失败返回 Result、记录诊断并继续本地文本刷新，不回滚已发布 CultureState。
 - Plugin-aware：插件语言包必须可撤销、可释放、可卸载。
@@ -178,7 +178,7 @@ Current culture = zh-CN
 
 ### 7. 语言包 Assembly
 
-普通 .NET 运行时支持语言包放在独立 assembly 中运行时动态加载。
+语言包可以嵌入静态链接或已经由 owner 加载的 assembly；Localization 只读取 descriptor 的 `SourceAssembly`，不根据路径加载 DLL。
 
 推荐模式：
 
@@ -187,8 +187,8 @@ AssemblyLanguagePackageProvider
 FileLanguagePackageProvider
 ```
 
-- `AssemblyLanguagePackageProvider`：普通 .NET / CoreCLR / 插件动态加载场景。
-- `FileLanguagePackageProvider`：Native AOT 或严格 AOT 模式，使用 `.locpack`、json 或 binary resource pack。
+- `AssemblyLanguagePackageProvider`：读取已知 `SourceAssembly` 中的 embedded locpack。
+- `FileLanguagePackageProvider`：加载可更新、可下载或独立部署的纯数据 `.locpack`。
 
 语言包 assembly 应尽量是 resource-only，不放可执行代码。生成的 key constants 和 registrar 位于模块或插件主 assembly，语言包 assembly 只提供资源数据。
 

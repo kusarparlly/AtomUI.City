@@ -89,16 +89,16 @@ Mvvm 不负责：
 
 ### 3. 底层依赖
 
-第一版直接复用 `CommunityToolkit.Mvvm`：
+第一版继续复用 `CommunityToolkit.Mvvm` 的 command 体系和 source generator 能力：
 
-- `ObservableObject`
-- `ObservableValidator`
 - `IRelayCommand`
 - `IAsyncRelayCommand`
 - `RelayCommand`
 - `AsyncRelayCommand`
 - `[ObservableProperty]`
 - `[RelayCommand]`
+
+依据 [ADR 0017](../../decisions/0017-aot-first-generated-viewmodel-validation.md)，City 不再把 `ObservableObject` 或 `ObservableValidator` 暴露为 `ViewModelBase` 的 public 父类。属性通知与验证基类由 City 持有，以避免第三方继承结构和反射验证进入长期 API/AOT 合同。
 
 不重新发明命令类型，不引入 `CityCommand` / `CityViewModel` 这类命名。命名空间已经表达框架身份。
 
@@ -111,6 +111,7 @@ ReactiveUI / Rx 可以作为适配层，但不是默认核心依赖。
 | 类型 | 职责 |
 |---|---|
 | `ViewModelBase` | 默认 ViewModel 基类。 |
+| `ValidatingViewModelBase` | 需要 DataAnnotations 或 typed custom validator 的验证型 ViewModel 基类。 |
 | `IActivatable` | 支持激活/停用的 ViewModel contract。 |
 | `ActivationContext` | ViewModel 激活上下文。 |
 | `ActivationScope` | ViewModel 激活期资源和取消边界。 |
@@ -263,7 +264,7 @@ Interaction 适合：
 
 ### 11. Validation 模型
 
-默认基于 `ObservableValidator`。
+验证基于 `ValidatingViewModelBase`、City Generator 和 `ValidationScope`，不基于运行时反射式 `ObservableValidator`。
 
 Mvvm 补充：
 
@@ -344,6 +345,7 @@ Generator/Analyzer 负责：
 - 生成 command descriptor。
 - 生成 interaction descriptor。
 - 与 Presentation generator 对齐 View/ViewModel binding。
+- 为 `ValidatingViewModelBase` 派生类生成静态属性验证，拒绝无法分析的反射式 fallback。
 - 避免运行时扫描程序集查找 ViewModel。
 
 Mvvm 不通过反射扫描 ViewModel，不基于命名约定做默认发现。

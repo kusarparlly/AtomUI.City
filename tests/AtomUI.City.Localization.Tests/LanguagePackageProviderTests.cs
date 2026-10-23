@@ -11,7 +11,7 @@ namespace AtomUI.City.Localization.Tests;
 public sealed class LanguagePackageProviderTests
 {
     [Fact]
-    public void AssemblyProviderUsesDescriptorLoadContextWithoutPinningDefaultContext()
+    public void AssemblyProviderUsesOwnerLoadedSourceAssemblyWithoutPinningLoadContext()
     {
         var loadContext = LoadAssemblyPackageInCollectibleContext();
 
@@ -318,7 +318,7 @@ public sealed class LanguagePackageProviderTests
     }
 
     [Fact]
-    public async Task AssemblyProviderLoadsEmbeddedLocPackResource()
+    public async Task AssemblyProviderRejectsLocationOnlyDescriptor()
     {
         var descriptor = new LanguagePackageDescriptor(
             "Host.en-US",
@@ -333,10 +333,8 @@ public sealed class LanguagePackageProviderTests
 
         var result = await provider.LoadAsync(descriptor);
 
-        Assert.True(result.Succeeded);
-        Assert.NotNull(result.Package);
-        Assert.True(result.Package.TryGetString("Settings.Title", out var value));
-        Assert.Equal("Settings", value);
+        Assert.False(result.Succeeded);
+        Assert.Equal(LocalizationErrorKind.InvalidDescriptor, result.Error?.Kind);
     }
 
     [Fact]
@@ -368,7 +366,7 @@ public sealed class LanguagePackageProviderTests
             ResourceScope.Host)
         {
             ProviderKind = LanguagePackageProviderKind.Assembly,
-            Location = typeof(LanguagePackageProviderTests).Assembly.Location,
+            SourceAssembly = typeof(LanguagePackageProviderTests).Assembly,
             ResourceBaseName = "Fixtures.Host.en-US.locpack.json",
         };
 
@@ -388,7 +386,7 @@ public sealed class LanguagePackageProviderTests
             ResourceScope.Host)
         {
             ProviderKind = LanguagePackageProviderKind.Assembly,
-            Location = typeof(LanguagePackageProviderTests).Assembly.Location,
+            SourceAssembly = typeof(LanguagePackageProviderTests).Assembly,
             ResourceBaseName = "Host.en-US.locpack.json",
         };
 
@@ -407,7 +405,7 @@ public sealed class LanguagePackageProviderTests
             ResourceScope.Host)
         {
             ProviderKind = LanguagePackageProviderKind.Assembly,
-            Location = typeof(LanguagePackageProviderTests).Assembly.Location,
+            SourceAssembly = typeof(LanguagePackageProviderTests).Assembly,
             ResourceBaseName = "AtomUI.City.Localization.Tests.Fixtures.Host.en-US.locpack.json",
         };
         var provider = new AssemblyLanguagePackageProvider();
@@ -605,27 +603,23 @@ public sealed class LanguagePackageProviderTests
             "localization-test-" + Guid.NewGuid().ToString("N"),
             isCollectible: true);
         var weakReference = new WeakReference(context);
+        var sourceAssembly = context.LoadFromAssemblyPath(
+            Path.GetFullPath(typeof(LanguagePackageProviderTests).Assembly.Location));
         var descriptor = new LanguagePackageDescriptor(
             "Host.en-US",
             CultureInfo.GetCultureInfo("en-US"),
             ResourceScope.Host)
         {
             ProviderKind = LanguagePackageProviderKind.Assembly,
-            Location = typeof(LanguagePackageProviderTests).Assembly.Location,
+            SourceAssembly = sourceAssembly,
             ResourceBaseName = "AtomUI.City.Localization.Tests.Fixtures.Host.en-US.locpack.json",
-            LoadContext = context,
         };
         var provider = new AssemblyLanguagePackageProvider();
         var result = provider.LoadAsync(descriptor).AsTask().GetAwaiter().GetResult();
 
         Assert.True(result.Succeeded);
-        Assert.Contains(
-            context.Assemblies,
-            assembly => string.Equals(
-                assembly.Location,
-                typeof(LanguagePackageProviderTests).Assembly.Location,
-                StringComparison.OrdinalIgnoreCase));
-        result.Package!.Dispose();
+        Assert.Same(sourceAssembly, result.Package!.Descriptor.SourceAssembly);
+        result.Package.Dispose();
         context.Unload();
 
         return weakReference;

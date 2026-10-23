@@ -40,7 +40,8 @@
 
 | API family | 主要类型 | 用途 |
 | --- | --- | --- |
-| ViewModel | `ViewModelBase` | observable validation、激活与释放 |
+| 普通 ViewModel | `ViewModelBase` | 属性变更通知、激活与释放；不默认携带验证运行时 |
+| 验证型 ViewModel | `ValidatingViewModelBase` | 生成式属性验证、错误通知与验证状态 |
 | 激活 | `IActivatable`、activation scope contracts | 将订阅和异步工作绑定到可见生命周期 |
 | 命令 | `CommandGroup`、`CommandExecutionState` | 聚合命令并观察执行状态 |
 | 验证 | validation contracts 和事件模型 | 公开稳定、不可伪造的验证状态 |

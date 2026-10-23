@@ -19,6 +19,7 @@
 | `AUCBLD0201` | InvalidPluginPackageLayout | 插件包缺少必需资产或存在路径逃逸。 |
 | `AUCBLD0202` | MultiplePluginMainAssemblies | 插件包主程序集布局不唯一。 |
 | `AUCBLD0301` | DynamicPluginNotAotCompatible | Strict AOT 与动态插件配置冲突。 |
+| `AUCBLD0302` | StrictAotDiagnosticSuppressed | Strict AOT runtime project 试图通过 `NoWarn` 或 `WarningsNotAsErrors` 屏蔽 IL2xxx/IL3xxx 诊断。 |
 | `AUCBLD0401` | InvalidApplicationPublishLayout | 应用发布布局或 application manifest 无效。 |
 | `AUCBLD0501` | ResxCompilationFailed | RESX 无法安全、完整地编译为 City locpack。 |
 

@@ -45,7 +45,7 @@ flowchart LR
 | UI work 未 drain | FakeUiDispatcher 暴露 pending work。 | FakeUiDispatcherTests |
 | generator 输出变化 | snapshot assertion 失败并显示 source name。 | SourceGenerationTestKitTests |
 | 插件卸载后仍有 contribution | PluginTestHost 失败。 | PluginTestHostTests |
-| AOT 禁止模式被使用 | AotCompatibilityCheck 返回 diagnostic。 | AotCompatibilityCheckTests |
+| 显式源码文本命中已登记 AOT 风险 pattern | AotSourcePatternCheck 返回 heuristic diagnostic；不代表 AOT 验收。 | AotSourcePatternCheckTests |
 
 ## 与其他模块关系
 

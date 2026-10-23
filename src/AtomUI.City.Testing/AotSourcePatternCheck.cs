@@ -1,35 +1,39 @@
 namespace AtomUI.City.Testing;
 
 /// <summary>
-/// Represents aot compatibility check.
+/// Performs configurable ordinal source-text pattern linting for common AOT risks.
 /// </summary>
-public sealed class AotCompatibilityCheck
+/// <remarks>
+/// This heuristic lint does not run the linker or AOT analyzers and cannot prove
+/// that an application is NativeAOT compatible.
+/// </remarks>
+public sealed class AotSourcePatternCheck
 {
     private readonly List<ForbiddenAotPattern> _forbiddenPatterns = [];
 
-    private AotCompatibilityCheck()
+    private AotSourcePatternCheck()
     {
     }
 
     /// <summary>
-    /// Executes the create operation.
+    /// Creates an empty source pattern check.
     /// </summary>
-    public static AotCompatibilityCheck Create()
+    public static AotSourcePatternCheck Create()
     {
-        return new AotCompatibilityCheck();
+        return new AotSourcePatternCheck();
     }
 
     /// <summary>
-    /// Executes the forbid pattern operation.
+    /// Adds an ordinal source-text pattern rule.
     /// </summary>
-    public AotCompatibilityCheck ForbidPattern(string diagnosticId, string pattern)
+    public AotSourcePatternCheck ForbidPattern(string diagnosticId, string pattern)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(diagnosticId);
         ArgumentException.ThrowIfNullOrWhiteSpace(pattern);
 
         if (!_forbiddenPatterns.Any(existing =>
-                string.Equals(existing.DiagnosticId, diagnosticId, StringComparison.Ordinal)
-                && string.Equals(existing.Pattern, pattern, StringComparison.Ordinal)))
+                string.Equals(existing.DiagnosticId, diagnosticId, StringComparison.Ordinal) &&
+                string.Equals(existing.Pattern, pattern, StringComparison.Ordinal)))
         {
             _forbiddenPatterns.Add(new ForbiddenAotPattern(diagnosticId, pattern));
         }
@@ -38,9 +42,10 @@ public sealed class AotCompatibilityCheck
     }
 
     /// <summary>
-    /// Executes the forbid default aot patterns operation.
+    /// Adds the built-in heuristic patterns for runtime type scans, unbounded
+    /// activation, and dynamic method generation.
     /// </summary>
-    public AotCompatibilityCheck ForbidDefaultAotPatterns()
+    public AotSourcePatternCheck ForbidDefaultAotRiskPatterns()
     {
         ForbidPattern("AOT001", "Assembly.GetTypes");
         ForbidPattern("AOT002", "Activator.CreateInstance");
@@ -50,15 +55,15 @@ public sealed class AotCompatibilityCheck
     }
 
     /// <summary>
-    /// Executes the evaluate operation.
+    /// Evaluates explicitly supplied source text against the configured patterns.
     /// </summary>
-    public IReadOnlyList<AotCompatibilityDiagnostic> Evaluate(
+    public IReadOnlyList<AotSourcePatternDiagnostic> Evaluate(
         IEnumerable<SourceFile> sources,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(sources);
 
-        var diagnostics = new List<AotCompatibilityDiagnostic>();
+        var diagnostics = new List<AotSourcePatternDiagnostic>();
 
         foreach (var source in sources)
         {
@@ -70,10 +75,10 @@ public sealed class AotCompatibilityCheck
 
                 if (source.Text.Contains(pattern.Pattern, StringComparison.Ordinal))
                 {
-                    diagnostics.Add(new AotCompatibilityDiagnostic(
+                    diagnostics.Add(new AotSourcePatternDiagnostic(
                         pattern.DiagnosticId,
                         source.Path,
-                        $"Source '{source.Path}' uses forbidden AOT pattern '{pattern.Pattern}'."));
+                        $"Source '{source.Path}' contains AOT risk pattern '{pattern.Pattern}'."));
                 }
             }
         }

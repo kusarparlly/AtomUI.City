@@ -14,7 +14,7 @@
 | AUC-BUILD-006 | Release Gates | 已实现并通过产品合同测试 | engineering/check-docs.sh, pack/test gates | EngineeringGateTests; PackagingReleaseGateTests |
 | AUC-BUILD-007 | Test Naming | 已实现并通过产品合同测试 | test project and test file naming convention | TestNamingConventionTests |
 | AUC-BUILD-008 | MSBuild Transitive Assets | 已实现并通过产品合同测试 | buildTransitive props/targets、machine-readable contract、analyzer package assets | BuildAssemblyTests; SourceGeneratorProjectStructureTests; ProjectInventoryTests |
-| AUC-BUILD-009 | Build Task Execution | 已实现并通过产品消费测试 | Build properties/items, AtomUI.City.Build.Tasks, plugin/application manifests | ManifestTaskTests; IncrementalGeneratorInfrastructureTests; AtomUI.City.Build.PackagingSmoke |
+| AUC-BUILD-009 | Build Task Execution | 已实现并通过 Strict AOT 门禁 | Build properties/items, AtomUI.City.Build.Tasks, plugin/application manifests | ManifestTaskTests; BuildTransitiveEvaluationTests; AtomUI.City.Build.PackagingSmoke; Strict AOT consumers |
 | AUC-BUILD-010 | RESX Language Package Compilation | 已实现并通过模板消费测试 | `AtomUICityCompileResx`、`AtomUICityResx`、`CompileAtomUICityResx` | ManifestTaskTests; GenerationTemplateRendererTests |
 
 ## Feature 硬门禁
@@ -150,15 +150,15 @@ Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤�
 ## AUC-BUILD-009 Build Task Execution
 
 Feature ID: `AUC-BUILD-009`
-Status: 已实现并通过 Tasks、Generator 与 NuGet-only 产品消费测试
+Status: 已实现并通过 Strict AOT 门禁
 Goal: 让公开的 Build Property、Item 和 Target 具有真实、可验证的生产消费链，禁止静默空实现。
 Public Contract: `AtomUICitySourceGenerationMode`、`AtomUICityStrictAot`、插件和应用打包 Property/Item、package/application manifest v1。
-Runtime / Build Behavior: `AtomUI.City.Build` 负责编排；包内 `AtomUI.City.Build.Tasks` 负责确定性 JSON、路径校验、资产布局、Hash 和最终包验证；Generator 继续输出强类型 C# Catalog。
-Failure Behavior: 非法值、缺少必需 metadata、路径逃逸、重复声明、无效 manifest 或包布局必须以稳定 `AUCBLD` 诊断阻止构建。
+Runtime / Build Behavior: `AtomUI.City.Build` 负责编排；包内 `AtomUI.City.Build.Tasks` 负责确定性 JSON、路径校验、资产布局、Hash 和最终包验证；Generator 继续输出强类型 C# Catalog。`AtomUICityStrictAot=true` 对 runtime closure 启用 AOT/trim/single-file analyzer，并在所有支持 TFM 中 fail-closed；不自动设置 `PublishAot`，也不把 runtime AOT 属性传播到 tooling-only project。
+Failure Behavior: 非法值、缺少必需 metadata、路径逃逸、重复声明、无效 manifest、包布局或未处理的 AOT/trimming/single-file IL 诊断必须阻止构建。Strict AOT 不依赖消费项目自行设置 `TreatWarningsAsErrors`，也不允许项目级 `NoWarn` 静默屏蔽相关 IL 诊断。
 Threading / Cancellation: Task 不保存静态可变状态；MSBuild 取消终止当前构建；相同输入产生相同字节输出。
-Diagnostics: `AUCBLD0001/0002`、`AUCBLD0101/0102`、`AUCBLD0201/0202`、`AUCBLD0301`、`AUCBLD0401`。
-Tests: `ManifestTaskTests; IncrementalGeneratorInfrastructureTests; AtomUI.City.Build.PackagingSmoke`
-Required Assertions: 真实 build/publish/pack、九类 Item 消费、Strict/Compatible/Off、AOT、模板缺包门禁、最终应用不携带 Build/Tasks/Generator。
+Diagnostics: `AUCBLD0001/0002`、`AUCBLD0101/0102`、`AUCBLD0201/0202`、`AUCBLD0301/0302`、`AUCBLD0401`。
+Tests: `ManifestTaskTests; IncrementalGeneratorInfrastructureTests; AtomUI.City.Build.PackagingSmoke; Strict AOT positive/negative package consumers`
+Required Assertions: 真实 build/publish/pack、九类 Item 消费、Strict/Compatible/Off、模板缺包门禁、最终应用不携带 Build/Tasks/Generator；反射 JSON、未传播 DI constructor DAM、RUC 和动态代码在 Strict AOT 下跨 TFM 失败，安全 runtime 项目通过，tooling-only 项目不接收不适用属性；最终应用另行完成真实 NativeAOT publish/run。
 Acceptance Criteria: 不存在只登记名称而无生产消费者的 Build Property、Item 或 Target。
 
 ## AUC-BUILD-010 RESX Language Package Compilation

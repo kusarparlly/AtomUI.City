@@ -32,6 +32,7 @@
 | AUC-GENERATORS-008 | Generator | GeneratorDiagnosticTests | 断言 diagnostic id、severity、message args 和 source location。 | id 复用、severity 漂移、缺少 location 必须测试失败。 | Implemented |
 | AUC-GENERATORS-009 | Generator | EventBusGeneratorTests; GeneratedSourceVisibilityTests; GeneratorNamingTests | 断言 contract/channel/handler metadata、稳定 EventBus feature/hint naming、generated manifest、跨程序集 reachability、registrar 单次聚合、可编译输出与 public surface 白名单。 | 重复 contract id、非法 owner/policy/handler、缺失或未生成 manifest 的 contract、开放/外部/可变共享对象图必须输出 `AUCGEN005` 且阻断 EventBus registrar 内容。 | Implemented |
 | AUC-GENERATORS-010 | Generator | AtomUICityIncrementalGeneratorDataTests; GeneratedSourceVisibilityTests; GeneratorNamingTests | 断言强类型 Data descriptor、manifest attribute、稳定 registrar/hint naming、tuple、继承 operation、可编译输出与 public surface 白名单。 | 重复 client id、非法签名/policy/return、泛型容器和 Mutation cache 必须输出 `AUCGEN005` 且不生成 Data registrar。 | Implemented |
+| AUC-GENERATORS-011 | Generator/NativeAOT | AtomUICityIncrementalGeneratorMvvmTests; GeneratedValidationTests; GeneratorNamingTests; NativeAOT Runtime Matrix | 断言标准 Attribute、Compare、CustomValidation、稳定 hint/规则顺序、可编译输出、无新增 public surface 和双 TFM 原生验证行为。 | 非 partial 类型、未知 Attribute、非法方法、开放泛型输出 `AUCGEN009` 且不生成不完整验证代码。 | Implemented and NativeAOT Verified |
 
 ## 缺口处理
 

@@ -14,6 +14,7 @@ public sealed class GeneratorNamingTests
         Assert.Equal("EventBus", GeneratorFeatureNames.GetName(GeneratorFeature.EventBus));
         Assert.Equal("Localization", GeneratorFeatureNames.GetName(GeneratorFeature.Localization));
         Assert.Equal("PluginSystem", GeneratorFeatureNames.GetName(GeneratorFeature.PluginSystem));
+        Assert.Equal("Mvvm", GeneratorFeatureNames.GetName(GeneratorFeature.Mvvm));
         Assert.Equal("Data", GeneratorFeatureNames.GetName(GeneratorFeature.Data));
     }
 

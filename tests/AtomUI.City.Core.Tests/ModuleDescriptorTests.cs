@@ -8,7 +8,7 @@ public sealed class ModuleDescriptorTests
     public void ModuleGraphFailureRecordsMissingDependencyPath()
     {
         var exception = Assert.Throws<InvalidOperationException>(() =>
-            ModuleRegistry.CreateForTesting([typeof(DependsOnMissingModule)]));
+            ModuleRegistryTestFactory.Create([typeof(DependsOnMissingModule)]));
 
         Assert.Contains(typeof(DependsOnMissingModule).FullName!, exception.Message, StringComparison.Ordinal);
         Assert.Contains(typeof(MissingModule).FullName!, exception.Message, StringComparison.Ordinal);
@@ -21,7 +21,7 @@ public sealed class ModuleDescriptorTests
         CycleEndModule.CreatedCount = 0;
 
         var exception = Assert.Throws<InvalidOperationException>(() =>
-            ModuleRegistry.CreateForTesting([typeof(CycleStartModule), typeof(CycleEndModule)]));
+            ModuleRegistryTestFactory.Create([typeof(CycleStartModule), typeof(CycleEndModule)]));
 
         Assert.Contains(typeof(CycleStartModule).FullName!, exception.Message, StringComparison.Ordinal);
         Assert.Contains(typeof(CycleEndModule).FullName!, exception.Message, StringComparison.Ordinal);
@@ -81,7 +81,7 @@ public sealed class ModuleDescriptorTests
     public void ModuleGraphFailureRecordsDuplicateModuleId()
     {
         var exception = Assert.Throws<InvalidOperationException>(() =>
-            ModuleRegistry.CreateForTesting([typeof(DuplicateModuleA), typeof(DuplicateModuleB)]));
+            ModuleRegistryTestFactory.Create([typeof(DuplicateModuleA), typeof(DuplicateModuleB)]));
 
         Assert.Contains("DuplicateModule", exception.Message, StringComparison.Ordinal);
     }

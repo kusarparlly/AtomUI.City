@@ -11,6 +11,7 @@ internal static class GeneratorFeatureNames
     public const string Localization = nameof(Localization);
     public const string PluginSystem = nameof(PluginSystem);
     public const string Data = nameof(Data);
+    public const string Mvvm = nameof(Mvvm);
 
     public static string GetName(GeneratorFeature feature)
     {
@@ -34,6 +35,8 @@ internal static class GeneratorFeatureNames
                 return PluginSystem;
             case GeneratorFeature.Data:
                 return Data;
+            case GeneratorFeature.Mvvm:
+                return Mvvm;
             default:
                 throw new ArgumentOutOfRangeException(nameof(feature), feature, "Unknown generator feature.");
         }

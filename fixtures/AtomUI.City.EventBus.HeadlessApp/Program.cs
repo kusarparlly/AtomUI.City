@@ -35,6 +35,32 @@ public sealed class DogfoodModuleFive : ModuleBase;
 [EventChannel("concurrent", Capacity = 32, ExecutionMode = EventChannelExecutionMode.Concurrent, MaximumConcurrency = 4)]
 public sealed record AotMessage(int Value);
 
+public sealed class AotPayloadProjectorDependency
+{
+    public string Prefix => "native-aot";
+}
+
+public sealed class AotPayloadProjector : IEventPayloadDiagnosticProjector<AotMessage>
+{
+    private readonly AotPayloadProjectorDependency _dependency;
+
+    public AotPayloadProjector(AotPayloadProjectorDependency dependency)
+    {
+        _dependency = dependency;
+    }
+
+    public EventPayloadDiagnosticSnapshot Project(AotMessage eventData)
+    {
+        return new EventPayloadDiagnosticSnapshot(
+            new Dictionary<string, string?>
+            {
+                ["value"] = $"{_dependency.Prefix}:{eventData.Value}"
+            },
+            schemaVersion: "v1",
+            sizeEstimate: sizeof(int));
+    }
+}
+
 [EventHandler(typeof(HeadlessApplicationModule), ChannelName = "aot")]
 public sealed class AotMessageHandler : IEventHandler<AotMessage>
 {
@@ -115,6 +141,12 @@ internal static class Program
         Ensure(result.Deliveries.Count == 1 && result.Deliveries[0].Succeeded,
             "The generated AOT handler did not complete successfully.");
         Ensure(AotMessageHandler.LastValue == 808, "The generated AOT handler received the wrong payload.");
+        var diagnostics = host.Services.GetRequiredService<IHostDiagnostics>();
+        Ensure(diagnostics.Records.Any(record =>
+                record.Code == EventDiagnosticIds.EventPublished &&
+                record.Context.TryGetValue("payload.value", out var projectedValue) &&
+                string.Equals(projectedValue, "native-aot:808", StringComparison.Ordinal)),
+            "The DI-created payload projector did not execute in the NativeAOT process.");
         Ensure(moduleCount >= 6, "The product matrix did not select at least six modules.");
         Ensure(dogfoodDeliveries == 20 && DogfoodHandler.HandledCount == 20,
             "The generated 20-handler product matrix was incomplete.");
@@ -145,6 +177,15 @@ internal static class Program
     {
         var builder = ApplicationHost.CreateBuilder(args);
         builder.UseModule<EventBusModule>();
+        builder.ConfigureServices(services =>
+        {
+            services.AddSingleton<AotPayloadProjectorDependency>();
+            services.AddEventPayloadDiagnosticProjector<AotMessage, AotPayloadProjector>();
+            services.ConfigureEventBusDiagnostics(new EventBusDiagnosticsOptions
+            {
+                EnablePayloadProjection = true
+            });
+        });
         builder.ConfigureHost(options =>
         {
             options.ApplicationId = "AtomUI.City.EventBus.HeadlessApp";

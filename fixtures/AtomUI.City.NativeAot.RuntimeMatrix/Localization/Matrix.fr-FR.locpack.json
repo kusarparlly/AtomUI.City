@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "packageId": "Matrix.fr-FR",
+  "culture": "fr-FR",
+  "resources": {
+    "Matrix.Greeting": "file"
+  }
+}

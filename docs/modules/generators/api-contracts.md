@@ -11,10 +11,11 @@
 | API Family | 关键类型 | 职责 | 硬性行为 |
 | --- | --- | --- | --- |
 | Tooling Entry | AtomUICityIncrementalGenerator, BuildServiceProviderUsageAnalyzer | Roslyn incremental generator 与 analyzer 激活入口。 | 必须能从 analyzer 包发现并实例化；不引用运行时包；不构成第三方扩展 SDK。 |
-| Metadata Readers | ModuleMetadataReader, ServiceRegistrationMetadataReader, RouteMetadataReader, PluginMetadataReader, LocalizationMetadataReader, PresentationViewMetadataReader, EventMetadataReader, DataClientMetadataReader | 从 syntax/semantic model 读取声明。 | reader 不做运行时业务；非法声明输出 diagnostic metadata；`LocalizationMetadata.Diagnostics` 保存 attribute 读取阶段错误；EventBus/Data metadata 只能由主 incremental pipeline 发布。 |
+| Metadata Readers | ModuleMetadataReader, ServiceRegistrationMetadataReader, RouteMetadataReader, PluginMetadataReader, LocalizationMetadataReader, PresentationViewMetadataReader, EventMetadataReader, DataClientMetadataReader, validation metadata reader（Designed） | 从 syntax/semantic model 读取声明。 | reader 不做运行时业务；非法声明输出 diagnostic metadata；`LocalizationMetadata.Diagnostics` 保存 attribute 读取阶段错误；EventBus/Data/Validation metadata 只能由主 incremental pipeline 发布。 |
 | Manifest Builders | ModuleDependencyGraphBuilder, ServiceRegistrationManifestBuilder, RouteManifestBuilder, PluginManifestBuilder, LocalizationManifestBuilder, PresentationViewManifestBuilder | 校验 metadata 并生成 manifest result。 | result 不可变；排序确定；失败不生成不完整 success manifest。 |
 | EventBus Generation Pipeline | EventMetadataReader, EventGenerationManifest, ServiceRegistrarSourceBuilder | 校验事件 contract、channel、handler 与 owner 并把静态注册语句合入 service registrar。 | 非法事件声明阻断该批 registrar；跨程序集 contract 必须具备可达 generated manifest；不得用运行时扫描补缺。 |
 | Data Generation Pipeline | DataClientMetadataReader, DataClientGenerationMetadata, DataClientRegistrarSourceBuilder | 校验 Data client/operation 并生成 descriptor registrar。 | 非法 client 或重复 id 阻断该 compilation 的 Data registrar；继承 operation 与 policy metadata 必须确定性保留。 |
+| ViewModel Validation Generation Pipeline（Designed） | validation metadata/manifest/source pipeline | 校验 `ValidatingViewModelBase` 派生类型并生成静态属性验证。 | 不支持或无法静态解析的规则输出 `AUCGEN009` 并阻断该类型输出；不得运行时反射 fallback。 |
 | Source Builders | ModuleRegistrarSourceBuilder, ServiceRegistrarSourceBuilder, DataClientRegistrarSourceBuilder, RouteSourceBuilder, LocalizationRegistrarSourceBuilder, PresentationViewRegistrarSourceBuilder | 生成 C# 注册和强类型入口代码。 | hint name 稳定；生成代码不依赖 runtime reflection；公开声明只能来自 reviewed visibility allowlist；Localization registrar 通过单次 `RegisterRange` 原子注册 manifest。 |
 | Diagnostics | GeneratorDiagnosticIds, GeneratorDiagnostics, GeneratorDiagnosticDefinition | 编译期诊断定义和创建。 | diagnostic id、severity、category 和 message args 稳定。 |
 
@@ -55,6 +56,7 @@
 | EventMetadataReader.Read | 读取事件 contract、channel 或 handler 声明。 | INamedTypeSymbol。 | EventGenerationCandidate 或 null。 | 非法 owner、schema、channel、handler 或共享对象图写入 candidate issues；主 pipeline 转换为 diagnostic 并阻断输出。 | 由 syntax provider 控制。 | 无共享 mutable cache；同一 symbol 产生稳定 metadata。 |
 | DataClientMetadataReader.TryRead | 读取 Data client 及其直接和继承 operation。 | INamedTypeSymbol。 | DataClientGenerationMetadata 或 null。 | 非法 client、operation 签名、返回形态或 policy 写入 issues；主 pipeline 转换为 diagnostic 并阻断输出。 | 由 syntax provider 控制。 | 无共享 mutable cache；operation 枚举与输出排序稳定。 |
 | DataClientRegistrarSourceBuilder.Build | 生成 Data manifest attribute、registrar 与 descriptor 注册代码。 | assembly name、已验证 client metadata。 | C# source text。 | 空 assembly name 或 null collection 拒绝；存在 validation issue 的 metadata 不得传入。 | 纯 CPU。 | registrar 名称含规范化 assembly name 与稳定 hash；client/operation 稳定排序。 |
+| ValidationSourceBuilder.Build（Designed） | 生成属性级和全量验证实现。 | 已验证的 ViewModel validation manifest。 | C# source text。 | manifest failed 时不得调用；未知 Attribute、非法 CustomValidation 或开放泛型必须已由 `AUCGEN009` 阻断。 | 纯 CPU并观察 Roslyn token。 | hint name、属性和规则顺序 byte-stable；不生成新的 public surface。 |
 | GeneratorDiagnostics.CreateRoslynDiagnostic | 创建 Roslyn diagnostic。 | feature、generator diagnostic、location、message args。 | Diagnostic。 | 参数数量不匹配按 Roslyn Diagnostic 格式化规则稳定失败。 | 同步 API 无 token。 | diagnostic definition 不可变，可并发读取。 |
 
 ## Tooling Entry 与 Internal Pipeline 类型覆盖

@@ -33,8 +33,9 @@
 | AUC-MVVM-010 | Contract | CommandTests | 断言 await 原异常、ICommand handler 恰好一次、取消排除、诊断故障隔离和无磁盘副作用。 | handler 异常、throwing diagnostics、重复观察、fire-and-forget UI path。 | Implemented / Release Validation Pending |
 | AUC-MVVM-011 | Contract/PlatformIntegration | CommandTests; UiCommandFactoryTests | 断言四个状态属性经 dispatcher 交付、Headless 语义、faulted ValueTask 和真实 UI 线程。 | inline/queued 订阅者异常、Runtime Stopped/Faulted 和结果隔离。 | Implemented / Release Validation Pending |
 | AUC-MVVM-012 | Unit/RuntimeLifecycle/Contract | CommandTests; UiCommandFactoryTests | 断言跨 Command latest-wins、generation/currentness、立即切换、取消、Activation 监督、dispatcher 和 domain 隔离。 | 不合作旧执行、关闭/Dispose 竞态、取消回调、drain timeout、diagnostics 和 API 漂移。 | Release Verified |
+| AUC-MVVM-013 | Generator/Contract/NativeAOT | GeneratedValidationTests; ValidationScopeTests; AtomUICityIncrementalGeneratorMvvmTests; NativeAOT Runtime Matrix | 断言标准 Attribute、Compare、CustomValidation、稳定顺序、HasErrors/ErrorsChanged/GetErrors、无反射 fallback 和双 TFM 原生运行。 | 未知 Attribute、非法 custom method、非 partial 类型、开放泛型、规则异常、Dispose 后 mutation 和 IL2xxx/IL3xxx。 | Verified |
 
-表中 `Status` 是 Feature 的发布成熟度，不只是现有测试是否通过。`AUC-MVVM-007` 至 `011` 仍保持各自既有的 `Release Validation Pending`；不得因同一轮全局回归自动推断它们的专项发布矩阵已闭环。`AUC-MVVM-012` 的发布证据为 MVVM `113/113`、Presentation `171/171`、16 个非平台测试项目 `2224/2224`、10 轮重复竞态测试、Presentation Public API build/pack、API governance `16/16` 及隔离 `win-x64` self-contained package consumer。
+表中 `Status` 是 Feature 的发布成熟度，不只是现有测试是否通过。`AUC-MVVM-007` 至 `011` 仍保持各自既有的 `Release Validation Pending`；不得因同一轮全局回归自动推断它们的专项发布矩阵已闭环。`AUC-MVVM-012` 的既有发布证据保持不变。`AUC-MVVM-013` 已由 MVVM `117/117`、Generator `209/209` 以及 `net8.0`/`net10.0` Windows NativeAOT Runtime Matrix 完成实现和原生行为验证。
 
 ## 当前审计缺口
 

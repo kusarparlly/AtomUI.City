@@ -46,3 +46,8 @@ ADR 用于记录已经形成约束力的重要决策，包括背景、决策、�
 - [0014-presentation-ui-command-factory.md](0014-presentation-ui-command-factory.md)
 - [0015-shared-command-execution-domain.md](0015-shared-command-execution-domain.md)
 - [0016-routing-presentation-coordination.md](0016-routing-presentation-coordination.md)
+- [0017-aot-first-generated-viewmodel-validation.md](0017-aot-first-generated-viewmodel-validation.md)
+- [0018-aot-safe-localization-package-boundary.md](0018-aot-safe-localization-package-boundary.md)
+- [0019-strict-aot-is-fail-closed.md](0019-strict-aot-is-fail-closed.md)
+- [0020-no-test-only-code-in-runtime-assemblies.md](0020-no-test-only-code-in-runtime-assemblies.md)
+- [0021-persistent-native-aot-runtime-matrix.md](0021-persistent-native-aot-runtime-matrix.md)

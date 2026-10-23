@@ -8,7 +8,9 @@ public sealed class ProjectDependencyBoundaryTests
     {
         ["AtomUI.City.Build"] = ["AtomUI.City.Build.Tasks", "AtomUI.City.Generators"],
         ["AtomUI.City.Build.Tasks"] = [],
-        ["AtomUI.City.Cli"] = ["AtomUI.City.Build", "AtomUI.City.Core", "AtomUI.City.PluginSystem", "AtomUI.City.Templates"],
+        // CLI invokes the target project's MSBuild entry points. The target project, not the CLI tool,
+        // owns the AtomUI.City.Build package reference and its buildTransitive assets.
+        ["AtomUI.City.Cli"] = ["AtomUI.City.Core", "AtomUI.City.PluginSystem", "AtomUI.City.Templates"],
         ["AtomUI.City.Core"] = [],
         ["AtomUI.City.Data"] = ["AtomUI.City.Core", "AtomUI.City.Security"],
         ["AtomUI.City.EventBus"] = ["AtomUI.City.Core"],

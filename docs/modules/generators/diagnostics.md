@@ -23,12 +23,21 @@
 
 `AUCGEN001` 在 1.0 Preview 中保留但不公开定义。原 `DynamicDiscoveryNotAllowed` 从未有对应输入和触发链；运行时动态发现未来作为独立 Feature 实现时，必须重新评审诊断合同。
 
+## 已冻结、待施工诊断码
+
+| Planned Code | Name | Feature | Severity |
+| --- | --- | --- | --- |
+| `AUCGEN009` | UnsupportedGeneratedValidation | AUC-GENERATORS-011 / AUC-MVVM-013 | Error |
+
+`AUCGEN009` 用于无法静态生成的 ViewModel 验证声明，包括未知 Attribute、非法 `CustomValidation` 目标、非 partial 派生类型、开放泛型和不可访问成员。它不得用于运行时验证失败；普通 Invalid 进入验证状态，规则异常由 `AUCMVVM008` 记录。
+
 ## Feature 诊断归属
 
 | Feature | Category | 当前失败码 | 阻断行为 |
 | --- | --- | --- | --- |
 | EventBus generation | `AtomUI.City.Generators.EventBus` | `AUCGEN005` | 任一 contract、channel、handler、owner、共享对象图或跨程序集 manifest 输入非法时，不得发布包含不完整 EventBus metadata 的 service registrar。 |
 | Data generation | `AtomUI.City.Generators.Data` | `AUCGEN005` | 任一 client/operation 输入非法或 client id 重复时，不得生成该 compilation 的 Data registrar。 |
+| ViewModel validation generation（Designed） | `AtomUI.City.Generators.MvvmValidation` | `AUCGEN009` | 任一规则无法静态解析时，不得生成该 ViewModel 的不完整验证实现，也不得回退到运行时反射。 |
 
 EventBus 与 Data 当前复用 `InvalidManifestInput` 是既有公开诊断合同；不得仅因内部 reader 重构改变 code、默认 severity、feature category 或 source location。若未来需要更细诊断码，必须先更新 compatibility、测试与迁移说明。
 

@@ -176,7 +176,7 @@ Command operation
 
 Payload diagnostics 必须 opt-in，并通过 contract 提供的稳定 formatter 生成 Host-owned snapshot。
 
-Application Plane 1.0 使用强类型 `IEventPayloadDiagnosticProjector<TEvent>`。Projector 失败必须与发布事务隔离；插件 projector 的所有权、lease 和卸载在 `AUC-EVENTBUS-009` 收口。
+Application Plane 1.0 使用强类型 `IEventPayloadDiagnosticProjector<TEvent>`。Projector 失败必须与发布事务隔离；插件 projector 的所有权、lease 和卸载在 `AUC-EVENTBUS-009` 收口。公开的 `AddEventPayloadDiagnosticProjector<TEvent,TProjector>` 必须向 NativeAOT linker 声明 `TProjector` 的 public constructors 可达；双 TFM 原生测试必须使用带 DI 构造依赖的 projector 走完整注册、解析和投影路径，不能只验证 generated event catalog。
 
 ### 6. Exception 记录
 

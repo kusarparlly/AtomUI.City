@@ -114,7 +114,8 @@ tools/
 | `AtomUICityManifestIntermediateOutputPath` | `$(IntermediateOutputPath)AtomUI.City/manifests/` | manifest 中间输出目录。 |
 | `AtomUICityEnableAnalyzers` | `true` | 是否启用 analyzer。 |
 | `AtomUICitySourceGenerationMode` | `Strict` | `Strict`、`Compatible`、`Off`。 |
-| `AtomUICityStrictAot` | `false` | 是否启用严格 AOT 检查。 |
+| `AtomUICityStrictAot` | `false` | 对 runtime closure 启用 AOT/trim/single-file analyzer，并把未处理的相关 IL 诊断作为构建错误；不自动设置 `PublishAot`。行为不得依赖消费项目额外启用 warning-as-error，也不得传播到 tooling-only project。 |
+| `AtomUICityRuntimeProject` | runtime 项目为 `true`；可识别的 Roslyn analyzer 为 `false` | 标识当前项目是否进入应用运行时闭包。仅 tooling-only 项目可以显式设为 `false`；不得用它绕过普通 runtime 项目的 Strict AOT 门禁。 |
 | `AtomUICityPackagePlugin` | `false` | 是否打包插件。 |
 | `AtomUICityPackageApplication` | `false` | 是否打包应用。 |
 | `AtomUICityBuildDiagnosticsLevel` | `Normal` | 诊断详细程度。 |
@@ -186,7 +187,7 @@ tools/
 | `PackAtomUICityPlugin` | 生成插件 NuGet 包。 |
 | `InstallAtomUICityPluginToLocalCache` | 把开发插件安装到本地开发缓存。 |
 | `PublishAtomUICityApplication` | 发布应用。 |
-| `ValidateAtomUICityAotCompatibility` | AOT/trimming 兼容检查。 |
+| `ValidateAtomUICityAotCompatibility` | fail-closed 的 AOT/trimming/single-file 兼容检查；跨支持 TFM 保持一致失败语义，真实 NativeAOT publish/run 由发布门禁另行执行。 |
 | `WriteAtomUICityBuildDiagnostics` | 写入构建诊断。 |
 | `CleanAtomUICityOutput` | 清理框架输出。 |
 | `CleanAtomUICityPluginArtifacts` | 清理插件中间产物与包产物。 |

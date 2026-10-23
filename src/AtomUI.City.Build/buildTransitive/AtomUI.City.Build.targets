@@ -1,6 +1,19 @@
 <Project>
   <PropertyGroup>
     <AtomUICityBuildTasksAssembly Condition="'$(AtomUICityBuildTasksAssembly)' == ''">$(MSBuildThisFileDirectory)../tools/net10.0/AtomUI.City.Build.Tasks.dll</AtomUICityBuildTasksAssembly>
+    <_AtomUICityDetectedRuntimeProject Condition="'$(IsRoslynComponent)' == 'true' or '$(OutputItemType)' == 'Analyzer'">false</_AtomUICityDetectedRuntimeProject>
+    <_AtomUICityDetectedRuntimeProject Condition="'$(_AtomUICityDetectedRuntimeProject)' == ''">true</_AtomUICityDetectedRuntimeProject>
+    <AtomUICityRuntimeProject Condition="'$(AtomUICityRuntimeProject)' == ''">$(_AtomUICityDetectedRuntimeProject)</AtomUICityRuntimeProject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(AtomUICityStrictAot)' == 'true' and '$(AtomUICityRuntimeProject)' == 'true'">
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableAotAnalyzer>true</EnableAotAnalyzer>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ILLinkTreatWarningsAsErrors>true</ILLinkTreatWarningsAsErrors>
+    <IlcTreatWarningsAsErrors>true</IlcTreatWarningsAsErrors>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)AtomUI.City.Application.targets" Condition="Exists('$(MSBuildThisFileDirectory)AtomUI.City.Application.targets')" />
@@ -24,6 +37,9 @@
     <Error Condition="'$(AtomUICityBuildDiagnosticsLevel)' != 'Off' and '$(AtomUICityBuildDiagnosticsLevel)' != 'Normal' and '$(AtomUICityBuildDiagnosticsLevel)' != 'Detailed'"
            Code="AUCBLD0002"
            Text="AtomUICityBuildDiagnosticsLevel must be Off, Normal, or Detailed." />
+    <Error Condition="'$(AtomUICityRuntimeProject)' != 'true' and '$(AtomUICityRuntimeProject)' != 'false'"
+           Code="AUCBLD0002"
+           Text="AtomUICityRuntimeProject must be true or false." />
     <Error Condition="!Exists('$(AtomUICityBuildTasksAssembly)')"
            Code="AUCBLD0001"
            Text="AtomUI.City Build Tasks assembly is missing: $(AtomUICityBuildTasksAssembly)." />
@@ -40,7 +56,10 @@
     <ValidateManifestFilesTask Manifests="@(AtomUICityGeneratedManifest)" />
   </Target>
 
-  <Target Name="ValidateAtomUICityAotCompatibility" AfterTargets="CoreCompile" Condition="'$(AtomUICityStrictAot)' == 'true'">
+  <Target Name="ValidateAtomUICityAotCompatibility" BeforeTargets="CoreCompile" Condition="'$(AtomUICityStrictAot)' == 'true' and '$(AtomUICityRuntimeProject)' == 'true'">
+    <Error Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(NoWarn);$(WarningsNotAsErrors)', '(^|[;,\s])IL[23][0-9]{3}($|[;,\s])'))"
+           Code="AUCBLD0302"
+           Text="Strict AOT does not allow project-level suppression or downgrade of IL2xxx/IL3xxx diagnostics. Use a source-level suppression with a reviewed justification." />
     <Error Condition="'$(AtomUICityPlugin)' == 'true' and '$(AtomUICityPluginNativeAotCompatible)' != 'true'"
            Code="AUCBLD0301"
            Text="Strict AOT requires AtomUICityPluginNativeAotCompatible=true for plugin projects." />

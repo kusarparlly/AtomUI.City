@@ -18,6 +18,7 @@
 | AUC-MVVM-010 | Command Exception Delivery | Implemented | ICommandExceptionHandler, command exception context | CommandTests |
 | AUC-MVVM-011 | Command Notification Dispatch | Implemented | CommandFactory notification dispatcher | CommandTests; UiCommandFactoryTests |
 | AUC-MVVM-012 | Shared Command Execution Domain | Implemented | CommandExecutionDomain, CommandExecutionLease, CommandFactory domain overloads | CommandTests; UiCommandFactoryTests |
+| AUC-MVVM-013 | Generated ViewModel Validation | Verified | ValidatingViewModelBase, generated validation contract | GeneratedValidationTests; NativeAOT Runtime Matrix |
 
 ## Feature 硬门禁
 
@@ -203,3 +204,17 @@ Diagnostics: `AUCMVVM016-017`，上下文包含 domain id、generation、active 
 Tests: `CommandTests; UiCommandFactoryTests`
 Required Assertions: 两个 Command 共享 domain 时后发取消前发且立即开始；generation 单调、IsCurrent 准确；不合作旧执行不阻塞新执行；independent domain 隔离；activation stop、dispose/drain、关闭竞态和 throwing diagnostics 均有覆盖。
 Acceptance Criteria: AtomBox/AtomPix 不再为跨 Command latest-wins 重写 CTS/锁/代际所有权；业务提交仍使用应用自己的 version/generation 栅栏；不引入通用 policy engine。
+
+## AUC-MVVM-013 Generated ViewModel Validation
+
+Feature ID: `AUC-MVVM-013`
+Status: `Verified`
+Goal: 把普通 ViewModel 与验证型 ViewModel 分离，并以编译期生成代码执行 DataAnnotations 和 typed custom validator，消除默认运行时反射验证。
+Public Contract: `ViewModelBase`、`ValidatingViewModelBase`、`INotifyDataErrorInfo` 可观察面；typed custom validator 的确切 API card 必须在施工前冻结。
+Runtime / Build Behavior: `ViewModelBase` 为 City 自有轻量属性通知/生命周期基类；需要验证的开发者类型继承 `ValidatingViewModelBase` 并声明为 `partial`。Generator 读取受支持 Attribute，生成确定性的属性 switch、规则实例化/直接调用与全量验证入口；普通 ViewModel 不携带验证状态。
+Failure Behavior: 验证不通过更新字段/对象错误，不抛业务异常；规则执行异常映射为 `Failed` 并记录 `AUCMVVM008`；无法静态生成的声明以 `AUCGEN009` 阻断构建，不回退运行时反射。
+Threading / Cancellation: 同步属性规则在 property mutation 调用线程执行；异步业务验证继续由 `ValidationScope` 管理并观察有效 token。错误状态提交不得在框架锁内调用用户代码或事件订阅者。
+Diagnostics: `AUCGEN009` 定位不支持的验证声明；运行时规则异常使用 `AUCMVVM008` 并携带 ViewModel type、property name 和 validator type，不包含字段秘密值。
+Tests: `GeneratedValidationTests; ValidationScopeTests; AtomUICityIncrementalGeneratorMvvmTests; AtomUI.City.NativeAot.RuntimeMatrix`
+Required Assertions: 覆盖首批标准 Attribute、`Compare`、`CustomValidation`、typed custom validator、规则顺序、错误通知、非法签名、Dispose 后行为、无反射 fallback，以及 net8/net10 win-x64 NativeAOT 原生运行。
+Acceptance Criteria: 两个 TFM 均无本 Feature 导致的 IL2xxx/IL3xxx；原生进程实际证明有效/无效输入、错误增删和 UI 可观察通知；Public API、generated output、诊断和迁移文档一致。

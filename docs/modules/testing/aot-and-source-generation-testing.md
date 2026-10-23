@@ -106,6 +106,8 @@ Manifest 字段顺序必须稳定。
 
 ### 5. AOT 和 trimming 测试
 
+`AotSourcePatternCheck` 只提供快速源码字符串 lint：它可以固定团队禁止文本，但不解析 C# 语义、不检查依赖闭包、不运行 linker/analyzer，也不产生 “AOT compatible” 结论。下列验收项由 Build strict analyzer、应用 NativeAOT publish 和原生进程运行实现，不能由 pattern lint 代替。
+
 必须覆盖：
 
 - dynamic discovery 在 strict AOT 模式下被拒绝或诊断。

@@ -63,15 +63,15 @@
 
 ## AtomUI.City.Localization Language Package Assemblies 设计
 
-适用范围：独立语言包 assembly、satellite assembly、collectible AssemblyLoadContext、ResourceManager、Native AOT locpack fallback 和卸载约束。
+适用范围：静态链接或已由 owner 加载的 assembly 内嵌 locpack、file locpack、插件 owner 撤销与 NativeAOT 边界。
 
 ### 1. 定位
 
-普通 .NET 桌面运行时下，Localization 支持语言包放在独立 assembly 中运行时动态加载。
+Localization 支持从编译期已知或已经由 owner 加载的 assembly 中读取 embedded locpack，但它不负责加载该 assembly。
 
 语言包 assembly 推荐是 resource-only assembly，不放可执行代码。它只承载指定 culture 的资源数据，不承载业务逻辑。
 
-Native AOT 不支持运行时动态加载 assembly，因此必须提供 file-based locpack fallback。
+可更新、可下载或独立部署的语言资源使用纯数据 `.locpack`。默认 Localization 在 CoreCLR、trimming、single-file 和 NativeAOT 下遵循同一 provider 边界，不以动态 DLL 作为语言包扩展机制。
 
 ### 2. Provider 模型
 
@@ -86,8 +86,8 @@ ILanguagePackageProvider
 
 | Provider | 场景 |
 |---|---|
-| `AssemblyLanguagePackageProvider` | CoreCLR、普通桌面运行时、插件动态加载。 |
-| `FileLanguagePackageProvider` | Native AOT、严格 trimming、独立资源包。 |
+| `AssemblyLanguagePackageProvider` | 静态链接或已由 owner 加载的 assembly embedded locpack。 |
+| `FileLanguagePackageProvider` | 可更新、可下载或独立部署的纯数据 `.locpack`。 |
 
 两者都输出同一套 `LanguagePackage` / `ILanguagePackageProvider` contract。
 
@@ -95,7 +95,7 @@ ILanguagePackageProvider
 
 ### 3. Assembly 语言包布局
 
-部署目录可以采用 .NET satellite assembly 风格：
+静态引用的资源程序集或模块主程序集可以嵌入 locpack；descriptor 必须直接保存 `SourceAssembly`。示意布局：
 
 ```text
 locales/
@@ -116,28 +116,28 @@ SalesModule.Localization.zh-CN.dll
 SalesModule.Localization.en-US.dll
 ```
 
-当前 provider 不做 satellite probing。静态引用或已经加载的语言包应在 descriptor 中提供 `SourceAssembly` 和 embedded locpack resource name；需要按路径动态加载的外部语言包则提供精确 assembly path。生成的 registrar 使用 `SourceAssembly`，因此自包含单文件应用不依赖 `Assembly.Location`。无论目录和命名如何，descriptor 必须说明：
+当前 provider 不做 satellite probing，也不按路径加载 DLL。静态引用或已经由 owner 加载的语言包必须在 descriptor 中提供 `SourceAssembly` 和 embedded locpack resource name。生成的 registrar 使用 `SourceAssembly`，因此自包含单文件应用不依赖 `Assembly.Location`。descriptor 必须说明：
 
 - Culture。
 - PackageId。
-- Source assembly 或 Assembly path。
+- Source assembly。
 - Resource base name。
 - ContributionId。
 - Version。
 - Checksum。
-- AssemblyLoadContext：descriptor 记录被发现 assembly 所属 context；collectible plugin 必须在该 context 解析/加载，owner revoke 后方可 unload，禁止回落到 Default ALC。
+- Owner / contribution：collectible plugin 必须先由 PluginSystem 加载，再贡献其 `SourceAssembly`；Localization 只在 owner revoke 时释放资源引用，不创建、选择或回落 AssemblyLoadContext。
 
 ### 4. 加载流程
 
 ```text
 Language package descriptor
--> use source assembly, or resolve package path and load it in package load context
+-> require its source assembly
 -> open embedded locpack stream
 -> validate and create immutable LanguagePackage
 -> cache by (culture, packageId)
 ```
 
-Host app 的静态 embedded 语言包直接引用 source assembly，兼容自包含单文件发布；外部语言包可以加载到默认上下文或专用上下文。插件语言包 descriptor 必须保存插件的 collectible `AssemblyLoadContext`，并通过 owner/contribution 撤销先释放 package；ContributionLease 本身由 PluginSystem 管理。
+Host app 的静态 embedded 语言包直接引用 source assembly，兼容自包含单文件与 NativeAOT 发布。插件语言包 descriptor 引用已由 PluginSystem 加载的插件 assembly，并通过 owner/contribution 撤销先释放 package；ContributionLease 和 AssemblyLoadContext 均由 PluginSystem 管理。外部语言文件由 `FileLanguagePackageProvider` 加载 `.locpack`。
 
 ### 5. 卸载约束
 
@@ -154,9 +154,9 @@ Host app 的静态 embedded 语言包直接引用 source assembly，兼容自包
 
 生成的 key constants 和 registrar 位于模块或插件主 assembly。语言包 assembly 只提供资源数据。
 
-### 6. Native AOT Locpack
+### 6. 外部 Locpack 与 NativeAOT
 
-Native AOT 模式使用 file-based locpack。
+外部、可替换资源统一使用 file-based locpack；NativeAOT 与普通 CoreCLR 使用相同格式。
 
 当前格式是 schema v1 JSON locpack；binary 和 embedded generated table 尚无 Feature ID。
 
@@ -184,27 +184,28 @@ Native AOT 模式使用 file-based locpack。
 
 | 场景 | 默认处理 |
 |---|---|
-| assembly 不存在 | fallback 或 culture switch rollback。 |
-| assembly 加载失败 | fallback 或 rollback。 |
+| Assembly descriptor 缺少 `SourceAssembly` | 返回 `InvalidDescriptor`；禁止根据 Location 动态加载。 |
 | schema/version/id/culture/checksum 不匹配 | 返回对应稳定 `LocalizationErrorKind`，不发布 package。 |
 | locpack 超过 16 MiB | 返回 `PackageTooLarge`，不继续分配或发布 package。 |
 | embedded resource suffix 同时匹配多个资源 | 返回 `PackageNotFound`，不得按枚举顺序任取一个资源。 |
 | checksum 不匹配 | 拒绝加载。 |
 | culture 不匹配 | 拒绝加载。 |
-| Native AOT 发布 | 不注册 assembly provider descriptor，应用显式注册 file locpack descriptor；发布/复制由 Build 能力承接。 |
+| NativeAOT 发布 | 默认 provider 组合可用；generated embedded descriptor、file locpack 和 in-memory 路径均不得产生 trimming/AOT warning。 |
 | 卸载后仍有引用 | 由 PluginSystem 的 unload/lease 诊断承接。 |
 
 ### 9. 测试策略
 
 测试必须覆盖：
 
-- assembly package 加载。
+- 已知 source assembly embedded package 加载。
 - source assembly package 在没有文件路径时加载。
-- descriptor 指定 assembly/resource 解析。
+- 缺少 SourceAssembly 或仅给出 assembly path 时稳定拒绝且不动态加载。
+- descriptor 指定 source assembly/resource 解析。
 - file locpack 加载。
 - file locpack provider（Native AOT publish smoke 需由 Build/Release Gate 单独立项）。
 - checksum mismatch。
 - locpack size limit、duplicate root property 和 provider kind mismatch。
 - embedded resource exact/unique suffix 解析。
-- plugin package unload。
+- plugin package owner revoke 后释放对已加载 assembly 的引用。
 - Host 不持有插件 package 引用。
+- 默认 `AddLocalization()` 的双 TFM NativeAOT publish/run。

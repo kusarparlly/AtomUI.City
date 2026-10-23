@@ -6,6 +6,7 @@ using AtomUI.City.Generators.Diagnostics;
 using AtomUI.City.Generators.EventBus;
 using AtomUI.City.Generators.Localization;
 using AtomUI.City.Generators.Modularity;
+using AtomUI.City.Generators.Mvvm;
 using AtomUI.City.Generators.Presentation;
 using AtomUI.City.Generators.Routing;
 using Microsoft.CodeAnalysis;
@@ -59,6 +60,55 @@ public sealed class AtomUICityIncrementalGenerator : IIncrementalGenerator
         InitializePresentation(context, generationEnabled);
         InitializeLocalization(context, generationEnabled);
         InitializeData(context, generationEnabled);
+        InitializeMvvm(context, generationEnabled);
+    }
+
+    private static void InitializeMvvm(
+        IncrementalGeneratorInitializationContext context,
+        IncrementalValueProvider<bool> generationEnabled)
+    {
+        var candidates = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                static (node, _) => node is ClassDeclarationSyntax,
+                static (syntaxContext, _) => ViewModelValidationMetadataReader.TryRead(syntaxContext))
+            .Where(static candidate => candidate is not null);
+
+        context.RegisterSourceOutput(
+            candidates.Combine(generationEnabled),
+            static (sourceContext, input) =>
+            {
+                if (!input.Right)
+                {
+                    return;
+                }
+
+                var metadata = input.Left!;
+                if (metadata.Issues.Count > 0)
+                {
+                    foreach (var issue in metadata.Issues)
+                    {
+                        sourceContext.ReportDiagnostic(GeneratorDiagnostics.CreateRoslynDiagnostic(
+                            GeneratorFeature.Mvvm,
+                            new GeneratorDiagnostic(
+                                GeneratorDiagnostics.InvalidViewModelValidation,
+                                issue.Message,
+                                metadata.Type.ToDisplayString()),
+                            issue.Location));
+                    }
+                    return;
+                }
+
+                var containingAssemblyName = metadata.Type.ContainingAssembly?.Name;
+                var assemblyName = string.IsNullOrWhiteSpace(containingAssemblyName)
+                    ? "Assembly"
+                    : containingAssemblyName!;
+                sourceContext.AddSource(
+                    GeneratedCodeNames.CreateHintName(
+                        GeneratorFeature.Mvvm,
+                        assemblyName,
+                        metadata.Type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat) + ".Validation"),
+                    SourceText.From(ViewModelValidationSourceBuilder.Build(metadata), Encoding.UTF8));
+            });
     }
 
     private static void InitializeData(

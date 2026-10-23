@@ -96,8 +96,6 @@ AtomUI.City.Localization.LanguagePackageDescriptor.FallbackCulture.init -> void
 AtomUI.City.Localization.LanguagePackageDescriptor.InMemoryResources.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>?
 AtomUI.City.Localization.LanguagePackageDescriptor.InMemoryResources.init -> void
 AtomUI.City.Localization.LanguagePackageDescriptor.LanguagePackageDescriptor(string! packageId, System.Globalization.CultureInfo! culture, AtomUI.City.Localization.ResourceScope scope) -> void
-AtomUI.City.Localization.LanguagePackageDescriptor.LoadContext.get -> System.Runtime.Loader.AssemblyLoadContext?
-AtomUI.City.Localization.LanguagePackageDescriptor.LoadContext.init -> void
 AtomUI.City.Localization.LanguagePackageDescriptor.Location.get -> string?
 AtomUI.City.Localization.LanguagePackageDescriptor.Location.init -> void
 AtomUI.City.Localization.LanguagePackageDescriptor.PackageId.get -> string!

@@ -218,12 +218,23 @@ AtomUI.City.Mvvm.ViewModelBase.Dispose() -> void
 AtomUI.City.Mvvm.ViewModelBase.DisposeAsync() -> System.Threading.Tasks.ValueTask
 AtomUI.City.Mvvm.ViewModelBase.IsActive.get -> bool
 AtomUI.City.Mvvm.ViewModelBase.IsDisposed.get -> bool
-AtomUI.City.Mvvm.ViewModelBase.SetProperty<T>(ref T field, T newValue, bool validate, string? propertyName = null) -> bool
+AtomUI.City.Mvvm.ViewModelBase.PropertyChanged -> System.ComponentModel.PropertyChangedEventHandler?
+AtomUI.City.Mvvm.ViewModelBase.PropertyChanging -> System.ComponentModel.PropertyChangingEventHandler?
 AtomUI.City.Mvvm.ViewModelBase.SetProperty<T>(ref T field, T newValue, string? propertyName = null) -> bool
-AtomUI.City.Mvvm.ViewModelBase.SetProperty<T>(ref T field, T newValue, System.Collections.Generic.IEqualityComparer<T>! comparer, bool validate, string? propertyName = null) -> bool
 AtomUI.City.Mvvm.ViewModelBase.SetProperty<T>(ref T field, T newValue, System.Collections.Generic.IEqualityComparer<T>! comparer, string? propertyName = null) -> bool
 AtomUI.City.Mvvm.ViewModelBase.ThrowIfDisposed() -> void
 AtomUI.City.Mvvm.ViewModelBase.ViewModelBase(AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Mvvm.ValidatingViewModelBase
+AtomUI.City.Mvvm.ValidatingViewModelBase.ErrorsChanged -> System.EventHandler<System.ComponentModel.DataErrorsChangedEventArgs!>?
+AtomUI.City.Mvvm.ValidatingViewModelBase.GetErrors(string? propertyName) -> System.Collections.IEnumerable!
+AtomUI.City.Mvvm.ValidatingViewModelBase.HasErrors.get -> bool
+AtomUI.City.Mvvm.ValidatingViewModelBase.SetProperty<T>(ref T field, T newValue, bool validate, string? propertyName = null) -> bool
+AtomUI.City.Mvvm.ValidatingViewModelBase.SetProperty<T>(ref T field, T newValue, System.Collections.Generic.IEqualityComparer<T>! comparer, bool validate, string? propertyName = null) -> bool
+AtomUI.City.Mvvm.ValidatingViewModelBase.ValidateAllProperties() -> void
+AtomUI.City.Mvvm.ValidatingViewModelBase.ValidateProperty(string! propertyName, object? value) -> void
+AtomUI.City.Mvvm.ValidatingViewModelBase.ValidatingViewModelBase(AtomUI.City.Core.Diagnostics.IHostDiagnostics? diagnostics = null) -> void
+AtomUI.City.Mvvm.ValidatingViewModelBase.ValidationException.get -> System.Exception?
+AtomUI.City.Mvvm.ValidatingViewModelBase.ValidationStatus.get -> AtomUI.City.Mvvm.ValidationStatus
 const AtomUI.City.Mvvm.DeactivationGuard.CanceledReason = "deactivation-cancelled" -> string!
 const AtomUI.City.Mvvm.DeactivationGuard.FailedReason = "deactivation-failed" -> string!
 const AtomUI.City.Mvvm.MvvmDiagnosticIds.ActivationFailed = "AUCMVVM001" -> string!
@@ -272,6 +283,12 @@ static AtomUI.City.Mvvm.CommandExceptionContext.operator ==(AtomUI.City.Mvvm.Com
 static AtomUI.City.Mvvm.OperationExecutionResult.operator !=(AtomUI.City.Mvvm.OperationExecutionResult? left, AtomUI.City.Mvvm.OperationExecutionResult? right) -> bool
 static AtomUI.City.Mvvm.OperationExecutionResult.operator ==(AtomUI.City.Mvvm.OperationExecutionResult? left, AtomUI.City.Mvvm.OperationExecutionResult? right) -> bool
 static AtomUI.City.Mvvm.OperationScope.Start(System.Threading.CancellationToken cancellationToken) -> AtomUI.City.Mvvm.OperationScope!
+static AtomUI.City.Mvvm.ValidatingViewModelBase.ValidateAttribute(System.Collections.Generic.ICollection<string!>! errors, object? value, string! displayName, System.ComponentModel.DataAnnotations.ValidationAttribute! attribute) -> void
+static AtomUI.City.Mvvm.ValidatingViewModelBase.ValidateResult(System.Collections.Generic.ICollection<string!>! errors, System.ComponentModel.DataAnnotations.ValidationResult? result) -> void
 virtual AtomUI.City.Mvvm.ViewModelBase.OnActivatedAsync(AtomUI.City.Mvvm.ActivationContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 virtual AtomUI.City.Mvvm.ViewModelBase.OnDeactivatedAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
 virtual AtomUI.City.Mvvm.ViewModelBase.OnDisposed() -> void
+virtual AtomUI.City.Mvvm.ViewModelBase.OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs! eventArgs) -> void
+virtual AtomUI.City.Mvvm.ViewModelBase.OnPropertyChanging(System.ComponentModel.PropertyChangingEventArgs! eventArgs) -> void
+virtual AtomUI.City.Mvvm.ValidatingViewModelBase.ValidateAllGeneratedProperties() -> void
+virtual AtomUI.City.Mvvm.ValidatingViewModelBase.ValidateGeneratedProperty(string! propertyName, object? value, System.Collections.Generic.ICollection<string!>! errors) -> void

@@ -53,6 +53,29 @@ jobs:
         shell: pwsh
         run: ./engineering/check-core-mvp-aot.ps1 -Frameworks ${{ matrix.framework }}
 
+  nativeaot-runtime-matrix:
+    name: NativeAOT Runtime Matrix (${{ matrix.framework }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        framework:
+          - net10.0
+          - net8.0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.300
+
+      - name: Publish and run NativeAOT runtime matrix
+        shell: pwsh
+        run: ./engineering/check-native-aot-runtime-matrix.ps1 -Frameworks ${{ matrix.framework }}
+
   presentation-windows-release:
     name: Presentation Windows Release Candidate
     runs-on: windows-latest

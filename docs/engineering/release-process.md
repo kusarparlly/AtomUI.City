@@ -25,6 +25,9 @@
 - license 检查。
 - 隔离本地 NuGet consumer：候选包必须从本次生成的本地源恢复，禁止通过 `ProjectReference` 或全局缓存中的同版本 City 包通过测试。
 - 对声明 Windows 正式支持的 Presentation 运行真实 desktop、隔离 NuGet consumer 和批准性能 baseline 比较。
+- 对声明 Windows NativeAOT 支持的运行时模块执行持久 runtime matrix：`net8.0/win-x64` 与 `net10.0/win-x64` strict build、真实 NativeAOT publish、原生进程运行和结构化业务断言。
+
+Windows 综合运行时矩阵的固定入口为 `engineering/check-native-aot-runtime-matrix.ps1`；Core、EventBus、Data、Presentation 的专项 fixture/gate 继续提供各自更深的模块边界证据。
 
 ## 3. 发布流程
 
@@ -52,6 +55,7 @@ Confirm docs
 - 单元测试缺失。
 - 集成测试失败。
 - AOT/trimming 诊断未处理。
+- NativeAOT runtime matrix 任一支持 TFM/RID 未发布、原生进程未运行或关键业务断言失败。
 - package layout 不符合规范。
 - 隔离 consumer 未从当前本地候选源恢复全部 City 包，或仍包含 `ProjectReference`。
 - 插件安装/卸载 smoke test 失败。
@@ -82,5 +86,6 @@ Release notes 至少包含：
 | plugin smoke | Integration | 插件安装、启用、停用、卸载链路可跑。 |
 | release notes | Docs | 版本变更可追踪。 |
 | Presentation Windows RC | Platform/Package/Benchmark | Headless 与 desktop 正常退出，包消费者成功，时间回退不超过 15%，分配回退不超过 10%。 |
+| NativeAOT runtime matrix | AOT/Integration/Product | 支持的运行时模块关键公开路径在 `net8.0/win-x64` 与 `net10.0/win-x64` 中均完成 strict build、零未处理 IL 诊断、真实 publish 和原生运行；结果不得外推到未实测 OS/RID。 |
 
 Presentation 1.0 的 Windows 模块发布入口为 `engineering/check-presentation-release.ps1`。共享 Windows CI 使用 benchmark `Verify` 模式；正式候选必须在批准开发机使用默认 `Compare` 模式，且不得自动重写 baseline。

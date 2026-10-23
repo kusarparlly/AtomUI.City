@@ -16,6 +16,7 @@ public sealed class GeneratorDiagnosticTests
         Assert.Equal("AUCGEN006", GeneratorDiagnosticIds.DuplicatePresentationView);
         Assert.Equal("AUCGEN007", GeneratorDiagnosticIds.MultipleApplicationModules);
         Assert.Equal("AUCGEN008", GeneratorDiagnosticIds.InvalidGeneratedModule);
+        Assert.Equal("AUCGEN009", GeneratorDiagnosticIds.InvalidViewModelValidation);
     }
 
     [Fact]

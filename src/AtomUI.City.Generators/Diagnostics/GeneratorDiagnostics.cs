@@ -47,6 +47,12 @@ internal static class GeneratorDiagnostics
         "A generated module does not satisfy the module catalog or application-root contract.",
         GeneratorDiagnosticSeverity.Error);
 
+    public static readonly GeneratorDiagnosticDefinition InvalidViewModelValidation = new GeneratorDiagnosticDefinition(
+        GeneratorDiagnosticIds.InvalidViewModelValidation,
+        "ViewModel validation cannot be generated",
+        "A ViewModel validation declaration cannot be implemented by the AOT-first generator.",
+        GeneratorDiagnosticSeverity.Error);
+
     public static IReadOnlyList<GeneratorDiagnosticDefinition> All { get; } = Array.AsReadOnly(new[]
     {
         DuplicateModuleName,
@@ -56,6 +62,7 @@ internal static class GeneratorDiagnostics
         DuplicatePresentationView,
         MultipleApplicationModules,
         InvalidGeneratedModule,
+        InvalidViewModelValidation,
     });
 
     public static Diagnostic CreateRoslynDiagnostic(

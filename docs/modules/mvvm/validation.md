@@ -42,6 +42,7 @@
 | AUC-MVVM-004 | Interactions | InteractionTests |
 | AUC-MVVM-005 | Validation | ValidationScopeTests |
 | AUC-MVVM-006 | Operation Scope | CommandTests |
+| AUC-MVVM-013 | Generated ViewModel Validation | GeneratedValidationTests; MvvmNativeAotProcessTests |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 
@@ -66,15 +67,25 @@ Validation 负责 ViewModel 层的输入验证和状态暴露。
 
 验证失败不是异常。验证失败应作为状态暴露给 UI、Command、Diagnostics 和 Testing。
 
-### 2. 底层依赖
+### 2. 基类与所有权边界
 
-第一版默认复用 `CommunityToolkit.Mvvm`：
+依据 [ADR 0017](../../decisions/0017-aot-first-generated-viewmodel-validation.md)，验证不再由所有 `ViewModelBase` 默认继承的 `ObservableValidator` 提供：
 
 ```text
-ObservableValidator
+ViewModelBase
+├── property notification / activation / dispose / diagnostics
+└── no validation state
+
+ValidatingViewModelBase : ViewModelBase
+├── INotifyDataErrorInfo
+├── HasErrors / ErrorsChanged / GetErrors
+├── generated synchronous validation
+└── ValidationScope integration
 ```
 
-Mvvm 在其上补充：
+需要验证的开发者 ViewModel 必须继承 `ValidatingViewModelBase`；普通 ViewModel 只继承 `ViewModelBase`。City 不保留 `ObservableValidator` 反射兼容路径。
+
+Mvvm 在验证基类上提供：
 
 - ValidationScope。
 - 同步验证和异步验证结果归一。
@@ -148,12 +159,16 @@ UI 展示形式由 Presentation 和应用决定。
 
 ### 8. AOT / Source Generator
 
-Generator/Analyzer 可负责：
+Generator/Analyzer 必须负责：
 
-- 诊断 validation attribute 使用不兼容 AOT。
-- 生成 validation descriptor。
-- 生成属性验证 manifest。
+- 编译期读取 `ValidatingViewModelBase` 派生类上的 DataAnnotations，不运行时枚举 Attribute。
+- 为常用 Attribute 生成确定性属性分派和静态规则调用；`Compare` 生成直接属性访问。
+- 把 `CustomValidation` 的类型与方法名解析成直接静态调用，非法或不可访问签名输出 `AUCGEN009`。
+- 未知 `ValidationAttribute` 在 Strict AOT 下输出 `AUCGEN009`，不得静默反射降级。
+- 生成属性验证和全量验证入口，生成成员不扩大 public surface。
 - 诊断异步验证未接入 cancellation token。
+
+首批标准 Attribute 范围固定为 `Required`、`Range`、`StringLength`、`MinLength`、`MaxLength`、`RegularExpression`、`EmailAddress`、`Phone`、`Url`、`CreditCard`；新增规则必须同步 Feature、测试和 AOT 证据。typed custom validator 的精确 API 在施工前另行冻结。
 
 ### 9. 错误策略
 

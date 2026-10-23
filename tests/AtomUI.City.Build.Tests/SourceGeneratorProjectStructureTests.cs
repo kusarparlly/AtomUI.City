@@ -109,6 +109,18 @@ public sealed class SourceGeneratorProjectStructureTests
 
         var buildTargets = XDocument.Load(Path.Combine(buildRoot, "buildTransitive", "AtomUI.City.Build.targets"));
         Assert.Contains(
+            buildTargets.Descendants("PropertyGroup").Elements("TreatWarningsAsErrors"),
+            property => property.Value == "true");
+        Assert.Contains(
+            buildTargets.Descendants("PropertyGroup").Elements("ILLinkTreatWarningsAsErrors"),
+            property => property.Value == "true");
+        Assert.Contains(
+            buildTargets.Descendants("PropertyGroup").Elements("IlcTreatWarningsAsErrors"),
+            property => property.Value == "true");
+        Assert.Contains(
+            buildTargets.Descendants("Error"),
+            error => error.Attribute("Code")?.Value == "AUCBLD0302");
+        Assert.Contains(
             buildTargets.Descendants("Import"),
             import => import.Attribute("Project")?.Value ==
                       "$(MSBuildThisFileDirectory)AtomUI.City.Core.Diagnostics.targets");

@@ -81,25 +81,6 @@ internal sealed class ModuleRegistry : IModuleLifecycleController
         }
     }
 
-    internal static ModuleRegistry CreateForTesting(
-        IReadOnlyList<Type> moduleTypes,
-        IHostDiagnostics? diagnostics = null,
-        TimeSpan? buildCleanupTimeout = null)
-    {
-        ArgumentNullException.ThrowIfNull(moduleTypes);
-
-        var registrations = moduleTypes
-            .Select(moduleType => new ModuleRegistration(
-                ModuleDescriptorFactory.CreateFromAttributes(moduleType),
-                () => (IModule)Activator.CreateInstance(moduleType)!))
-            .ToArray();
-
-        return Create(
-            ModuleGraphValidator.Validate(registrations),
-            diagnostics,
-            buildCleanupTimeout);
-    }
-
     public void ConfigureServices(
         IApplicationContext applicationContext,
         IServiceCollection services,

@@ -10,7 +10,7 @@
 | Module/Plugin Host | ModuleTestHost, PluginTestHost | 模块和插件生命周期测试。 | 加载、卸载、撤销可断言。 |
 | Threading Tools | FakeUiDispatcher, DeterministicScheduler | 可控 UI 和异步调度。 | 不依赖固定 delay。 |
 | Generator Kit | SourceGenerationTestCase, GeneratedSourceSnapshot | source generator 测试。 | 输出和 diagnostic 可 snapshot。 |
-| AOT Gate | AotCompatibilityCheck | AOT/trimming 规则检查。 | 禁止模式产生 diagnostic。 |
+| AOT Source Lint | AotSourcePatternCheck | 对调用方提供的源码执行启发式字符串模式检查。 | 命中模式产生 diagnostic；通过不表示 NativeAOT compatible，真实门禁由 Build strict analyzer 与 publish/run 承担。 |
 | Data Test Doubles | FakeDataConnection, RecordingDataRequestHandler, ScriptedDataCredentialProvider, ScriptedDataTransport 及记录模型 | Data 连接、管线、凭据和传输的确定性测试。 | 不访问真实网络；脚本 FIFO 消费；调用证据可断言。 |
 
 ## 首批冻结 API Cards
@@ -219,30 +219,30 @@
 | Breaking Change Rules | 修改 snapshot 排序、diagnostic matching 或 generated source normalization 属于 breaking change。 |
 | Tests | `SourceGenerationTestKitTests` 断言 source snapshot、diagnostics、references 和 stable ordering。 |
 
-### `AotCompatibilityCheck`
+### `AotSourcePatternCheck`
 
 | Field | Contract |
 | --- | --- |
-| Type | `AotCompatibilityCheck` |
+| Type | `AotSourcePatternCheck` |
 | Namespace | `AtomUI.City.Testing` |
 | Assembly | `AtomUI.City.Testing` |
 | Stability | Preview |
 | Feature | AUC-TESTING-008 |
-| Purpose | 检查运行时扫描、dynamic code、unbounded reflection 和 trimming 风险。 |
-| Owner | Build/test gate |
+| Purpose | 对显式提供的源码文本执行可配置、快速的 AOT 风险字符串 lint。 |
+| Owner | Test method / lightweight source policy check |
 | Created By | 测试或 engineering gate。 |
 | Lifetime | 单次 run 产生 immutable diagnostics。 |
 | DI Lifetime | 不进入生产 DI。 |
 | Thread Safety | 输入不可变时可并发运行；文件系统扫描由调用方隔离 root。 |
 | Disposal | 无长期资源；文件句柄必须在 run 内关闭。 |
-| Nullability | project path、assembly metadata、rule set 不得为空。 |
-| Cancellation | 文件读取和 metadata 扫描必须观察 token。 |
-| Failure Behavior | 发现禁止模式返回 diagnostic；扫描失败返回 failed check result。 |
-| Diagnostics | 记录 rule id、symbol、assembly、path、reason。 |
-| Plugin Boundary | 插件包检查必须区分 dynamic plugin 和 static plugin 支持范围。 |
-| AOT / Trimming | 该类型本身是 AOT gate，不进入运行时包。 |
-| Breaking Change Rules | 修改 rule id、severity 或禁止模式语义属于 breaking change。 |
-| Tests | `AotCompatibilityCheckTests` 断言 reflection scan、dynamic code、trimming 风险和误报边界。 |
+| Nullability | source 集合、source path/text、diagnostic id 和 pattern 不得为空。 |
+| Cancellation | 每个 source 和 rule 扫描前观察 token。 |
+| Failure Behavior | 命中 ordinal substring 返回 diagnostic；不识别语义调用、依赖程序集或 linker 数据流；注释和字符串中的相同文本也可能命中。 |
+| Diagnostics | 记录 rule id、source path、pattern 和 reason；不得输出 “AOT compatible” 结论。 |
+| Plugin Boundary | 不检查插件包或动态/静态插件兼容性，只扫描调用方提供的源码文本。 |
+| AOT / Trimming | 该类型是 heuristic lint，不是 AOT gate，不进入生产运行时包；Build strict analyzer 与真实 publish/run 才提供验收证据。 |
+| Breaking Change Rules | 修改默认 pattern、ordinal matching、diagnostic id 或输入边界属于 breaking change；不得扩大其证明含义。 |
+| Tests | `AotSourcePatternCheckTests` 断言 pattern matching、取消、重复规则及明确的假阳性/假阴性边界。 |
 
 ### `TestLayerAttribute`
 
@@ -319,7 +319,7 @@
 | DeterministicScheduler.AdvanceBy | 推进虚拟时间。 | duration >= 0。 | 执行的 task 数。 | task 异常进入 scheduler diagnostics。 | 取消任务跳过或标记 cancelled。 | 同一 scheduler 单线程推进。 |
 | PluginTestHost.InstallAsync | 安装已由 builder 声明的测试插件。 | plugin id。 | PluginTestRecord。 | 未声明的 plugin id 或安装失败通过异常暴露。 | 必须观察 token。 | 同一 plugin id 的生命周期操作由测试串行驱动。 |
 | SourceGenerationTestCase.Run | 运行 generator 测试。 | source files、additional files、references。 | GeneratedSourceSnapshot 和 diagnostics。 | 编译失败保留 diagnostics。 | 测试 token 传递给 runner。 | 输出按 hint name 稳定排序。 |
-| AotCompatibilityCheck.Run | 检查 AOT 禁止模式。 | assembly/project metadata。 | diagnostic list。 | 发现反射扫描兜底等模式返回 diagnostic。 | 纯 CPU/文件读取可观察 token。 | 结果不可变。 |
+| AotSourcePatternCheck.Evaluate | 对显式 SourceFile 文本执行禁止 pattern lint。 | source files、cancellation token。 | immutable diagnostic list。 | ordinal substring 命中返回 diagnostic；无命中只表示未命中当前规则。 | 每个 source/rule 前观察 token。 | 规则集不变时结果可重复。 |
 
 ## 关键方法详细合同
 
@@ -884,14 +884,14 @@
 | Diagnostics | `Diagnostics` 保存 generator diagnostics；`CompilationDiagnostics` 保存 output compilation diagnostics。 |
 | Tests | `SourceGenerationTestKitTests`。 |
 
-### `AotCompatibilityCheck.ForbidDefaultAotPatterns`
+### `AotSourcePatternCheck.ForbidDefaultAotRiskPatterns`
 
 | Field | Contract |
 | --- | --- |
 | Feature | AUC-TESTING-008 |
-| Purpose | 注册 Testing 内置 AOT 风险规则，包括 runtime reflection scan、unbounded activator 和 dynamic code。 |
+| Purpose | 注册 Testing 内置的三个启发式源码文本风险 pattern：runtime reflection scan、unbounded activator 和 dynamic code。 |
 | Parameters | 无。 |
-| Return | 当前 `AotCompatibilityCheck`。 |
+| Return | 当前 `AotSourcePatternCheck`。 |
 | Nullability | 无。 |
 | Cancellation | 无。 |
 | Exceptions or Result | 重复注册同一 diagnostic id 和 pattern 时不重复添加。 |
@@ -899,16 +899,16 @@
 | Concurrency | 配置阶段不保证线程安全。 |
 | Side Effects | 修改内部 forbidden pattern rule set。 |
 | Diagnostics | Evaluate 时返回匹配 diagnostics。 |
-| Tests | `AotCompatibilityCheckTests`。 |
+| Tests | `AotSourcePatternCheckTests`。 |
 
-### `AotCompatibilityCheck.Evaluate`
+### `AotSourcePatternCheck.Evaluate`
 
 | Field | Contract |
 | --- | --- |
 | Feature | AUC-TESTING-008 |
-| Purpose | 扫描 source files，返回命中的 AOT risk diagnostics。 |
+| Purpose | 使用 ordinal substring 扫描 source files，返回命中的启发式 AOT risk diagnostics；不执行语义分析或兼容性认证。 |
 | Parameters | `sources` 不能为 null；`cancellationToken` 在每个 source 和 rule 扫描前观察。 |
-| Return | immutable `AotCompatibilityDiagnostic` snapshot。 |
+| Return | immutable `AotSourcePatternDiagnostic` snapshot。 |
 | Nullability | `sources` 不接受 null；返回集合不为空。 |
 | Cancellation | token 取消时抛 `OperationCanceledException`，不返回部分 diagnostics。 |
 | Exceptions or Result | source 为 null 时由枚举访问抛出；pattern match 不抛异常。 |
@@ -916,7 +916,7 @@
 | Concurrency | rule set 不变时可并发 Evaluate。 |
 | Side Effects | 无。 |
 | Diagnostics | diagnostic message 包含 source path 和 pattern。 |
-| Tests | `AotCompatibilityCheckTests`。 |
+| Tests | `AotSourcePatternCheckTests`。 |
 
 ### `TestLayerNames.AllCategories` 和 `IsKnownCategory`
 
@@ -956,8 +956,8 @@
 
 | Type | 分类 | Review 规则 |
 | --- | --- | --- |
-| `AotCompatibilityCheck` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
-| `AotCompatibilityDiagnostic` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `AotSourcePatternCheck` | 支持类型 | 新增、删除、重命名、默认 pattern 或 ordinal matching 行为变化必须更新本文档和 compatibility；不得宣称 AOT 兼容证明。 |
+| `AotSourcePatternDiagnostic` | 支持类型 | diagnostic id、path、pattern/message 变化必须更新本文档和 compatibility。 |
 | `DeterministicScheduler` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `DeterministicScheduledWorkItem` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `DisposableTracker` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |

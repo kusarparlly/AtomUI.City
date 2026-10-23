@@ -1,6 +1,6 @@
 # AtomUI.City.Core Features
 
-本文件是 Core 模块 Feature 数量、编号和状态的权威清单。当前 Core 1.0 合同共定义 8 个 Feature（`AUC-CORE-001` 至 `AUC-CORE-008`），状态为 `8/8 Verified`。没有 Feature ID 的功能不能进入实现；新增、拆分、合并或变更 Feature 状态时，必须先更新本清单，并同步更新 [testing.md](testing.md) 的测试矩阵。
+本文件是 Core 模块 Feature 数量、编号和状态的权威清单。当前 Core 1.0 合同共定义 8 个 Feature（`AUC-CORE-001` 至 `AUC-CORE-008`），运行时行为与 AOT cleanliness 均为 `8/8 Verified`。没有 Feature ID 的功能不能进入实现；新增、拆分、合并或变更 Feature 状态时，必须先更新本清单，并同步更新 [testing.md](testing.md) 的测试矩阵。
 
 ## Feature 索引
 
@@ -9,7 +9,7 @@
 | AUC-CORE-001 | Application Host Builder | Verified | ApplicationHost, ApplicationHostOptions, IApplicationHostBuilder, IApplicationHost, IApplicationContext；internal implementation: ApplicationHostBuilder | ApplicationHostBuilderTests; ApplicationHostRuntimeTests; ApplicationHostIndustrialLifecycleTests |
 | AUC-CORE-002 | Lifecycle Pipeline | Verified | LifecyclePipeline, LifecyclePipelineBuilder, LifecycleStage | ApplicationHostRuntimeTests; LifecycleMiddlewarePipelineTests; ApplicationHostIndustrialLifecycleTests; CoreHeadlessProcessTests |
 | AUC-CORE-003 | Lifecycle Scope Tree | Verified | LifecycleScope, LifecycleScopeKind, LifecycleScopeState | LifecycleScopeTreeTests |
-| AUC-CORE-004 | Module Contract | Verified | ModuleBase, IModule, ModuleDescriptor, ModuleOrigin, DependsOnAttribute, ServiceConfigurationContext | ModuleBaseTests; ModuleDescriptorTests; ApplicationHostModuleLifecycleTests; ApplicationHostIndustrialLifecycleTests |
+| AUC-CORE-004 | Module Contract | Verified | ModuleBase, IModule, ModuleDescriptor, ModuleOrigin, DependsOnAttribute, ServiceConfigurationContext | ModuleBaseTests; ModuleDescriptorTests; ApplicationHostModuleLifecycleTests; ApplicationHostIndustrialLifecycleTests; strict AOT analyzer; Core MVP NativeAOT |
 | AUC-CORE-005 | DI Registration Markers | Verified | ServiceAttribute, ScopedServiceAttribute, ExposeServicesAttribute, ServiceRegistrationOwnerAttribute, GeneratedServiceManifestAttribute, IServiceRegistrar, IServiceRegistrarContext, 标记接口 | ServiceRegistrationAttributeTests; AtomUICityIncrementalGeneratorDependencyInjectionTests; GeneratedServiceRegistrationCatalogTests; CoreMvpCliProcessTests; Core MVP NativeAOT |
 | AUC-CORE-006 | Host Diagnostics | Verified | IHostDiagnostics, HostDiagnosticRecord, HostDiagnosticIds | HostDiagnosticsTests |
 | AUC-CORE-007 | UI Dispatcher Contract | Verified | IUiDispatcher, UnavailableUiDispatcher | UiDispatcherIntegrationTests |
@@ -20,6 +20,7 @@
 | 约束 | 验收要求 |
 | --- | --- |
 | Core 不允许引用 Avalonia、AtomUI、Roslyn、CLI、Templates 或 Testing 生产程序集。 | 必须有实现、测试或工程门禁证据。 |
+| Core 发货程序集不得包含仅供测试使用的 factory、branch、backdoor 或反射辅助代码。 | `ForTesting`/`TestOnly`/friend-only helper 扫描、源码审查和 strict AOT analyzer 必须证明；测试便利逻辑放在 tests 项目。 |
 | ApplicationHostBuilder Build 后必须冻结服务注册入口。 | 必须有实现、测试或工程门禁证据。 |
 | LifecyclePipeline stage 顺序必须稳定，同一 stage 内 middleware 顺序必须稳定。 | 必须有实现、测试或工程门禁证据。 |
 | StartAsync、StopAsync、DisposeAsync 和 Dispose 必须有明确幂等规则，Stopped 后再次 Start 必须失败。 | 必须有实现、测试或工程门禁证据。 |
@@ -81,12 +82,12 @@ Feature ID: `AUC-CORE-004`
 Status: Verified
 Goal: 模块声明、依赖、配置、服务注册和初始化钩子。
 Public Contract: ModuleBase, IModule, ModuleDescriptor, ModuleOrigin, DependsOnAttribute, ServiceConfigurationContext
-Runtime / Build Behavior: 模块声明、依赖、PreConfigure 配置、服务注册阶段边界和初始化钩子。
+Runtime / Build Behavior: 模块声明、依赖、PreConfigure 配置、服务注册阶段边界和初始化钩子。生产 ModuleRegistry 只接受验证后的 `ModuleRegistration.Factory`；仅供测试的 Type + Activator 工厂不得编译进 Core runtime assembly。
 Failure Behavior: 非模块类型、循环依赖、缺失依赖、重复 id、非法 origin、插件 descriptor 缺失 plugin id、服务配置阶段后继续 mutation 失败；默认 id 使用类型全名。
 Threading / Cancellation: 遵守 [threading.md](threading.md)；涉及异步、IO、dispatcher、plugin、connection、process 或 generator 的操作必须显式处理 cancellation。
 Diagnostics: 现有诊断码见 [diagnostics.md](diagnostics.md)；产品级缺口必须在 [全局 1.0 进度](../../superpowers/plans/2026-06-11-development-tracking-plan.md) 中追踪。
 Tests: `ModuleAttributeTests; ModuleBaseTests; ModuleDescriptorTests`。
-Required Assertions: 断言依赖排序、默认 id、显式 id、模块来源、PreConfigure 顺序、配置阶段禁止解析运行时服务、配置阶段结束后拒绝继续修改服务注册。
+Required Assertions: 断言依赖排序、默认 id、显式 id、模块来源、PreConfigure 顺序、配置阶段禁止解析运行时服务、配置阶段结束后拒绝继续修改服务注册；测试辅助工厂位于 Core.Tests，Core `src` 无 test-only symbol，strict AOT 不产生该路径的 IL2067，双 TFM NativeAOT generated factory 继续运行。
 Acceptance Criteria: API 行为、失败路径、诊断上下文、释放或撤销、兼容性影响均可由测试证明。
 ## AUC-CORE-005 DI Registration Markers
 

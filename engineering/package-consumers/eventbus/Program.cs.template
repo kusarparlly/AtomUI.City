@@ -25,8 +25,11 @@ public sealed class ConsumerEventHandler : IEventHandler<ConsumerEvent>
 
     public static Task WaitForTwoDeliveriesAsync() => TwoDeliveries.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
-    public ValueTask HandleAsync(EventContext<ConsumerEvent> context)
+    public ValueTask HandleAsync(
+        EventContext<ConsumerEvent> context,
+        CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (Interlocked.Increment(ref _deliveryCount) == 2)
         {
             TwoDeliveries.TrySetResult(true);

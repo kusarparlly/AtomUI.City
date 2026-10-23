@@ -13,7 +13,7 @@ public sealed class ModuleRegistryConcurrencyTests
     public async Task SynchronousServiceConfigurationObservesCancellationBeforeModuleHook()
     {
         CancellableServiceConfigurationModule.Count = 0;
-        var registry = ModuleRegistry.CreateForTesting([typeof(CancellableServiceConfigurationModule)]);
+        var registry = ModuleRegistryTestFactory.Create([typeof(CancellableServiceConfigurationModule)]);
         using var cancellation = new CancellationTokenSource();
         cancellation.Cancel();
 
@@ -30,7 +30,7 @@ public sealed class ModuleRegistryConcurrencyTests
     public async Task ForwardPhaseConcurrencyHonorsSynchronousAndAsynchronousContracts()
     {
         GatedPhaseModule.Reset();
-        var registry = ModuleRegistry.CreateForTesting([typeof(GatedPhaseModule)]);
+        var registry = ModuleRegistryTestFactory.Create([typeof(GatedPhaseModule)]);
         var applicationContext = ApplicationHostTestBuilder.CreateContext();
         var services = new ServiceCollection();
         services.AddSingleton<IHostDiagnostics>(new InMemoryHostDiagnostics());
@@ -76,7 +76,7 @@ public sealed class ModuleRegistryConcurrencyTests
     public async Task InitializationRequiresOneApplicationScopeAcrossAllModuleStages()
     {
         ScopeRecordingModule.Reset();
-        var registry = ModuleRegistry.CreateForTesting([typeof(ScopeRecordingModule)]);
+        var registry = ModuleRegistryTestFactory.Create([typeof(ScopeRecordingModule)]);
         var applicationContext = ApplicationHostTestBuilder.CreateContext();
         var services = new ServiceCollection();
         registry.ConfigureServices(applicationContext, services);
@@ -152,7 +152,7 @@ public sealed class ModuleRegistryConcurrencyTests
     public async Task TerminalTransactionWaitsForActiveInitialization()
     {
         GatedPhaseModule.Reset();
-        var registry = ModuleRegistry.CreateForTesting([typeof(GatedPhaseModule)]);
+        var registry = ModuleRegistryTestFactory.Create([typeof(GatedPhaseModule)]);
         var applicationContext = ApplicationHostTestBuilder.CreateContext();
         var services = new ServiceCollection();
         var configureServices = Task.Factory.StartNew(
@@ -188,7 +188,7 @@ public sealed class ModuleRegistryConcurrencyTests
     {
         FailingContributionModule.Count = 0;
         FailingContributionModule.DisposeCount = 0;
-        var registry = ModuleRegistry.CreateForTesting([typeof(FailingContributionModule)]);
+        var registry = ModuleRegistryTestFactory.Create([typeof(FailingContributionModule)]);
         var applicationContext = ApplicationHostTestBuilder.CreateContext();
         var services = new ServiceCollection();
         registry.ConfigureServices(applicationContext, services);
@@ -217,7 +217,7 @@ public sealed class ModuleRegistryConcurrencyTests
     public async Task CrossTerminalReentrancyFailsFastAndCleanupContinues()
     {
         ReentrantDisposeModule.Reset();
-        var registry = ModuleRegistry.CreateForTesting([typeof(ReentrantDisposeModule)]);
+        var registry = ModuleRegistryTestFactory.Create([typeof(ReentrantDisposeModule)]);
         var applicationContext = ApplicationHostTestBuilder.CreateContext();
         var services = new ServiceCollection();
         services.AddSingleton<IModuleLifecycleController>(registry);
@@ -241,7 +241,7 @@ public sealed class ModuleRegistryConcurrencyTests
         LifecycleScope ApplicationScope)>
         CreateInitializedRegistryAsync()
     {
-        var registry = ModuleRegistry.CreateForTesting(
+        var registry = ModuleRegistryTestFactory.Create(
             [typeof(ModuleFive), typeof(ModuleThree), typeof(ModuleOne), typeof(ModuleFour), typeof(ModuleTwo)]);
         var applicationContext = ApplicationHostTestBuilder.CreateContext();
         var services = new ServiceCollection();

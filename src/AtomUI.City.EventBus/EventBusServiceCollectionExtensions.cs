@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using AtomUI.City.Core.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -97,7 +98,9 @@ public static class EventBusServiceCollectionExtensions
     /// <summary>
     /// Executes the add event payload diagnostic projector&lt;tevent, tprojector&gt; operation.
     /// </summary>
-    public static IServiceCollection AddEventPayloadDiagnosticProjector<TEvent, TProjector>(
+    public static IServiceCollection AddEventPayloadDiagnosticProjector<
+        TEvent,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TProjector>(
         this IServiceCollection services)
         where TProjector : class, IEventPayloadDiagnosticProjector<TEvent>
     {

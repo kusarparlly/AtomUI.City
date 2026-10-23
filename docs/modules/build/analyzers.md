@@ -127,6 +127,8 @@ AUCANL0001
 - Native AOT 模式动态插件。
 - 非 source-generated serializer/options binding，如果框架要求生成路径。
 
+`AtomUICityStrictAot=true` 时，上述由 .NET AOT、trimming、single-file analyzer 或 City Analyzer 产生的兼容性诊断必须 fail-closed，不能只显示 warning 后返回成功。项目级 `NoWarn` 不得静默屏蔽相关 IL 诊断；合法例外使用带 justification 的源码级 suppression。Strict AOT 只作用于 runtime closure，不得把 `IsAotCompatible` 等运行时属性传给 Generator/MSBuild Task 项目。最终兼容性结论仍需要真实 NativeAOT publish/run，Analyzer 不能替代原生执行证据。
+
 ### 6. 测试门禁
 
 Analyzer 可以辅助发现：
@@ -143,7 +145,7 @@ Analyzer 可以辅助发现：
 |---|---|---|
 | diagnostic id | Analyzer test | 规则触发稳定 ID。 |
 | diagnostic location | Analyzer test | 定位到声明位置。 |
-| strict AOT | Analyzer test | dynamic discovery 报错。 |
+| strict AOT | Analyzer/Build/NativeAOT process test | reflection JSON、RUC、缺失 DAM 与 dynamic code 跨 TFM 阻断；安全 runtime 通过；tooling-only project 不误报；最终应用 publish/run。 |
 | plugin leak | Analyzer test | private contract 泄漏报错。 |
 | route conflict | Analyzer test | 重复 route 报错。 |
 | no false positive | Analyzer test | 正确代码不报错。 |

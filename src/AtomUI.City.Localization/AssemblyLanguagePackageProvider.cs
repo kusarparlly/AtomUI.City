@@ -1,7 +1,5 @@
 using System.Globalization;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.Loader;
 
 namespace AtomUI.City.Localization;
 
@@ -51,13 +49,13 @@ public sealed class AssemblyLanguagePackageProvider : ILanguagePackageProvider
             return ValueTask.FromResult(Cancelled(cancellationToken));
         }
 
-        if (descriptor.SourceAssembly is null && string.IsNullOrWhiteSpace(descriptor.Location))
+        if (descriptor.SourceAssembly is null)
         {
             return ValueTask.FromResult(
                 LanguagePackageLoadResult.Failed(
                     new LocalizationError(
-                        LocalizationErrorKind.PackageNotFound,
-                        "Assembly language package source or location is required.")));
+                        LocalizationErrorKind.InvalidDescriptor,
+                        "Assembly language package source assembly is required.")));
         }
 
         if (string.IsNullOrWhiteSpace(descriptor.ResourceBaseName))
@@ -72,7 +70,7 @@ public sealed class AssemblyLanguagePackageProvider : ILanguagePackageProvider
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var assembly = descriptor.SourceAssembly ?? LoadAssemblyFromPath(descriptor);
+            var assembly = descriptor.SourceAssembly;
             cancellationToken.ThrowIfCancellationRequested();
             var resourceName = ResolveResourceName(assembly, descriptor.ResourceBaseName);
 
@@ -124,7 +122,6 @@ public sealed class AssemblyLanguagePackageProvider : ILanguagePackageProvider
         {
             ProviderKind = LanguagePackageProviderKind.Assembly,
             ScopeId = attribute.ScopeId,
-            LoadContext = AssemblyLoadContext.GetLoadContext(assembly),
             SourceAssembly = assembly,
             FallbackCulture = string.IsNullOrWhiteSpace(attribute.FallbackCulture)
                 ? null
@@ -134,23 +131,6 @@ public sealed class AssemblyLanguagePackageProvider : ILanguagePackageProvider
             Checksum = attribute.Checksum,
             ContributionId = attribute.ContributionId,
         };
-    }
-
-    [UnconditionalSuppressMessage(
-        "SingleFile",
-        "IL3000:Avoid accessing Assembly file path when publishing as a single file",
-        Justification = "This compatibility path is used only for descriptors that explicitly provide a file location.")]
-    private static Assembly LoadAssemblyFromPath(LanguagePackageDescriptor descriptor)
-    {
-        var fullPath = Path.GetFullPath(descriptor.Location!);
-        var loadContext = descriptor.LoadContext ?? AssemblyLoadContext.Default;
-        return loadContext.Assemblies.FirstOrDefault(candidate =>
-                !string.IsNullOrWhiteSpace(candidate.Location)
-                && string.Equals(
-                    Path.GetFullPath(candidate.Location),
-                    fullPath,
-                    StringComparison.OrdinalIgnoreCase))
-            ?? loadContext.LoadFromAssemblyPath(fullPath);
     }
 
     private static string? ResolveResourceName(Assembly assembly, string resourceBaseName)

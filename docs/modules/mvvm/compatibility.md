@@ -25,6 +25,8 @@
 
 ## 已落地的 Preview 迁移
 
+- [ADR 0017](../../decisions/0017-aot-first-generated-viewmodel-validation.md) 已实施一次 Preview breaking change：`ViewModelBase` 不再继承 CommunityToolkit `ObservableValidator`，需要验证的类型改为继承 `ValidatingViewModelBase`。City 尚未正式发布，因此不保留旧父类、强制转换或预编译派生程序集兼容；Public API baseline、生成器合同、迁移文档和双 TFM NativeAOT 证据已同步。
+
 - `OperationResult` 已在 `AUC-MVVM-008` 中重命名为 `OperationExecutionResult`，明确它是命令/operation 运行快照，不是领域业务结果；Preview 阶段不保留旧名兼容壳。
 - `CommandFactory.CreateAsync` 的固定 `IActivationScope?` 捕获不再作为 ViewModel 默认合同；新的 activation owner 入口每次执行解析当前 Scope。显式固定 Scope 只保留为标注清晰的低级一次性入口。
 - 旧的“异步命令异常只记录 Failed 且不向 awaited caller 抛出”行为已由 `AUC-MVVM-010` 替换。调用方必须迁移为 await/catch，UI `ICommand` 路径必须提供应用异常 handler。

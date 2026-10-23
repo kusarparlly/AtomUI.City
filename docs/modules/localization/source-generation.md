@@ -84,7 +84,7 @@ Generator 负责：
 - Module resource descriptor。
 - Plugin resource descriptor。
 
-当前生成入口为 `AtomUI.City.Generated.GeneratedLocalizationManifest`：`RegisterPackages` 通过一次 `LanguagePackageRegistry.RegisterRange` 原子注册全部 descriptor，任一冲突都不得留下部分注册；`SupportedCultures` 和 `ResourceKeys` 提供稳定 manifest，`Keys` 提供强类型常量。生成 descriptor 保存声明 assembly 的 `AssemblyLoadContext`。生成链由 `AtomUICityIncrementalGenerator.Initialize` 直接初始化，不允许仅存在独立 metadata/builder 而未接入 Roslyn pipeline。
+当前生成入口为 `AtomUI.City.Generated.GeneratedLocalizationManifest`：`RegisterPackages` 通过一次 `LanguagePackageRegistry.RegisterRange` 原子注册全部 descriptor，任一冲突都不得留下部分注册；`SupportedCultures` 和 `ResourceKeys` 提供稳定 manifest，`Keys` 提供强类型常量。生成 descriptor 直接保存声明 `SourceAssembly`，不要求运行时扫描或按路径加载程序集。生成链由 `AtomUICityIncrementalGenerator.Initialize` 直接初始化，不允许仅存在独立 metadata/builder 而未接入 Roslyn pipeline。
 
 `LocalizationMetadataReader` 将 attribute 读取阶段错误写入 `LocalizationMetadata.Diagnostics`；主 pipeline 必须先报告这些错误并停止生成，不能把无效声明过滤后继续产生部分 manifest。
 
@@ -119,12 +119,13 @@ Generator 负责：
 
 ### 5. AOT
 
-Native AOT 模式：
+NativeAOT 模式：
 
-- 禁止依赖动态 assembly loading。
-- 使用 file-based locpack。
+- 禁止依赖动态 assembly loading 或运行时程序集扫描。
+- generated manifest 可以注册直接持有 `SourceAssembly` 的 embedded locpack descriptor。
+- 外部、可替换语言内容使用 file-based `.locpack` descriptor。
 - manifest 和 key constants 仍由 generator 生成。
-- file locpack descriptor 由应用显式注册；当前 attribute registrar 生成的是 assembly provider descriptor。
+- `AddLocalization()` 的默认 File、Assembly、InMemory provider 组合必须通过严格 AOT publish/run。
 
 ### 6. Build 集成
 

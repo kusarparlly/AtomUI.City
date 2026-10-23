@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "packageId": "Matrix.en-US",
+  "culture": "en-US",
+  "resources": {
+    "Matrix.Greeting": "embedded"
+  }
+}

@@ -9,4 +9,5 @@ internal static class GeneratorDiagnosticIds
     public const string DuplicatePresentationView = "AUCGEN006";
     public const string MultipleApplicationModules = "AUCGEN007";
     public const string InvalidGeneratedModule = "AUCGEN008";
+    public const string InvalidViewModelValidation = "AUCGEN009";
 }

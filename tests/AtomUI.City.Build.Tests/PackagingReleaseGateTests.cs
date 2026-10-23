@@ -256,10 +256,18 @@ public sealed class PackagingReleaseGateTests
         Assert.Contains("$assembly_name.xml", publicApiScript, StringComparison.Ordinal);
 
         var localPackageConsumerScript = File.ReadAllText(localPackageConsumerScriptPath);
+        var localPackageConsumerProgram = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            EngineeringScriptsDirectoryName,
+            "package-consumers",
+            "release",
+            "Program.cs.template"));
         Assert.Contains("-local-gate", localPackageConsumerScript, StringComparison.Ordinal);
         Assert.Contains("NUGET_PACKAGES", localPackageConsumerScript, StringComparison.Ordinal);
         Assert.Contains("must not contain ProjectReference", localPackageConsumerScript, StringComparison.Ordinal);
         Assert.Contains("did not originate from the candidate local feed", localPackageConsumerScript, StringComparison.Ordinal);
+        Assert.Contains("CancellationToken cancellationToken", localPackageConsumerProgram, StringComparison.Ordinal);
+        Assert.Contains("cancellationToken.ThrowIfCancellationRequested()", localPackageConsumerProgram, StringComparison.Ordinal);
     }
 
     [Fact]

@@ -108,7 +108,7 @@ public sealed class ApplicationHostModuleLifecycleTests
     {
         ThrowingConstructionCleanupModule.DisposeCount = 0;
 
-        var failure = Assert.Throws<AggregateException>(() => ModuleRegistry.CreateForTesting(
+        var failure = Assert.Throws<AggregateException>(() => ModuleRegistryTestFactory.Create(
             [typeof(FailingConstructorModule), typeof(ThrowingConstructionCleanupModule)]));
 
         Assert.Equal(2, failure.InnerExceptions.Count);
@@ -163,7 +163,7 @@ public sealed class ApplicationHostModuleLifecycleTests
         try
         {
             var result = RunBuildOnNonPumpingSynchronizationContext(() =>
-                ModuleRegistry.CreateForTesting(
+                ModuleRegistryTestFactory.Create(
                     [typeof(HangingConstructionCleanupModule), typeof(HangingCleanupFailingConstructorModule)],
                     diagnostics,
                     TimeSpan.FromMilliseconds(100)));
@@ -327,7 +327,7 @@ public sealed class ApplicationHostModuleLifecycleTests
     public void CapturedModuleServiceCollectionRejectsMutationAfterServiceConfigurationPhase()
     {
         CapturedServicesModule.CapturedServices = null;
-        var registry = ModuleRegistry.CreateForTesting([typeof(CapturedServicesModule)]);
+        var registry = ModuleRegistryTestFactory.Create([typeof(CapturedServicesModule)]);
         var services = new ServiceCollection();
 
         registry.ConfigureServices(ApplicationHostTestBuilder.CreateContext(), services);

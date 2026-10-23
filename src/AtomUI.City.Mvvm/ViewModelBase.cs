@@ -1,6 +1,6 @@
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using AtomUI.City.Core.Diagnostics;
-using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AtomUI.City.Mvvm;
 
@@ -8,7 +8,8 @@ namespace AtomUI.City.Mvvm;
 /// Represents view model base.
 /// </summary>
 public abstract class ViewModelBase :
-    ObservableValidator,
+    INotifyPropertyChanged,
+    INotifyPropertyChanging,
     IActivatable,
     IActivationScopeOwner,
     IDisposable,
@@ -44,6 +45,16 @@ public abstract class ViewModelBase :
 
     /// <inheritdoc />
     public event EventHandler? ActivationStateChanged;
+
+    /// <summary>
+    /// Occurs before a property value changes.
+    /// </summary>
+    public event PropertyChangingEventHandler? PropertyChanging;
+
+    /// <summary>
+    /// Occurs after a property value changes.
+    /// </summary>
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
     /// Gets a value indicating whether is active.
@@ -308,7 +319,7 @@ public abstract class ViewModelBase :
     /// <summary>
     /// Executes the set property&lt;t&gt; operation.
     /// </summary>
-    protected new bool SetProperty<T>(
+    protected bool SetProperty<T>(
         ref T field,
         T newValue,
         [CallerMemberName] string? propertyName = null)
@@ -319,7 +330,7 @@ public abstract class ViewModelBase :
     /// <summary>
     /// Executes the set property&lt;t&gt; operation.
     /// </summary>
-    protected new bool SetProperty<T>(
+    protected bool SetProperty<T>(
         ref T field,
         T newValue,
         IEqualityComparer<T> comparer,
@@ -329,39 +340,33 @@ public abstract class ViewModelBase :
         ArgumentNullException.ThrowIfNull(comparer);
         ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
 
-        return base.SetProperty(ref field, newValue, comparer, propertyName);
+        if (comparer.Equals(field, newValue))
+        {
+            return false;
+        }
+
+        OnPropertyChanging(new PropertyChangingEventArgs(propertyName));
+        field = newValue;
+        OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+        return true;
     }
 
     /// <summary>
-    /// Executes the set property&lt;t&gt; operation.
+    /// Raises <see cref="PropertyChanging"/>.
     /// </summary>
-    protected new bool SetProperty<T>(
-        ref T field,
-        T newValue,
-        bool validate,
-        [CallerMemberName] string? propertyName = null)
+    protected virtual void OnPropertyChanging(PropertyChangingEventArgs eventArgs)
     {
-        ThrowIfDisposed();
-        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
-
-        return base.SetProperty(ref field, newValue, validate, propertyName);
+        ArgumentNullException.ThrowIfNull(eventArgs);
+        PropertyChanging?.Invoke(this, eventArgs);
     }
 
     /// <summary>
-    /// Executes the set property&lt;t&gt; operation.
+    /// Raises <see cref="PropertyChanged"/>.
     /// </summary>
-    protected new bool SetProperty<T>(
-        ref T field,
-        T newValue,
-        IEqualityComparer<T> comparer,
-        bool validate,
-        [CallerMemberName] string? propertyName = null)
+    protected virtual void OnPropertyChanged(PropertyChangedEventArgs eventArgs)
     {
-        ThrowIfDisposed();
-        ArgumentNullException.ThrowIfNull(comparer);
-        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
-
-        return base.SetProperty(ref field, newValue, comparer, validate, propertyName);
+        ArgumentNullException.ThrowIfNull(eventArgs);
+        PropertyChanged?.Invoke(this, eventArgs);
     }
 
     /// <summary>

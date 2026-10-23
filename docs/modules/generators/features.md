@@ -16,6 +16,7 @@
 | AUC-GENERATORS-008 | Diagnostics | 已实现并通过产品合同测试 | Public Tooling Entry: BuildServiceProviderUsageAnalyzer; Internal: GeneratorDiagnosticIds, GeneratorDiagnostics | GeneratorDiagnosticTests |
 | AUC-GENERATORS-009 | EventBus Contract and Handler Manifest | 已实现并通过产品合同测试 | Internal: EventMetadataReader, EventGenerationManifest; Generated Output: service registrar 中的 EventBus manifest | EventBusGeneratorTests; GeneratedSourceVisibilityTests |
 | AUC-GENERATORS-010 | Data Client Descriptor Manifest | 已实现并通过产品合同测试 | Internal: DataClientMetadataReader, DataClientGenerationMetadata, DataClientRegistrarSourceBuilder; Generated Output: data client registrar | AtomUICityIncrementalGeneratorDataTests; GeneratedSourceVisibilityTests |
+| AUC-GENERATORS-011 | ViewModel Validation Generation | Implemented and NativeAOT Verified | Internal validation metadata/manifest/source pipeline; Generated Output: private/protected validation implementation | AtomUICityIncrementalGeneratorMvvmTests; GeneratedValidationTests; NativeAOT Runtime Matrix |
 
 ## Feature 硬门禁
 
@@ -176,3 +177,18 @@ Diagnostics: diagnostic category 使用 `AtomUI.City.Generators.Data`，定位�
 Tests: `AtomUICityIncrementalGeneratorDataTests; GeneratedSourceVisibilityTests; GeneratorNamingTests`
 Required Assertions: 断言强类型 descriptor、manifest attribute、稳定 registrar/hint name、重复 client id、签名和 policy 拒绝、tuple type reference、泛型容器拒绝、继承 operation、可编译输出及 generated public surface 白名单。
 Acceptance Criteria: Data attribute 声明能够生成确定、可编译、无运行时扫描的 descriptor registrar；任一非法声明必须在编译期阻断该批 Data 输出。
+
+## AUC-GENERATORS-011 ViewModel Validation Generation
+
+Feature ID: `AUC-GENERATORS-011`
+Status: `Implemented and NativeAOT Verified`
+Goal: 为 `ValidatingViewModelBase` 派生类生成无运行时反射的 DataAnnotations 验证实现。
+Internal Contract: validation metadata reader、validation manifest builder、validation source builder；实现类型名称可在施工时确定，不构成开发者 SDK。
+Generated Output Contract: 在开发者 `partial` ViewModel 中生成 private/protected property validation 分派和全量验证实现；不得生成新的 public 类型或成员。hint name、属性顺序和同一属性的规则顺序必须确定。
+Runtime / Build Behavior: 编译期读取受支持标准 Attribute；`Compare` 生成直接属性访问；`CustomValidation` 解析为确定的静态方法调用；typed custom validator contract 在 API card 冻结后接入。生成代码通过 `ValidatingViewModelBase` 的受控 hook 原子替换字段错误。
+Failure Behavior: 非 partial 派生类、未知 Attribute、非法 Attribute 参数、不可访问/歧义 `CustomValidation` 方法、开放泛型或无法生成的类型统一输出 `AUCGEN009` Error，并且不生成不完整验证实现。
+Threading / Cancellation: 纯编译期 CPU，传递 Roslyn cancellation token，不使用全局 mutable cache。
+Diagnostics: `AUCGEN009 UnsupportedGeneratedValidation`，category 为 `AtomUI.City.Generators.MvvmValidation`，定位到 Attribute、目标属性或非法方法参数中最精确的位置。
+Tests: `AtomUICityIncrementalGeneratorMvvmTests; GeneratedValidationTests; GeneratorNamingTests; AtomUI.City.NativeAot.RuntimeMatrix`
+Required Assertions: 覆盖受支持 Attribute、多个属性/规则稳定排序、Compare、CustomValidation、非法输入、增量输入隔离、可编译输出、public surface 白名单和双 TFM NativeAOT 原生验证行为。
+Acceptance Criteria: 验证型 ViewModel 在 net8/net10 NativeAOT 下不产生本 Feature 引起的 IL2xxx/IL3xxx，运行时不枚举 Attribute、不按字符串反射方法且错误通知行为与 Mvvm 合同一致。
