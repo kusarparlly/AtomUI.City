@@ -333,6 +333,7 @@ public sealed class StressDataConnectionFactory(IStressAccessTokenSession tokenS
             ConnectionId = $"stress-signalr-{Guid.NewGuid():N}",
             Endpoint = new Uri(endpoints.Http, "/stress-hub"),
             Owner = owner,
+            JsonContract = StressSignalRJson.Contract,
             AccessTokenProvider = () => ValueTask.FromResult<string?>(tokenSession.CurrentToken),
             ReconnectDelays = [TimeSpan.Zero, TimeSpan.FromMilliseconds(20), TimeSpan.FromMilliseconds(100)],
         });

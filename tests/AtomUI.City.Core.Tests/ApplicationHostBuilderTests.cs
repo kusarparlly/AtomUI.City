@@ -3,13 +3,56 @@ using AtomUI.City.Core.Hosting;
 using AtomUI.City.Core.Lifecycle;
 using AtomUI.City.Core.Modularity;
 using Microsoft.Extensions.Configuration;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AtomUI.City.Core.Tests;
 
 public sealed class ApplicationHostBuilderTests
 {
+    [Fact]
+    public async Task DefaultLoggingProvidersArePortableAndExcludeEventLog()
+    {
+        await using var host = ApplicationHostTestBuilder.Create().Build();
+
+        var providerNames = host.Services
+            .GetServices<ILoggerProvider>()
+            .Select(static provider => provider.GetType().FullName)
+            .ToArray();
+
+        Assert.Contains("Microsoft.Extensions.Logging.Console.ConsoleLoggerProvider", providerNames);
+        Assert.Contains("Microsoft.Extensions.Logging.Debug.DebugLoggerProvider", providerNames);
+        Assert.Contains("Microsoft.Extensions.Logging.EventSource.EventSourceLoggerProvider", providerNames);
+        Assert.DoesNotContain(
+            providerNames,
+            static name => name?.Contains("EventLogLoggerProvider", StringComparison.Ordinal) == true);
+    }
+
+    [Fact]
+    public async Task WindowsApplicationCanExplicitlyOptIntoEventLog()
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        var builder = ApplicationHostTestBuilder.Create();
+        builder.ConfigureServices(AddWindowsEventLog);
+
+        await using var host = builder.Build();
+
+        Assert.Contains(
+            host.Services.GetServices<ILoggerProvider>(),
+            static provider => provider.GetType().FullName ==
+                "Microsoft.Extensions.Logging.EventLog.EventLogLoggerProvider");
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static void AddWindowsEventLog(IServiceCollection services) =>
+        services.AddLogging(logging => logging.AddEventLog());
+
     [Fact]
     public void CreateBuilderCreatesConfigurableApplicationHostBuilder()
     {

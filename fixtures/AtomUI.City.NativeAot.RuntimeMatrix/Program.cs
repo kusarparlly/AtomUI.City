@@ -40,6 +40,7 @@ public sealed class MatrixApplicationModule : ModuleBase
     {
         context.Services.AddState();
         context.Services.AddRouting(global::AtomUI.City.Generated.GeneratedRoutingRouteManifest.CreateDescriptors());
+        context.Services.AddSingleton<MatrixOrderResolver>();
         context.Services.AddSecurity();
         context.Services.AddLocalization();
     }
@@ -61,10 +62,26 @@ public readonly record struct MatrixRouteParameters(int Id);
 public static partial class MatrixRoutes
 {
     [Route("orders/{id:int}", typeof(MatrixRouteTarget), Id = "matrix.orders")]
+    [RouteResolvers(typeof(MatrixOrderResolver))]
     public static partial RouteReference<MatrixRouteParameters> Orders();
 }
 
 public sealed class MatrixRouteTarget;
+
+public sealed class MatrixOrderResolver : IRouteResolver
+{
+    public ValueTask<RouteResolveResult> ResolveAsync(
+        RouteResolveContext context,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return ValueTask.FromResult(RouteResolveResult.Success(
+            new Dictionary<string, object?>
+            {
+                ["resolvedOrderId"] = int.Parse(context.Parameters["id"]),
+            }));
+    }
+}
 
 public sealed partial class MatrixViewModel : ValidatingViewModelBase
 {
@@ -95,10 +112,12 @@ public sealed record MatrixResult(
     int RouteCount,
     bool SecurityAllowed,
     bool SecurityChallenge,
+    bool SecurityPersistence,
     bool MvvmGeneratedValidation,
     bool LocalizationEmbedded,
     bool LocalizationFile,
     bool LocalizationInMemory,
+    bool LocalizationKnownAssembly,
     string FrameworkDescription);
 
 [JsonSerializable(typeof(MatrixResult))]
@@ -126,10 +145,12 @@ internal static class Program
         Ensure(MatrixApplicationModule.InitializationCount == 1, "Core module initialization did not run exactly once.");
 
         var stateNotificationCount = VerifyState(host.Services);
-        var routeCount = VerifyRouting(host.Services);
-        var (securityAllowed, securityChallenge) = await VerifySecurityAsync(host.Services);
+        var routeCount = await VerifyRoutingAsync(host.Services);
+        var (securityAllowed, securityChallenge, securityPersistence) =
+            await VerifySecurityAsync(host.Services);
         var mvvmGeneratedValidation = VerifyMvvm();
-        var (embedded, file, inMemory) = await VerifyLocalizationAsync(host.Services);
+        var (embedded, file, inMemory, knownAssembly) =
+            await VerifyLocalizationAsync(host.Services);
 
         await host.StopAsync();
         Ensure(MatrixApplicationModule.ShutdownCount == 1, "Core module shutdown did not run exactly once.");
@@ -142,10 +163,12 @@ internal static class Program
             RouteCount: routeCount,
             SecurityAllowed: securityAllowed,
             SecurityChallenge: securityChallenge,
+            SecurityPersistence: securityPersistence,
             MvvmGeneratedValidation: mvvmGeneratedValidation,
             LocalizationEmbedded: embedded,
             LocalizationFile: file,
             LocalizationInMemory: inMemory,
+            LocalizationKnownAssembly: knownAssembly,
             FrameworkDescription: System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription);
 
         Console.WriteLine("CITY_NATIVEAOT_RUNTIME_MATRIX_OK");
@@ -169,7 +192,7 @@ internal static class Program
         return notifications.Count;
     }
 
-    private static int VerifyRouting(IServiceProvider services)
+    private static async Task<int> VerifyRoutingAsync(IServiceProvider services)
     {
         var graph = services.GetRequiredService<IRouteGraphProvider>().CurrentSnapshot;
         var route = MatrixRoutes.Orders();
@@ -177,10 +200,20 @@ internal static class Program
         Ensure(route.Id == "matrix.orders", "Generated route reference has the wrong identity.");
         Ensure(match.Status == RouteMatchStatus.Success, "Generated route did not match.");
         Ensure(match.Route.RouteId == route.Id && match.Parameters["id"] == "42", "Route match metadata is incorrect.");
+        await using var scope = new NavigationScope(
+            graph,
+            type => services.GetService(type));
+        var navigation = await scope.NavigateByPathAsync("orders/42");
+        Ensure(navigation.Status == NavigationResultStatus.Success, "Generated route navigation failed.");
+        Ensure(
+            scope.CurrentSnapshot.ResolvedData.TryGetValue("resolvedOrderId", out var resolved)
+            && resolved is 42,
+            "Route resolver was not activated through the runtime DI component path.");
         return graph.Routes.Count;
     }
 
-    private static async Task<(bool Allowed, bool Challenge)> VerifySecurityAsync(IServiceProvider services)
+    private static async Task<(bool Allowed, bool Challenge, bool Persistence)> VerifySecurityAsync(
+        IServiceProvider services)
     {
         var registry = services.GetRequiredService<PermissionRegistry>();
         registry.Add(new PermissionDescriptor("matrix.read"));
@@ -191,7 +224,52 @@ internal static class Program
         var challenge = await checker.CheckAsync(new ClaimsPrincipal(new ClaimsIdentity()), "matrix.read");
         Ensure(allowed.Status == AuthorizationResultStatus.Allowed, "Registered permission was not allowed.");
         Ensure(challenge.Status == AuthorizationResultStatus.Challenge, "Anonymous permission check did not challenge.");
-        return (true, true);
+        var persistence = await VerifySecurityPersistenceAsync();
+        return (true, true, persistence);
+    }
+
+    private static async Task<bool> VerifySecurityPersistenceAsync()
+    {
+        var rootPath = Path.Combine(
+            Path.GetTempPath(),
+            "AtomUI.City.NativeAot.RuntimeMatrix",
+            Guid.NewGuid().ToString("N"));
+        try
+        {
+            var store = new FileCredentialStore(rootPath);
+            var account = new SecurityAccountKey(
+                "Bearer",
+                "https://matrix.example.test",
+                "matrix-tenant",
+                "matrix-user");
+            var credential = new AccountCredentialSnapshot(
+                account,
+                "matrix-api",
+                "matrix-access-token",
+                "Bearer",
+                "matrix-refresh-token",
+                DateTimeOffset.UtcNow.AddHours(1));
+            var saved = await store.SaveAsync(credential);
+            var loaded = await store.GetAsync(account, "matrix-api");
+            var removed = await store.RemoveAsync(account, "matrix-api");
+            var missing = await store.GetAsync(account, "matrix-api");
+            Ensure(saved.Succeeded && saved.Value, "Security credential file was not saved.");
+            Ensure(
+                loaded.Succeeded
+                && loaded.Value!.AccessToken == "matrix-access-token"
+                && loaded.Value.RefreshToken == "matrix-refresh-token",
+                "Security credential file was not loaded through source-generated JSON.");
+            Ensure(removed.Succeeded && removed.Value, "Security credential file was not removed.");
+            Ensure(!missing.Succeeded, "Removed Security credential unexpectedly remained readable.");
+            return true;
+        }
+        finally
+        {
+            if (Directory.Exists(rootPath))
+            {
+                Directory.Delete(rootPath, recursive: true);
+            }
+        }
     }
 
     private static bool VerifyMvvm()
@@ -211,10 +289,14 @@ internal static class Program
         return true;
     }
 
-    private static async Task<(bool Embedded, bool File, bool InMemory)> VerifyLocalizationAsync(IServiceProvider services)
+    private static async Task<(bool Embedded, bool File, bool InMemory, bool KnownAssembly)> VerifyLocalizationAsync(
+        IServiceProvider services)
     {
         var registry = services.GetRequiredService<LanguagePackageRegistry>();
         global::AtomUI.City.Generated.GeneratedLocalizationManifest.RegisterPackages(registry, "matrix.generated");
+        var embeddedDescriptor = AssertSingleEmbeddedDescriptor(registry);
+        var directAssemblyLoad = await new AssemblyLanguagePackageProvider().LoadAsync(embeddedDescriptor);
+        Ensure(directAssemblyLoad.Succeeded, "Known SourceAssembly localization package failed to load.");
 
         var filePath = Path.Combine(AppContext.BaseDirectory, "Localization", "Matrix.fr-FR.locpack.json");
         Ensure(registry.Register(
@@ -239,7 +321,17 @@ internal static class Program
         var embedded = await ReadLocalizedValueAsync(localization, "en-US", "embedded");
         var file = await ReadLocalizedValueAsync(localization, "fr-FR", "file");
         var inMemory = await ReadLocalizedValueAsync(localization, "zh-CN", "memory");
-        return (embedded, file, inMemory);
+        return (embedded, file, inMemory, true);
+    }
+
+    private static LanguagePackageDescriptor AssertSingleEmbeddedDescriptor(LanguagePackageRegistry registry)
+    {
+        var descriptor = registry.Descriptors.Single(item => item.PackageId == "Matrix.en-US");
+        Ensure(
+            descriptor.ProviderKind == LanguagePackageProviderKind.Assembly
+            && ReferenceEquals(descriptor.SourceAssembly, typeof(Program).Assembly),
+            "Generated localization descriptor did not retain its statically known SourceAssembly.");
+        return descriptor;
     }
 
     private static async Task<bool> ReadLocalizedValueAsync(

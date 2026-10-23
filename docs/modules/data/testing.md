@@ -42,6 +42,7 @@
 | AUC-DATA-018 | Contract/RuntimeLifecycle | DataLargePayloadTests; DataDogfoodTests | 流式 IO、进度、range/resume、声明长度完整性、取消、临时文件和内存上限。 | partial file、progress failure、range/length mismatch。 | Completed |
 | AUC-DATA-019 | Unit/PluginLifecycle | DataRequestHandlerTests; DataPluginLifecycleTests | handler 顺序、单次 continuation、capability、扩展异常映射和撤销。 | denied capability、handler/source/authorizer failure、double next、direct-pipeline bypass。 | Completed |
 | AUC-DATA-020 | Dogfood/RuntimeLifecycle | DataTestDoublesTests; DataDogfoodTests | Testing doubles 与真实本地 HTTP/gRPC/SignalR 压力场景。 | WebSocket fault/reconnect、high concurrency、reentrant stop。 | Completed |
+| AUC-DATA-021 | Unit/NativeAOT/RealProtocol | SignalRJsonContractTests; Data NativeAOT protocol gate | source-generated JSON contract、resolver 顺序、受控 protocol 安装、自定义 DTO invoke/response/push。 | 空合同、argument/response/message 元数据缺失、双 TFM reflection fallback。 | Completed |
 
 ## 缺口处理
 

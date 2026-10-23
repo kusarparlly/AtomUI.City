@@ -99,7 +99,7 @@ builder.ConfigureServices(services => services.AddSingleton<AppService>());
 
 DI Attribute 解释以 Generator 的 Roslyn metadata reader 为唯一生产规则源。Core runtime 不提供反射式 `ServiceRegistrationMetadata` reader；重新引入第二套 Attribute/lifetime/expose 解释实现属于兼容性与 NativeAOT 风险，必须作为独立设计变更审查。
 
-Windows `net8.0` NativeAOT 应用若保留 Generic Host 的 EventLog 可达路径，需要显式提供 `System.Threading.AccessControl`；Core MVP AOT 产品夹具已采用仅 AOT 模式的直接引用，并把 ILC `will always throw` 纳入失败门禁。该要求来自 Generic Host 的 Windows 日志依赖闭包，不改变自动服务注册协议。
+Core 的默认 logging provider 固定为 Console、Debug 和 EventSource，不包含 Windows EventLog。应用仍可通过标准 `ILoggingBuilder` 显式增加或替换 provider。显式启用 EventLog 的应用负责引用 `Microsoft.Extensions.Logging.EventLog`，并在目标 TFM/RID 上验证其传递依赖；Core 不通过隐藏 `System.Threading.AccessControl` 引用为该选择兜底。
 
 引用程序集 registrar 形成的是图而不是树。同一 registrar 可能经多条引用路径到达应用聚合入口，必须按 registrar identity 幂等跳过，不能重复产生 descriptor。Owner type 不是 registrar identity：不同 registrar 声明同一 owner 属于跨程序集所有权冲突，必须在 Host Build 确定性失败并报告双方身份，禁止静默忽略后到注册。不同 owner 的同 contract 注册不属于 registrar 去重规则，继续遵守普通冲突、TryAdd 或 Replace 合同。
 

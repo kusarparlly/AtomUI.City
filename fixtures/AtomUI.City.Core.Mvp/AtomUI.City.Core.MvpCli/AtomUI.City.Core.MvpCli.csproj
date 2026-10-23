@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(AtomUICityCoreMvpPublishAot)' == 'true'">
-    <PackageReference Include="System.Threading.AccessControl" />
   </ItemGroup>
 
 </Project>

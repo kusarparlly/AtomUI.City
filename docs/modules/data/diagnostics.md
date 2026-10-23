@@ -47,6 +47,7 @@
 | `AUCDATA033` | TransferProgressFailed | `src/AtomUI.City.Data/Diagnostics.cs` |
 | `AUCDATA034` | TransferCompleted | `src/AtomUI.City.Data/Diagnostics.cs` |
 | `AUCDATA035` | CacheInvalidationUnsupported | `src/AtomUI.City.Data/Diagnostics.cs` |
+| `AUCDATA036` | SignalRPayloadMetadataMissing | `src/AtomUI.City.Data/Diagnostics.cs` |
 
 ## 产品级必须诊断的失败
 
@@ -54,6 +55,7 @@
 - transport timeout：返回 `Timeout` 并记录 `operationId`；generated descriptor 提供静态 client/operation metadata，不包含 endpoint。
 - connection owner dispose：关闭该 owner 的 connection；request/stream cancellation 由 parent scope 或 contribution lease 传播。
 - 请求取消：返回 Cancelled，不写缓存和状态。
+- SignalR argument、response 或 server message 缺少静态 JSON 元数据：记录 connection id、method、payload type 与 direction；invoke 返回 `SerializationError`，subscribe 抛 `SignalRPayloadMetadataException`。
 
 ## 上下文字段
 

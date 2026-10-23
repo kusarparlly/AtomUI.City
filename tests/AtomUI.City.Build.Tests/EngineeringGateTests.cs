@@ -37,6 +37,10 @@ public sealed class EngineeringGateTests
         Assert.Contains("bash engineering/check-release.sh --no-restore", workflow, StringComparison.Ordinal);
         Assert.Contains("nativeaot-runtime-matrix", workflow, StringComparison.Ordinal);
         Assert.Contains("check-native-aot-runtime-matrix.ps1", workflow, StringComparison.Ordinal);
+        Assert.Contains("data-nativeaot-real-protocols", workflow, StringComparison.Ordinal);
+        Assert.Contains("check-data-native-aot.ps1", workflow, StringComparison.Ordinal);
+        Assert.Contains("presentation-nativeaot-gui", workflow, StringComparison.Ordinal);
+        Assert.Contains("check-presentation-native-aot.ps1", workflow, StringComparison.Ordinal);
         Assert.Contains("presentation-windows-release", workflow, StringComparison.Ordinal);
         Assert.Contains("check-presentation-release.ps1", workflow, StringComparison.Ordinal);
     }
@@ -64,6 +68,31 @@ public sealed class EngineeringGateTests
         Assert.Contains("AtomUICityRuntimeMatrixPublishAot=true", script, StringComparison.Ordinal);
         Assert.Contains("CITY_NATIVEAOT_RUNTIME_MATRIX_OK", script, StringComparison.Ordinal);
         Assert.Contains("ConvertFrom-Json", script, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void NativeAotProtocolAndGuiGatesExerciseRealHostBoundaries()
+    {
+        var repositoryRoot = RepositoryPaths.FindRepositoryRoot();
+        var dataScript = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            EngineeringScriptsDirectoryName,
+            "check-data-native-aot.ps1"));
+        var presentationScript = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            EngineeringScriptsDirectoryName,
+            "check-presentation-native-aot.ps1"));
+
+        Assert.Contains("AtomUI.City.Data.HeadlessApp", dataScript, StringComparison.Ordinal);
+        Assert.Contains("DATA_AOT_SERVER_READY", dataScript, StringComparison.Ordinal);
+        Assert.Contains("signalRInvoke", dataScript, StringComparison.Ordinal);
+        Assert.Contains("signalRPush", dataScript, StringComparison.Ordinal);
+        Assert.Contains("AtomUICityDataPublishAot=true", dataScript, StringComparison.Ordinal);
+        Assert.Contains("AtomUI.City.Presentation.DesktopApp", presentationScript, StringComparison.Ordinal);
+        Assert.Contains("PublishAot=true", presentationScript, StringComparison.Ordinal);
+        Assert.Contains("Presentation Windows desktop self-test passed.", presentationScript, StringComparison.Ordinal);
+        Assert.Contains("will always throw", dataScript, StringComparison.Ordinal);
+        Assert.Contains("will always throw", presentationScript, StringComparison.Ordinal);
     }
 
     [Fact]

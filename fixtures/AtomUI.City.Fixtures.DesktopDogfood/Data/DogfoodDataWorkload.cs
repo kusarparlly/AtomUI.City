@@ -319,6 +319,7 @@ internal sealed class DogfoodDataWorkload
                 ConnectionId = "dogfood-signalr",
                 Endpoint = new Uri(_server.Endpoints.Http, "/stress-hub"),
                 Owner = owner,
+                JsonContract = DogfoodSignalRJson.Contract,
                 AccessTokenProvider = () => ValueTask.FromResult<string?>("stress/admin/r10"),
                 ReconnectDelays = [TimeSpan.Zero, TimeSpan.FromMilliseconds(20)],
             },

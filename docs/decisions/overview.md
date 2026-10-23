@@ -51,3 +51,5 @@ ADR 用于记录已经形成约束力的重要决策，包括背景、决策、�
 - [0019-strict-aot-is-fail-closed.md](0019-strict-aot-is-fail-closed.md)
 - [0020-no-test-only-code-in-runtime-assemblies.md](0020-no-test-only-code-in-runtime-assemblies.md)
 - [0021-persistent-native-aot-runtime-matrix.md](0021-persistent-native-aot-runtime-matrix.md)
+- [0022-aot-safe-signalr-json-contract.md](0022-aot-safe-signalr-json-contract.md)
+- [0023-portable-default-logging-providers.md](0023-portable-default-logging-providers.md)

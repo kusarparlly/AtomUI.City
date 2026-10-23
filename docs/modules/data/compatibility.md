@@ -20,7 +20,8 @@
 - `DataRequestPipeline` 的 runtime/concurrency gate -> capability -> credential -> cache -> resilience -> handler/transport -> consistency/cache commit 顺序、取消后不写缓存、transient result retry 和 transport/handler exception retry diagnostics 进入 1.0 兼容承诺；单个 handler continuation 每次 attempt 只能调用一次。
 - `HttpDataTransport` 的非成功 status 映射进入 1.0 兼容承诺，特别是 422 -> `ValidationFailed`、504 -> `Timeout`。
 - `GrpcStatusCode` 数值与 status mapping、`NativeGrpcClient` 的 metadata/deadline、四种 call shape、stream backpressure 和 completion 行为进入 1.0 兼容承诺。
-- `SignalRDataTransport` 的兼容 invoker mapping，以及 `SignalRRealtimeConnection` 的 reconnect、subscription、principal switch、状态通知和 owner shutdown 进入 1.0 兼容承诺。
+- `SignalRDataTransport` 的兼容 invoker mapping，以及 `SignalRRealtimeConnection` 的 reconnect、subscription、principal switch、状态通知和 owner shutdown 进入 1.0 兼容承诺。`SignalRRealtimeConnection.Create` 必须显式接收 `SignalRConnectionOptions.JsonContract`；缺少业务 payload 静态元数据时在所有运行环境 fail-closed，不回退反射。
+- 直接接收任意预构造 `HubConnection` 的 public 构造入口被受控 builder callback 取代，使 City 能保证最终 JSON protocol 合同。该变化属于 1.0 preview 阶段的有意 breaking change；调用方迁移为 `SignalRRealtimeConnection.Create(options)` 并提供 source-generated context。
 - `DataConnectionManager` 必须拒绝 ownerless、重复 id、未知 state 或 stopped owner 的长连接；按注册顺序 start、按注册逆序 stop；同一连接的外部并发启停共享事务，首调用 token 驱动底层事务、后续 token 只取消自身等待，同一异步调用链重入快速失败；单个 stop 失败不阻断其他连接；注册句柄撤销幂等，失败后允许重试。
 - `AccessTokenCredentialProvider` 必须在匿名请求时跳过 token provider，并把 token provider 非取消异常映射为 `Unavailable` credential result；`DataCredential.ToString()` 不得输出 credential parameter。
 - `DataCacheKey` 的 canonical identity/value equality、安全 revision 隔离、TTL、operation/client-version/policy-version 定向失效和 `IDataCacheInvalidator` 匹配维度进入 1.0 兼容承诺；插件请求自动采用 signed origin 的 contribution id，显式不匹配在 lookup 前拒绝；默认内存 cache 抑制跨 invalidation 的 stale write。

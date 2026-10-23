@@ -161,6 +161,7 @@ public sealed class DataContractValidationTests
                 ConnectionId = "signalr",
                 Endpoint = new Uri("relative", UriKind.Relative),
                 Owner = owner,
+                JsonContract = SignalRJsonContract.Create(SignalRTestJsonContext.Default),
             }));
         Assert.Throws<ArgumentException>(() => SignalRRealtimeConnection.Create(
             new SignalRConnectionOptions
@@ -168,6 +169,7 @@ public sealed class DataContractValidationTests
                 ConnectionId = "signalr",
                 Endpoint = new Uri("https://localhost/hub"),
                 Owner = DataConnectionOwner.None,
+                JsonContract = SignalRJsonContract.Create(SignalRTestJsonContext.Default),
             }));
     }
 

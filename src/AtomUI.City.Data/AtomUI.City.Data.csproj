@@ -4,6 +4,7 @@
     <PackageReference Include="Grpc.Core.Api" />
     <PackageReference Include="Grpc.Net.Client" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.Json" />
     <PackageReference Include="Microsoft.Extensions.Http" />
 
     <ProjectReference Include="../AtomUI.City.Core/AtomUI.City.Core.csproj" />

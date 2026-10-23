@@ -8,10 +8,10 @@
 | --- | --- | --- |
 | Core | `ApplicationHost`、generated module catalog、module init/shutdown | 初始化与关闭各执行一次。 |
 | State | `IStateRegistry`、observe、write、`ComputedState<T>` | 初始/变更通知各一次，计算值为 42。 |
-| Routing | route attributes、generated manifest、matcher | generated reference 与 route id 一致，`orders/42` 提取参数。 |
-| Security | `AddSecurity`、permission registry/checker | 已认证权限 Allowed，匿名主体 Challenge。 |
+| Routing | route attributes、generated manifest、matcher、DI resolver activation | generated reference 与 route id 一致，`orders/42` 提取参数并由运行时 DI resolver 提交 resolved data。 |
+| Security | `AddSecurity`、permission registry/checker、`FileCredentialStore` | 已认证权限 Allowed，匿名主体 Challenge；credential 完成保存、读取、删除且 source-generated JSON 可用。 |
 | Mvvm | `ViewModelBase` 通知、`ValidatingViewModelBase`、generated DataAnnotations | Required/Range 产生并清除错误，无反射验证。 |
-| Localization | generated embedded descriptor、file locpack、in-memory descriptor | 三类 provider 都切换 culture 并得到预期文本；无路径 DLL 加载。 |
+| Localization | generated embedded descriptor、known `SourceAssembly`、file locpack、in-memory descriptor | 三类 provider 都切换 culture 并得到预期文本；generated descriptor 直接持有静态程序集并由 assembly provider 加载，无路径 DLL 加载。 |
 
 Core、EventBus、Data 与 Presentation 的现有专项 NativeAOT fixture 继续提供各自更深的边界覆盖；本应用不复制那些重型矩阵。PluginSystem 在正式建设前不纳入通过声明。
 

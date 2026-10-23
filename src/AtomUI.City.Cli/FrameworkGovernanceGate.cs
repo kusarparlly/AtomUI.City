@@ -31,6 +31,7 @@ internal static partial class FrameworkGovernanceGate
     {
         "Unit", "Contract", "FrameworkIntegration", "RuntimeLifecycle", "PluginLifecycle",
         "PlatformIntegration", "Generator", "Analyzer", "Build", "TemplateSmoke", "Dogfood",
+        "NativeAOT", "RealProtocol",
     };
 
     private static readonly HashSet<string> ValidTestLayers = new(StringComparer.Ordinal)

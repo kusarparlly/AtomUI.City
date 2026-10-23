@@ -11,7 +11,7 @@
 | API Family | 关键类型 | 职责 | 硬性行为 |
 | --- | --- | --- | --- |
 | Request Pipeline | IDataRequestPipeline, DataRequest<T>, DataRequestContext | 统一请求执行。 | runtime/concurrency gate -> capability -> credential -> cache -> resilience -> handler/transport -> consistency/cache commit 顺序稳定；transient transport exception 按 retry policy 处理。 |
-| Transports | HttpDataTransport, GrpcDataTransport, SignalRDataTransport, NativeGrpcClient, SignalRRealtimeConnection | HTTP 原生传输、兼容委托适配和官方 gRPC/SignalR client。 | 直接调用时 request/context 必须属于同一操作；取消不得进入用户 delegate；原生 stream/subscription 必须有界、可撤销并受 owner 管理。 |
+| Transports | HttpDataTransport, GrpcDataTransport, SignalRDataTransport, NativeGrpcClient, SignalRRealtimeConnection, SignalRJsonContract | HTTP 原生传输、兼容委托适配和官方 gRPC/SignalR client。 | 直接调用时 request/context 必须属于同一操作；取消不得进入用户 delegate；原生 stream/subscription 必须有界、可撤销并受 owner 管理；SignalR 业务 payload 必须具有应用提供的静态 JSON 元数据。 |
 | Connection | DataConnectionManager, IDataConnection, DataConnectionOwner, DataConnectionRegistration | 长连接生命周期。 | owner 和唯一 connection id 必填；同一连接启停串行；注册句柄撤销幂等；关闭失败继续清理。 |
 | Authentication | IDataCredentialProvider, AccessTokenCredentialProvider | 从 Security 获取 credential。 | 匿名请求不取 token；token provider 非取消异常映射为 Unavailable credential result。 |
 | Caching | IDataRequestCache, IDataExpiringRequestCache, IDataCacheInvalidator, DataCacheKey | 请求缓存与一致性。 | canonical key 组成稳定；TTL、operation/principal/permission/plugin/client/policy revision 隔离与批量失效可执行；插件 key 自动绑定 active contribution；默认内存 cache 抑制跨 invalidation 的 stale write。 |
@@ -21,7 +21,7 @@
 | Large Payload | DataLargePayloadClient, DataTransferOptions, DataTemporaryFile | 固定内存上传下载。 | 固定缓冲区、进度节流、range/resume、声明长度完整性校验、取消清理；未 Commit 临时文件随 lease 删除。 |
 | Error Model | DataResult<T>, DataError, DataErrorKind | 统一结果和错误模型。 | success result 不携带 error；failed/cancelled/stale result 不携带 value；partial 同时携带可用 value 和 error，且不自动重试或缓存；DataError 拒绝未知 kind 和空白 message。 |
 | DI Registration | DataServiceCollectionExtensions | 默认 Data 服务注册。 | AddData 注册 pipeline、credential adapter、client factory、cache、connection manager、diagnostics 和 HTTP/gRPC/SignalR transports；未注册 `IAccessTokenProvider` 时 adapter 内部使用 unavailable fallback，但不占用全局 token provider 合同；因此模块注册顺序为 Data -> Security 时仍由 Security provider 接管；重复调用不重复默认 transport；pre-registration override 保留优先级。 |
-| Diagnostics | DataDiagnosticIds | 数据访问诊断。 | AUCDATA001-035 稳定。 |
+| Diagnostics | DataDiagnosticIds | 数据访问诊断。 | AUCDATA001-036 稳定。 |
 
 ## 关键方法合同
 
@@ -36,7 +36,9 @@
 | DataClientRegistry.Register / Unregister | 管理按 contract type 索引的 client。 | typed client。 | void / bool。 | 空 client/id 拒绝；缺失 unregister 返回 false。 | 不适用。 | 线程安全；同一 contract type 后注册者替换前注册者。 |
 | IDataOperationScheduler.ExecuteAsync | 执行 operation concurrency policy。 | request/delegate/token。 | DataResult<T>。 | queue full 或 duplicate operation 返回 PolicyRejected；scheduler 释放后拒绝新请求。 | 排队和 operation 均观察 token；scheduler 释放会取消所有活动 operation。 | FIFO/KeyedSerial 串行；CancelPrevious 取消旧操作；LatestWins 抑制旧结果；并发替换、完成和释放不重复释放 cancellation source。 |
 | NativeGrpcClient unary/streaming | 执行官方 gRPC call。 | method/payload/options/credential/token。 | DataResult 或 owned stream。 | disconnected、RPC status、deadline 和 protocol failure 稳定映射。 | call 与 stream 观察 token。 | client-stream concurrent Complete 合并；complete 后 write 拒绝；stream 并发 Dispose 共享清理事务并等待当前 write 后释放 call。 |
-| SignalRRealtimeConnection Start/Stop/Invoke/Subscribe/SwitchPrincipal | 管理 realtime 连接。 | method/arguments/options/token。 | DataResult、subscription 或 ValueTask。 | disconnected invoke 返回 ConnectionClosed；stop 后拒绝新 subscription；释放后 mutation 抛 ObjectDisposedException。 | transport、subscription 和 owner stop 观察 token。 | 生命周期串行；并发 dispose 共享事务；状态观察者锁外分发；观察者重入 dispose 不等待自身。 |
+| SignalRRealtimeConnection Start/Stop/Invoke/Subscribe/SwitchPrincipal | 管理 realtime 连接。 | method/arguments/options/token。 | DataResult、subscription 或 ValueTask。 | disconnected invoke 返回 ConnectionClosed；缺少 argument/response 元数据时 invoke 返回 SerializationError；缺少 server message 元数据时 subscribe 抛 `SignalRPayloadMetadataException`；stop 后拒绝新 subscription；释放后 mutation 抛 ObjectDisposedException。 | transport、subscription 和 owner stop 观察 token。 | 生命周期串行；并发 dispose 共享事务；状态观察者锁外分发；观察者重入 dispose 不等待自身。 |
+
+`SignalRJsonContract` 由应用通过一个或多个 source-generated `JsonSerializerContext` / `IJsonTypeInfoResolver` 创建。resolver 顺序稳定，创建后配置冻结，并由 `SignalRConnectionOptions.JsonContract` 强制传入。City 使用同一个合同配置 SignalR JSON protocol 和入口预检；任何运行环境都不得在元数据缺失时回退到反射。高级连接设置只能通过 `SignalRConnectionOptions.ConfigureConnection` 修改 builder，City 最后安装 JSON protocol。直接接收任意预构造 `HubConnection` 的构造函数不是 public 合同。
 | DataContributionLease.RevokeAsync | 撤销插件全部数据贡献。 | 无。 | ValueTask。 | 多个清理失败聚合；诊断失败隔离。 | 在途请求使用 contribution cancellation；停止连接后等待 handler 退出再释放注册。 | 并发 revoke 共享事务且幂等；handler 同调用链重入只启动事务，避免等待自身。 |
 | DataLargePayloadClient Upload/Download | 固定缓冲区传输并报告进度。 | request/stream/progress/options/token。 | DataResult<DataTransferReceipt/DataTemporaryFile>。 | network/disk/range/progress failure 稳定映射或隔离；响应声明长度与实际字节不一致返回 StreamProtocolError。 | 取消返回 Cancelled；临时文件释放后删除。 | 每次调用独立 operationId；不持有调用方 stream。 |
 
@@ -99,6 +101,7 @@
 | `SignalRInvocationContext` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `SignalRConnectionClosedException` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `SignalRReconnectFailedException` | 支持类型 | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
+| `SignalRJsonContract`, `SignalRPayloadDirection`, `SignalRPayloadMetadataException` | SignalR JSON contract | resolver 组合、冻结、缺失元数据失败模式或方向语义变化必须更新本文档和 compatibility。 |
 | `SignalRDataTransport` | 关键 contract | 新增、删除、重命名或默认行为变化必须更新本文档和 compatibility。 |
 | `DataCacheEntryOptions`, `DataCacheInvalidation`, `DataCacheInvalidationReason`, `DataCacheInvalidationResult` | 缓存 contract | TTL、匹配维度或默认失效原因变化必须更新本文档和 compatibility。 |
 | `IDataCacheInvalidator`, `IDataExpiringRequestCache`, `DataCacheFingerprint` | 缓存 contract | identity、批量失效或兼容 fallback 变化必须更新本文档和 compatibility。 |

@@ -26,6 +26,7 @@
 | AUC-DATA-018 | Large Payload and Progress | Completed | DataLargePayloadClient, DataTransferOptions | DataLargePayloadTests; DataDogfoodTests |
 | AUC-DATA-019 | Pipeline Extensibility and Capability | Completed | IDataRequestHandler, IDataCapabilityAuthorizer | DataRequestHandlerTests; DataPluginLifecycleTests |
 | AUC-DATA-020 | Testing Infrastructure and Dogfood | Completed | ScriptedDataTransport, ScriptedDataCredentialProvider, RecordingDataRequestHandler, FakeDataConnection | DataTestDoublesTests; DataDogfoodTests |
+| AUC-DATA-021 | AOT-safe SignalR JSON Contract | Completed | SignalRJsonContract, SignalRPayloadMetadataException | SignalRJsonContractTests; Data NativeAOT protocol gate |
 
 ## Feature 硬门禁
 
@@ -179,13 +180,13 @@ Acceptance Criteria: Host 生命周期、失败隔离和并发幂等由测试证
 
 ## Completed 1.0 Features
 
-`AUC-DATA-011` 至 `AUC-DATA-020` 已由正式 contract、专项测试和真实 headless fixture 完成验收；
+`AUC-DATA-011` 至 `AUC-DATA-021` 已由正式 contract、专项测试和真实 headless/NativeAOT fixture 完成验收；
 `AUC-DATA-003/004` 的委托适配入口继续作为兼容层保留。
 
 | Feature ID | 完成合同 |
 | --- | --- |
 | AUC-DATA-011 | 基于官方 gRPC client 的 unary/channel/server/client/bidi streaming、metadata、deadline、owner、backpressure 和并发释放事务。 |
-| AUC-DATA-012 | 基于官方 SignalR client 的 HubConnection、invoke、server push、订阅撤销、reconnect、token/account switch 和 owner shutdown。 |
+| AUC-DATA-012 | 基于官方 SignalR client 的 HubConnection、invoke、server push、订阅撤销、reconnect、token/account switch 和 owner shutdown；JSON payload 元数据由 AUC-DATA-021 约束。 |
 | AUC-DATA-013 | AllowConcurrent、DisallowConcurrent、Queue、CancelPrevious、LatestWins、KeyedSerial 全部具有确定性执行与竞态测试。 |
 | AUC-DATA-014 | timeout/retry 之外补齐 circuit breaker、fallback、rate limit、策略作用域和诊断。 |
 | AUC-DATA-015 | canonical cache identity、TTL、operation/mutation/principal/permission/plugin/route/version invalidation、stale write suppression 和失败隔离。 |
@@ -194,6 +195,7 @@ Acceptance Criteria: Host 生命周期、失败隔离和并发幂等由测试证
 | AUC-DATA-018 | upload/download progress、流式 IO、临时文件、range/resume、声明长度完整性、取消和大文件内存上限。 |
 | AUC-DATA-019 | 固定阶段内可组合 handler、单次 continuation、metadata validation、plugin capability 和扩展异常映射。 |
 | AUC-DATA-020 | Testing 包 test doubles、真实本地 HTTP/gRPC/SignalR headless fixture、压力与竞态门禁。 |
+| AUC-DATA-021 | 应用提供 source-generated SignalR JSON 合同；缺失元数据统一 fail-closed；真实自定义 DTO invoke/response/push 双 TFM NativeAOT 通过。 |
 
 ### AUC-DATA-011 Native gRPC And Streaming
 
@@ -233,4 +235,18 @@ Acceptance Criteria: Host 生命周期、失败隔离和并发幂等由测试证
 
 ### AUC-DATA-020 Testing Infrastructure And Dogfood
 
-`AtomUI.City.Testing` 提供 scripted transport/credential、recording handler 和 fake connection。`AtomUI.City.Data.HeadlessApp` 在本地真实启动 HTTP/1.1、HTTP/2 gRPC 和 SignalR，覆盖并发、四种 gRPC 调用、WebSocket 断线重连、身份切换、handler 重入 stop 和大载荷；`AtomUI.City.Data.AotApp` 验证 generated catalog 的 NativeAOT 路径。
+`AtomUI.City.Testing` 提供 scripted transport/credential、recording handler 和 fake connection。`AtomUI.City.Data.HeadlessApp` 在本地真实启动 HTTP/1.1、HTTP/2 gRPC 和 SignalR，覆盖并发、四种 gRPC 调用、WebSocket 断线重连、身份切换、handler 重入 stop 和大载荷；`AtomUI.City.Data.AotApp` 以原生进程验证 generated catalog、HTTP、gRPC 以及自定义 DTO SignalR invoke/response/push 路径。
+
+### AUC-DATA-021 AOT-safe SignalR JSON Contract
+
+Feature ID: `AUC-DATA-021`
+Status: Completed
+Goal: 让应用显式提供 SignalR 业务 payload 的 source-generated JSON 元数据，并在所有运行模式中拒绝反射 fallback。
+Public Contract: `SignalRJsonContract`, `SignalRPayloadDirection`, `SignalRPayloadMetadataException`, `SignalRConnectionOptions.JsonContract`
+Runtime / Build Behavior: 一个或多个 `IJsonTypeInfoResolver` 按声明顺序组成不可变 JSON 合同；City 将该合同安装到 `JsonHubProtocol`，并在 invocation argument、response 与 server message 进入协议前验证根类型元数据。
+Failure Behavior: 缺少元数据时，invoke 返回 `SerializationError`，subscribe 抛出 `SignalRPayloadMetadataException`，二者均写入 `AUCDATA036`；CoreCLR 与 NativeAOT 行为一致，不回退反射序列化。
+Threading / Cancellation: 合同创建后只读且可跨连接并发使用；元数据预检发生在网络操作前，不改变调用方 cancellation 语义。
+Diagnostics: `AUCDATA036`。
+Tests: `SignalRJsonContractTests`; Data 真实协议 NativeAOT gate。
+Required Assertions: resolver 组合顺序、空合同拒绝、argument/response/message 缺失元数据 fail-closed、自定义 DTO invoke/response/push 在 `net8.0` 与 `net10.0` 原生进程通过。
+Acceptance Criteria: 公开 API、迁移说明、专项测试和双 TFM 真实 SignalR 原生门禁全部完成。

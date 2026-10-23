@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Runtime.ExceptionServices;
 using System.Threading.Channels;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AtomUI.City.Data;
 
@@ -31,6 +32,17 @@ public sealed class SignalRConnectionOptions
     /// Gets or sets access token provider.
     /// </summary>
     public Func<ValueTask<string?>>? AccessTokenProvider { get; init; }
+
+    /// <summary>
+    /// Gets or sets the static JSON metadata used by the SignalR protocol.
+    /// </summary>
+    public required SignalRJsonContract JsonContract { get; init; }
+
+    /// <summary>
+    /// Gets or sets an optional callback for advanced connection builder configuration.
+    /// City installs the JSON protocol after this callback returns.
+    /// </summary>
+    public Action<IHubConnectionBuilder>? ConfigureConnection { get; init; }
 
     /// <summary>
     /// Represents the reconnect delays value.
@@ -136,6 +148,7 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
 {
     private static readonly AsyncLocal<SignalRRealtimeConnection?> CurrentStateObserver = new();
     private readonly HubConnection _connection;
+    private readonly SignalRJsonContract _jsonContract;
     private readonly IDataDiagnostics? _diagnostics;
     private readonly SemaphoreSlim _lifecycle = new(1, 1);
     private readonly ConcurrentDictionary<Guid, IDataSubscription> _subscriptions = new();
@@ -152,14 +165,16 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
     /// <summary>
     /// Initializes a new instance of the <c>SignalRRealtimeConnection</c> type.
     /// </summary>
-    public SignalRRealtimeConnection(
+    internal SignalRRealtimeConnection(
         string connectionId,
         DataConnectionOwner owner,
         HubConnection connection,
+        SignalRJsonContract jsonContract,
         IDataDiagnostics? diagnostics = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(connectionId);
         ArgumentNullException.ThrowIfNull(connection);
+        ArgumentNullException.ThrowIfNull(jsonContract);
         if (owner == DataConnectionOwner.None)
         {
             throw new ArgumentException("A SignalR connection must declare a connection owner.", nameof(owner));
@@ -167,6 +182,7 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
         ConnectionId = connectionId;
         Owner = owner;
         _connection = connection;
+        _jsonContract = jsonContract;
         _diagnostics = diagnostics;
         _stateChanges = Channel.CreateUnbounded<DataConnectionStateChangedEventArgs>(
             new UnboundedChannelOptions
@@ -216,6 +232,7 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
         ArgumentNullException.ThrowIfNull(options);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.ConnectionId);
         ArgumentNullException.ThrowIfNull(options.Endpoint);
+        ArgumentNullException.ThrowIfNull(options.JsonContract);
         if (!options.Endpoint.IsAbsoluteUri
             || options.Endpoint.Scheme is not ("http" or "https"))
         {
@@ -239,7 +256,16 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
             builder.WithAutomaticReconnect(options.ReconnectDelays.ToArray());
         }
 
-        return new SignalRRealtimeConnection(options.ConnectionId, options.Owner, builder.Build(), diagnostics);
+        options.ConfigureConnection?.Invoke(builder);
+        builder.AddJsonProtocol(protocolOptions =>
+            protocolOptions.PayloadSerializerOptions = options.JsonContract.SerializerOptions);
+
+        return new SignalRRealtimeConnection(
+            options.ConnectionId,
+            options.Owner,
+            builder.Build(),
+            options.JsonContract,
+            diagnostics);
     }
 
     /// <summary>
@@ -295,6 +321,34 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(methodName);
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposed) != 0, this);
+        try
+        {
+            _jsonContract.EnsureMetadata(
+                typeof(TResponse),
+                ConnectionId,
+                methodName,
+                SignalRPayloadDirection.Response);
+            foreach (var argument in arguments ?? [])
+            {
+                if (argument is not null)
+                {
+                    _jsonContract.EnsureMetadata(
+                        argument.GetType(),
+                        ConnectionId,
+                        methodName,
+                        SignalRPayloadDirection.Argument);
+                }
+            }
+        }
+        catch (SignalRPayloadMetadataException exception)
+        {
+            WriteMissingPayloadMetadata(exception);
+            return DataResult<TResponse>.Failed(new DataError(
+                DataErrorKind.SerializationError,
+                exception.Message,
+                Exception: exception));
+        }
+
         if (State != DataConnectionState.Connected)
         {
             return DataResult<TResponse>.Failed(
@@ -347,6 +401,19 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
         ArgumentException.ThrowIfNullOrWhiteSpace(methodName);
         ArgumentNullException.ThrowIfNull(handler);
         ObjectDisposedException.ThrowIf(Volatile.Read(ref _disposed) != 0, this);
+        try
+        {
+            _jsonContract.EnsureMetadata(
+                typeof(TMessage),
+                ConnectionId,
+                methodName,
+                SignalRPayloadDirection.ServerMessage);
+        }
+        catch (SignalRPayloadMetadataException exception)
+        {
+            WriteMissingPayloadMetadata(exception);
+            throw;
+        }
 
         var subscription = new DataSubscription<TMessage>(
             Owner,
@@ -375,6 +442,18 @@ public sealed class SignalRRealtimeConnection : IRealtimeConnectionTransport
 
         _ = RemoveCompletedSubscriptionAsync(subscription);
         return subscription;
+    }
+
+    private void WriteMissingPayloadMetadata(SignalRPayloadMetadataException exception)
+    {
+        DataDiagnosticWriter.TryWrite(_diagnostics, new DataDiagnosticRecord(
+            DataDiagnosticIds.SignalRPayloadMetadataMissing,
+            exception.Message,
+            DataDiagnosticSeverity.Error,
+            ClientId: ConnectionId,
+            OperationName: exception.MethodName,
+            TransportKind: DataTransportKind.SignalR,
+            ErrorKind: DataErrorKind.SerializationError));
     }
 
     /// <summary>

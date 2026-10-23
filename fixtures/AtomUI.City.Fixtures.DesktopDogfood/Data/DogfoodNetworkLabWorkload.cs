@@ -166,6 +166,7 @@ internal sealed class DogfoodNetworkLabWorkload
                 ConnectionId = "dogfood-network-signalr",
                 Endpoint = new Uri($"http://127.0.0.1:{proxy.Port}/stress-hub"),
                 Owner = owner,
+                JsonContract = DogfoodSignalRJson.Contract,
                 AccessTokenProvider = () => ValueTask.FromResult<string?>("stress/admin/r10"),
                 ReconnectDelays =
                 [

@@ -139,6 +139,14 @@ Streaming 和 SignalR 默认不缓存原始消息。
 - 显式 EventBus publish。
 - 应用 adapter 自行维护的 latest snapshot。
 
+### 7. SignalR JSON 元数据
+
+SignalR 业务消息的 JSON 形状属于应用或业务模块。应用必须使用 `[JsonSerializable]` 生成 `JsonSerializerContext`，并把一个或多个 context 作为 `IJsonTypeInfoResolver` 交给 `SignalRJsonContract`。City 不扫描程序集、不生成业务 serializer，也不允许 SignalR 默认协议在缺少元数据时回退到反射。
+
+合同必须覆盖 invocation 的每个非 null argument 运行时类型、response 类型以及每个 subscription message 类型。City 在进入协议前执行根类型预检；遗漏元数据时写入 `AUCDATA036` 并稳定失败。动态形状应显式使用 `JsonElement`、`JsonDocument` 或应用 converter，不得把未知 `object` 当作动态发现入口。
+
+NativeAOT 验收必须由托管本地服务和原生客户端执行真实 WebSocket 协议，覆盖自定义 DTO 请求、返回和 server push；只连接成功、只使用 primitive 或仅验证 generated descriptor 均不构成 SignalR AOT 证据。
+
 禁止：
 
 - 无限消息缓存。

@@ -46,6 +46,7 @@
 | AUC-DATA-005 | Connection Lifecycle | DataConnectionLifecycleTests |
 | AUC-DATA-006 | Authentication | AccessTokenCredentialProviderTests |
 | AUC-DATA-020 | Testing Infrastructure and Dogfood | DataTestDoublesTests; DataDogfoodTests |
+| AUC-DATA-021 | AOT-safe SignalR JSON Contract | SignalRJsonContractTests; Data NativeAOT protocol gate |
 
 本专题涉及的每个新增行为必须补充测试矩阵。涉及线程、插件、source generator、build、UI dispatcher、连接或状态的行为必须增加对应专项测试。
 

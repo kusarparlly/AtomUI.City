@@ -37,8 +37,9 @@ internal static class Program
             && generatedDescriptor.Operations.Count == 1,
             "Generated data client descriptor registration failed.");
 
-        var httpPort = ReservePort();
-        var grpcPort = ReservePort();
+        var serverOnly = args.Contains("--server-only", StringComparer.Ordinal);
+        var httpPort = ReadPort(args, "--http-port") ?? ReservePort();
+        var grpcPort = ReadPort(args, "--grpc-port") ?? ReservePort();
         var builder = WebApplication.CreateBuilder();
         builder.Logging.ClearProviders();
         builder.WebHost.ConfigureKestrel(options =>
@@ -77,6 +78,13 @@ internal static class Program
         {
             var httpEndpoint = new Uri($"http://127.0.0.1:{httpPort}");
             var grpcEndpoint = new Uri($"http://127.0.0.1:{grpcPort}");
+            if (serverOnly)
+            {
+                Console.WriteLine($"DATA_AOT_SERVER_READY http={httpEndpoint} grpc={grpcEndpoint}");
+                await Task.Delay(Timeout.InfiniteTimeSpan);
+                return 0;
+            }
+
             await VerifyHttpPipelineAsync(httpEndpoint);
             await VerifyLargePayloadAsync(httpEndpoint, payload);
             await VerifyGrpcAsync(grpcEndpoint);
@@ -225,6 +233,7 @@ internal static class Program
             ConnectionId = "fixture-signalr",
             Endpoint = new Uri(endpoint, "/probe-hub"),
             Owner = owner,
+            JsonContract = DataHeadlessSignalRJson.Contract,
             AccessTokenProvider = () => ValueTask.FromResult<string?>("fixture-token"),
             ReconnectDelays = [TimeSpan.Zero, TimeSpan.FromMilliseconds(20)],
         });
@@ -325,6 +334,33 @@ internal static class Program
         listener.Start();
         var port = ((IPEndPoint)listener.LocalEndpoint).Port;
         listener.Stop();
+        return port;
+    }
+
+    private static int? ReadPort(IReadOnlyList<string> args, string option)
+    {
+        var index = -1;
+        for (var candidate = 0; candidate < args.Count; candidate++)
+        {
+            if (string.Equals(args[candidate], option, StringComparison.Ordinal))
+            {
+                index = candidate;
+                break;
+            }
+        }
+
+        if (index < 0)
+        {
+            return null;
+        }
+
+        if (index + 1 >= args.Count
+            || !int.TryParse(args[index + 1], out var port)
+            || port is <= 0 or > 65535)
+        {
+            throw new ArgumentException($"{option} requires a valid TCP port.", nameof(args));
+        }
+
         return port;
     }
 
@@ -447,4 +483,23 @@ public sealed class ProbeHub : Hub
         await Clients.Caller.SendAsync("StopMessage", value);
         return value;
     }
+
+    public NativeAotSignalRReply AotEcho(NativeAotSignalRRequest request) =>
+        new(request.Value + 1, request.CorrelationId);
+
+    public async Task<NativeAotSignalRReply> AotPublish(NativeAotSignalRRequest request)
+    {
+        var message = new NativeAotSignalRMessage(
+            request.Value + 2,
+            request.CorrelationId,
+            "server-push");
+        await Clients.Caller.SendAsync("AotMessage", message);
+        return new NativeAotSignalRReply(request.Value + 1, request.CorrelationId);
+    }
 }
+
+public sealed record NativeAotSignalRRequest(int Value, string CorrelationId);
+
+public sealed record NativeAotSignalRReply(int Value, string CorrelationId);
+
+public sealed record NativeAotSignalRMessage(int Value, string CorrelationId, string Source);

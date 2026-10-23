@@ -135,7 +135,7 @@ integration.md
 - canonical table 表头固定为 `Feature ID | Test Type | Test File | Required Assertions | Failure Paths | Status`；第一版不接受合并 Feature、纯数字 Feature、`Test Family` 或自由文本矩阵作为机器证据。
 - 每个 canonical Feature 必须且只能有一行同 ID 测试矩阵；缺失输出 `AUCCLI0607`，重复或引用未知 Feature 输出 `AUCCLI0611`。
 - `Test Type` 使用 `/` 分隔多个 token，trim 后逐个精确匹配；空 token、重复 token、逗号分隔和未知大小写均输出 `AUCCLI0612`。
-- 合法 matrix Test Type 固定为：`Unit`、`Contract`、`FrameworkIntegration`、`RuntimeLifecycle`、`PluginLifecycle`、`PlatformIntegration`、`Generator`、`Analyzer`、`Build`、`TemplateSmoke`、`Dogfood`。
+- 合法 matrix Test Type 固定为：`Unit`、`Contract`、`FrameworkIntegration`、`RuntimeLifecycle`、`PluginLifecycle`、`PlatformIntegration`、`Generator`、`Analyzer`、`Build`、`TemplateSmoke`、`Dogfood`、`NativeAOT`、`RealProtocol`。
 - `Test File` 使用英文分号或中文分号分隔 evidence token；逗号不作为分隔符，避免自然语言名称产生歧义。
 - 只有符合 C# identifier 且以 `Tests` 结尾的 token 才是测试类型身份；其他证据文字可以保留，但不能满足“测试类型存在”规则。
 - 每行至少包含一个可解析的 `*Tests` 类型。该类型必须在排除目录之外的 `tests/**/*.cs` 中存在 top-level class/record/struct declaration；namespace、partial 和 generic arity 不影响简单类型名匹配，注释、字符串和嵌套类型不计。
@@ -146,7 +146,7 @@ integration.md
 - `Generator` 和 `Analyzer` evidence 必须解析到 `tests/AtomUI.City.Generators.Tests` 内的测试类型。
 - `Build` evidence 必须解析到 `tests/AtomUI.City.Build.Tests` 或 `tests/AtomUI.City.Build.Tasks.Tests` 内的测试类型。
 - `TemplateSmoke` evidence 必须解析到 `tests/AtomUI.City.TemplateSmokeTests` 内的测试类型。
-- `Dogfood` 是 testing matrix 的合法 Test Type，但不是当前 `TestLayerAttribute` 的合法值。
+- `Dogfood`、`NativeAOT` 与 `RealProtocol` 是 testing matrix 的合法 Test Type，但不是当前 `TestLayerAttribute` 的合法值。
 - 源码显式使用 `TestLayerAttribute` 时，只接受当前 `TestLayerNames` 定义的 `Unit`、`Contract`、`FrameworkIntegration`、`RuntimeLifecycle`、`PluginLifecycle`、`PlatformIntegration`、`TemplateSmoke`、`Generator`、`Analyzer`、`Build`。
 - 第一版不要求每个测试类型都使用 `TestLayerAttribute`；它只拒绝已经显式声明但值未知的 layer。
 
@@ -190,7 +190,7 @@ integration.md
 | Test root | framework profile 要求的 `tests` 根和测试项目存在。 | 缺失时 Error。 |
 | Declared test identity | Feature/testing matrix 引用的 `*Tests` 类型能在工作区测试源码中找到。 | 引用不存在为 Error。 |
 | Feature/test consistency | Feature 表与 testing matrix 对同一 Feature 的主测试身份不矛盾。 | 不一致为 Error。 |
-| Test Type vocabulary | 测试矩阵只使用 `Unit`、`Contract`、`FrameworkIntegration`、`RuntimeLifecycle`、`PluginLifecycle`、`PlatformIntegration`、`Generator`、`Analyzer`、`Build`、`TemplateSmoke`、`Dogfood`。 | 未知 Test Type 为 Error。 |
+| Test Type vocabulary | 测试矩阵只使用 `Unit`、`Contract`、`FrameworkIntegration`、`RuntimeLifecycle`、`PluginLifecycle`、`PlatformIntegration`、`Generator`、`Analyzer`、`Build`、`TemplateSmoke`、`Dogfood`、`NativeAOT`、`RealProtocol`。 | 未知 Test Type 为 Error。 |
 | Specialized evidence | Generator、Analyzer、Build 和 Template Feature 的测试矩阵声明相应专项 Test Type，并引用存在的测试类型。 | 缺失或类型不符为 Error。 |
 | Test layer values | 源码显式使用 `TestLayerAttribute` 时，其值必须属于 `TestLayerNames` 已定义集合。 | 未知 layer 为 Error。 |
 

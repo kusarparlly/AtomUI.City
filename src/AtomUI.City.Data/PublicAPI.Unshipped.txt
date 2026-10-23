@@ -733,7 +733,6 @@ AtomUI.City.Data.SignalRRealtimeConnection.DisposeAsync() -> System.Threading.Ta
 AtomUI.City.Data.SignalRRealtimeConnection.InvokeAsync<TResponse>(string! methodName, System.Collections.Generic.IReadOnlyList<object?>? arguments = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
 AtomUI.City.Data.SignalRRealtimeConnection.Owner.get -> AtomUI.City.Data.DataConnectionOwner
 AtomUI.City.Data.SignalRRealtimeConnection.PrincipalRevision.get -> string?
-AtomUI.City.Data.SignalRRealtimeConnection.SignalRRealtimeConnection(string! connectionId, AtomUI.City.Data.DataConnectionOwner owner, Microsoft.AspNetCore.SignalR.Client.HubConnection! connection, AtomUI.City.Data.IDataDiagnostics? diagnostics = null) -> void
 AtomUI.City.Data.SignalRRealtimeConnection.StartAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
 AtomUI.City.Data.SignalRRealtimeConnection.State.get -> AtomUI.City.Data.DataConnectionState
 AtomUI.City.Data.SignalRRealtimeConnection.StateChanged -> System.EventHandler<AtomUI.City.Data.DataConnectionStateChangedEventArgs!>?
@@ -872,6 +871,24 @@ static AtomUI.City.Data.GrpcCallOptions.Default.get -> AtomUI.City.Data.GrpcCall
 static AtomUI.City.Data.GrpcCallResult<T>.Failed(AtomUI.City.Data.GrpcStatusCode statusCode, string? detail = null) -> AtomUI.City.Data.GrpcCallResult<T>!
 static AtomUI.City.Data.GrpcCallResult<T>.Success(T value) -> AtomUI.City.Data.GrpcCallResult<T>!
 static AtomUI.City.Data.SignalRRealtimeConnection.Create(AtomUI.City.Data.SignalRConnectionOptions! options, AtomUI.City.Data.IDataDiagnostics? diagnostics = null) -> AtomUI.City.Data.SignalRRealtimeConnection!
+AtomUI.City.Data.SignalRJsonContract
+AtomUI.City.Data.SignalRPayloadDirection
+AtomUI.City.Data.SignalRPayloadDirection.Argument = 0 -> AtomUI.City.Data.SignalRPayloadDirection
+AtomUI.City.Data.SignalRPayloadDirection.Response = 1 -> AtomUI.City.Data.SignalRPayloadDirection
+AtomUI.City.Data.SignalRPayloadDirection.ServerMessage = 2 -> AtomUI.City.Data.SignalRPayloadDirection
+AtomUI.City.Data.SignalRPayloadMetadataException
+AtomUI.City.Data.SignalRPayloadMetadataException.SignalRPayloadMetadataException(string! connectionId, string! methodName, System.Type! payloadType, AtomUI.City.Data.SignalRPayloadDirection direction, System.Exception? innerException = null) -> void
+AtomUI.City.Data.SignalRPayloadMetadataException.ConnectionId.get -> string!
+AtomUI.City.Data.SignalRPayloadMetadataException.Direction.get -> AtomUI.City.Data.SignalRPayloadDirection
+AtomUI.City.Data.SignalRPayloadMetadataException.MethodName.get -> string!
+AtomUI.City.Data.SignalRPayloadMetadataException.PayloadType.get -> System.Type!
+AtomUI.City.Data.SignalRConnectionOptions.ConfigureConnection.get -> System.Action<Microsoft.AspNetCore.SignalR.Client.IHubConnectionBuilder!>?
+AtomUI.City.Data.SignalRConnectionOptions.ConfigureConnection.init -> void
+AtomUI.City.Data.SignalRConnectionOptions.JsonContract.get -> AtomUI.City.Data.SignalRJsonContract!
+AtomUI.City.Data.SignalRConnectionOptions.JsonContract.init -> void
+const AtomUI.City.Data.DataDiagnosticIds.SignalRPayloadMetadataMissing = "AUCDATA036" -> string!
+static AtomUI.City.Data.SignalRJsonContract.Create(params System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver![]! resolvers) -> AtomUI.City.Data.SignalRJsonContract!
+static AtomUI.City.Data.SignalRJsonContract.Create(System.Collections.Generic.IEnumerable<System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver!>! resolvers, System.Action<System.Text.Json.JsonSerializerOptions!>? configure = null) -> AtomUI.City.Data.SignalRJsonContract!
 virtual AtomUI.City.Data.DataOperationDelegate<TResponse>.Invoke(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
 virtual AtomUI.City.Data.DataRequestHandlerDelegate<TResponse>.Invoke(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<AtomUI.City.Data.DataResult<TResponse>!>
 ~override AtomUI.City.Data.DataConnectionOwner.Equals(object obj) -> bool

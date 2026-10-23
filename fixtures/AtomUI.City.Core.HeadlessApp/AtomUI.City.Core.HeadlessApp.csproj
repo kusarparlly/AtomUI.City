@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(AtomUICityHeadlessPublishAot)' == 'true' And '$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="System.Threading.AccessControl" />
   </ItemGroup>
 
 </Project>

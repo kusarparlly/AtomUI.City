@@ -15,6 +15,5 @@
     <Compile Include="../Shared/ProcessEntryPoint.cs" Link="ProcessEntryPoint.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(AtomUICityCoreEventBusDogfoodPublishAot)' == 'true' And '$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="System.Threading.AccessControl" />
   </ItemGroup>
 </Project>

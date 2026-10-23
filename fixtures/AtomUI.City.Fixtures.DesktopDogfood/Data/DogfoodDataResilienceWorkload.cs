@@ -408,13 +408,15 @@ internal sealed class DogfoodDataResilienceWorkload
                 "PublishInventorySequence",
                 [sent],
                 cancellationToken).ConfigureAwait(false);
+            Require(
+                published.Succeeded && published.Value == sent.Length,
+                $"DTR-11 SignalR sequence publication failed: {published.Error?.Message}");
             await WaitForAsync(
                 () => messages.Count == sent.Length,
                 TimeSpan.FromSeconds(5),
                 "DTR-11 SignalR sequence was not delivered.",
                 cancellationToken).ConfigureAwait(false);
             Require(
-                published.Succeeded && published.Value == sent.Length &&
                 messages.Select(static message => message.Sequence).SequenceEqual([2L, 1L, 2L, 3L]),
                 "DTR-11 SignalR transport hid or reordered duplicate sequence values.");
             Record("DTR-11");
@@ -550,6 +552,7 @@ internal sealed class DogfoodDataResilienceWorkload
                 ConnectionId = connectionId,
                 Endpoint = new Uri(endpoint, "/stress-hub"),
                 Owner = owner,
+                JsonContract = DogfoodSignalRJson.Contract,
                 AccessTokenProvider = () => ValueTask.FromResult<string?>("stress/admin/r10"),
                 ReconnectDelays = reconnectDelays,
             },

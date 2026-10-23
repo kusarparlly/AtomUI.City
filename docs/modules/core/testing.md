@@ -76,9 +76,7 @@ output/bin/Release/AtomUI.City.Core.HeadlessApp/net10.0/win-x64/publish/AtomUI.C
 ```
 
 需要直接复核 `net8.0` Headless 原生程序时，可在 restore/publish 命令中同时覆盖
-`AtomUICityDevelopTargetFramework=net8.0` 与 `AtomUICityTargetFrameworks=net8.0`。测试产品仅在
-`net8.0 + NativeAOT` 条件下引用 `System.Threading.AccessControl`，用于补齐 Generic Host Windows
-EventLog 可达路径的依赖闭包；该引用不会进入 Core 包，也不会进入普通 JIT Headless 构建。
+`AtomUICityDevelopTargetFramework=net8.0` 与 `AtomUICityTargetFrameworks=net8.0`。默认日志集合必须解析出 Console、Debug 与 EventSource provider，且不包含 `EventLogLoggerProvider`；Windows 应用显式调用 `AddEventLog` 后仍应正常注册 EventLog provider。
 
 ## AUC-CORE-005 Core MVP Dogfood 门禁
 
@@ -100,7 +98,7 @@ Windows NativeAOT 门禁同时覆盖 Core 的两个 Release TFM：
 
 该脚本必须使用仓库锁定 SDK，分别发布并运行 `net10.0/win-x64` 与 `net8.0/win-x64`，且发布日志不得出现 `IL2xxx` trimming warning、`IL3xxx` AOT warning 或 ILC `will always throw` 风险。CI 通过独立 Windows matrix job 强制执行。普通 JIT Headless 成功不能替代本门禁。
 
-Core MVP 的 AOT 模式显式引用 `System.Threading.AccessControl`，补齐 Generic Host Windows EventLog 可达路径在 `net8.0` 原生发布中的依赖闭包；普通 JIT 构建不携带该测试产品专用引用。
+Core MVP 与综合 NativeAOT fixture 不得引用 `System.Threading.AccessControl` 掩盖默认闭包问题；普通消费者必须在没有该隐藏依赖时完成双 TFM strict publish/run。
 
 ## 性能基线建设
 

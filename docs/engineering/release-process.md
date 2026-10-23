@@ -27,7 +27,7 @@
 - 对声明 Windows 正式支持的 Presentation 运行真实 desktop、隔离 NuGet consumer 和批准性能 baseline 比较。
 - 对声明 Windows NativeAOT 支持的运行时模块执行持久 runtime matrix：`net8.0/win-x64` 与 `net10.0/win-x64` strict build、真实 NativeAOT publish、原生进程运行和结构化业务断言。
 
-Windows 综合运行时矩阵的固定入口为 `engineering/check-native-aot-runtime-matrix.ps1`；Core、EventBus、Data、Presentation 的专项 fixture/gate 继续提供各自更深的模块边界证据。
+Windows 综合运行时矩阵的固定入口为 `engineering/check-native-aot-runtime-matrix.ps1`。不同宿主边界必须拆分为可独立定位的阻断门禁：综合 Core/runtime matrix、Data 托管本地服务 + 原生协议客户端、Presentation Windows GUI。三类门禁都执行 `net8.0/win-x64` 与 `net10.0/win-x64` strict build、publish、原生进程和结构化断言；任一缺失均不得宣称完整 NativeAOT 通过。
 
 ## 3. 发布流程
 

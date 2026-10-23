@@ -19,6 +19,9 @@ Core、EventBus 和 Data 已有持久的 NativeAOT 验证载体；Presentation �
 6. PluginSystem 在其正式建设和动态/静态插件 AOT 边界完成前不进入“全运行时模块通过”的矩阵结论；tooling-only 的 Build.Tasks、Generators、Templates 和 Testing 不作为运行时 NativeAOT 应用模块验收。
 7. Mvvm、Localization 等已经发现明确 AOT 缺陷的模块，先完成对应设计修复，再把正向路径加入永久矩阵；门禁不得通过 suppression 掩盖未解决诊断。
 8. NativeAOT 结果按 OS/RID 独立声明。Windows 通过不能推导 Linux 或 macOS 通过；后两者必须在对应操作系统的本机工具链上 publish/run 后才能标记 Verified。
+9. Data 必须使用独立托管测试服务和原生客户端覆盖真实 HTTP、gRPC、SignalR 自定义 DTO 请求、返回与推送；descriptor、scheduler 或 primitive smoke 不得替代协议证据。
+10. Presentation 必须把真实 Windows desktop self-test 的双 TFM NativeAOT publish/run 纳入持久门禁；普通 JIT GUI 测试不能替代该证据。
+11. Core 普通消费者和所有综合 fixture 不得通过测试专用 `System.Threading.AccessControl` 引用掩盖默认 EventLog 闭包。
 
 ## 影响
 
@@ -34,7 +37,8 @@ Core、EventBus 和 Data 已有持久的 NativeAOT 验证载体；Presentation �
 - 工程脚本必须在任何 restore、publish、IL 诊断、进程退出或业务断言失败时返回非零。
 - 临时审计程序不能作为长期通过证据；通过结论必须能够由仓库中的固定命令重新生成。
 - 发布报告必须记录 SDK、TFM、RID、OS、配置、包来源以及实际执行的场景集合。
+- CI 应按 Core/综合 runtime、Data 网络协议、Presentation GUI 等宿主边界拆分作业，使失败能够定位到具体闭包；任一作业缺失都不得宣称完整门禁通过。
 
 ## 实施状态
 
-已于 2026-10-23 完成。`fixtures/AtomUI.City.NativeAot.RuntimeMatrix`、场景设计文档和 `engineering/check-native-aot-runtime-matrix.ps1` 已提交；Windows `net8.0/win-x64` 与 `net10.0/win-x64` 均完成 clean NativeAOT publish 和原生业务断言。当前执行机器使用 SDK 10.0.113；仓库正式门禁仍以 `global.json` 钉住的 SDK 为准。
+已于 2026-10-23 完成两阶段施工。综合 Runtime Matrix 已覆盖 Security 文件持久化、Routing DI resolver 和 Localization 已知 `SourceAssembly`；`check-data-native-aot.ps1` 使用托管本地服务与原生客户端验证真实 HTTP、gRPC、SignalR 自定义 DTO invoke/response/push；`check-presentation-native-aot.ps1` 验证真实 Windows GUI。Core MVP 与全部综合 fixture 已移除隐藏 AccessControl 引用。三组门禁均在 `net8.0/win-x64`、`net10.0/win-x64` publish/run 通过并进入 CI。

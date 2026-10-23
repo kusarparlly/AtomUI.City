@@ -25,10 +25,6 @@
     <Compile Include="../Shared/ProcessEntryPoint.cs" Link="ProcessEntryPoint.cs" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(AtomUICityRuntimeMatrixPublishAot)' == 'true' And '$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="System.Threading.AccessControl" />
-  </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Localization/Matrix.en-US.locpack.json"
                       LogicalName="AtomUI.City.NativeAot.RuntimeMatrix.Localization.Matrix.en-US.locpack.json" />

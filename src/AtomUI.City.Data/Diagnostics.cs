@@ -145,6 +145,11 @@ public static class DataDiagnosticIds
     /// Represents the cache invalidation unsupported value.
     /// </summary>
     public const string CacheInvalidationUnsupported = "AUCDATA035";
+
+    /// <summary>
+    /// Represents the signal rpayload metadata missing value.
+    /// </summary>
+    public const string SignalRPayloadMetadataMissing = "AUCDATA036";
 }
 
 /// <summary>

@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.EventLog;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 
@@ -30,12 +29,7 @@ internal sealed class ApplicationHostBuilder : IApplicationHostBuilder
     internal ApplicationHostBuilder(string[] args)
     {
         _args = args.ToArray();
-        _builder = Host.CreateApplicationBuilder(_args);
-
-        if (OperatingSystem.IsWindows())
-        {
-            _builder.Logging.AddFilter<EventLogLoggerProvider>(static _ => false);
-        }
+        _builder = CreatePortableHostBuilder(_args);
 
         _configuration = new GuardedConfigurationManager(
             _builder.Configuration,
@@ -44,6 +38,39 @@ internal sealed class ApplicationHostBuilder : IApplicationHostBuilder
         _services = new GuardedServiceCollection(
             _builder.Services,
             () => _applyingUserServices);
+    }
+
+    private static HostApplicationBuilder CreatePortableHostBuilder(string[] args)
+    {
+        var entryAssemblyName = Assembly.GetEntryAssembly()?.GetName().Name;
+        var environmentName = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+        var builder = Host.CreateEmptyApplicationBuilder(new HostApplicationBuilderSettings
+        {
+            Args = args,
+            ApplicationName = string.IsNullOrWhiteSpace(entryAssemblyName) ? null : entryAssemblyName,
+            EnvironmentName = string.IsNullOrWhiteSpace(environmentName)
+                ? Environments.Production
+                : environmentName,
+            ContentRootPath = Directory.GetCurrentDirectory(),
+        });
+
+        builder.Configuration
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .AddJsonFile(
+                $"appsettings.{builder.Environment.EnvironmentName}.json",
+                optional: true,
+                reloadOnChange: true)
+            .AddEnvironmentVariables();
+        if (args.Length > 0)
+        {
+            builder.Configuration.AddCommandLine(args);
+        }
+
+        builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+        builder.Logging.AddConsole();
+        builder.Logging.AddDebug();
+        builder.Logging.AddEventSourceLogger();
+        return builder;
     }
 
     public IConfigurationManager Configuration => _configuration;

@@ -57,10 +57,12 @@ foreach ($framework in $Frameworks) {
         $result.routeCount -lt 1 -or
         -not $result.securityAllowed -or
         -not $result.securityChallenge -or
+        -not $result.securityPersistence -or
         -not $result.mvvmGeneratedValidation -or
         -not $result.localizationEmbedded -or
         -not $result.localizationFile -or
-        -not $result.localizationInMemory) {
+        -not $result.localizationInMemory -or
+        -not $result.localizationKnownAssembly) {
         throw "City NativeAOT runtime matrix business assertions failed for $framework/$RuntimeIdentifier."
     }
 }

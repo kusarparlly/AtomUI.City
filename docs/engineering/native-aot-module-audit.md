@@ -376,8 +376,8 @@ SuppressTrimAnalysisWarnings=false
 
 第二轮没有发现 P0。排除尚未进入当前版本施工范围的 PluginSystem 后，确认：
 
-- **2 个 P1 生产实现问题**：Core 1 个、Data 1 个；
-- **1 组 P2 验收门禁覆盖问题**；
+- 第二轮最初发现的 **2 个 P1 生产实现问题**（Core、Data）已按 ADR 0022/0023 完成整改；
+- 第二轮最初发现的 **1 组 P2 验收门禁覆盖问题**已按 ADR 0021 完成持久化；
 - EventBus、Localization、Mvvm、Presentation、Routing、Security、State 在本轮 Windows 双 TFM验证边界内没有发现新的生产实现阻断项。
 
 若把 PluginSystem 也纳入全仓统计，则第一轮保留的 CITY-AOT-004/005 仍未解决：installer 的 reflection JSON 在双 TFM 原生进程中确定性失败，动态插件加载也尚未形成 NativeAOT Host 的确定性拒绝与静态插件闭环。它们继续按既定版本计划延期，不计入当前非插件产品范围的两个 P1。
@@ -386,13 +386,13 @@ SuppressTrimAnalysisWarnings=false
 
 | 模块 | 第二轮判定 | 复审结论 |
 |---|---|---|
-| AtomUI.City.Core | **Conditional / P1** | 模块生命周期、generated DI 和显式模块注册均可原生运行；普通 `net8.0` 消费者仍会因 Windows EventLog 依赖闭包产生 `will always throw`。 |
-| AtomUI.City.Data | **Failed / P1（SignalR 默认路径）** | generated descriptor、scheduler 和 cache fingerprint 可原生运行；默认 SignalR JSON 协议处理自定义 payload 时在 `net8.0`、`net10.0` 原生进程中均确定性失败。 |
+| AtomUI.City.Core | **Verified** | empty Generic Host builder 显式恢复可移植配置与 Console/Debug/EventSource；普通消费者不含隐藏 AccessControl，双 TFM Core MVP 无 EventLog ILC 诊断并运行通过。 |
+| AtomUI.City.Data | **Verified** | generated descriptor、scheduler、cache 及真实 HTTP/gRPC/SignalR 自定义 DTO invoke/response/push 均在双 TFM 原生进程通过。 |
 | AtomUI.City.EventBus | **Verified** | generated catalog、6 modules、20 handlers、带 DI 依赖 projector、投递及停止路径双 TFM 原生通过。 |
 | AtomUI.City.Localization | **Verified** | generated/embedded、file、in-memory 以及显式已知 assembly discovery 路径双 TFM 原生通过；没有恢复路径 DLL 动态加载。 |
 | AtomUI.City.Mvvm | **Verified** | 普通 ViewModel 与 generated validation 均使用静态路径，没有运行时反射回退。 |
 | AtomUI.City.PluginSystem | **Deferred / Failed paths retained** | CITY-AOT-004/005 结论不变，等待该模块正式建设。 |
-| AtomUI.City.Presentation | **Verified（Windows）/ Gate incomplete** | `net8.0`、`net10.0` Windows NativeAOT GUI 可执行程序均完成真实 window/outlet/ViewModel lifecycle；原生 GUI 证据尚未完整并入持久发布门禁。 |
+| AtomUI.City.Presentation | **Verified（Windows）** | `net8.0`、`net10.0` Windows NativeAOT GUI 可执行程序均完成真实 window/outlet/ViewModel lifecycle，并已进入持久 CI 门禁。 |
 | AtomUI.City.Routing | **Verified** | generated route 路径和基于 `Type` 的 Guard DI 解析均在原生进程中通过。 |
 | AtomUI.City.Security | **Verified** | source-generated JSON 以及文件凭据保存、读取、删除路径双 TFM 原生通过。 |
 | AtomUI.City.State | **Verified** | registry、write、observe、computed state 的持久 runtime matrix 继续通过。 |
@@ -419,9 +419,11 @@ System.InvalidOperationException: Reflection-based serialization has been disabl
 
 这也是 analyzer clean 不能代替业务原生运行的直接证据：SignalR 的反射序列化风险隐藏在依赖包默认协议内部，City 源码自身可以不产生 IL warning。
 
-现有 `Data.AotApp` 只覆盖 generated descriptor catalog、scheduler 和 cache fingerprint，没有建立真实 HTTP/gRPC/SignalR 数据路径，因此前文把整个 Data 模块标记为 `Verified` 的结论范围过宽。最新结论应拆分为：Data 基础设施路径已验证，默认 SignalR 自定义消息路径失败，Data 模块整体为 `Failed / P1`。
+第二轮审计发现时，`Data.AotApp` 只覆盖 generated descriptor catalog、scheduler 和 cache fingerprint，没有建立真实 HTTP/gRPC/SignalR 数据路径；因此当时把整个 Data 模块标记为 `Verified` 的结论范围过宽，并将 Data 暂时降级为 `Failed / P1`。本节保留该历史发现；修复后的最终状态以本文顶部矩阵和本节后续实施状态为准。
 
 后续设计必须明确业务消息序列化元数据的所有权和注册方式，让应用或模块向 Data 提供 source-generated resolver/context；NativeAOT 下缺少元数据时必须 fail-closed，不能回退到反射序列化。
+
+实施状态（2026-10-23）：已完成 ADR 0022。应用拥有 DTO 与 source-generated JSON 元数据；Data 提供不可变 `SignalRJsonContract` 并强制 `SignalRConnectionOptions` 携带该合同。City 将合同安装到 SignalR JSON protocol，并在 argument、response 和 server message 入口统一预检；CoreCLR 与 NativeAOT 一律 fail-closed。Data 单元测试 `306/306`，真实协议门禁在双 TFM 原生进程全部通过。
 
 ### 12.5 CITY-AOT-R2-002：Core Windows EventLog 仍污染 .NET 8 NativeAOT 闭包（P1）
 
@@ -440,9 +442,11 @@ ILC: Method '[System.Diagnostics.EventLog]...EnterMutexWithoutGlobal' will alway
 Failed to load assembly 'System.Threading.AccessControl'
 ```
 
-生成的程序在当前未触发 EventLog 的启动/停止路径仍可运行，因此这不是已证明的默认启动崩溃；但 City 的 strict gate 明确拒绝 `will always throw`，普通消费者也不应为了 Core 内部默认但被过滤的 Provider 手工补充隐藏依赖，所以最新判定为 `Conditional / P1`。
+第二轮审计发现时，生成的程序在未触发 EventLog 的启动/停止路径仍可运行，因此这不是已证明的默认启动崩溃；但 City 的 strict gate 明确拒绝 `will always throw`，普通消费者也不应为了 Core 内部默认但被过滤的 Provider 手工补充隐藏依赖，所以当时判定为 `Conditional / P1`。本节保留该历史判定；修复后的最终状态以本文顶部矩阵和本节后续实施状态为准。
 
-推荐修复方向是默认真正移除 EventLog Provider，而不是仅添加 filter 或让所有应用携带 Windows 专属依赖。开发者显式启用 EventLog 并不等于必然不支持 NativeAOT；只要目标为 Windows、依赖完整且通过严格原生验证，显式启用路径仍可以支持 NativeAOT，但会扩大平台专属编译闭包。该修复方向仍需在施工前完成最终确认。
+审计裁决的修复方向是默认真正移除 EventLog Provider，而不是仅添加 filter 或让所有应用携带 Windows 专属依赖。开发者显式启用 EventLog 并不等于必然不支持 NativeAOT；只要目标为 Windows、依赖完整且通过严格原生验证，显式启用路径仍可以支持 NativeAOT，但会扩大平台专属编译闭包。该方案已经按 ADR-0023 落地并通过双 TFM 原生门禁。
+
+实施状态（2026-10-23）：已完成 ADR 0023。实践证明普通 builder 创建后再 `ClearProviders` 仍会保留 EventLog 可达闭包，因此最终实现改用 `CreateEmptyApplicationBuilder`，显式恢复可移植配置源及 Console、Debug、EventSource；EventLog 由应用显式 opt-in。全部隐藏 AccessControl 引用已删除，Core 单元测试 `271/271` 和 Core MVP 双 TFM strict NativeAOT publish/run 通过。
 
 ### 12.6 CITY-AOT-R2-003：持久原生门禁尚未覆盖全部已验证业务路径（P2）
 
@@ -457,13 +461,15 @@ Data 的问题进一步证明，只有 descriptor 或辅助组件能够原生运
 
 本项是持续验证可信度问题，不额外计入 Core/Data 的两个生产实现问题。
 
+实施状态（2026-10-23）：已完成 ADR 0021。综合 Core/runtime、Data 真实协议原生客户端、Presentation Windows NativeAOT GUI 已拆分为三个 CI 作业；Security 文件持久化、Routing DI 组件解析和 Localization 已知 SourceAssembly 均进入综合矩阵。三组门禁在双 TFM publish/run 全部通过。
+
 ### 12.7 第二轮发布判定
 
 截至第二轮复审：
 
-- 可以宣称：除明确列出的 Core、Data、PluginSystem 边界外，其余本轮运行时模块的关键路径已取得 Windows `net8.0` / `net10.0` NativeAOT 实证。
-- 不可以宣称：Core 已在普通消费者场景中做到全程 clean NativeAOT publish。
-- 不可以宣称：Data 全部传输能力已支持 NativeAOT；默认 SignalR 自定义消息路径已经被真实证据证明失败。
+- 可以宣称：除按版本计划延期的 PluginSystem 外，本轮运行时模块关键路径已取得 Windows `net8.0` / `net10.0` NativeAOT 实证并进入持久门禁。
+- 可以宣称：Core 普通消费者默认闭包不再包含 EventLog 隐藏依赖，双 TFM strict NativeAOT publish/run clean。
+- 可以宣称：Data 的真实 HTTP、gRPC 和 SignalR source-generated 自定义消息路径已取得双 TFM NativeAOT 实证。
 - 不可以宣称：City 全模块或 PluginSystem 已达到工业级 NativeAOT。
 - 不可以把 analyzer clean、浅层 AOT fixture 或普通 build/test 作为真实业务 NativeAOT 兼容性的替代证明。
 - Linux/macOS 继续保持未验证，不从 Windows 结果外推。
